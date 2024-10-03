@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 8.8.04.003
+* Version 8.8.06.006
 *
 */
 
@@ -464,6 +464,9 @@ global $wppa_cron_maintenance_slugs;
 			}
 		}
 	}
+
+	// Clear url extension cache (for wppa_set sc)
+	delete_option( 'wppa_set' );
 
 	// Done!
 	if ( ! $wppa_error ) {

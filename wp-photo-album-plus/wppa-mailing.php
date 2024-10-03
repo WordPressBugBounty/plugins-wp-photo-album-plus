@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 8.8.05.001
+* Version 8.8.06.003
 *
 */
 
@@ -26,6 +26,7 @@ add_action( 'wppa_do_mailinglist_cron', 'wppa_do_mailinglist', 10, 6 );
 function wppa_schedule_mailinglist( $type, $alb = 0, $pho = 0, $com = 0, $url = '', $start = 0, $delay = 120 ) {
 
 	if ( ! wppa_switch( 'email_on' ) ) return;
+	if ( $type == 'newalbumnotify' ) $delay = 120 * 60; // Give the user an hour to put something in the album
 
 	$log_args = " Args: $alb, $pho, $com, $url, $start.";
 
@@ -304,7 +305,8 @@ global $wpdb;
 						$content .=
 							'<br>' .
 							/* translators: html a tag */
-							sprintf( __( 'You can see the content %1$shere%2$s', 'wp-photo-album-plus' ), '<a href="' . $the_link . '" >', '</a>' );
+							sprintf( __( 'You can see the content %1$shere%2$s', 'wp-photo-album-plus' ), '<a href="' . $the_link . '" >', '</a>' ) .
+							'<br>' . __( 'If there is no content yet: try again later. The creator of the album may need some time to add content', 'wp-photo-album-plus' );
 					}
 
 

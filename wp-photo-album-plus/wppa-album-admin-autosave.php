@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 8.8.05.003
+* Version 8.8.06.002
 *
 */
 
@@ -1760,6 +1760,9 @@ global $wppa_revno;
 									</option>
 									<option value="imagefactory-mcr"' . ( $cover_type == 'imagefactory-mcr' ? $sel : '' ) . ' >' .
 										__( 'Image Factory mcr', 'wp-photo-album-plus' ) . '
+									</option>
+									<option value="titleonly"' . ( $cover_type == 'titleonly' ? $sel : '' ) . ' >' .
+										__( 'Album title only', 'wp-photo-album-plus' ) . '
 									</option>
 								</select>
 							</div>' );

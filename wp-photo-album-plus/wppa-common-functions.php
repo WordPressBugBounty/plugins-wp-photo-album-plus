@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 8.8.05.003
+* Version: 8.8.06.006
 *
 */
 
@@ -80,6 +80,7 @@ global $wppa_version;
 static $first_pla = true;
 global $wppa_current_shortcode;
 global $wppa_current_shortcode_atts;
+//global $wppa_runtime_settings;
 
 	$wppa_current_shortcode = false;
 	$wppa_current_shortcode_atts = false;
@@ -263,6 +264,10 @@ global $wppa_current_shortcode_atts;
 		'meonly' 					=> '',
 		'container-wrapper-class' 	=> '',
 	);
+
+	if ( false && is_array( $wppa_runtime_settings ) ) {
+		$wppa = array_merge( $wppa, $wppa_runtime_settings );
+	}
 }
 
 function wppa_get_randseed( $type = '' ) {
@@ -1605,7 +1610,7 @@ static $cache1, $cache2;
 	$is_many = false;
 	if ( $args['checkarray'] && ! empty( $args['array'] ) ) {
 		$c = count( $args['array'] );
-		if ( wppa_opt( 'photo_admin_max_albums' ) && $c > wppa_opt( 'photo_admin_max_albums' ) ) {
+		if ( wppa_opt( 'photo_admin_max_albums' ) && wppa_opt( 'photo_admin_max_albums' ) > 0 && $c > wppa_opt( 'photo_admin_max_albums' ) ) {
 			$is_many = true;
 		}
 	}

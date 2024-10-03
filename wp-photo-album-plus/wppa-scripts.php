@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 8.8.05.003
+* Version 8.8.06.004
 */
 
 // Place all wppa related js declarations in the header, both admin and frontend
@@ -38,24 +38,27 @@ global $wpdb;
 	// Find ajax url
 	$method = wppa_opt( 'ajax_method' );
 	$can_ajax = 'true';
-	switch ( $method ) {
-		case 'admin':
-			$al = site_url() . '/wp-admin/admin-ajax.php';
-			break;
-		case 'none':
-			$al = site_url() . '/wp-admin/admin-ajax.php';
-			if ( ! is_admin() ) {
-				$can_ajax = 'false';
-			}
-			break;
-		case 'rest':
-			$al = rest_url() . 'wp-photo-album-plus/endPoint';
-			break;
-		case 'redir':
-			$al = ( wppa_switch( 'ajax_home' ) ? home_url() : site_url() ) . '/wppaajax';
-			break;
-		default:
-			$al = site_url() . '/wp-admin/admin-ajax.php';
+	if ( is_admin() ) $al = site_url() . '/wp-admin/admin-ajax.php';
+	else {
+		switch ( $method ) {
+			case 'admin':
+				$al = site_url() . '/wp-admin/admin-ajax.php';
+				break;
+			case 'none':
+				$al = site_url() . '/wp-admin/admin-ajax.php';
+				if ( ! is_admin() ) {
+					$can_ajax = 'false';
+				}
+				break;
+			case 'rest':
+				$al = rest_url() . 'wp-photo-album-plus/endPoint';
+				break;
+			case 'redir':
+				$al = ( wppa_switch( 'ajax_home' ) ? home_url() : site_url() ) . '/wppaajax';
+				break;
+			default:
+				$al = site_url() . '/wp-admin/admin-ajax.php';
+		}
 	}
 	$ajax_url = $al;
 

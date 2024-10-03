@@ -1,17 +1,26 @@
 WP Photo Album Plus Changelog
 
+= 8.8.06 =
+
+* New album cover type added: Title only and Title only mcr.
+* New album notify mails are only sent after one hour to reduce the chance the link from the email points to an empty album.
+* Clearing mailing lists did not work, fixed.
+* Inline setting changes created by the [wppa_set] shortcode are now preserved during ajax calls.
+* Fixed a bug in Supersearch. The supersearch failed to display properly on large sites due to limitation of the max length of a php string that can be output at once.
+* The block version of the Photo Of The Day widget now also uses the links as defined in Basic settings -> Links -> III -> Item 1, or Basic settings -> Photos -> III -> Items 1 and 2.
+
 = 8.8.05 =
 
-* New setting: Basic settings -> Comments -> I -> Item 18: Admin edit link. 
+* New setting: Basic settings -> Comments -> I -> Item 18: Admin edit link.
 Enables edit and delete links below each comment on the slide display for users that have wppa comment admin rights (e.g. administratrs); also for apporved comments.
-So, users with moderate rights can approve or delete pending comments; 
+So, users with moderate rights can approve or delete pending comments;
 users with comment admin rights can approve, delete and edit pending comments, and edit apporoved comments only if the Admin Edit link is enabled.
 Editing comments is on the comment admin page and has also the possibilities to change status and delete comments.
 * The user friendlynbess of the comment admin page has been improved.
-* The iptc and exif import features have been revised. Garbage like undefined tags will no longer be imported. 
-You can rescreen all existing iptc and exif data by maintenance procedure Recuperate on the settings page Advanced settings -> Maintenance -> I -> Item 7. 
+* The iptc and exif import features have been revised. Garbage like undefined tags will no longer be imported.
+You can rescreen all existing iptc and exif data by maintenance procedure Recuperate on the settings page Advanced settings -> Maintenance -> I -> Item 7.
 This may take a while on larger systems; initially all existing iptc and exif data will be cleared before renewal.
-* There are new - better data specs for the wppa specific database tables. Especially for db systems that have rerstrictions in the size of db rows. 
+* There are new - better data specs for the wppa specific database tables. Especially for db systems that have rerstrictions in the size of db rows.
 To enable the new specs, run Advanced settings -> Maintenance -> III -> Item 7: Convert db field specs.
 
 = 8.8.04 =

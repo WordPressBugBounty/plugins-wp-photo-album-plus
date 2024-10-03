@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 8.8.05.003
+* Version: 8.8.06.006
 *
 */
 
@@ -135,6 +135,7 @@ global $wppa_current_shortcode_atts;
 global $albums_used;
 global $photos_used;
 global $other_deps;
+global $wppa_runtime_settings;
 
 	// Init
 	wppa_reset_occurrance();
@@ -162,6 +163,11 @@ global $other_deps;
 	$wppa['anon'] 		= $atts['anon'];
 	$wppa['meonly'] 	= $atts['meonly'];
 	$wppa['container-wrapper-class'] = $atts['class'];
+
+	// Interprete wppa_set settable runtime settings
+	if ( is_array( $wppa_runtime_settings ) ) {
+		$wppa = array_merge( $wppa, $wppa_runtime_settings );
+	}
 
 	// Assume all toplevel albums used when generic
 	if ( $wppa['cache'] && $atts['type'] == 'generic' ) {
@@ -928,27 +934,35 @@ function wppa_set_shortcodes( $xatts, $content = '' ) {
 global $wppa;
 global $wppa_opt;
 global $wppa_runtime_settings;
+global $wppa_url_set_extension;
 
-	if ( ! $wppa_runtime_settings ) {
-		$wppa_runtime_settings = array();
-	}
+	// Init
+	// Runtime settings are applied after occurrance reset
+	if ( ! $wppa_runtime_settings ) $wppa_runtime_settings = array();
+
+	// All option settings are saved for the url
+	if ( ! $wppa_url_set_extension ) $wppa_url_set_extension = '';
 
 	$atts = shortcode_atts( array(
 		'name' 		=> '',
 		'value' 	=> ''
 	), $xatts );
 
-	// Reset?
+	// Reset after an empty [wppa_set] shortcode
 	if ( ! $atts['name'] ) {
 		$wppa_opt = false;
 		wppa_initialize_runtime();
-		wppa_reset_occurrance();
+
+		// Make sure next occ after reset has no mods
 		$wppa_runtime_settings = array();
-		return;
+		$wppa_url_set_extension = '';
+		wppa_reset_occurrance();
 	}
 
 	// Process item $atts
-	wppa_proc_set( $atts );
+	else {
+		wppa_proc_set( $atts );
+	}
 }
 
 // Enable wppa_set shortcode handler
@@ -958,6 +972,7 @@ add_shortcode( 'wppa_set', 'wppa_set_shortcodes' );
 function wppa_proc_set( $item ) {
 global $wppa_opt;
 global $wppa_runtime_settings;
+global $wppa_url_set_extension;
 
 	// Are we enabled?
 	if ( ! wppa_switch( 'enable_shortcode_wppa_set' ) ) {
@@ -967,7 +982,8 @@ global $wppa_runtime_settings;
 
 	// Find out if it is an option or a runtime setting
 	$is_opt = false;
-	$name = $item['name'];
+	$name 	= $item['name'];
+	$value 	= $item['value'];
 	if ( isset( $wppa_opt[$name] ) ) {
 		$is_opt = true;
 	}
@@ -978,13 +994,20 @@ global $wppa_runtime_settings;
 
 	// Option?
 	if ( $is_opt ) {
-		$wppa_opt[$name] = $item['value'];
+		$wppa_opt[$name] = $value;
 	}
 
 	// Runtime setting
 	else {
-		$wppa_runtime_settings[$name] = $item['value'];
+		$wppa_runtime_settings[$name] = $value;
 	}
+
+	// Add it to the extension of the ajax url
+	$wppa_url_set_extension .= "$name=$value&amp;"; // "&wppa-set[$name]=$value";
+
+	// Save
+	wppa_encrypt_set();
+
 }
 
 // Enable simple photo shortcode handler

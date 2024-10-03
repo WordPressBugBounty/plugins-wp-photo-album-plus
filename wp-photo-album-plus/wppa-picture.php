@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 8.8.02.001
+* Version 8.8.06.008
 *
 */
 
@@ -91,8 +91,14 @@ function wppa_get_picture_html( $args ) {
 	}
 
 	// Get other data
-	$link 		= wppa_get_imglnk_a( $type, $id );
-	$isthumb 	= strpos( $type, 'thumb' ) !== false;
+	$linktype = $type;
+
+	if ( wppa( 'in_widget' ) == 'potd' ) {
+		$linktype = 'potdwidget';
+	}
+	$link = wppa_get_imglnk_a( $linktype, $id );
+
+	$isthumb = strpos( $type, 'thumb' ) !== false;
 	if ( $isthumb ) {
 		$file = wppa_get_thumb_path( $id );
 	}

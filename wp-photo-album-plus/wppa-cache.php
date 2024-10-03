@@ -3,7 +3,7 @@
 /*
 /* Contains all wppa smart cache functions
 /*
-/* Version 8.8.05.003
+/* Version 8.8.06.006
 */
 
 // Test for caching
@@ -225,9 +225,9 @@ global $wpdb;
 	}
 
 	// Log making cachefile
-	$extra = '';
+	$extra = ' page = ' . $page . ' occur = ' . wppa( 'mocc' );
 	if ( $remark ) {
-		$extra = ' for {b}' . $remark . '{/b}. ';
+		$extra .= ' for {b}' . $remark . '{/b}. ';
 	}
 	wppa_log( 'fso', 'Writring cachefile ' . str_replace( WPPA_CONTENT_PATH, '...', $file ) . $extra );
 

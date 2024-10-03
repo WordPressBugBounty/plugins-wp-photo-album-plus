@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 8.8.05.003
+* Version: 8.8.06.006
 *
 */
 
@@ -75,6 +75,12 @@ function wppa_album_cover( $id ) {
 			break;
 		case 'grid':
 			wppa_album_cover_grid( $id );
+			break;
+		case 'titleonly':
+			wppa_album_cover_titleonly( $id, false );
+			break;
+		case 'titleonly-mcr':
+			wppa_album_cover_titleonly( $id, true );
 			break;
 		default:
 			$err = 'Unimplemented covertype: ' . $cover_type;
@@ -826,6 +832,199 @@ global $cover_count_key;
 	// Close the album box
 	wppa_out( '</div>' );
 
+}
+
+// The titleonly cover type
+function wppa_album_cover_titleonly( $albumid, $multicolresp = false ) {
+global $cover_count_key;
+
+	// Poging 2
+	// Init
+	$album 	= wppa_cache_album( $albumid );
+
+	// Multi column responsive?
+	if ( $multicolresp ) $mcr = 'mcr-'; else $mcr = '';
+
+	// Find album details
+	$coverphoto = wppa_get_coverphoto_id( $albumid );
+	$image 		= wppa_cache_photo( $coverphoto );
+	$photocount = wppa_get_visible_photo_count( $albumid );
+	$albumcount = wppa_get_visible_album_count( $albumid );
+
+	// Init links
+	$title 				= '';
+	$linkpage 			= '';
+	$href_title 		= '';
+	$href_slideshow 	= '';
+	$onclick_title 		= '';
+	$onclick_slideshow 	= '';
+
+	// See if there is substantial content to the album
+	$has_content = $albumcount || $photocount;
+
+	// What is the albums title linktype
+	$linktype = $album['cover_linktype'];
+
+	// If not specified, use default
+	if ( ! $linktype ) {
+		$linktype = 'content';
+	}
+
+	// What is the albums title linkpage
+	$linkpage = $album['cover_linkpage'];
+
+	// Fix backward compatibility issue
+	if ( $linkpage == '-1' ) {
+		$linktype = 'none';
+	}
+
+	// Find the cover title href, onclick and title
+	$title_attr 	= wppa_get_album_title_attr_a( 	$albumid,
+													$linktype,
+													$linkpage,
+													$has_content,
+													$coverphoto,
+													$photocount
+												);
+	$href_title 	= $title_attr['href'];
+	$onclick_title 	= $title_attr['onclick'];
+	$title 			= $title_attr['title'];
+
+	// Find the slideshow link and onclick
+	$href_slideshow = wppa_get_slideshow_url( array( 'album' => $albumid,
+													 'page' => $linkpage ) );
+	$ajax_slideshow = wppa_get_slideshow_url_ajax( array( 'album' => $albumid,
+														  'page' => $linkpage ) );
+	if ( ! $linkpage ) {
+		$onclick_slideshow = "wppaDoAjaxRender( " . wppa( 'mocc' ) . ", '" . $ajax_slideshow . "', '" . $href_slideshow . "' )";
+		$href_slideshow = "#";
+	}
+
+	// Find the coverphoto link
+	if ( $coverphoto ) {
+		$photolink = wppa_get_imglnk_a( 	'coverimg',
+											$coverphoto,
+											$href_title,
+											$title,
+											$onclick_title,
+											'',
+											$albumid
+										);
+	}
+	else {
+		$photolink = false;
+	}
+
+	// Find the coverphoto details
+	if ( $coverphoto ) {
+		$path 		= wppa_get_thumb_path( 	$coverphoto );
+		$imgattr_a 	= wppa_get_imgstyle_a( 	$coverphoto,
+											$path,
+											wppa_opt( 'smallsize' ),
+											'',
+											'cover'
+										);
+		$src 		= wppa_get_thumb_url( 	$coverphoto,
+											true,
+											'',
+											$imgattr_a['width'],
+											$imgattr_a['height'],
+											wppa_switch( 'cover_use_thumb' )
+										);
+	}
+
+	// No coverphoto
+	else {
+		$path 		= '';
+		$imgattr_a 	= false;
+		$src 		= '';
+	}
+
+	// Feed?
+	if ( is_feed() ) {
+		$events  	= '';
+	}
+	else {
+		$events 	= wppa_get_imgevents( 'cover' );
+	}
+
+	// Is cover a-symmetric ?
+	$photo_pos = wppa( 'coverphoto_pos' );
+	if ( $photo_pos == 'left' || $photo_pos == 'right' ) {
+		$class_asym = 'wppa-asym-text-frame-' . $mcr . wppa( 'mocc' );
+	}
+	else {
+		$class_asym = '';
+	}
+
+	// Set up album cover style
+	$style =  '';
+	if ( is_feed() ) {
+		$style .= ' padding:7px;';
+	}
+
+	$style .= wppa_get_cover_width( 'cover' );
+
+	if ( $cover_count_key == 'm' ) {
+		$style .= 'margin-left: 8px;';
+	}
+	elseif ( $cover_count_key == 'r' ) {
+		$style .= 'float:right;';
+	}
+	else {
+		$style .= 'clear:both;';
+	}
+
+	// keep track of position
+	wppa_step_covercount( 'cover' );
+
+	// Open the album box
+	wppa_out( '
+	<div
+		id="album-' . $albumid . '-' . wppa( 'mocc' ) . '"
+		class="wppa-album-cover-standard album wppa-box wppa-cover-box wppa-cover-box-' . $mcr . wppa( 'mocc' ) . '"
+		style="' . $style . '"
+		>' );
+
+	// Open the Cover text frame
+	$textframestyle = wppa_get_text_frame_style( $photo_pos, 'cover' );
+	wppa_out( '
+	<div
+		id="covertext_frame_' . $albumid . '_' . wppa( 'mocc' ) . '"
+		class="wppa-text-frame-' . wppa( 'mocc' ) . ' wppa-text-frame wppa-cover-text-frame ' . $class_asym . '" ' .
+		$textframestyle . '>' );
+
+	// The Album title
+	if ( $photolink ) {
+		$target = '_self';
+	}
+	else {
+		$target = '';
+	}
+	wppa_the_album_title( 	$albumid,
+							$href_title,
+							$onclick_title,
+							$title,
+							$target
+						);
+
+	// Close the Cover text frame
+	if ( $photo_pos == 'left' ) {
+		wppa_out( '
+		</div>
+		<div style="clear:both"></div>' );
+	}
+
+	// Close the Cover text frame
+	if ( $photo_pos != 'left' ) {
+		wppa_out( '</div>' );
+	}
+
+	// Prepare for closing
+	wppa_out( '<div style="clear:both;"></div>' );
+
+	// Close the album box
+	wppa_out( '</div>' );
 }
 
 // A single coverphoto
@@ -1769,11 +1968,15 @@ function wppa_album_cover_view_link( $id ) {
 	wppa_out( '</div>' );
 }
 
-function wppa_the_album_title( $alb, $href_title, $onclick_title, $title, $target ) {
+function wppa_the_album_title( $alb, $href_title, $onclick_title, $title, $target, $float_count = false ) {
 
 	$album = wppa_cache_album( $alb );
 
 	$album_title = wppa_get_album_name( $alb );
+
+	if ( $float_count ) {
+		wppa_out( '<div style="width:90%;float:left;">' );
+	}
 
 	wppa_out( '<h2 class="wppa-title" style="clear:none;">' );
 
@@ -1805,8 +2008,14 @@ function wppa_the_album_title( $alb, $href_title, $onclick_title, $title, $targe
 		}
 	wppa_out( '</h2>' );
 
+	if ( $float_count ) {
+		wppa_out( '</div>' );
+		wppa_out( '<div style="width:9%;float:right;">' );
+	}
+
 	// Photo count?
 	if ( wppa_opt( 'count_on_title' ) != '-none-' ) {
+		$cnt = 0;
 		if ( wppa_opt( 'count_on_title' ) == 'self' ) {
 			$cnt = wppa_get_visible_photo_count( $alb );
 		}
@@ -1884,7 +2093,7 @@ function wppa_the_album_title( $alb, $href_title, $onclick_title, $title, $targe
 				href="' . $href . '"
 				target="_blank"
 				class="wppa-cover-album-id"
-				style="cursor:pointer"
+				style="cursor:pointer;'.($float_count ? 'float:right;' : '').'"
 				title="' . esc_attr( __( 'Edit Album', 'wp-photo-album-plus' ) ) . '"
 				>
 				(' . $alb . ')
@@ -1894,7 +2103,7 @@ function wppa_the_album_title( $alb, $href_title, $onclick_title, $title, $targe
 			$album_id = '
 			<span
 				class="wppa-cover-album-id"
-				style="cursor:help"
+				style="cursor:help;'.($float_count ? 'float:right;' : '').'"
 				title="' . esc_attr( __( 'Album id', 'wp-photo-album-plus' ) ) . '"
 				>
 				(' . $alb . ')
@@ -1905,6 +2114,9 @@ function wppa_the_album_title( $alb, $href_title, $onclick_title, $title, $targe
 		$album_id = '';
 	}
 	wppa_out( $album_id );
+	if ( $float_count ) {
+		wppa_out( '</div>' );
+	}
 }
 
 function wppa_albumcover_sublinks( $id, $width, $rsp ) {

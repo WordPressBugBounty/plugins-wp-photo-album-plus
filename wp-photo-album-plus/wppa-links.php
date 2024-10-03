@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 8.8.05.003
+* Version: 8.8.06.006
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 function wppa_get_permalink( $key = '', $plain = false ) {
 global $wppa_lang;
 global $wppa_locale;
+global $wppa_url_set_extension;
 
 	if ( ! $key && is_search() ) $key = wppa_opt( 'search_linkpage' );
 
@@ -81,24 +82,20 @@ global $wppa_locale;
 
 	if ( $wppa_lang ) {	// If lang in querystring: keep it
 		if ( strpos( $pl, 'lang=' ) === false ) { 	// Not yet
-			if ( $key == 'js' ) $pl .= 'lang=' . $wppa_lang . '&';
-			else $pl .= 'lang=' . $wppa_lang . '&amp;';
+			$pl .= 'lang=' . $wppa_lang . '&amp;';
 		}
 	}
 
 	if ( wppa( 'is_rootsearch' ) ) {
-		if ( $key == 'js' ) $pl .= 'rootsearch=1&';
-		else $pl .= 'rootsearch=1&amp;';
+		$pl .= 'rootsearch=1&amp;';
 	}
 
 	if ( wppa_is_virtual() ) {
-		if ( $key == 'js' ) $pl .= 'vt=1&';
-		else $pl .= 'vt=1&amp;';
+		$pl .= 'vt=1&amp;';
 	}
 
  	if ( wppa( 'cache' ) ) {
-		if ( $key == 'js' ) $pl .= 'cache=1&';
-		else $pl .= 'cache=1&amp;';
+		$pl .= 'cache=1&amp;';
 	}
 
 	if ( wppa_is_anon() ) {
@@ -107,6 +104,14 @@ global $wppa_locale;
 
 	if ( wppa_is_meonly() ) {
 		$pl .= 'meonly=1&amp;';
+	}
+	
+	if ( $wppa_url_set_extension ) {
+		$pl .= wppa_encrypt_set() . '&amp;';
+	}
+	
+	if ( $key == 'js' ) {
+		$pl = str_replace( '&amp;', '&' );
 	}
 
 	return $pl;
@@ -117,6 +122,7 @@ function wppa_get_ajaxlink( $key = '', $deltamoccur = '0' ) {
 global $wppa_lang;
 global $wppa_locale;
 global $wppa_runtime_settings;
+global $wppa_url_set_extension;
 
 	if ( ! $key && is_search() ) $key = wppa_opt( 'search_linkpage' );
 
@@ -173,19 +179,16 @@ global $wppa_runtime_settings;
 
 	if ( $wppa_lang ) {	// If lang in querystring: keep it
 		if ( strpos($al, 'lang=') === false ) { 	// Not yet
-			if ( $key == 'js' ) $al .= '&lang=' . $wppa_lang;
-			else $al .= '&amp;lang=' . $wppa_lang;
+			$al .= '&amp;lang=' . $wppa_lang;
 		}
 	}
 
 	if ( wppa( 'is_rootsearch' ) ) {
-		if ( $key == 'js' ) $al .= '&rootsearch=1';
-		else $al .= '&amp;rootsearch=1';
+		$al .= '&amp;rootsearch=1';
 	}
 
 	if ( wppa_is_virtual() ) {
-		if ( $key == 'js' ) $al .= '&vt=1';
-		else $al .= '&amp;vt=1';
+		$al .= '&amp;vt=1';
 	}
 
 	if ( wppa( 'cache' ) ) {
@@ -200,14 +203,17 @@ global $wppa_runtime_settings;
 		$al .= '&amp;meonly=1';
 	}
 
-	if ( is_array( $wppa_runtime_settings ) ) {
-		foreach( array_keys( $wppa_runtime_settings ) as $key ) {
-			$value = $wppa_runtime_settings[$key];
-			$al .= '&amp;' . $key . '=' . $value;
-		}
+	if ( $wppa_url_set_extension ) {
+		$al .= '&amp;' . wppa_encrypt_set();
 	}
 
-	return $al.'&amp;';
+	$al .= '&amp;';
+	
+	if ( $key == 'js' ) {
+		$al = str_replace( '&amp;', '&', $al );
+	}
+
+	return $al;
 }
 
 // get page url of current album image
@@ -492,6 +498,9 @@ function wppa_convert_from_pretty( $uri ) {
 				case 'ps':
 					$deltauri = 'wppa-photos=';
 					break;
+				case 'st':
+					$deltauri = 'wppa-set=';
+					break;
 
 				default:
 					$deltauri = '';
@@ -508,7 +517,7 @@ function wppa_convert_from_pretty( $uri ) {
 	}
 
 	$newuri = wppa_trim_wppa_( $newuri );
-	if ( $garbage ) {
+	if ( false && $garbage ) {
 		if ( strpos( $newuri, '?' ) === false ) {
 			$newuri .= '?' . $garbage;
 		}
@@ -522,6 +531,7 @@ function wppa_convert_from_pretty( $uri ) {
 
 // Pretty links Encode
 function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
+global $wppa_url_set_extension;
 
 	// Make local copy, decompresse
 	$uri = $xuri;
@@ -584,6 +594,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 					'catbox',
 					'potdhis',
 					'photos',
+					'set',
 					);
 
 	$uri = $parts[0] . '?';
@@ -669,6 +680,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 						'catbox',
 						'potdhis',
 						'photos',
+						'set',
 					);
 	if ( count($args) > 0 ) {
 		foreach ( $args as $arg ) {
@@ -710,6 +722,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 					case 'catbox': 			$newuri .= 'cb'; break;
 					case 'potdhis': 		$newuri .= 'ph'; break;
 					case 'photos': 			$newuri .= 'ps'; break;
+					case 'set': 			$newuri .= 'st'; break;
 					default: wppa_log( 'err', sprintf( 'err', 'Unimplemented code %s encountered in wppa_convert_to_pretty()', $code ) );
 				}
 				if ( $val !== false ) {
@@ -718,6 +731,10 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 				}
 			}
 		}
+	}
+	
+	if ( false && $wppa_url_set_extension ) {
+		$newuri .= '?' . $wppa_url_set_extension;
 	}
 
 	return $newuri;

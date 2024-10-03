@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 8.8.05.003
+* Version: 8.8.06.007
 *
 */
 
@@ -359,8 +359,11 @@ global $other_deps;
 		}
 
 		elseif ( wppa( 'is_landing' ) && ! wppa( 'src' ) ) {
+			wppa_container( 'open' );
+			wppa_container( 'close' );
+			$out = wppa( 'out' );
 			wppa_reset_occurrance();
-			return '';	// Do nothing on a landing page without a querystring while it is also not a search operation
+			return $out;
 		}
 		// End direct handled
 

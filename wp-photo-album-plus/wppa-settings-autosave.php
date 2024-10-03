@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 8.8.05.003
+* Version: 8.8.06.005
 *
 */
 
@@ -1779,6 +1779,8 @@ global $wppa_hide_this;
 									__('Long Descriptions mcr', 'wp-photo-album-plus' ),
 									__('Image Factory mcr', 'wp-photo-album-plus' ),
 									__('Grid with images only', 'wp-photo-album-plus' ),
+									__('Album title only', 'wp-photo-album-plus' ),
+									__('Album title only mcr', 'wp-photo-album-plus' ),
 								);
 					$vals = array(	'default',
 									'longdesc',
@@ -1787,6 +1789,8 @@ global $wppa_hide_this;
 									'longdesc-mcr',
 									'imagefactory-mcr',
 									'grid',
+									'titleonly',
+									'titleonly-mcr',
 								);
 					$html = wppa_select($slug, $opts, $vals);
 					wppa_setting_new($slug, '4', $name, $desc, $html, $help);

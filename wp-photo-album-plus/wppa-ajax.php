@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 8.8.05.003
+* Version: 8.8.06.007
 *
 */
 
@@ -48,6 +48,7 @@ global $wppa_session;
 global $wppa_log_file;
 global $wppa_opt;
 global $wppa;
+global $wppa_url_set_extension;
 
 	wppa( 'ajax', true );
 	if ( ! defined( 'DOING_WPPA_AJAX' ) ) {
@@ -72,15 +73,23 @@ global $wppa;
 		wppa_log( 'ajax', 'Script = ' . basename( wppa_script_filename() ) . ', Args = ' . var_export($_REQUEST,true) );
 	}
 
+/*
 	// Any runtime modifyable settings?
 	foreach( array_keys( $_GET ) as $key ) {
 		$value = isset( $_GET[$key] ) ? sanitize_text_field( wp_unslash( $_GET[$key] ) ) : '';
-		if ( substr( $key, 0, 5 ) == 'wppa_' ) {
-			if ( isset( $wppa_opt[$key] ) ) {
-				$wppa_opt[$key] = $value;
+		if ( ! substr( $key, 0, 5 ) == 'wppa_' ) {
+			if ( isset( $wppa[$key] ) ) {
+				$wppa[$key] = $value;
+wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
+			}
+			else {
+				$key = 'wppa_' . $key;
 			}
 		}
 	}
+*/
+	// Interprete encrypted wppa_set settings
+	wppa_decrypt_set();
 
 	switch ( $wppa_action ) {
 		case 'log':

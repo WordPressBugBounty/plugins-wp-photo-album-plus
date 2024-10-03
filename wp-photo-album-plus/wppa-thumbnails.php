@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 8.8.05.003
+* Version: 8.8.06.002
 *
 */
 
@@ -1187,13 +1187,13 @@ function wppa_get_thumb_masonry( $id ) {
 		// Landscape?
 		if ( $imgwidth > $imgheight ) {
 			$popwidth 	= wppa_opt( 'popupsize' );
-			$popheight 	= round( $popwidth * $imgheight / $imgwidth );
+			$popheight 	= round( intval( $popwidth ) * intval( $imgheight ) / intval( $imgwidth ) );
 		}
 
 		// Portrait
 		else {
 			$popheight 	= wppa_opt( 'popupsize' );
-			$popwidth 	= round( $popheight * $imgwidth / $imgheight );
+			$popwidth 	= round( intval( $popheight ) * intval( $imgwidth ) / intval( $imgheight ) );
 		}
 	}
 

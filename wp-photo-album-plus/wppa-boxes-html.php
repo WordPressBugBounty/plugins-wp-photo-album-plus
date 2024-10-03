@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 8.8.05.001
+* Version 8.8.06.010
 *
 */
 
@@ -780,21 +780,27 @@ global $wppa_session;
 
 // The supersearch box
 function wppa_supersearch_box() {
+global $wppa;
 
 	if ( is_feed() ) return;
 
 	wppa_container( 'open' );
+	wppa_echo( $wppa['out'] );
+	$wppa['out'] = '';
 
-	wppa_out( '
+	wppa_echo( '
 		<div
 			id="wppa-search-' . wppa( 'mocc' ) . '"
 			class="wppa-box wppa-search"
-			>' .
-			wppa_get_supersearch_html() . '
+			>' );
+			wppa_get_supersearch_html();
+	wppa_echo( '
 			<div class="wppa-clear" ></div>
 		</div>' );
 
 	wppa_container( 'close' );
+	wppa_echo( $wppa['out'] );
+	$wppa['out'] = '';
 }
 
 // Get supersearch html
@@ -959,7 +965,7 @@ global $photos_used;
 
 	// Make the html
 	$id = 'wppa_searchform_' . $mocc;
-	$result = '
+	wppa_echo( '
 	<form
 		id="' . $id . '"
 		action="'.$pagelink.'"
@@ -971,11 +977,11 @@ global $photos_used;
 			id="wppa-ss-pageurl-' . $mocc . '"
 			name="wppa-ss-pageurl"' .
 			' value="'.$pagelink.'"' .
-		' />';
+		' />' );
 
 		// album or photo
 		$id = 'wppa-ss-pa-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-2"
@@ -997,11 +1003,11 @@ global $photos_used;
 				>' .
 				__('Photos', 'wp-photo-album-plus' ) . '
 			</option>
-		</select>';
+		</select>' );
 
 		// album
 		$id = 'wppa-ss-albumopt-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-' . ( ! empty( $catlist ) ? '3' : '2' ) . '"
@@ -1010,17 +1016,17 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ');"
 			onwheel="event.stopPropagation();"
 			size="' . ( ! empty( $catlist ) ? '3' : '2' ) . '"
-			>';
+			>' );
 			if ( ! empty( $catlist ) ) {
-				$result .= '
+				wppa_echo( '
 				<option
 					value="c"' .
 					( $ss_data['0'] == 'a' && $ss_data['1'] == 'c' ? ' selected' : '' ) . '
 					>' .
 					__( 'Category', 'wp-photo-album-plus' ) . '
-				</option>';
+				</option>' );
 			}
-			$result .= '
+			wppa_echo( '
 			<option
 				value="n"' .
 				( $ss_data['0'] == 'a' && $ss_data['1'] == 'n' ? ' selected' : '' ) . '
@@ -1033,12 +1039,12 @@ global $photos_used;
 				>' .
 				__( 'Text', 'wp-photo-album-plus' ) . '
 			</option>
-		</select>';
+		</select>' );
 
 		// album category
 		if ( ! empty( $catlist ) ) {
 			$id = 'wppa-ss-albumcat-' . $mocc;
-			$result .= '
+			wppa_echo( '
 			<select
 				id="' . $id . '"
 				class="wppa-supersearch-' . ( min( count( $catlist ), '6' ) ) . '"
@@ -1051,25 +1057,24 @@ global $photos_used;
 				title="' .
 					esc_attr( __( 'CTRL+Click to add/remove option.', 'wp-photo-album-plus' ) ) .
 					esc_attr( __( 'Items must meet all selected options.', 'wp-photo-album-plus' ) ) . '"
-				>';
+				>' );
 				foreach ( array_keys( $catlist ) as $cat ) {
 					$sel = in_array ( $cat, $ss_cats );
-					$result .= '
+					wppa_echo( '
 					<option
 						value="' . $cat . '"
 						class="' . $id . '"' .
 						( $sel ? ' selected' : '' ) . '
 						>' .
 						$cat . '
-					</option>';
+					</option>' );
 				}
-			$result .= '
-			</select>';
+			wppa_echo( '</select>' );
 		}
 
 		// album name
 		$id = 'wppa-ss-albumname-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-' . ( min( count( $albums ), '6' ) ) . '"
@@ -1078,24 +1083,23 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ');"
 			onwheel="event.stopPropagation();"
 			size="' . ( min( count( $albums ), '6' ) ) . '"
-			>';
+			>' );
 			foreach ( $albums as $album ) {
 				$name = stripslashes( $album['name'] );
 				$sel = ( $ss_data['3'] == $name && $ss_data['0'] == 'a' && $ss_data['1'] == 'n' );
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . esc_attr( $name ) . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					wppa_translate( $name ) . '
-				</option>';
+				</option>' );
 			}
-		$result .=
-		'</select>';
+		wppa_echo( '</select>' );
 
 		// album text
 		$id = 'wppa-ss-albumtext-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-' . ( min( count( $albumtxt ), '6' ) ) . '"
@@ -1108,21 +1112,20 @@ global $photos_used;
 			title="' .
 				esc_attr( __( 'CTRL+Click to add/remove option.', 'wp-photo-album-plus' ) ) .
 				esc_attr( __( 'Items must meet all selected options.', 'wp-photo-album-plus' ) ) . '"
-			>';
+			>' );
 			foreach ( $albumtxt as $txt ) {
 				$text = $txt['slug'];
 				$sel = in_array ( $text, $ss_atxt );
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . $text . '"
 					class="' . $id . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					$text . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// photo
 		$n = '1' +
@@ -1131,7 +1134,7 @@ global $photos_used;
 			'1' +
 			( wppa_switch( 'save_iptc' ) ) +
 			( wppa_switch( 'save_exif' ) );
-		$result .= '
+		wppa_echo( '
 		<select
 			id="wppa-ss-photoopt-' . $mocc . '"
 			class="wppa-supersearch-' . $n . '"
@@ -1146,56 +1149,55 @@ global $photos_used;
 				( $ss_data['0'] == 'p' && $ss_data['1'] == 'n' ? 'selected ' : '' ) . '
 				>' .
 				__( 'Name', 'wp-photo-album-plus' ) . '
-			</option>';
+			</option>' );
 			if ( count( $ownerlist ) > '1' ) {
-				$result .= '
+				wppa_echo( '
 				<option
 					value="o"' .
 					( $ss_data['0'] == 'p' && $ss_data['1'] == 'o' ? 'selected ' : '' ) . '
 					>' .
 						__( 'Owner', 'wp-photo-album-plus' ) . '
-				</option>';
+				</option>' );
 			}
 			if ( ! empty( $taglist ) ) {
-				$result .= '
+				wppa_echo( '
 				<option
 					value="g"' .
 					( $ss_data['0'] == 'p' && $ss_data['1'] == 'g' ? 'selected ' : '' ) . '
 					>' .
 					__( 'Tag', 'wp-photo-album-plus' ) . '
-				</option>';
+				</option>' );
 			}
-			$result .= '
+			wppa_echo( '
 			<option' . '
 				value="t"' .
 				( $ss_data['0'] == 'p' && $ss_data['1'] == 't' ? 'selected ' : '' ) . '
 				>' .
 				__( 'Text', 'wp-photo-album-plus' ) . '
-			</option>';
+			</option>' );
 			if ( wppa_switch( 'save_iptc' ) ) {
-				$result .= '
+				wppa_echo( '
 				<option
 					value="i"' .
 					( $ss_data['0'] == 'p' && $ss_data['1'] == 'i' ? 'selected ' : '' ) . '
 					>' .
 					__( 'Iptc', 'wp-photo-album-plus' ) . '
-				</option>';
+				</option>' );
 			}
 			if ( wppa_switch( 'save_exif' ) ) {
-				$result .= '
+				wppa_echo( '
 				<option
 					value="e"' .
 					( $ss_data['0'] == 'p' && $ss_data['1'] == 'e' ? 'selected ' : '' ) . '
 					>' .
 					__( 'Exif', 'wp-photo-album-plus' ) . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// photo name
 		$id = 'wppa-ss-photoname-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-' . min( count( $photonames ), '6' ) . '"
@@ -1204,24 +1206,23 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ');"
 			onwheel="event.stopPropagation();"
 			size="' . min( count( $photonames ), '6' ) . '"
-			>';
+			>' );
 			foreach ( $photonames as $photo ) {
 				$name = stripslashes( $photo['name'] );
 				$sel = ( $ss_data['3'] == $name && $ss_data['0'] == 'p' && $ss_data['1'] == 'n' );
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . esc_attr( $photo['name'] ) . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					wppa_translate( $name ) . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// photo owner
 		$id = 'wppa-ss-photoowner-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-' . min( count( $ownerlist ), '6' ) . '"
@@ -1230,25 +1231,24 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ');"
 			onwheel="event.stopPropagation();"
 			size="' . ( min( count( $ownerlist ), '6' ) ) . '"
-			>';
+			>' );
 			foreach ( $ownerlist as $photo ) {
 				$owner = $photo['owner'];
 				$sel = ( $ss_data['3'] == $owner && $ss_data['0'] == 'p' && $ss_data['1'] == 'o' );
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . $owner . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					$owner . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// photo tag
 		if ( ! empty( $taglist ) ) {
 			$id = 'wppa-ss-phototag-' . $mocc;
-			$result .= '
+			wppa_echo( '
 			<select
 				id="' . $id . '"
 				class="wppa-supersearch-' . min( count( $taglist ), '6' ) . '"
@@ -1261,25 +1261,24 @@ global $photos_used;
 				title="' .
 					esc_attr( __( 'CTRL+Click to add/remove option.', 'wp-photo-album-plus' ) ) .
 					esc_attr( __( 'Items must meet all selected options.', 'wp-photo-album-plus' ) ) . '"
-				>';
+				>' );
 				foreach ( array_keys( $taglist ) as $tag ) {
 					$sel = in_array ( $tag, $ss_tags );
-					$result .= '
+					wppa_echo( '
 					<option
 						value="'.$tag.'"
 						class="' . $id . '"' .
 						( $sel ? ' selected' : '' ) . '
 						>' .
 						$tag . '
-					</option>';
+					</option>' );
 				}
-			$result .= '
-			</select>';
+			wppa_echo( '</select>' );
 		}
 
 		// photo text
 		$id = 'wppa-ss-phototext-' . $mocc;
-		$result .= '
+		wppa_echo( '
 		<select
 			id="' . $id . '"
 			class="wppa-supersearch-' . min( count( $phototxt ), '6' ) . '"
@@ -1292,24 +1291,23 @@ global $photos_used;
 			title="' .
 				esc_attr( __( 'CTRL+Click to add/remove option.', 'wp-photo-album-plus' ) ) .
 				esc_attr( __( 'Items must meet all selected options.', 'wp-photo-album-plus' ) ) . '"
-			>';
+			>' );
 			foreach ( $phototxt as $txt ) {
 				$text 	= $txt['slug'];
 				$sel 	= in_array ( $text, $ss_ptxt );
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . $text . '"
 					class="' . $id . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					$text . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// photo iptc
-		$result .= '
+		wppa_echo( '
 		<select
 			id="wppa-ss-photoiptc-' . $mocc . '"
 			class="wppa-supersearch-' . min( count( $iptclist ), '6' ) . '"
@@ -1318,24 +1316,23 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ');"
 			onwheel="event.stopPropagation();"
 			size="' . min( count( $iptclist ), '6' ) . '"
-			>';
+			>' );
 			$reftag = str_replace( 'H', '#', $ss_data['2'] );
 			foreach ( $iptclist as $item ) {
 				$tag = $item['tag'];
 				$sel = ( $reftag == $tag && $ss_data['0'] = 'p' && $ss_data['1'] == 'i' );
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . $tag . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					rtrim( wppa_translate( $item['description'], 'wp-photo-album-plus' ), " \n\r\t\v\0:" ) . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// Iptc items
-		$result .= '
+		wppa_echo( '
 		<select
 			id="wppa-ss-iptcopts-' . $mocc . '"
 			class="wppa-supersearch-6"
@@ -1345,10 +1342,10 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ')"
 			onwheel="event.stopPropagation();"
 			>
-		</select>';
+		</select>' );
 
 		// photo exif
-		$result .= '
+		wppa_echo( '
 		<select
 			id="wppa-ss-photoexif-' . $mocc . '"
 			class="wppa-supersearch-6"
@@ -1357,7 +1354,7 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ');"
 			onwheel="event.stopPropagation();"
 			size="' . min( count( $exiflist ), '6' ) . '"
-			>';
+			>' );
 			$reftag = str_replace( 'H', '#', $ss_data['2'] );
 
 			// Process all tags
@@ -1391,19 +1388,18 @@ global $photos_used;
 				$desc = $item['desc'];
 				$sel = ( $reftag == $tag && $ss_data['0'] == 'p' && $ss_data['1'] == 'e' );
 
-				$result .= '
+				wppa_echo( '
 				<option
 					value="' . $tag . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					$desc . '
-				</option>';
+				</option>' );
 			}
-		$result .= '
-		</select>';
+		wppa_echo( '</select>' );
 
 		// Exif items
-		$result .= '
+		wppa_echo( '
 		<select
 			id="wppa-ss-exifopts-' . $mocc . '"
 			class="wppa-supersearch-6"
@@ -1413,18 +1409,18 @@ global $photos_used;
 			onchange="wppaSuperSearchSelect(' . $mocc . ')"
 			onwheel="event.stopPropagation();"
 			>
-		</select>';
+		</select>' );
 
 		// The spinner
-		$result .= '
+		wppa_echo( '
 		<img
 			id="wppa-ss-spinner-' . $mocc . '"
 			src="' . wppa_get_imgdir() . '/spinner.gif' . '"
 			style="margin:0 4px;display:none;"
-		/>';
+		/>' );
 
 		// The button
-		$result .= '
+		wppa_echo( '
 		<input
 			type="button"
 			id="wppa-ss-button-' . $mocc . '"
@@ -1433,12 +1429,10 @@ global $photos_used;
 			value="' . __( 'Submit', 'wp-photo-album-plus' ) . '"
 			style="vertical-align:top;margin:2px;display:none;"
 			onclick="wppaSuperSearchSelect(' . $mocc . ' , true)"
-		/>';
+		/>' );
 
-	$result .= '
-	</form>';
+	wppa_echo( '</form>' );
 
-	return $result;
 }
 
 // Superview box
@@ -1925,6 +1919,7 @@ function wppa_get_multitag_html( $nperline = '2', $seltags = '' ) {
 // Make html for sharebox
 function wppa_get_share_html( $id, $key = '', $js = true, $single = false ) {
 global $wppa_locale;
+global $wppa_fb_init_done;
 
 	$p = wppa_get_the_id();
 	$p_void = explode( ',', wppa_opt( 'sm_void_pages' ) );
@@ -2270,11 +2265,9 @@ global $wppa_locale;
 	}
 
 	// Need init?
-	if ( $need_fb_init ) {
-
+	if ( $need_fb_init && ! $wppa_fb_init_done ) {
 		wppa_js( 'jQuery(document).ready(function(){wppaFbInit();});' );
-
-		$need_fb_init = false;
+		$wppa_fb_init_done = true;
 	}
 
 	return '<div class="wppa-share-' . $key . '" >' . $qr . $tw . $pi . $li . $fb . '<div style="clear:both"></div></div>';
@@ -2284,6 +2277,7 @@ global $wppa_locale;
 function wppa_get_share_page_html() {
 global $wppa_locale;
 global $wpdb;
+global $wppa_fb_init_done;
 
 	// The page/post id
 	$p = wppa_get_the_ID();
@@ -2450,9 +2444,9 @@ global $wpdb;
 	}
 
 	// Need init?
-	if ( $need_fb_init ) {
+	if ( $need_fb_init && ! $wppa_fb_init_done) {
 		wppa_js( 'jQuery(document).ready(function(){wppaFbInit();});' );
-		$need_fb_init = false;
+		$wppa_fb_init_done = true;
 	}
 
 	$result = 	'<div style="clear:both"></div>' .

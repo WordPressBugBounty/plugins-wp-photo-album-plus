@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '8.8.04.001';
+wppaJsUtilsVersion = '8.8.06.008';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -414,6 +414,7 @@ function _wppaMakeLazyVisible() {
 		jQuery( potential ).each( function() {
 			src = jQuery(this).attr('data-src');
 			if ( wppaIsElementInViewport(this) ) {
+wppaConsoleLog('lazy does '+src);
 				jQuery(this).attr('src', src);
 				jQuery(this).removeAttr('data-src');
 				jQuery(this).parent().css({'min-height':0});

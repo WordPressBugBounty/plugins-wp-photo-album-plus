@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 8.8.00.001
+* Version: 8.8.06.002
 *
 */
 
@@ -413,6 +413,24 @@ global $wpdb;
 			$duration 		= $photo['duration'];
 			$indexdtm 		= $photo['indexdtm'];
 			$usedby 		= $photo['usedby'] ? explode( ".", trim( $photo['usedby'], '. ' ) ) : array();
+			if ( count( $usedby ) > 0 ) {
+				$diddel = false;
+				foreach( array_keys( $usedby ) as $k ) {
+					$p = get_page( $usedby[$k] );
+					if ( is_object( $p ) && $p->post_status != 'publish' ) {
+						unset( $usedby[$k] );
+						$diddel = true;
+					}
+				}
+				if ( $diddel ) {
+					if ( count( $usedby ) ) {
+						wppa_update_photo( $id, ['usedby' => '.' . implode( '.', $usedby ) . '.'] );
+					}
+					else {
+						wppa_update_photo( $id, ['usedby' => ''] );
+					}
+				}
+			}
 			$misc 			= $photo['misc'];
 
 			// See if item is a multimedia item

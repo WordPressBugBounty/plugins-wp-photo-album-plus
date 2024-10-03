@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 8.7.04.002
+* Version 8.8.06.006
 *
 */
 
@@ -307,3 +307,72 @@ function wppa_encrypt_url( $url ) {
 	return $newurl;
 }
 
+// Functions to en/decrypt url extensions that contain setting changes created by the [wppa_set] shortcode.
+// This must be encrypted to avoid unwanted/malicious setting changes by hackers
+// There is one wp option (array) called wppa_set that contains items like wppa_set[md5(settingchanges) => settingchanges]
+function wppa_encrypt_set() {
+global $wppa_url_set_extension;
+
+	// Are we enabled?
+	if ( ! wppa_switch( 'enable_shortcode_wppa_set' ) ) {
+		return;
+	}
+
+	// Empty?
+	if ( ! $wppa_url_set_extension ) {
+		return; // nothing to do
+	}
+
+	// Compute crypt
+	$key = md5($wppa_url_set_extension);
+
+	// Get existing
+	$all = get_option( 'wppa-set', array() );
+
+	// If not save yet, save it
+	if ( !isset( $all[$key] ) ) {
+		$all[$key] = $wppa_url_set_extension;
+		update_option( 'wppa-set', $all );
+	}
+
+	// return new query arg
+	return 'wppa-set=' . $key;
+}
+
+function wppa_decrypt_set() {
+global $wppa_url_set_extension;
+global $wppa_opt;
+
+	// Are we enabled?
+	if ( ! wppa_switch( 'enable_shortcode_wppa_set' ) ) {
+		return;
+	}
+
+	// Get the date to be decrypted
+	$crypt = wppa_get( 'set', '', 'text' );
+
+	// Empty?
+	if ( ! $crypt ) {
+		return; // nothing to do
+	}
+
+	// Get existing
+	$all = get_option( 'wppa-set', array() );
+
+	// Fill global with decrypted value
+	if ( isset( $all[$crypt] ) ) {
+		$wppa_url_set_extension = $all[$crypt];
+	}
+
+	// Process items
+	if ( $wppa_url_set_extension ) {
+		$temp = str_replace( '&amp;', '&', $wppa_url_set_extension );
+		$temp = explode( '&', trim( $temp, '&' ) );
+		foreach( $temp as $t ) {
+			$key = substr( $t, 0, strpos( $t, '=' ) );
+			$val = substr( $t, strpos( $t, '=' ) + 1 );
+			$wppa_opt[$key] = $val;
+//			wppa_log( 'misc', 'wppa_set item = ' . $key . ', value = ' . $val );
+		}
+	}
+}

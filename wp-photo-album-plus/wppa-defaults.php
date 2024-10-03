@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 8.8.05.001
+* Version: 8.8.06.006
 *
 */
 
@@ -965,7 +965,7 @@ horizrailenabled:false,";
 						'wppa_meta_page'				=> 'yes',		// 9
 						'wppa_meta_all'					=> 'yes',		// 10
 						'wppa_alt_type'					=> 'fullname',
-						'wppa_photo_admin_max_albums' 	=> '500',
+						'wppa_photo_admin_max_albums' 	=> '0',
 						'wppa_jpeg_quality'				=> '95',
 						'wppa_geo_edit' 				=> 'no',
 						'wppa_adminbarmenu_admin'		=> 'yes',

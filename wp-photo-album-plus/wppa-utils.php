@@ -1210,14 +1210,16 @@ global $wpdb;
 	if ( is_array( $in_use ) ) {
 
 		$post = get_post( $in_use[0] );
-		if ( defined( 'DOING_AJAX' ) ) {
-			wppa_echo( 'ER||0||' . '<span style="color:#ff0000">' . esc_html__( 'Could not delete photo', 'wp-photo-album-plus' ) . '</span>||' .
-						__( 'Photo is still in use in post/page', 'wp-photo-album-plus' ) . ' ' . $post->post_title );
-			wppa_exit();
-		}
-		else {
-			wppa_error_message( __( 'Photo is still in use in post/page', 'wp-photo-album-plus' ) . ' ' . $post->post_title );
-			return false;
+		if ( $post ) {
+			if ( defined( 'DOING_AJAX' ) ) {
+				wppa_echo( 'ER||0||' . '<span style="color:#ff0000">' . esc_html__( 'Could not delete photo', 'wp-photo-album-plus' ) . '</span>||' .
+							__( 'Photo is still in use in post/page', 'wp-photo-album-plus' ) . ' ' . $post->post_title );
+				wppa_exit();
+			}
+			else {
+				wppa_error_message( __( 'Photo is still in use in post/page', 'wp-photo-album-plus' ) . ' ' . $post->post_title );
+				return false;
+			}
 		}
 	}
 
