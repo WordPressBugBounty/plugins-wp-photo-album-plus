@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 8.8.05.003
+* Version: 8.8.07.004
 *
 */
 
@@ -5988,4 +5988,86 @@ function wppa_nav_icon_size( $where ) {
 	return $icsiz;
 }
 
+// Fix sequence numnbers after adding an Item
+// Works only when sequence order is set to order# or order# desc
+// @1: text 'album' or 'media'
+// @2: int id of the just added item
+function wppa_fix_seq_nums( $what, $last ) {
+global $wpdb;
 
+	// Sanitize input
+	if ( $what !== 'album' && $what !== 'media' ) {
+		wppa_log( 'err', 'Inbvalid arg 1 in wppa_fix_seq_nums(): ' . sanitize_text_field( $what ) );
+		return;
+	}
+	if ( ! wppa_is_posint( $last ) ) {
+		wppa_log( 'err', 'Inbvalid arg 2 in wppa_fix_seq_nums(): ' . sanitize_text_field( $last ) );
+		return;
+	}
+
+	// Do the album
+	if ( $what == 'album' ) {
+
+		// Get the album info
+		$parent = wppa_get_album_item( $last, 'a_parent' );
+		if ( $parent > 0 ) {
+			$album = wppa_cache_album( $parent );
+		}
+		else {
+			$album = '';
+		}
+
+		// Find the sequence method
+		$method = '';
+
+		// Parent is album
+		if ( $album ) {
+			if ( $album['suba_order_by'] == '1' ) $method = 'order';
+			elseif ( $album['suba_order_by'] == '-1' ) $method = 'orderdesc';
+			elseif ( $album['suba_order_by'] != '0' ) return; // Default no set to seqno(desc)
+		}
+
+		// Parent is none or separate, or parent sequence is default: use system default
+		if ( ! $method ) {
+			if ( wppa_opt( 'list_albums_by' ) == '1' ) $method = 'order';
+			if ( wppa_opt( 'list_albums_by' ) == '-1' ) $method = 'orderdesc';
+		}
+
+		// Method not following sequence numbering?
+		if ( ! $method ) return;
+
+		// Find the subalbum count
+		$query 		= $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE a_parent = %d", $parent );
+		$subcount 	= wppa_get_var( $query );
+
+		if ( $subcount < 2 ) return; // Only max one subalbum; nothing to Fix
+
+		// Ascending order nos
+		if ( $method == 'order' ) {
+
+			// Get the subalbs, except the last one
+			$query 	= $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = %d AND id <> %d ORDER BY a_order, id", $parent, $last );
+			$subs 	= wppa_get_col( $query );
+
+			// Now fix sequence
+			$seqno = 1;
+			foreach( $subs as $aid ) {
+				wppa_update_album( $aid, ['a_order' => $seqno] );
+				$seqno++;
+			}
+			wppa_update_album( $last, ['a_order' => $seqno] );
+
+		}
+
+		// Descenting order nos
+		else {
+		}
+
+	}
+
+	// Do the media item
+	elseif ( $what == 'media' ) {
+	}
+
+	return;
+}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 8.8.05.003
+* Version 8.8.07.004
 *
 */
 
@@ -369,6 +369,7 @@ global $wpdb;
 		if ( $data['a_parent'] > 0 ) {
 			wppa_invalidate_treecounts( $data['a_parent'] );
 		}
+		wppa_fix_seq_nums( 'album', $data['id'] );
 
 		return $data['id'];
 	}

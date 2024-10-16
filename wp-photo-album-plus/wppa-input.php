@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 8.8.05.003
+* Version: 8.8.07.004
 *
 */
 
@@ -232,7 +232,7 @@ function wppa_get_get_filter( $name ) {
 			break;
 
 		default:
-			$result = 'raw';
+			$result = 'text';
 			break;
 	}
 

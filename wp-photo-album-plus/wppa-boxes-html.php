@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 8.8.06.010
+* Version 8.8.07.003
 *
 */
 
@@ -33,7 +33,7 @@ function wppa_thumb_area( $action ) {
 			$result .= 	'
 			<div
 				id="wppa-thumb-area-' . $mocc . '"
-				class="wppa-box wppa-thumb-area wppa-thumb-area-' . $mocc . ( $modal ? ' wppa-modal' : '' ) . '"
+				class="wppa-box wppa-thumb-area wppa-thumb-area-' . $mocc . ( $modal ? ' wppa-modal' : '' ) . ( $nice ? ' wppa-nicescroll' : '' ) .'"
 				style="' . ( $maxh > '1' ? 'max-height:' . $maxh . 'px;' : '' ) . '
 						overflow:' . $overflow . ';"
 				onscroll="wppaMakeLazyVisible(\'scroll thumbarea\');"
@@ -46,7 +46,7 @@ function wppa_thumb_area( $action ) {
 
 		// Use nicescroller?
 		if ( $nice ) {
-			$result .= 	'<div class="wppa-nicewrap" >';
+			$result .= 	'<div class="wppa-nicewrap">';
 		}
 
 		// Display create sub album and upload photo links conditionally
@@ -116,7 +116,7 @@ function wppa_contest_box() {
 		$result .= 	'
 		<div
 			id="wppa-thumb-area-' . $mocc . '"
-			class="wppa-box wppa-contest wppa-thumb-area wppa-thumb-area-' . $mocc . '"
+			class="wppa-box wppa-contest wppa-thumb-area wppa-thumb-area-' . $mocc . ( $nice ? ' wppa-nicescroll' : '' ) . '"
 			style="' . ( $maxh > '1' ? 'max-height:' . $maxh . 'px;' : '' ) . '
 					overflow:' . $overflow . ';"
 			onscroll="wppaMakeLazyVisible(\'scroll content box\');"
@@ -4014,7 +4014,7 @@ global $wpdb;
 								}
 
 								// Still no user, try to find him by display name
-								if ( ! $usr )
+								if ( ! $usr ) {
 									$query = $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE display_name = %s", stripslashes( $comment['user'] ) );
 									$usr = wppa_get_results( $query );
 
@@ -4054,7 +4054,7 @@ global $wpdb;
 										style="float:left;margin-right:5px">' .
 										$avt .
 									'</div>';
-
+							}
 							$originatorblock .= '
 						</td>';
 
@@ -6439,7 +6439,7 @@ function wppa_grid_box() {
 		$result .= 	'
 		<div
 			id="wppa-thumb-area-' . $mocc . '"
-			class="wppa-box wppa-contest wppa-thumb-area wppa-thumb-area-' . $mocc . '"
+			class="wppa-box wppa-contest wppa-thumb-area wppa-thumb-area-' . $mocc . ( $nice ? ' wppa-nicescroll' : '' ) . '"
 			style="' . ( $maxh > '1' ? 'max-height:' . $maxh . 'px;' : '' ) . '
 					overflow:' . $overflow . ';padding-left:0;"
 			onscroll="wppaMakeLazyVisible(\'scroll gridbox\');"
@@ -6869,7 +6869,7 @@ function wppa_audio_only_container( $action ) {
 			$result .= 	'
 			<div
 				id="wppa-audio-only-' . $mocc . '"
-				class="wppa-box wppa-audio-only"
+				class="wppa-box wppa-audio-only ' . ( $nice ? ' wppa-nicescroll' : '' ) . '"
 				>';
 		}
 		else {

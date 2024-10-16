@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version: 8.8.00.003
+* Version: 8.8.07.001
 *
 */
 
@@ -931,7 +931,7 @@ function wppa_get_thumbratioxy( $id ) {
 		$result = wppa_get_videox( $id ) / wppa_get_videoy( $id );
 	}
 	else {
-		if ( wppa_get_thumby( $id ) ) {
+		if ( is_numeric( wppa_get_thumbx( $id ) ) && is_numeric( wppa_get_thumby( $id ) ) ) {
 			$result = wppa_get_thumbx( $id ) / wppa_get_thumby( $id );
 		}
 		else {

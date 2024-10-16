@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 8.8.06.007
+* Version: 8.8.07.001
 *
 */
 
@@ -3836,7 +3836,7 @@ global $cover_count_key;
 				( $maxh > '1' ? 'max-height:' . $maxh . 'px;' : '' ) .
 				'overflow:' . $overflow . ';' .
 				'"' . '
-				class="albumlist' . ( $modal ? ' wppa-modal' : '' ) . '"
+				class="albumlist' . ( $modal ? ' wppa-modal' : '' ) . ( $nice ? ' wppa-nicescroll' : '' ) . '"
 				onscroll="wppaMakeLazyVisible(\'scroll albumlist\');"
 				>' );
 

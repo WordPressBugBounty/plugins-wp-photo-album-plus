@@ -1,5 +1,10 @@
 WP Photo Album Plus Changelog
 
+= 8.8.07 =
+
+* Fixed a problem in resizing areas when nicescroller installed.
+* Fiuxed a problem in local avatar selection.
+
 = 8.8.06 =
 
 * New album cover type added: Title only and Title only mcr.

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version: 8.7.03.006
+* Version: 8.8.07.004
 */
 
 class wppaStereoWidget extends WP_Widget {
@@ -78,7 +78,7 @@ class wppaStereoWidget extends WP_Widget {
 	// Set defaults
 	function get_defaults() {
 
-		$defaults = array( 	'title' 	=> __( 'Stereo Photo Settings', 'wp-photo-album-plus ' ),
+		$defaults = array( 	'title' 	=> __( 'Stereo Photo Settings', 'wp-photo-album-plus' ),
 							'logonly' 	=> 'no',
 							);
 		return $defaults;

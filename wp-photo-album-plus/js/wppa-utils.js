@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '8.8.06.008';
+wppaJsUtilsVersion = '8.8.07.002';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -414,7 +414,6 @@ function _wppaMakeLazyVisible() {
 		jQuery( potential ).each( function() {
 			src = jQuery(this).attr('data-src');
 			if ( wppaIsElementInViewport(this) ) {
-wppaConsoleLog('lazy does '+src);
 				jQuery(this).attr('src', src);
 				jQuery(this).removeAttr('data-src');
 				jQuery(this).parent().css({'min-height':0});
@@ -432,20 +431,7 @@ wppaConsoleLog('lazy does '+src);
 		wppaInitMasonryPlus();
 
 		// Resize nicescroller
-		if ( jQuery("div").getNiceScroll ) {
-			setTimeout( function(){
-				jQuery( "div" ).getNiceScroll().resize();
-			},500);
-			setTimeout( function(){
-				jQuery( "div" ).getNiceScroll().resize();
-			},1500);
-		}
-
-		// Fake a scroll
-//		setTimeout( function(){
-//			jQuery(".wppa-box").trigger("scroll");
-//			jQuery("body").trigger("scroll");
-//		}, 250);
+		wppaResizeNice('wppaMakeLazyVisible');
 	}
 
 	wppaLazyDone = false;
@@ -533,6 +519,9 @@ function wppaSizeArea() {
 		}
 		jQuery(this).parent().parent().css({top:t});
 	});
+
+	// Nice scroller
+	wppaResizeNice('wppaSizeArea');
 
 }
 

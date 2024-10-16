@@ -286,15 +286,9 @@ global $wpdb;
 		}
 
 		// Nothing to do
-		elseif ( wppa_is_int( $album ) ) {
-
-			wppa_echo( '<p>' . esc_html__( 'The album is empty', 'wp-photo-album-plus' ) . '</p>' );
-			return;
-		}
-
-		else {
-			return;
-		}
+		wppa_photo_admin_footer( $album );
+		
+		return;
 	}
 
 	// Quick edit skips a few time consuming settings like copy and move to other album
@@ -3124,7 +3118,35 @@ global $wpdb;
 		wppa_admin_pagination( $pagesize, $page, $count, $link, 'bottom' );
 
 	} /* photos not empty */
+	
+	if ( $is_album ) wppa_photo_admin_footer( $album );
 } /* function */
+
+function wppa_photo_admin_footer( $album ) {
+global $wpdb;
+	
+	if ( wppa_is_posint( $album ) ) {
+
+		$photocount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `album` = %d", $album ) );
+		$childcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `a_parent` = %d", $album ) );
+		if ( $childcount && $photocount ) {
+			/* Translators: integer counts */
+			wppa_echo( '<p>' . esc_html__( sprintf( 'The album contains %d subalbum(s) and %d media item(s)', $childcount, $photocount ), 'wp-photo-album-plus' ) );
+		}
+		elseif( $childcount ) {
+			/* Translators: integer count */
+			wppa_echo( '<p>' . esc_html( sprintf( _n( 'The album contains %d subalbum', 'The album contains %d subalbums', $childcount, 'wp-photo-album-plus' ), $childcount ) ) . '</p>' );
+		}
+		elseif( $photocount ) {
+			/* Translators: integer count */
+			wppa_echo( '<p>' . esc_html( sprintf( _n( 'The album contains %d media item', 'The album contains %d media items', $photocount, 'wp-photo-album-plus' ), $photocount ) ) . '</p>' );
+		}
+		else {
+			wppa_echo( '<p>' . esc_html__( 'The album is empty', 'wp-photo-album-plus' ) . '</p>' );
+		}
+		return;
+	}
+}
 
 function wppa_album_photos_bulk( $album, $page_1 = false ) {
 	global $wpdb;

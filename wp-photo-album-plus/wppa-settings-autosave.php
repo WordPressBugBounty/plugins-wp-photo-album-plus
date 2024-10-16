@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 8.8.06.005
+* Version: 8.8.07.004
 *
 */
 
@@ -487,8 +487,11 @@ global $wppa_hide_this;
 		wp_nonce_field( 'wppa-nonce', 'wppa-nonce' );
 
 		// Any tab set? else default general
-		$tab = wppa_get( 'tab', 'general' );
-		$subtab = wppa_get( 'subtab', '0' );
+		$tab = wppa_get( 'tab', 'general', 'text' );
+		if ( ! isset( $wppa_tab_names[$tab] ) ) {
+			$tab = 'general';
+		}
+		$subtab = wppa_get( 'subtab', '0', 'int' );
 
 		// Get the linkpages dependant of tab (if we need them)
 		if ( $tab == 'share' || $tab == 'links' ) {

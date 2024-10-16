@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '8.8.04.003';
+wppaWppaVer = '8.8.07.002';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -97,7 +97,7 @@ jQuery(document).ready(function(){
 
 		setTimeout( function() {
 
-			wppaResizeNice();
+			wppaResizeNice('wppaDoInit');
 
 		}, 1000);
     });
@@ -116,12 +116,7 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on("tabbychange",function(){
 
-		if ( typeof jQuery("div").getNiceScroll != "undefined" ) {
-			setTimeout(function(){
-				jQuery("div").getNiceScroll().resize();
-				wppaDoAllAutocols();
-			},500);
-		}
+		wppaResizeNice('tabbychange');
 		setTimeout(function(){
 			wppaDoAllAutocols();
 			jQuery(window).trigger("resize");
@@ -148,7 +143,7 @@ jQuery(document).ready(function(){
 	}
 
 	// Lazy on mobile extra:
-	jQuery("div").on("touchmove", function(){wppaMakeLazyVisible('duv touchmove');});
+	jQuery("div").on("touchmove", function(){wppaMakeLazyVisible('div touchmove');});
 
 	// Align ajax spinner
 	jQuery(".wppa-ajax-spin").css({top:wppaWindowHeight()/2,left:wppaWindowWidth()/2});
@@ -157,21 +152,27 @@ jQuery(document).ready(function(){
 
 // Resize all nicescrollers
 var wppaResizeNiceTimer;
-function wppaResizeNice() {
-
+var wppaResizeNiceTimestamp;
+function wppaResizeNice(from) {
+console.log('Nice resize called from '+from);
 	clearTimeout(wppaResizeNiceTimer);
-
-	wppaResizeNiceTimer = setTimeout(function(){_wppaResizeNice()}, 200);
+	wppaResizeNiceTimestamp = Date.now();
+	wppaResizeNiceTimer = setTimeout(function(){_wppaResizeNice(from)}, Math.max(wppaResizeEndDelay, wppaScrollEndDelay));
 }
-function _wppaResizeNice() {
+function _wppaResizeNice(from) {
 
-	if ( typeof jQuery("body").getNiceScroll == "function" ) {
-		jQuery("body").getNiceScroll().resize();
-	}
-	jQuery("div").each(function(){
-		if ( typeof jQuery(this).getNiceScroll == "function" ) {
-			jQuery(this).getNiceScroll().resize();
+	// Body?
+	if ( from != 'wppaMakeLazyVisible' ) {
+		if ( typeof jQuery("body").getNiceScroll == "function" ) {
+			jQuery("body").getNiceScroll().resize();
+			console.log('Nice resized body after '+(Date.now() - wppaResizeNiceTimestamp)+' millisec');
 		}
+	}
+
+	// Areas
+	jQuery(".wppa-nicescroll").each(function(){
+		jQuery(this).getNiceScroll().resize();
+		console.log('Nice resized ' + jQuery(this).attr('id') + ' after ' + ( Date.now() - wppaResizeNiceTimestamp ) + ' millisec' );
 	});
 }
 
@@ -239,6 +240,8 @@ function _wppaDoAllAutocols(i) {
 	if ( i < wppaExtendedResizeCount || wppaExtendedResizeCount == -1 ) {
 		setTimeout(function(){_wppaDoAllAutocols(i+1)}, wppaExtendedResizeDelay);
 	}
+
+	wppaResizeNice('wppaDoAllAutocols');
 
 	return true;
 }
