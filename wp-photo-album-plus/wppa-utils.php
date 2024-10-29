@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 8.8.07.004
+* Version: 8.8.08.002
 *
 */
 
@@ -3408,51 +3408,6 @@ function wppa_nonce_field( $action = -1, $name = "_wpnonce", $referer = true, $w
 	return $nonce_field;
 }
 
-// Like convert_smilies, but directe rendered to <img> tag to avoid performance bottleneck for emoji's when ajax on firefox
-function wppa_convert_smilies( $text ) {
-static $smilies;
-
-	// Initialize
-	if ( ! is_array( $smilies ) ) {
-		$smilies = array(	";-)" 		=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f609.png" />',
-							":|" 		=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f610.png" />',
-							":x" 		=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f621.png" />',
-							":twisted:" => '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f608.png" />',
-							":shock:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f62f.png" />',
-							":razz:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f61b.png" />',
-							":oops:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f633.png" />',
-							":o" 		=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f62e.png" />',
-							":lol:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f606.png" />',
-							":idea:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f4a1.png" />',
-							":grin:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f600.png" />',
-							":evil:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f47f.png" />',
-							":cry:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f625.png" />',
-							":cool:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f60e.png" />',
-							":arrow:" 	=> '<img class="emoji" draggable="false" alt="?" src="http://s.w.org/images/core/emoji/72x72/27a1.png" />',
-							":???:" 	=> '<img class="emoji" draggable="false" alt="??" src="http://s.w.org/images/core/emoji/72x72/1f615.png" />',
-							":?:" 		=> '<img class="emoji" draggable="false" alt="?" src="http://s.w.org/images/core/emoji/72x72/2753.png" />',
-							":!:" 		=> '<img class="emoji" draggable="false" alt="?" src="http://s.w.org/images/core/emoji/72x72/2757.png" />'
-		);
-	}
-
-	// Perform
-	$result = $text;
-	foreach ( array_keys( $smilies ) as $key ) {
-		$result = str_replace( $key, $smilies[$key], $result );
-	}
-
-	// Convert non-emoji's
-	$result = convert_smilies( $result );
-
-	// SSL?
-	if ( is_ssl() ) {
-		$result = str_replace( 'http://', 'https://', $result );
-	}
-
-	// Done
-	return $result;
-}
-
 function wppa_is_virtual() {
 
 	if ( wppa( 'is_virtual' ) ) return true;
@@ -4089,7 +4044,7 @@ global $wpdb;
 	if ( $mylike ) {
 		if ( $likes > 1 ) {
 			/* translators: counts */
-			$text = sprintf( _n( 'You and %d other person like this', 'You and %d other people like this', $likes - 1 ), $likes - 1 );
+			$text = sprintf( _n( 'You and %d other person like this', 'You and %d other people like this', $likes - 1, 'wp-photo-album-plus'  ), $likes - 1 );
 		}
 		else {
 			$text = __( 'You are the first one who likes this', 'wp-photo-album-plus' );
@@ -4110,7 +4065,7 @@ global $wpdb;
 	$result['mine']  	= $mylike;
 	$result['total'] 	= $likes;
 	/* translators: counts */
-	$result['display'] 	= sprintf( _n( '%d like', '%d likes', $likes ), $likes );
+	$result['display'] 	= sprintf( _n( '%d like', '%d likes', $likes, 'wp-photo-album-plus' ), $likes );
 
 	return $result;
 }
@@ -6017,24 +5972,31 @@ global $wpdb;
 			$album = '';
 		}
 
-		// Find the sequence method
+		// Init for findong the sequence method
 		$method = '';
+		$m = '0';
 
-		// Parent is album
+		// Parent is physical album
 		if ( $album ) {
-			if ( $album['suba_order_by'] == '1' ) $method = 'order';
-			elseif ( $album['suba_order_by'] == '-1' ) $method = 'orderdesc';
-			elseif ( $album['suba_order_by'] != '0' ) return; // Default no set to seqno(desc)
+			$m = $album['suba_order_by'];
 		}
 
-		// Parent is none or separate, or parent sequence is default: use system default
-		if ( ! $method ) {
-			if ( wppa_opt( 'list_albums_by' ) == '1' ) $method = 'order';
-			if ( wppa_opt( 'list_albums_by' ) == '-1' ) $method = 'orderdesc';
+		// Parent is virtual album OR album method is use default, find the system default
+		if ( ! $album || $m == '0' ) {
+			$m = wppa_opt( 'list_albums_by' );
 		}
 
-		// Method not following sequence numbering?
-		if ( ! $method ) return;
+		// Find method
+		switch( $m ) {
+			case '1':
+				$method = 'order';
+				break;
+			case '-1':
+				$method = 'orderdesc';
+				break;
+			default:
+				return; // Method not seqno(desc)
+		}
 
 		// Find the subalbum count
 		$query 		= $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE a_parent = %d", $parent );
@@ -6042,31 +6004,95 @@ global $wpdb;
 
 		if ( $subcount < 2 ) return; // Only max one subalbum; nothing to Fix
 
-		// Ascending order nos
-		if ( $method == 'order' ) {
+		// Get the subalbs, except the last one
+		$query 	= $wpdb->prepare( "SELECT id, a_order FROM $wpdb->wppa_albums WHERE a_parent = %d AND id <> %d ORDER BY a_order, id", $parent, $last );
+		$subs 	= wppa_get_results( $query );
 
-			// Get the subalbs, except the last one
-			$query 	= $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = %d AND id <> %d ORDER BY a_order, id", $parent, $last );
-			$subs 	= wppa_get_col( $query );
+		// See if the sequence need to be fixed
+		$need_fix = false;
+		$expect = 1;
+		foreach( $subs as $alb ) {
+			if ( $alb['a_order'] != $expect ) {
+				$need_fix = true;
+			}
+			$expect++;
+		}
 
-			// Now fix sequence
+		// Now fix sequence
+		if ( $need_fix ) {
 			$seqno = 1;
-			foreach( $subs as $aid ) {
+			foreach( $subs as $alb ) {
+				$aid = $alb['id'];
 				wppa_update_album( $aid, ['a_order' => $seqno] );
 				$seqno++;
 			}
-			wppa_update_album( $last, ['a_order' => $seqno] );
-
 		}
 
-		// Descenting order nos
-		else {
-		}
+		// Fix the newest one
+		wppa_update_album( $last, ['a_order' => $subcount] );
 
 	}
 
 	// Do the media item
 	elseif ( $what == 'media' ) {
+
+		// Find the sequence method
+		$method = '';
+
+		// Get the media info
+		$media = wppa_cache_photo( $last );
+
+		// Find the sequence method
+		$method = '';
+		$m = wppa_get_album_item( $media['album'], 'p_order_by' );
+
+		// If use default, find the system default
+		if ( $m == '0' ) {
+			$m = wppa_opt( 'list_photos_by' );
+		}
+		switch( $m ) {
+			case '1':
+				$method = 'order';
+				break;
+			case '-1':
+				$method = 'orderdesc';
+				break;
+			default:
+				return; // Method not seqno(desc)
+		}
+
+		// Get the item count
+		$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d", $media['album'] );
+		$count = wppa_get_var( $query );
+		if ( $count < 2 ) return; 	// Only max one item; nothing to fix
+
+		// Get the items except the last one
+		$query = $wpdb->prepare( "SELECT id, p_order FROM $wpdb->wppa_photos WHERE album = %d AND id <> %d ORDER BY p_order, id", $media['album'], $last );
+		$items = wppa_get_results( $query );
+
+		// See if the sequence need to be fixed
+		$need_fix = false;
+		$expect = 1;
+		foreach( $items as $item ) {
+			if ( $item['p_order'] != $expect ) {
+				$need_fix = true;
+			}
+			$expect++;
+		}
+
+		// Now fix sequence
+		if ( $need_fix ) {
+			$seqno = 1;
+			foreach( $items as $item ) {
+				$id = $item['id'];
+				wppa_update_photo( $id, ['p_order' => $seqno] );
+				$seqno++;
+			}
+		}
+
+		// Fix the newest one
+		wppa_update_photo( $last, ['p_order' => $count] );
+
 	}
 
 	return;

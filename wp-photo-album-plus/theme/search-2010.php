@@ -6,7 +6,7 @@
  * @subpackage Twenty_Ten
  * @since Twenty Ten 1.0
  *
- * ver 8.7.03.002
+ * ver 8.7.03.006
  */
 
  /* Rename this file to search.php and replace search.php from theme twentyten by this file */
@@ -21,7 +21,7 @@ get_header(); ?>
 	$have_posts  = have_posts();
 	if ( $have_posts || $have_photos ) {
 		$s = '<span>' . get_search_query() . '</span>';
-		$title = esc_html__( 'Search Results for:', 'twentyten' ) . ' ' . esc_html( $s );
+		$title = esc_html__( 'Search Results for:', 'wp-photo-album-plus' ) . ' ' . esc_html( $s );
 		?>
 		<h1 class="page-title">
 			<?php echo esc_html( wppa_qt( $title ) ); ?>
@@ -36,9 +36,9 @@ get_header(); ?>
 	}
 	else { ?>
 				<div id="post-0" class="post no-results not-found">
-					<h2 class="entry-title"><?php esc_html_e( 'Nothing Found', 'twentyten' ); ?></h2>
+					<h2 class="entry-title"><?php esc_html_e( 'Nothing Found', 'wp-photo-album-plus' ); ?></h2>
 					<div class="entry-content">
-						<p><?php esc_html_e( 'Sorry, but nothing matched your search criteria. Please try again with some different keywords.', 'twentyten' ); ?></p>
+						<p><?php esc_html_e( 'Sorry, but nothing matched your search criteria. Please try again with some different keywords.', 'wp-photo-album-plus' ); ?></p>
 						<?php get_search_form(); ?>
 					</div><!-- .entry-content -->
 				</div><!-- #post-0 -->

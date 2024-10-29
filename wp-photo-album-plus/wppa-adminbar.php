@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* Version 8.7.03.002
+* Version 8.8.08.002
 *
 */
 
@@ -36,10 +36,12 @@ function wppa_admin_bar_menu() {
 	if ( $tot_pend ) $tot_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$tot_pend.'</span>';
 	else $tot_pending = '';
 
+	$atog = wppa_get_option( 'wppa_album_use_gallery', 'no' ) == 'yes';
+
 	if ( current_user_can( 'wppa_admin' ) ) {
 		$menu_items['admin'] = array(
 			'parent' => $wppaplus,
-			'title'  => _x( 'Albums', 'menu-item', 'wp-photo-album-plus' ) . $upl_pending,
+			'title'  => ( $atog ? _x( 'Galleries', 'menu-item', 'wp-photo-album-plus' ) : _x( 'Albums', 'menu-item', 'wp-photo-album-plus' ) ) . $upl_pending,
 			'href'   => admin_url( 'admin.php?page=wppa_admin_menu' )
 		);
 	}
@@ -159,7 +161,7 @@ function wppa_admin_bar_menu() {
 	// Add top-level item
 	$wp_admin_bar->add_menu( array(
 		'id'    => $wppaplus,
-		'title' => _x( 'Photo Albums', 'menu-item', 'wp-photo-album-plus' ) . $tot_pending,
+		'title' => ( $atog ? _x( 'Photo Galleries', 'menu-item', 'wp-photo-album-plus' ) : _x( 'Photo Albums', 'menu-item', 'wp-photo-album-plus' ) ) . $tot_pending,
 		'href'  => ''
 	) );
 

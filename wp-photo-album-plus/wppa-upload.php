@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 8.8.02.002
+* Version 8.8.08.001
 *
 */
 
@@ -14,9 +14,6 @@ function _wppa_page_upload() {
 global $target;
 global $wppa_revno;
 global $upload_album;
-
-	// Maybe it helps...
-	@ set_time_limit( 0 );
 
     // Who am I?
 	$user = wppa_get_user();

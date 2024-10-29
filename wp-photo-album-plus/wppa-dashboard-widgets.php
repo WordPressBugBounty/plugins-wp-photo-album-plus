@@ -4,7 +4,7 @@
 *
 * Contains dashboard widgets code
 *
-* Version 8.7.03.006
+* Version 8.8.08.001
 *
 */
 
@@ -245,7 +245,7 @@ function wppa_show_potd_log() {
 				<tr style="border-bottom:1px solid #444">
 					<td>' .
 						/* translators: integer id */
-						sprintf( __( 'Photo %d has been removed' ), $item['id'] ) . '
+						sprintf( __( 'Photo %d has been removed', 'wp-photo-album-plus' ), $item['id'] ) . '
 					</td>
 					<td>' .
 						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $item['tm'] ) . '<br>

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 8.8.07.004
+* Version: 8.8.08.002
 *
 */
 
@@ -2592,7 +2592,9 @@ global $wppa_hide_this;
 					$desc = __('Display thumbnail areas with upload link only for empty albums.', 'wp-photo-album-plus' );
 					$help = '';
 					$slug = 'wppa_show_empty_thumblist';
-					$html = wppa_checkbox($slug);
+					$opts = array(__('None', 'wp-photo-album-plus'), __('Only when there are no subalbums', 'wp-photo-album-plus'), __('Always', 'wp-photo-album-plus'));
+					$vals = array('never', 'nosub', 'always');
+					$html = wppa_select($slug, $opts, $vals);
 					wppa_setting_new($slug, '18', $name, $desc, $html, $help);
 
 					$name = __('Upload/create link on thumbnail area', 'wp-photo-album-plus' );
@@ -3385,7 +3387,7 @@ global $wppa_hide_this;
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 
-						$name = __('Start/stop on Filmonly');
+						$name = __('Start/stop on Filmonly', 'wp-photo-album-plus' );
 						$desc = __('Show the Start/Stop slideshow bar on filmonly displays.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_show_startstop_filmonly';
@@ -4499,7 +4501,7 @@ global $wppa_hide_this;
 
 						$name = __('Use wppa search form', 'wp-photo-album-plus' );
 						$desc = __('Uses wppa specific form', 'wp-photo-album-plus' );
-						$help = __('You may need to enable this when other (search) plugins break the wppa search mechanism');
+						$help = __('You may need to enable this when other (search) plugins break the wppa search mechanism', 'wp-photo-album-plus' );
 						$slug = 'wppa_use_wppa_search_form';
 						$onch = '';
 						$html = wppa_checkbox($slug, $onch);
@@ -6990,7 +6992,7 @@ global $wppa_hide_this;
 						$slug1 = 'wppa_max_photo_modtime';
 						$html1 = wppa_select($slug1, $opts, $vals);
 						$slug2 = 'wppa_pup_is_aup';
-						$html2 = '<span style="float:left">'.__( 'Mod album also' ).'</span>'.wppa_checkbox($slug2);
+						$html2 = '<span style="float:left">'.__( 'Mod album also', 'wp-photo-album-plus' ).'</span>'.wppa_checkbox($slug2);
 						wppa_setting_new($slug, '4', $name, $desc, $html1.$html2, $help);
 
 						$name = __('First photo', 'wp-photo-album-plus' );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 8.8.05.003
+* Version: 8.8.08.001
 *
 */
 
@@ -1812,10 +1812,12 @@ global $wppa_log_file;
 												$result .=
 												')<br>';
 											}
+											/*
 											elseif ( is_object( $data[$key] ) ) {
 												$temp = var_export( $data[$key], true );
 												$result .= '['.$key.'] => ' . $temp;
 											}
+											*/
 											else {
 												$result .= '['.$key.'] => '.$data[$key].'<br>';
 											}

@@ -3,15 +3,15 @@
 * Package: wp-photo-album-plus
 *
 * display the stats widget
-* Version 8.8.05.003
+* Version 8.8.08.001
 *
 */
 class WppaStatsWidget extends WP_Widget {
 
     // Constructor
     function __construct() {
-		$widget_ops = array( 'classname' => 'wppa_stats_widget', 'description' => __( 'WPPA Statistics', 'your-ip-widget' ) );
-		parent::__construct( 'your_ip', __( 'WPPA+ Stats', 'wppa_stats_widget' ), $widget_ops );
+		$widget_ops = array( 'classname' => 'wppa_stats_widget', 'description' => __( 'WPPA Statistics', 'wp-photo-album-plus' ) );
+		parent::__construct( 'your_ip', __( 'WPPA+ Stats', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	// Widget

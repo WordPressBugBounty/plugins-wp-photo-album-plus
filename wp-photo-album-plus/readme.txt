@@ -3,9 +3,9 @@ Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, video, audio, pdf, lightbox
 Requires at least: 6.0
-Tested up to: 6.6.2
+Tested up to: 6.7
 Requires PHP: 5.5
-Stable tag: 8.8.07.004
+Stable tag: 8.8.08.004
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

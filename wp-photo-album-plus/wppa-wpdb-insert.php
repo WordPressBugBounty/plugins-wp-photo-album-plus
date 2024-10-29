@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 8.8.07.004
+* Version 8.8.08.002
 *
 */
 
@@ -102,7 +102,7 @@ static $last;
 		return $wpdb->insert_id;
 	}
 
-	wppa_log( 'err', 'Could not insert into db table wppa_exif. data = ' . var_export( $data, true ) );
+	wppa_log( 'err', 'Could not insert into db table wppa_exif.' ); // data = ' . var_export( $data, true ) );
 	return false;
 }
 
@@ -148,7 +148,7 @@ static $last;
 		return $wpdb->insert_id;
 	}
 
-	wppa_log( 'err', 'Could not insert into db table wppa_iptc. data = ' . var_export( $data, true ) );
+	wppa_log( 'err', 'Could not insert into db table wppa_iptc.' ); //  data = ' . var_export( $data, true ) );
 	return false;
 }
 
@@ -297,11 +297,12 @@ global $wpdb;
 		// Update index
 		wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 		wppa_clear_cache( array( 'album' => $data['album'] ) );
+		wppa_fix_seq_nums( 'media', $data['id'] );
 		return $data['id'];
 	}
 
 	wppa_log( 'err', 'Could not insert into db table wppa_photos' );
-	wppa_log( 'err', var_export( $data, true ) );
+//	wppa_log( 'err', var_export( $data, true ) );
 	return false;
 }
 

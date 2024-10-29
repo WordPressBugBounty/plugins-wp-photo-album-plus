@@ -10,6 +10,8 @@
  * @package WordPress
  * @subpackage Twenty_Ten
  * @since Twenty Ten 1.0
+ *
+ * 8.8.08.001
  */
 global $wppa_show_statistics;
 
@@ -17,8 +19,8 @@ get_header(); ?>
 
 		<div id="container" class="one-column">
 			<div id="content" role="main">
-			
-<?php /* wppa_statistics(); */ /* This would show the statistics at the to of the page */?>	
+
+<?php /* wppa_statistics(); */ /* This would show the statistics at the to of the page */?>
 <?php $wppa_show_statistics = true; /* This will show the statistics within the wppa-container */?>
 
 <?php
@@ -27,7 +29,7 @@ get_header(); ?>
 		if ( !isset($wppa['searchstring']) ) $wppa['searchstring'] = '';
 		$page = get_option('wppa_search_linkpage', '0');
 		if ($page == '0') {
-			esc_attr_e('Warning. No page defined for search results!', 'wppa_theme');
+			esc_attr_e('Warning. No page defined for search results!', 'wp-photo-album-plus');
 		}
 		else {
 			if ( function_exists('wppa_dbg_url') ) $pagelink = wppa_dbg_url(get_page_link($page));
@@ -49,8 +51,8 @@ get_header(); ?>
 					<h1 class="entry-title"><?php the_title(); ?></h1>
 					<div class="entry-content">
 						<?php the_content(); ?>
-						<?php wp_link_pages( array( 'before' => '<div class="page-link">' . __( 'Pages:', 'twentyten' ), 'after' => '</div>' ) ); ?>
-						<?php edit_post_link( __( 'Edit', 'twentyten' ), '<span class="edit-link">', '</span>' ); ?>
+						<?php wp_link_pages( array( 'before' => '<div class="page-link">' . __( 'Pages:', 'wp-photo-album-plus' ), 'after' => '</div>' ) ); ?>
+						<?php edit_post_link( __( 'Edit', 'wp-photo-album-plus' ), '<span class="edit-link">', '</span>' ); ?>
 					</div><!-- .entry-content -->
 				</div><!-- #post-## -->
 				<?php /*do_action( 'addthis_widget' ); */?>
@@ -68,7 +70,7 @@ get_header(); ?>
 			jQuery('#wppa-container-1').css('margin-left', '-80px');
 //			jQuery('.wppa-fulldesc').css('color', '#eef7e6');
 //			jQuery('.wppa-fulltitle').css('color', '#eef7e6');
-//	jQuery('.wppa-nav').css('background-color', '#ccc');		
+//	jQuery('.wppa-nav').css('background-color', '#ccc');
 	});
 	/* ]]> */
 		</script>

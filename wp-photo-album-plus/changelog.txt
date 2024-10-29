@@ -1,5 +1,18 @@
 WP Photo Album Plus Changelog
 
+= 8.8.08 =
+
+* Maintenance release. To better comply with the plugin guidelines.
+* Textual fixes like missing or incorrect translations.
+* When the sequence method is set to order number / order number desc, and a new item is added the existing items will be correctly sequenced, and the latest added item will get the highest sequence no.
+* New album cover type title-only can now also be selected on the album admin page.
+* Assured compatibility with wp 6.7.
+* The setting to display empty thumbnail areas (Basic settings -> Thumbnails -> II -> Item 18) now has 3 choices: Never, Always and 'Only when there are no subalbums'
+* The links in the comment previous mails did not work due to incorrect album number. Fixed.
+* Comment previous email was also sent to the owner of the last comment. This was not intented and has been fixed.
+* In type slphoto the regular rating bar did not show up. Fixed.
+* The errormessage about unencrypted urls is now more descriptive, so the user knows what was wrong.
+
 = 8.8.07 =
 
 * Fixed a problem in resizing areas when nicescroller installed.

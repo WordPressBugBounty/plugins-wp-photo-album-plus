@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version: 8.8.05.003
+* Version: 8.8.08.003
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -121,7 +121,9 @@ global $locale;
 		$wppa_lang = substr( $wppa_locale, 0, 2 );
 	}
 
-	$bret = load_plugin_textdomain( 'wp-photo-album-plus', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	if ( version_compare( $wp_version, '6.6' ) < 1 ) {
+		$bret = load_plugin_textdomain( 'wp-photo-album-plus', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	}
 }
 
 // Compute all non-trivial constants and create required directories
@@ -500,7 +502,7 @@ global $_gallery;
 
 	$_gallery = __( 'gallery', 'wp-photo-album-plus' );
 }
-add_action( 'plugins_loaded', 'wppa_filter_translate', 1 );
+add_action( 'init', 'wppa_filter_translate', 19 );
 
 // Activate album to gallery conversion
 // This must be done after wppa_filter_translate() has completed to avoid endless recursion
@@ -513,7 +515,7 @@ function wppa_activate_albtogal_conversion() {
 
 	add_filter( 'gettext', 'wppa_album_to_gallery', 100 );
 }
-add_action( 'plugins_loaded', 'wppa_activate_albtogal_conversion', 20 );
+add_action( 'init', 'wppa_activate_albtogal_conversion', 20 );
 
 // Do the actual conversion from album to gallery
 function wppa_album_to_gallery( $text = '' ) {

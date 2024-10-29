@@ -5,8 +5,8 @@
  * @package WordPress
  * @subpackage Twenty_Sixteen
  * @since Twenty Sixteen 1.0
- * 
- * ver 8.7.03.002
+ *
+ * ver 8.7.03.006
  */
 
  /* Rename this file to search.php and replace search.php from theme twentysixteen by this file */
@@ -21,7 +21,7 @@ get_header(); ?>
 		<?php $have_posts = have_posts(); ?>
 		<?php if ( $have_posts || $have_photos ) {
 			$s = '<span>' . get_search_query() . '</span>';
-			$title = esc_html__( 'Search Results for:', 'twentyten' ) . ' ' . esc_html( $s );
+			$title = esc_html__( 'Search Results for:', 'wp-photo-album-plus' ) . ' ' . esc_html( $s );
 			?>
 			<header class="page-header">
 				<h1 class="page-title">
@@ -49,9 +49,9 @@ get_header(); ?>
 
 			// Previous/next page navigation.
 			the_posts_pagination( array(
-				'prev_text'          => __( 'Previous page', 'twentysixteen' ),
-				'next_text'          => __( 'Next page', 'twentysixteen' ),
-				'before_page_number' => '<span class="meta-nav screen-reader-text">' . __( 'Page', 'twentysixteen' ) . ' </span>',
+				'prev_text'          => __( 'Previous page', 'wp-photo-album-plus' ),
+				'next_text'          => __( 'Next page', 'wp-photo-album-plus' ),
+				'before_page_number' => '<span class="meta-nav screen-reader-text">' . __( 'Page', 'wp-photo-album-plus' ) . ' </span>',
 			) );
 
 		// If no content, include the "No posts found" template.

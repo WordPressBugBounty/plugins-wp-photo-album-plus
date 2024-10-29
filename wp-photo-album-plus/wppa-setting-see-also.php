@@ -3,10 +3,13 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 8.4.04.001
+* Version 8.8.08.002
 *
 */
 
+add_action( 'init', 'wppa_init_tab_names' );
+
+function wppa_init_tab_names() {
 global $wppa_tab_names;
 global $wppa_subtab_names;
 
@@ -168,6 +171,7 @@ global $wppa_subtab_names;
 			'4' => __( 'Other plugins related settings', 'wp-photo-album-plus' ),
 			),
 	);
+}
 
 // Setting pathinfo
 function wppa_setting_path( $b_a, $tab, $subtab = '', $item = '', $default = '' ) {

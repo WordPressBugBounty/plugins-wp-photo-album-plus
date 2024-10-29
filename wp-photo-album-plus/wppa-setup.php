@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 8.8.06.006
+* Version 8.8.08.002
 *
 */
 
@@ -381,6 +381,13 @@ global $wppa_cron_maintenance_slugs;
 				wppa_ok_message( get_option( 'wppa_pending_message' ) );
 				delete_option( 'wppa_pending_message' );
 			} );
+		}
+
+		if ( $old_rev <= '8808000' ) {
+			$cur = get_option( 'wppa_show_empty_thumblist', 'no' );
+			if ( $cur == 'yes' ) {
+				update_option( 'wppa_show_empty_thumblist', 'always' );
+			}
 		}
 	}
 

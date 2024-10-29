@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 8.8.07.003
+* Version 8.8.08.002
 *
 */
 
@@ -4068,7 +4068,7 @@ global $wpdb;
 							while(strchr($c,'\\')) $c = stripslashes($c); 	// Remove all slashes
 							$c = str_replace( '<br>', "\n", $c ); 			// For backward compat keep existing linebreak tags for later by nl2br
 							$c = wp_strip_all_tags( $c );
-							$c = wppa_convert_smilies( $c );
+							$c = convert_smilies( $c );
 							$c = nl2br( $c );
 							$c = str_replace( "'", "&apos;", $c ); 			// Convert single quote to html entity
 							if ( wppa_switch( 'comment_clickable' ) ) {
@@ -4558,9 +4558,9 @@ global $wpsmiliestrans;
 		foreach ( array_keys( $wppa_smilies ) as $key ) {
 			$onclick 	= esc_attr( 'wppaInsertAtCursor( document.getElementById( "' . $elm_id . '" ), " ' . $wppa_smilies[$key] . ' " )' );
 			$title 		= trim( $wppa_smilies[$key], ':' );
-			$result 	.= 	'<a onclick="'.$onclick.'" title="'.$title.'" >';
-			$result 	.= 		wppa_convert_smilies( $wppa_smilies[$key] );
-			$result 	.= 	'</a>';
+			$result 	.= 	'<span onclick="'.$onclick.'" title="'.$title.'" style="cursor:pointer">';
+			$result 	.= 		convert_smilies( $wppa_smilies[$key] );
+			$result 	.= 	'</span>';
 		}
 	}
 
@@ -5142,7 +5142,7 @@ global $other_deps;
 							if ( $ratcount 		== 'yes' ) {
 								$n = $data[$id]['ratingcount'];
 								/* translators: integer count */
-								$result .= sprintf( _n( '%d vote', '%d votes', 'wp-photo-album-plus' ), $n ) . '<br>';
+								$result .= sprintf( _n( '%d vote', '%d votes', $n, 'wp-photo-album-plus' ), $n ) . '<br>';
 							}
 							if ( $meanrat  		== 'yes' ) {
 								$m = $data[$id]['meanrating'];
@@ -5228,7 +5228,7 @@ global $other_deps;
 							if ( $ratcount 		== 'yes' ) {
 								$n = $data[$author]['ratingcount'];
 								/* translators: integer count */
-								$result .= sprintf( _n( '%d vote', '%d votes', 'wp-photo-album-plus' ), $n ).'<br>';
+								$result .= sprintf( _n( '%d vote', '%d votes', $n, 'wp-photo-album-plus' ), $n ).'<br>';
 							}
 							if ( $meanrat  		== 'yes' ) {
 								$m = $data[$author]['meanrating'];
@@ -5561,9 +5561,40 @@ global $photos_used;
 		$num_of_weeks++;
 	}
 	$first_day_of_the_week = wppa_local_date( 'N', wppa_local_strtotime( $year . '-' . $month . '-01-12' ) );
-	$day_labels = array(__("Mon"),__("Tue"),__("Wed"),__("Thu"),__("Fri"),__("Sat"),__("Sun"));
-	$month_labels = array(__("January"),__("February"),__("March"),__("April"),__("May"),__("June"),__("July"),__("August"),__("September"),__("October"),__("November"),__("December"));
-	$month_lbls = array(__("Jan"),__("Feb"),__("Mar"),__("Apr"),__("May"),__("Jun"),__("Jul"),__("Aug"),__("Sep"),__("Oct"),__("Nov"),__("Dec"));
+	$day_labels = array( __( "Mon", 'wp-photo-album-plus' ),
+						 __( "Tue", 'wp-photo-album-plus' ),
+						 __( "Wed", 'wp-photo-album-plus' ),
+						 __( "Thu", 'wp-photo-album-plus' ),
+						 __( "Fri", 'wp-photo-album-plus' ),
+						 __( "Sat", 'wp-photo-album-plus' ),
+						 __( "Sun", 'wp-photo-album-plus' )
+						);
+	$month_labels = array( __( "January", 'wp-photo-album-plus' ),
+						   __( "February", 'wp-photo-album-plus' ),
+						   __( "March", 'wp-photo-album-plus' ),
+						   __( "April", 'wp-photo-album-plus' ),
+						   __( "May", 'wp-photo-album-plus' ),
+						   __( "June", 'wp-photo-album-plus' ),
+						   __( "July", 'wp-photo-album-plus' ),
+						   __( "August", 'wp-photo-album-plus' ),
+						   __( "September", 'wp-photo-album-plus' ),
+						   __( "October", 'wp-photo-album-plus' ),
+						   __( "November", 'wp-photo-album-plus' ),
+						   __( "December", 'wp-photo-album-plus' )
+						 );
+	$month_lbls = array( __( "Jan", 'wp-photo-album-plus' ),
+						 __( "Feb", 'wp-photo-album-plus' ),
+						 __( "Mar", 'wp-photo-album-plus' ),
+						 __( "Apr", 'wp-photo-album-plus' ),
+						 __( "May", 'wp-photo-album-plus' ),
+						 __( "Jun", 'wp-photo-album-plus' ),
+						 __( "Jul", 'wp-photo-album-plus' ),
+						 __( "Aug", 'wp-photo-album-plus' ),
+						 __( "Sep", 'wp-photo-album-plus' ),
+						 __( "Oct", 'wp-photo-album-plus' ),
+						 __( "Nov", 'wp-photo-album-plus' ),
+						 __( "Dec", 'wp-photo-album-plus' )
+						);
 	$current_day = 0;
 	$pm = $month - 1;
 	if ( ! $pm ) {
@@ -6678,7 +6709,7 @@ function wppa_get_grid_image_html( $id ) {
 
 		// Unsupported
 		else {
-			wppa_log( 'err', 'Unsupported linktype in wppa_get_grid_image_html() ' . var_export( $link, true ) );
+			wppa_log( 'err', 'Unsupported linktype in wppa_get_grid_image_html()' ); // . var_export( $link, true ) );
 		}
 	}
 

@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 8.8.04.001
+* Version 8.8.08.003
 *
 */
 
@@ -900,8 +900,8 @@ function wppa_get_slide_rating_vote_only( $opt, $id = '0', $is_lightbox = false 
 
 function wppa_slide_rating_range( $opt ) {
 
-	// Not on unreal start album
-	if ( wppa( 'start_album' ) < '1' ) return '';
+	// Not on a feed
+	if ( is_feed() ) return '';
 
 	// Not on a slideonly
 	if ( wppa( 'is_slideonly' ) ) {

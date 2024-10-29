@@ -6,6 +6,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  * @version    SVN: $Id: Mobile_Detect.php 3 2009-05-21 13:06:28Z vic.stanciu $
  * @version    SVN: $Id: Mobile_Detect.php 3 2011-04-19 18:44:28Z sjevsejev $
+ *
+ * 8.8.08.001
  */
 
 class wppa_mobile_detect {
@@ -63,9 +65,10 @@ class wppa_mobile_detect {
         $device = strtolower(substr($name, 2));
         if ($name == "is" . ucfirst($device)) {
             return $this->isDevice($device);
-        } else {
-            trigger_error( esc_html( "Method $name not defined", E_USER_ERROR ) );
         }
+//		else {
+//            trigger_error( esc_html( "Method $name not defined", E_USER_ERROR ) );
+//      }
     }
 
 

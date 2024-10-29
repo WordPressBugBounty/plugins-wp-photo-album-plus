@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 8.8.06.007
+* Version: 8.8.08.001
 *
 */
 
@@ -70,7 +70,7 @@ global $wppa_url_set_extension;
 
 	if ( wppa_switch( 'log_ajax' ) && wppa_get( 'action' ) != 'heartbeat' && wppa_get( 'option' ) != 'heartbeat' ) {
 		$dummy = wp_verify_nonce( 'dummy-code', 'dummy-action' ); // Just to satisfy Plugin Check
-		wppa_log( 'ajax', 'Script = ' . basename( wppa_script_filename() ) . ', Args = ' . var_export($_REQUEST,true) );
+		wppa_log( 'ajax', 'Script = ' . basename( wppa_script_filename() ) ); // . ', Args = ' . var_export($_REQUEST,true) );
 	}
 
 /*
@@ -1067,7 +1067,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Send the mail
 			wppa_send_mail( array(	'to' => get_bloginfo( 'admin_email' ),
-									'subj' => __('Request for info'),
+									'subj' => __( 'Request for info', 'wp-photo-album-plus' ),
 									'cont' => $content,
 									'photo' => $photo,
 									'email' => wppa_get_user( 'email' ),
@@ -2831,7 +2831,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 								);
 								$att_id = media_handle_sideload( $file, 0, wppa_get_photo_name( $photo ) );
 								if ( is_wp_error( $att_id ) ) {
-									wppa_log( 'err', 'Could not export '. $file['name'] . ' to wp media. err = ' . $att_id->get_error_message() . ' Filespec = ' . var_export( $file, true )  );
+									wppa_log( 'err', 'Could not export '. $file['name'] . ' to wp media. err = ' . $att_id->get_error_message() ); // . ' Filespec = ' . var_export( $file, true )  );
 								}
 								else {
 
@@ -4084,12 +4084,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						$out = array();
 						exec( escapeshellcmd( $value . '/convert' ), $out, $err );
 						$ok = ( count( $out ) != 0 );
-						if ( $ok ) {
-							$out = array_reverse( $out );
-							array_push( $out, 'Setting magick path returned:' );
-							wppa_log( 'dbg', var_export( $out, true ) );
-						}
-						else {
+						if ( ! $ok ) {
 							wppa( 'error', '4713' );
 							$alert .= __( 'This path does not contain ImageMagick commands', 'wp-photo-album-plus' );
 						}

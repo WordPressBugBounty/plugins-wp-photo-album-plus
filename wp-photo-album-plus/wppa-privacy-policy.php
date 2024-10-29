@@ -4,7 +4,7 @@
 *
 * This file contains all procedures related to the privacy policy.
 *
-* Version 8.7.03.006
+* Version 8.8.08.001
 */
 
 function wppa_comment_exporter( $email_address, $page = 1 ) {
@@ -540,7 +540,7 @@ function wppa_zip_addfile( $zip, $wppa_media_file, $wppa_media_name ) {
 	if ( wppa_is_file( $wppa_media_file ) ) {
 
 		if ( ! $zip->addFile( $wppa_media_file, 'wppa-media/' . $wppa_media_name ) ) {
-			$error = __( 'Unable to add data to export file.' ) . ' ' . $wppa_media_file . ' as ' . $wppa_media_name;
+			$error = __( 'Unable to add data to export file.', 'wp-photo-album-plus' ) . ' ' . $wppa_media_file . ' as ' . $wppa_media_name;
 			wppa_log( 'err', $error );
 		}
 	}

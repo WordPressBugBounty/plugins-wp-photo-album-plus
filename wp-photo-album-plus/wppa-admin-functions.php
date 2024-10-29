@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 8.8.05.003
+* Version: 8.8.08.001
 *
 */
 
@@ -536,8 +536,8 @@ function _wppa_sanitze_files( $root, $from = '' ) {
 			// Check extension and mimetype
 			$file_is_ok = wppa_check_filetype_and_ext( $file, basename( $file ), wppa_get_mime_types( 'import' ) );
 			if ( ! $file_is_ok['ext'] || ! $file_is_ok['type'] ) {
-				if ( ! $file_is_ok['ext'] ) wppa_error_message( 'Illegal ext '.wppa_get_ext($file).' '.var_export(wppa_get_mime_types( 'import' ),true));
-				if ( ! $file_is_ok['type'] ) wppa_error_message( 'Illegal type '.wppa_get_ext($file).' '.var_export(wppa_get_mime_types( 'import' ),true));
+				if ( ! $file_is_ok['ext'] ) wppa_error_message( 'Illegal ext '.wppa_get_ext($file) ); // .' '.var_export(wppa_get_mime_types( 'import' ),true));
+				if ( ! $file_is_ok['type'] ) wppa_error_message( 'Illegal type '.wppa_get_ext($file) ); // .' '.var_export(wppa_get_mime_types( 'import' ),true));
 
 				wppa_unlink( $file );
 				/* translators: filename */
@@ -1152,7 +1152,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 			<span class="displaying-num">' .
 				sprintf(
 				/* translators: %s: Number of items. */
-				_n( '%s item', '%s items', $total_items ),
+				_n( '%s item', '%s items', $total_items, 'wp-photo-album-plus' ),
 				number_format_i18n( $total_items ) ) . '
 			</span>';
 
@@ -1166,7 +1166,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 		$output .= "\n" . sprintf(
 			'<a class="first-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true"><img src="'.wppa_get_imgdir('Left-3.svg').'" style="height:1em;margin-bottom:-1px;" /></span></a>',
 			esc_url( add_query_arg( 'paged', 1, $current_url ) ),
-			__( 'First page' )
+			__( 'First page', 'wp-photo-album-plus' )
 		);
 	}
 
@@ -1177,7 +1177,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 		$output .= "\n".sprintf(
 			'<a class="prev-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true"><img src="'.wppa_get_imgdir('Left-2.svg').'" style="height:1em;margin-bottom:-1px;" /></span></a>',
 			esc_url( add_query_arg( 'paged', max( 1, $current - 1 ), $current_url ) ),
-			__( 'Previous page' )
+			__( 'Previous page', 'wp-photo-album-plus' )
 		);
 	}
 
@@ -1185,7 +1185,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 	if ( 'bottom' === $which ) {
 		$html_current_page  = $current;
 		$total_pages_before = '
-		<span class="screen-reader-text">' . __( 'Current Page' ) . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
+		<span class="screen-reader-text">' . __( 'Current Page', 'wp-photo-album-plus' ) . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
 	}
 
 	// Current page top
@@ -1201,7 +1201,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 				aria-describedby="table-paging"
 				onchange="document.location.href=\'%s&paged=\'+Math.min(Math.max(parseInt(this.value)||1,1),'.$total_pages.')"
 			/><span class="tablenav-paging-text">',
-			'<label for="current-page-selector" class="screen-reader-text">' . __( 'Current Page' ) . '</label>',
+			'<label for="current-page-selector" class="screen-reader-text">' . __( 'Current Page', 'wp-photo-album-plus' ) . '</label>',
 			$current,
 			strlen( $total_pages ),
 			esc_url( remove_query_arg( 'paged' ) )
@@ -1225,7 +1225,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 		$output .= "\n". sprintf(
 			'<a class="next-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true"><img src="'.wppa_get_imgdir('Right-2.svg').'" style="height:1em;margin-bottom:-1px;" /></span></a>',
 			esc_url( add_query_arg( 'paged', min( $total_pages, $current + 1 ), $current_url ) ),
-			__( 'Next page' )
+			__( 'Next page', 'wp-photo-album-plus' )
 		);
 	}
 
@@ -1236,7 +1236,7 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 		$output .= sprintf(
 			'<a class="last-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true"><img src="'.wppa_get_imgdir('Right-3.svg').'" style="height:1em;margin-bottom:-1px;" /></span></a>',
 			esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ),
-			__( 'Last page' )
+			__( 'Last page', 'wp-photo-album-plus' )
 		);
 	}
 

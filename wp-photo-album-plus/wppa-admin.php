@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 8.7.04.002
+* Version: 8.8.08.002
 *
 */
 
@@ -57,9 +57,11 @@ function wppa_add_admin() {
 	// Add wppa menu
 	$icon_url = WPPA_URL . '/img/camera16.png';
 
+	$atog = wppa_get_option( 'wppa_album_use_gallery', 'no' ) == 'yes';
+
 	// Main menu Photo Albums
 	add_menu_page( 'WP Photo Album', 													// page_title
-					_x( 'Photo&thinsp;Albums', 'menu-item', 'wp-photo-album-plus' ) . $tot_pending, 	// menu_title
+					( $atog ? _x( 'Photo&thinsp;Galleries', 'menu-item', 'wp-photo-album-plus' ) : _x( 'Photo&thinsp;Albums', 'menu-item', 'wp-photo-album-plus' ) ) . $tot_pending, 	// menu_title
 					'wppa_admin', 														// capability
 					'wppa_admin_menu', 													// menu_slug
 					'wppa_admin', 														// function
@@ -67,11 +69,11 @@ function wppa_add_admin() {
 
 	// Albums
 	add_submenu_page( 'wppa_admin_menu',  												// parent_slug
-						__( 'Albums', 'wp-photo-album-plus' ),			 				// page_title
-						_x( 'Albums', 'menu-item', 'wp-photo-album-plus' ),				// menu_title
-						'wppa_admin',        											// capability
-						'wppa_admin_menu',      										// menu_slug
-						'wppa_admin' );													// function
+					  $atog ? __( 'Galleries', 'wp-photo-album-plus' ) : __( 'Albums', 'wp-photo-album-plus' ),			 					// page_title
+					  $atog ? _x( 'Galleries', 'menu-item', 'wp-photo-album-plus' ) : _x( 'Albums', 'menu-item', 'wp-photo-album-plus' ),	// menu_title
+					  'wppa_admin',        											// capability
+					  'wppa_admin_menu',      										// menu_slug
+					  'wppa_admin' );													// function
 
 	// Upload *
     add_submenu_page( 'wppa_admin_menu',

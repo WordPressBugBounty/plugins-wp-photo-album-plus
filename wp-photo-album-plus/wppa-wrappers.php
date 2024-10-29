@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 8.8.05.003
+* Version 8.8.08.001
 *
 */
 
@@ -27,9 +27,9 @@ function wppa_imagecreatefromjpeg( $file ) {
 		wppa_log( 'Err', 'Unsafe from path detected in wppa_imagecreatefromjpeg(): ' . wppa_shortpath(  $file ) );
 		return false;
 	}
-	ini_set( 'gd.jpeg_ignore_warning', true );
+//	ini_set( 'gd.jpeg_ignore_warning', true );
 
-	$img = imagecreatefromjpeg( $file );
+	$img = @imagecreatefromjpeg( $file );
 	if ( ! $img ) {
 		wppa_log( 'Err', 'Could not create memoryimage from file ' . wppa_shortpath( $file ) );
 	}
@@ -1195,14 +1195,14 @@ global $wpdb;
 function wppa_update( $table, $data, $where ) {
 global $wpdb;
 
-	wppa_log( 'db', "Update in table $table id = " . $where['id'] . ": " . var_export( $data, true ) );
+	wppa_log( 'db', "Update in table $table id = " . $where['id'] ); // . ": " . var_export( $data, true ) );
 	return $wpdb->update( $table, $data, $where );
 }
 
 function wppa_insert( $table, $data ) {
 global $wpdb;
 
-	wppa_log( 'db', "Insert in table $table: " . var_export( $data, true ) );
+	wppa_log( 'db', "Insert in table $table " ); //  . var_export( $data, true ) );
 	return $wpdb->insert( $table, $data );
 }
 

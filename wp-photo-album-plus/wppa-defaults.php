@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 8.8.06.006
+* Version: 8.8.08.002
 *
 */
 
@@ -289,7 +289,7 @@ horizrailenabled:false,";
 						'wppa_show_rating_count'			=> 'no',	// 7
 						'wppa_albdesc_on_thumbarea'			=> 'none',
 						'wppa_albname_on_thumbarea'			=> 'none',
-						'wppa_show_empty_thumblist' 		=> 'no',
+						'wppa_show_empty_thumblist' 		=> 'never',
 
 						'wppa_edit_thumb' 					=> 'yes',	// II-D17
 						'wppa_upload_link_thumbs' 			=> 'bottom',

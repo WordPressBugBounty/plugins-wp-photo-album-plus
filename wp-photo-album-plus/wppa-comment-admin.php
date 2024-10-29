@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 8.8.05.002
+* Version: 8.8.08.001
 *
 */
 
@@ -71,7 +71,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 			case 'status':
 				return $item[$column_name];
 			default:
-				return print_r($item,true); //Show the whole array for troubleshooting purposes
+				return ''; // print_r($item,true); //Show the whole array for troubleshooting purposes
 		}
 	}
 

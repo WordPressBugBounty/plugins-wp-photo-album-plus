@@ -4,7 +4,7 @@
 *
 * Copy of wp version
 * Modified by OpaJaap
-* Version 8.8.05.003
+* Version 8.8.08.001
 *
 */
 
@@ -172,7 +172,7 @@ class WPPA_List_Table {
 
 	// Message to be displayed when there are no items
 	public function no_items() {
-		esc_html_e( 'No items found.' );
+		esc_html_e( 'No items found.', 'wp-photo-album-plus'  );
 	}
 
 	// Displays the search box.
@@ -726,7 +726,7 @@ class WPPA_List_Table {
 
 		$output = '<span class="displaying-num">' . sprintf(
 			/* translators: %s: Number of items. */
-			_n( '%s item', '%s items', $total_items ),
+			_n( '%s item', '%s items', $total_items, 'wp-photo-album-plus' ),
 			number_format_i18n( $total_items )
 		) . '</span>';
 
@@ -1336,7 +1336,7 @@ class WPPA_List_Table {
 		if ( isset( $this->_pagination_args['total_items'] ) ) {
 			$response['total_items_i18n'] = sprintf(
 				/* translators: Number of items. */
-				_n( '%s item', '%s items', $this->_pagination_args['total_items'] ),
+				_n( '%s item', '%s items', $this->_pagination_args['total_items'], 'wp-photo-album-plus' ),
 				number_format_i18n( $this->_pagination_args['total_items'] )
 			);
 		}

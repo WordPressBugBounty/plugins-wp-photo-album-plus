@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 8.8.06.003
+* Version 8.8.08.004
 *
 */
 
@@ -47,7 +47,7 @@ function wppa_schedule_mailinglist( $type, $alb = 0, $pho = 0, $com = 0, $url = 
 		$owner = wppa_get_photo_item( $pho, 'owner' );
 
 		$pending = get_transient( 'last_feuploadnotify_scheduled-' . $owner . '-' . $alb );
-		wppa_log( 'eml', 'Reading transient ' . 'last_feuploadnotify_scheduled-' . $owner . '-' . $alb . ' Value = ' . var_export( $pending, true ) );
+//		wppa_log( 'eml', 'Reading transient ' . 'last_feuploadnotify_scheduled-' . $owner . '-' . $alb . ' Value = ' . var_export( $pending, true ) );
 
 		if ( ! $pending ) {
 
@@ -560,7 +560,7 @@ global $wpdb;
 				}
 
 				// Now do the 'commentprevious' mailing
-				wppa_schedule_mailinglist( 'commentprevious', 0, 0, $com );
+				wppa_schedule_mailinglist( 'commentprevious', $alb, $pho, $com );
 
 			break;
 
@@ -725,7 +725,7 @@ global $wpdb;
 						$pho = $comment['photo'];
 					}
 
-					// Get teh author
+					// Get the author
 					$author = get_user_by( 'login', $comment['user'] );
 					if ( $author ) {
 						$aut = $author->display_name;
@@ -737,10 +737,8 @@ global $wpdb;
 					// Get the users who commented on the photo
 					$users = wppa_get_col( $wpdb->prepare( "SELECT DISTINCT user FROM $wpdb->wppa_comments WHERE photo = %d", $pho ) );
 
-					// If the current author is in the list: remove him, he is most likely already notified
-					if ( isset( $users[$comment['user']] ) ) {
-						unset( $users[$comment['user']] );
-					}
+					// If the current author is in the list: remove him, we do not send mails to the owner of the comment
+					$users = array_diff( $users, [$comment['user']] );
 
 					// Any users left?
 					if ( empty( $users ) ) {
@@ -763,6 +761,9 @@ global $wpdb;
 						$cont .= '<br>' . wppa_get_preview_text( $pho, $the_link );
 					}
 
+					/* Translators: Ccomment on <itemtype> <itemname> that you commented earlier */
+					$subj = sprintf( __( 'Comment on %1$s %2$s that you commented earlier' , 'wp-photo-album-plus' ), wppa_get_type( $pho, true ), wppa_get_photo_name( $comment['photo'] ) );
+
 					// Process users
 					foreach( $users as $usr ) {
 
@@ -773,7 +774,7 @@ global $wpdb;
 
 							wppa_send_mail( array( 	'to' 			=> $user->user_email,
 													/* translators: photoname */
-													'subj' 			=> sprintf( __( 'Comment on photo %s that you commented earlier' , 'wp-photo-album-plus' ), wppa_get_photo_name( $comment['photo'] ) ),
+													'subj' 			=> $subj,
 													'cont' 			=> $cont,
 													'photo' 		=> $comment['photo'],
 													'replyurl' 		=> $url,
@@ -1163,11 +1164,11 @@ function wppa_send_mail( $args ) {
 
 				if ( is_array( $cont ) && wppa_switch( 'show_email_thumbs' ) ) {
 					foreach ( $cont as $c ) if ( $c ) {
-						$message_part_1 .= '<tr><td>'.wppa_convert_smilies( $c ).'</td></tr>';
+						$message_part_1 .= '<tr><td>'.convert_smilies( $c ).'</td></tr>';
 					}
 				}
 				else {
-					$message_part_1 .= '<tr><td>'.wppa_convert_smilies( $cont ).'</td></tr>';
+					$message_part_1 .= '<tr><td>'.convert_smilies( $cont ).'</td></tr>';
 				}
 
 				// Tell the moderator the email address of the originator of the photo/comment

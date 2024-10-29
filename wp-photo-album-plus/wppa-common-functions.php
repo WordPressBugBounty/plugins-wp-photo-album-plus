@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 8.8.06.006
+* Version: 8.8.08.002
 *
 */
 
@@ -716,8 +716,8 @@ global $wppa;
 
     switch ( $order ) {
 
-		case '1': $result = 'p_order'; break;
-		case '-1': $result = 'p_order DESC'; break;
+		case '1': $result = 'p_order, id'; break;
+		case '-1': $result = 'p_order DESC, id'; break;
 		case '2': $result = 'name'; break;
 		case '-2': $result = 'name DESC'; break;
 		case '3': $result = 'RAND(' . wppa_get_randseed() . ')'; break;

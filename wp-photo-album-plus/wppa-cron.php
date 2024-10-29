@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
- Version: 8.8.05.003
+ Version: 8.8.08.001
 *
 */
 
@@ -58,6 +58,8 @@ global $is_reschedule;
 		}
 
 		wp_schedule_single_event( time() + $delay, 'wppa_cron_event', array( $slug ) );
+
+		/* Start debug
 		$backtrace = debug_backtrace();
 		$args = '';
 		if ( is_array( $backtrace[1]['args'] ) ) {
@@ -78,6 +80,7 @@ global $is_reschedule;
 
 		$re = $is_reschedule ? 're-' : '';
 		wppa_log( 'cron', '{b}' . $slug . '{/b} ' . $re . 'scheduled by {b}' . $backtrace[1]['function'] . '(' . $args . '){/b} on line {b}' . $backtrace[0]['line'] . '{/b} of ' . basename( $backtrace[0]['file'] ) . ' called by ' . $backtrace[2]['function'] . ' to run in ' . $delay . ' seconds' );
+		*/ // End debug
 	}
 
 	// Update appropriate options

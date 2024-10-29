@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 8.8.06.006
+* Version 8.8.08.004
 *
 */
 
@@ -57,7 +57,7 @@ static $hits;
 	if ( wppa_is_int( $photo ) ) {
 		if ( is_user_logged_in() ) wppa_log( 'err', "Unencrypted photo $photo found." );
 		/* translators: integer photo id */
-		wp_die( esc_html( sprintf( __( 'Security check failure on unencrypted photo id %s', 'wp-photo-album-plus' ), $photo ) ) );
+		wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Media item id must be encrypted, %d given', 'wp-photo-album-plus' ), $photo ) ) );
 		return null;
 	}
 
@@ -183,7 +183,7 @@ static $hits;
 	if ( wppa_is_posint( $album ) ) {
 		if ( is_user_logged_in() ) wppa_log( 'err', "Unencrypted album $album found." );
 		/* translators: integer album id */
-		wp_die( esc_html( sprintf( __( 'Security check failure on unencrypted album id %s', 'wp-photo-album-plus' ), $album ) ) );
+		wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Album id must be encrypted, %d given', 'wp-photo-album-plus' ), $album ) ) );
 		return null;
 	}
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 8.8.07.004
+* Version: 8.8.08.001
 *
 */
 
@@ -365,8 +365,10 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 
 		case 'arraytxt':
 			$result = array();
-			if ( isset( $_REQUEST[$key] ) ) foreach( array_keys( wp_unslash( $_REQUEST[$key] ) ) as $k ) {
-				$result[sanitize_text_field( $k )] = isset( $_REQUEST[$key][$k] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key][$k] ) ) : '';
+			if ( isset( $_REQUEST[$key] ) ) {
+				foreach( array_keys( wp_unslash( $_REQUEST[$key] ) ) as $k ) {
+					$result[sanitize_text_field( $k )] = isset( $_REQUEST[$key][$k] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key][$k] ) ) : '';
+				}
 			}
 			return $result;
 			break;

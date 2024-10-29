@@ -10,18 +10,20 @@
  * @package WordPress
  * @subpackage Twenty_Ten
  * @since Twenty Ten 1.0
+ *
+ * wppa version 8.7.03.006
  */
- 
+
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly (2010)" );
- 
+
 global $wppa_show_statistics;
 
 get_header(); ?>
 
 		<div id="container" class="one-column">
 			<div id="content" role="main">
-			
-<?php /* wppa_statistics(); */ /* This would show the statistics at the to of the page */?>	
+
+<?php /* wppa_statistics(); */ /* This would show the statistics at the to of the page */?>
 <?php $wppa_show_statistics = true; /* This will show the statistics within the wppa-container */?>
 
 <?php if ( have_posts() ) while ( have_posts() ) : the_post(); ?>
@@ -30,8 +32,8 @@ get_header(); ?>
 					<h1 class="entry-title"><?php the_title(); ?></h1>
 					<div class="entry-content">
 						<?php the_content(); ?>
-						<?php wp_link_pages( array( 'before' => '<div class="page-link">' . __( 'Pages:', 'twentyten' ), 'after' => '</div>' ) ); ?>
-						<?php edit_post_link( __( 'Edit', 'twentyten' ), '<span class="edit-link">', '</span>' ); ?>
+						<?php wp_link_pages( array( 'before' => '<div class="page-link">' . __( 'Pages:', 'wp-photo-album-plus' ), 'after' => '</div>' ) ); ?>
+						<?php edit_post_link( __( 'Edit', 'wp-photo-album-plus' ), '<span class="edit-link">', '</span>' ); ?>
 					</div><!-- .entry-content -->
 				</div><!-- #post-## -->
 				<?php /*do_action( 'addthis_widget' ); */?>
@@ -49,7 +51,7 @@ get_header(); ?>
 			jQuery('#wppa-container-1').css('margin-left', '-80px');
 //			jQuery('.wppa-fulldesc').css('color', '#eef7e6');
 //			jQuery('.wppa-fulltitle').css('color', '#eef7e6');
-//	jQuery('.wppa-nav').css('background-color', '#ccc');		
+//	jQuery('.wppa-nav').css('background-color', '#ccc');
 	});
 	/* ]]> */
 		</script>

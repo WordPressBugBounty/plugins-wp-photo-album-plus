@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 8.8.01.006
+* Version: 8.8.08.002
 *
 */
 
@@ -161,7 +161,7 @@ global $wpdb;
 	// Cover type
 	if ( isset( $args['cover_type'] ) ) {
 		$ct = $args['cover_type'];
-		if ( in_array( $ct, array( '', 'default', 'longdesc', 'imagefactory', 'default-mcr', 'longdesc-mcr', 'imagefactory-mcr' ) ) ) {
+		if ( in_array( $ct, array( '', 'default', 'longdesc', 'imagefactory', 'default-mcr', 'longdesc-mcr', 'imagefactory-mcr', 'titleonly' ) ) ) {
 			$fields['cover_type'] = $ct;
 			$modified = true;
 		}
@@ -286,6 +286,9 @@ global $wpdb;
 		$iret = wppa_update( WPPA_ALBUMS, $fields, ['id' => $id] );
 		wppa_clear_cache( array( 'album' => $id ) );
 		wppa_cache_album( 'invalidate', $id );
+		if ( isset( $fields['a_parent'] ) ) {
+			wppa_fix_seq_nums( 'album', $id );
+		}
 	}
 	catch( Exception $e ) {
 		wppa_log( 'err', 'wppa_update_album() caught exception: ' .  $e->getMessage() );
@@ -651,6 +654,9 @@ global $wpdb;
 		// Clear associated caches
 		wppa_clear_cache( array( 'photo' => $id ) );
 		wppa_cache_photo( 'invalidate', $id );
+		if ( isset( $fields['album'] ) ) {
+			wppa_fix_seq_nums( 'media', $id );
+		}
 	}
 
 	return $iret;
