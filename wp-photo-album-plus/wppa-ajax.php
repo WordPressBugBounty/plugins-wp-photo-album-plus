@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 8.8.08.001
+* Version: 8.9.01.001
 *
 */
 
@@ -1162,6 +1162,13 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				wppa_exit();
 			}
 
+			// Garbage after shortcode?
+			$bpos = strpos( $shortcode, ']' );
+			if ( strlen( $shortcode ) != $bpos + 1 ) {
+				wppa_log( 'war', 'Shortcode ' . esc_html( $shortcode ) . ' trimmed after ]' );
+				$shortcode = substr( $shortcode, 0, $bpos + 1 );
+			}
+
 			// Prepare environment for rendering
 			wppa_load_theme();
 
@@ -1225,16 +1232,23 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Is it a valid shortcode?
 			$shortcode = wppa_get( 'shortcode' );
-			if ( $shortcode != '[wppa]' && substr( $shortcode, 0, 6 ) != '[wppa ' ) {
+			if ( $shortcode != '[wppa]' && substr( $shortcode, 0, 6 ) != '[wppa ' && substr( $shortcode, 0, 7 ) != '[photo ' ) {
 				wppa_log('war', 'Shortcode '.$shortcode.' rejected');
 				echo wp_json_encode( ['html' => __( 'Shortcode check failure', 'wp-photo-album-plus' ), 'js' => ''] );
 				wppa_exit();
 			}
 
+			// Garbage after shortcode?
+			// Some still use [/wppa] so we simply cut off after the first ]
+			$bpos = strpos( $shortcode, ']' );
+			if ( strlen( $shortcode ) != $bpos + 1 ) {
+				wppa_log( 'war', 'Shortcode ' . esc_html( $shortcode ) . ' trimmed after ]' );
+				$shortcode = substr( $shortcode, 0, $bpos + 1 );
+			}
+
 			// Yes
 			ob_start();
 			wppa_load_theme();
-//			wppa( 'mocc', wppa_get( 'occur' ) - 1 );
 			$result = do_shortcode( str_replace( '%23', '#', $shortcode ) );
 
 			// Get the JS

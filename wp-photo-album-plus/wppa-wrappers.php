@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 8.8.08.001
+* Version 8.9.01.001
 *
 */
 
@@ -265,13 +265,8 @@ function wppa_fclose( $handler ) {
 	}
 }
 
-function wppa_fputs( $handle, $string ) {
-	return fputs( $handle, $string );
-}
-
-function wppa_fwrite( $file, $data ) {
-
-	return fwrite( $file, $data );
+function wppa_fwrite( $handle, $string ) {
+	return fwrite( $handle, $string );
 }
 
 // Wrapper for glob
@@ -335,9 +330,6 @@ global $wppa_nodelete;
 			else {
 				wppa_log( 'War', wppa_shortpath( $file ) . ' could not be removed' );
 			}
-		}
-		else {
-//			wppa_log( 'War', wppa_shortpath( $file ) . ' not found while trying to remove' );
 		}
 	}
 	return true;
@@ -504,7 +496,7 @@ global $wp_filesystem;
 
 //	mbstring_binary_safe_encoding();
 
-	$data_length = strlen( $contents );
+//	$data_length = strlen( $contents );
 
 	$bytes_written = fwrite( $fp, $contents );
 	clearstatcache();
@@ -513,9 +505,9 @@ global $wp_filesystem;
 
 	fclose( $fp );
 
-	if ( $data_length !== $bytes_written ) {
-		return false;
-	}
+//	if ( $data_length !== $bytes_written ) {
+//		return false;
+//	}
 
 	wppa_chmod( $path );
 

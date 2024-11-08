@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 8.8.08.001
+* Version: 8.9.01.001
 *
 */
 
@@ -228,7 +228,7 @@ function wppa_get_get_filter( $name ) {
 
 		// Array text
 		case 'bulk-photo':
-			$result = 'arraytxt';
+			$result = 'txtarr';
 			break;
 
 		default:
@@ -349,8 +349,8 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			break;
 
 		case 'intarr':
+			$value = array();
 			if ( isset( $_REQUEST[$key] ) && is_array( $_REQUEST[$key] ) ) {
-				$value = array();
 				$i = 0;
 				while ( isset( $_REQUEST[$key][$i] ) ) {
 					$value[$i] = strval( intval( wp_unslash( $_REQUEST[$key][$i] ) ) );
@@ -358,19 +358,24 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 				}
 			}
 			else {
-				$value = isset( $_REQUEST[$key] ) ? strval( intval ( wp_unslash( $_REQUEST[$key] ) ) ) : $default;
+				if ( $default ) $value = $deafult;
 			}
 			return $value;
 			break;
 
-		case 'arraytxt':
-			$result = array();
-			if ( isset( $_REQUEST[$key] ) ) {
-				foreach( array_keys( wp_unslash( $_REQUEST[$key] ) ) as $k ) {
-					$result[sanitize_text_field( $k )] = isset( $_REQUEST[$key][$k] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key][$k] ) ) : '';
+		case 'txtarr':
+			$value = array();
+			if ( isset( $_REQUEST[$key] ) && is_array( $_REQUEST[$key] ) ) {
+				$i = 0;
+				while ( isset( $_REQUEST[$key][$i] ) ) {
+					$value[$i] = sanitize_text_field( wp_unslash( $_REQUEST[$key][$i] ) );
+					$i++;
 				}
 			}
-			return $result;
+			else {
+				if ( $default ) $value = $deafult;
+			}
+			return $value;
 			break;
 
 		case 'strip':

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the actual import functions
-* Version: 8.8.05.003
+* Version: 8.9.01.001
 *
 */
 
@@ -815,7 +815,7 @@ global $wpdb;
 		wppa_fclose( $write_handle );
 		wppa_import_quit( '20' );
 	}
-	if ( ! wppa_fputs( $write_handle, $header ) ) {
+	if ( ! wppa_fwrite( $write_handle, $header ) ) {
 		wppa_fclose( $handle );
 		wppa_fclose( $write_handle );
 		wppa_import_quit( '21' );
@@ -918,7 +918,7 @@ global $wpdb;
 				// Copy rest of file back to original
 				while ( ! feof( $handle ) ) {
 					$temp = fgets( $handle, 16*4096 );
-					wppa_fputs( $write_handle, $temp );
+					wppa_fwrite( $write_handle, $temp );
 				}
 				wppa_unlink( $tempfile );
 				wppa_import_quit( '23', false, true, false, $processed, $skipped );
@@ -1084,7 +1084,7 @@ global $wpdb;
 				// Copy rest of file back to original
 				while ( ! feof( $handle ) ) {
 					$temp = fgets( $handle, 16*4096 );
-					wppa_fputs( $write_handle, $temp );
+					wppa_fwrite( $write_handle, $temp );
 				}
 				wppa_unlink( $tempfile );
 				wppa_import_quit( '23', false, true, false, $processed, $skipped );

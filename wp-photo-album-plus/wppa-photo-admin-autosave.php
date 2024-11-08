@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 8.8.08.001
+* Version: 8.9.01.001
 *
 */
 
@@ -3173,7 +3173,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 			$totcount 	= count( $ids );
 
 			if ( is_array( $ids ) ) {
-				foreach ( array_keys( $ids ) as $crid ) {
+				foreach ( $ids as $crid ) {
 					$id = wppa_decrypt_photo( $crid );
 					$skip = false;
 					switch ( wppa_get( 'bulk-action' ) ) {
@@ -3596,7 +3596,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 								<!-- Checkbox -->
 								<td>
 									<input type="hidden" id="photo-nonce-' . $crid . '" value="' . wp_create_nonce( 'wppa-nonce_' . $id ) . '" />
-									<input type="checkbox" name="wppa-bulk-photo[' . $crid . ']" class="wppa-bulk-photo" />
+									<input type="checkbox" name="wppa-bulk-photo[]" value="' . $crid . '" class="wppa-bulk-photo" />
 								</td>
 								<!-- ID and delete link -->
 								<td>

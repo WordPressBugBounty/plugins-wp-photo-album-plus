@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 8.7.03.006
+* Version 8.9.01.001
 *
 */
 
@@ -438,6 +438,7 @@ function wppa_add_watermark( $id ) {
 	// Find the watermark file and location
 	$temp = wppa_get_water_file_and_pos( $id );
 	$waterfile = $temp['file'];
+	if ( ! wppa_is_file( $waterfile ) ) return false;
 	if ( ! $waterfile ) return false;					// an error has occurred
 
 	$waterpos = $temp['pos'];										// default
@@ -454,6 +455,7 @@ function wppa_add_watermark( $id ) {
 
 	$watersize = wppa_getimagesize( $waterfile );
 	if ( ! is_array( $watersize ) ) return false;	// Not a valid picture file
+
 	$waterimage = wppa_imagecreatefrompng( $waterfile );
 	if ( empty( $waterimage ) or ( !$waterimage ) ) {
 		wppa_log( 'Err', 'Watermark file '.$waterfile.' not found or corrupt' );
@@ -628,11 +630,12 @@ function wppa_imagecopymerge_alpha( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $s
             $colorxy = imagecolorat( $src_im, $x, $y );
             $alpha = ( $colorxy >> 24 ) & 0xFF;
             //calculate new alpha
-            if( $minalpha !== 127 ){
+            if ( $minalpha !== 127 ) {
                 $alpha = 127 + 127 * $pct * ( $alpha - 127 ) / ( 127 - $minalpha );
             } else {
                 $alpha += 127 * $pct;
             }
+			$alpha = intval( $alpha );
             //get the color index with new alpha
             $alphacolorxy = imagecolorallocatealpha( $src_im, ( $colorxy >> 16 ) & 0xFF, ( $colorxy >> 8 ) & 0xFF, $colorxy & 0xFF, $alpha );
             //set pixel with the new color + opacity

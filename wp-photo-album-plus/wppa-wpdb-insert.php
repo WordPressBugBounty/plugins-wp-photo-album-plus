@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 8.8.08.002
+* Version 8.8.08.005
 *
 */
 
@@ -294,10 +294,11 @@ global $wpdb;
 
 	if ( $bret ) {
 
-		// Update index
+		// Housekeeping
 		wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 		wppa_clear_cache( array( 'album' => $data['album'] ) );
 		wppa_fix_seq_nums( 'media', $data['id'] );
+		wppa_get_the_auto_page( $data['id'] );
 		return $data['id'];
 	}
 

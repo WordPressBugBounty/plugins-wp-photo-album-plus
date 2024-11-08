@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '8.8.07.002';
+wppaWppaVer = '8.8.08.006';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -1269,7 +1269,14 @@ function wppaGetUploadOptions( yalb, mocc, where, onComplete ) {
 		},
 		complete: function(response) {
 
-			var txt = response.responseJSON.html;
+			var txt;
+			if ( wppaAjaxMethod == 'rest' ) {
+				txt = response.responseJSON.html;
+			}
+			else {
+				theResult = JSON.parse(response.responseText);
+				txt = theResult.html;
+			}
 
 			if (txt.indexOf(__( 'Upload failed', 'wp-photo-album-plus' ))!=-1) {
 				jQuery('#bar-'+yalb+'-'+mocc).css('backgroundColor','#F77');

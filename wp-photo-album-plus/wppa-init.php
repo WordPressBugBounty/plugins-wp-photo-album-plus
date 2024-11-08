@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version: 8.8.08.003
+* Version: 8.8.08.005
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -440,21 +440,24 @@ global $wppa_lang;
 	return $text;
 }
 
-// Prepare translations for using Galery rather than Album
-function wppa_filter_translate() {
-global $wppa_album_gallery_texts_albums;
-global $wppa_album_gallery_texts_gallery;
-global $_gallery;
+// Do the conversion from album to gallery
+function wppa_album_to_gallery( $text = '' ) {
+global $wppa_skip_alb_to_gal;
+static $wppa_alb_to_gal_initializing;
+static $wppa_album_gallery_texts_albums;
+static $wppa_album_gallery_texts_gallery;
+static $_gallery;
+static $_Gallery;
 
-	// Keep it album?
-	if ( wppa_get_option( 'wppa_album_use_gallery', 'no' ) == 'no' ) {
-		return;
+	if ( $wppa_alb_to_gal_initializing ) return $text;
+	if ( $wppa_skip_alb_to_gal ) {
+		$wppa_skip_alb_to_gal = false;
+		return $text;
 	}
 
-	// Been here before?
-	if ( !empty( $wppa_album_gallery_texts_albums ) ) return;
-
-	$wppa_album_gallery_texts_albums = array(
+	if ( ! $wppa_album_gallery_texts_albums ) {
+		$wppa_alb_to_gal_initializing = true;
+		$wppa_album_gallery_texts_albums = array(
 									__( 'of the album', 'wp-photo-album-plus' ),
 									__( 'Renew album', 'wp-photo-album-plus' ),
 									__( 'renew album', 'wp-photo-album-plus' ),
@@ -477,7 +480,7 @@ global $_gallery;
 									__( 'album', 'wp-photo-album-plus' ),
 									);
 
-	$wppa_album_gallery_texts_gallery = array(
+		$wppa_album_gallery_texts_gallery = array(
 									__( 'of the gallery', 'wp-photo-album-plus' ),
 									__( 'Renew gallery', 'wp-photo-album-plus' ),
 									__( 'renew gallery', 'wp-photo-album-plus' ),
@@ -500,39 +503,17 @@ global $_gallery;
 									__( 'gallery', 'wp-photo-album-plus' ),
 									);
 
-	$_gallery = __( 'gallery', 'wp-photo-album-plus' );
-}
-add_action( 'init', 'wppa_filter_translate', 19 );
+		$_gallery = __( 'gallery', 'wp-photo-album-plus' );
+		$_Gallery = __( 'Gallery', 'wp-photo-album-plus' );
 
-// Activate album to gallery conversion
-// This must be done after wppa_filter_translate() has completed to avoid endless recursion
-function wppa_activate_albtogal_conversion() {
-
-	// Keep it album?
-	if ( wppa_get_option( 'wppa_album_use_gallery', 'no' ) == 'no' ) {
-		return;
-	}
-
-	add_filter( 'gettext', 'wppa_album_to_gallery', 100 );
-}
-add_action( 'init', 'wppa_activate_albtogal_conversion', 20 );
-
-// Do the actual conversion from album to gallery
-function wppa_album_to_gallery( $text = '' ) {
-global $wppa_skip_alb_to_gal;
-global $wppa_album_gallery_texts_albums;
-global $wppa_album_gallery_texts_gallery;
-global $_gallery;
-
-	if ( $wppa_skip_alb_to_gal ) {
-		$wppa_skip_alb_to_gal = false;
-		return $text;
+		$wppa_alb_to_gal_initializing = false;
 	}
 
 	$text = str_replace( $wppa_album_gallery_texts_albums,
 						 $wppa_album_gallery_texts_gallery,
 						 $text );
 	$text = str_replace( '-' . $_gallery . '-', '-album-', $text ); // Repair refs to wp (i.e. 'wp-photo-album-plus')
+	$text = str_replace( ' ' . $_Gallery . ' ', ' album ', $text ); // WP Photo Gallery Plus to WP Photo Album Plus
 
 	return $text;
 }
@@ -542,8 +523,11 @@ function wppa_filter_qtranslate() {
 	add_filter( 'gettext', 'wppa_translate' );
 	add_filter( 'widget_title', 'wppa_translate', 1 );
 	add_filter( 'translate_text', 'wppa_translate', 1 );
+	if ( get_option( 'wppa_album_use_gallery', 'no' ) == 'yes' ) {
+		add_filter( 'gettext', 'wppa_album_to_gallery' );
+	}
 }
-add_action( 'plugins_loaded', 'wppa_filter_qtranslate', 100 );
+add_action( 'init', 'wppa_filter_qtranslate' );
 
 // Fix All in one SEO tampers occur counter
 function wppa_fix_aioseo() {

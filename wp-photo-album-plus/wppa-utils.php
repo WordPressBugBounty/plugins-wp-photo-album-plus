@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 8.8.08.002
+* Version: 8.9.01.001
 *
 */
 
@@ -2033,8 +2033,12 @@ function wppa_get_the_landing_page( $slug, $title ) {
 
 function wppa_get_the_auto_page( $photo ) {
 
+	// Feature enabled?
+	if ( ! wppa_switch( 'auto_page' ) ) return '0';
+
+	// Validate args
 	if ( ! $photo ) return '0';					// No photo id, no page
-	if ( ! wppa_is_int( $photo ) ) return '0';	// $photo not numeric
+	if ( ! wppa_is_posint( $photo ) ) return '0';	// $photo not numeric
 
 	$thumb = wppa_cache_photo( $photo );		// Get photo info
 
@@ -4989,8 +4993,9 @@ function wppa_dump( $txt = '' ) {
 		wppa_unlink( $file );
 	}
 
-//	$who = wppa_get_user( 'login' );
-//	$when = wppa_local_date( 'd.m.Y H:i:s', time());
+	if ( is_array( $txt ) ) {
+		$txt = var_export( $txt, true );
+	}
 
 	if ( $txt ) {
 		if ( wppa_is_file( $file ) ) {

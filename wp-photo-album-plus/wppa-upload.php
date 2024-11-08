@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 8.8.08.001
+* Version 8.8.08.005
 *
 */
 
@@ -162,7 +162,7 @@ global $upload_album;
 				>' .
 				/* translators: intreger counts */
 				sprintf( __( '<b>Notice:</b> your server allows you to upload <b>%1$s</b> files of maximum <b>%2$s</b> bytes each and total <b>%3$s</b> bytes and allows <b>%4$s</b> seconds to complete.', 'wp-photo-album-plus' ), $max_files_txt, $max_size, $max_tot_size, $max_time ) . ' ' .
-				__( 'If your request exceeds these limitations, it will fail, probably without an errormessage.', 'wp-photo-album-plus' ) . ' ' .
+				__( 'If your request exceeds these limitations, it will fail, probably without an error message.', 'wp-photo-album-plus' ) . ' ' .
 				__( 'Additionally your hosting provider may have set other limitations on uploading files.' , 'wp-photo-album-plus' ) . '
 				<br>' .
 				wppa_check_memory_limit() . '

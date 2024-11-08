@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '8.7.00.002';
+var wppaJsAjaxVersion = '8.8.08.006';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender( mocc, ajaxurl, newurl, addHilite ) {
@@ -22,7 +22,7 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, addHilite ) {
 						type: 		'GET',
 						timeout: 	60000,
 						beforeSend: function( xhr ) {
-							
+
 										if ( wppaAjaxMethod == 'rest' ) {
 											xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 										}
@@ -52,7 +52,7 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, addHilite ) {
 										}
 
 										else {
-											
+
 											if ( typeof( xresult ) == 'string' ) {
 												var theResult = JSON.parse(xresult);
 												var result = theResult.html + '<script>' + theResult.js + '</script>';
@@ -317,7 +317,7 @@ function wppaAjaxRemovePhoto( mocc, photo, isslide ) {
 									}
 								},
 					success: 	function( xresult, status, xhr ) {
-						
+
 									var result;
 									if ( wppaAjaxMethod == 'rest' ) {
 										result = xresult.txt;
@@ -387,8 +387,8 @@ function wppaAjaxApproveComment( comment ) {
 									else {
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
-									}									
-									
+									}
+
 									// Approve succeeded?
 									if ( result == 'OK' ) {
 										jQuery( '.wppa-approve-'+comment ).css( 'display', 'none' );
@@ -429,7 +429,7 @@ function wppaAjaxRemoveComment( comment ) {
 									else {
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
-									}	
+									}
 
 									// Remove succeeded?
 									var rtxt = result.split( '||' );
@@ -470,7 +470,7 @@ function wppaAjaxAddPhotoToZip( mocc, id, reload ) {
 								else {
 									theResult = JSON.parse( xresult );
 									result = theResult.txt;
-								}	
+								}
 
 								// Adding succeeded?
 								var rtxt = result.split( '||' );
@@ -519,8 +519,8 @@ function wppaAjaxRemovePhotoFromZip( mocc, id, reload ) {
 									else {
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
-									}	
-									
+									}
+
 									// Removing succeeded?
 									var rtxt = result.split( '||' );
 									if ( rtxt[0] == 'OK' ) {
@@ -567,7 +567,7 @@ function wppaAjaxDeleteMyZip() {
 								else {
 									theResult = JSON.parse( xresult );
 									result = theResult.txt;
-								}	
+								}
 
 								// Reload
 								document.location.reload( true );
@@ -654,7 +654,7 @@ function wppaAjaxRequestInfoSend( mocc, id, reload ) {
 								}
 							},
 				success: 	function( xresult, status, xhr ) {
-					
+
 								var result;
 								if ( wppaAjaxMethod == 'rest' ) {
 									result = xresult.txt;
@@ -662,7 +662,7 @@ function wppaAjaxRequestInfoSend( mocc, id, reload ) {
 								else {
 									theResult = JSON.parse( xresult );
 									result = theResult.txt;
-								}	
+								}
 
 								// Request succeeded?
 								var rtxt = result.split( '||' );
@@ -727,8 +727,8 @@ function wppaEditPhoto( mocc, id ) {
 									else {
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
-									}	
-									
+									}
+
 									var opt = {
 										modal:		true,
 										resizable: 	true,
@@ -786,7 +786,7 @@ function wppaEditPhoto( mocc, id ) {
 }
 
 // Preview tags in frontend upload dialog
-function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPrev ) {
+function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPrev, tagsNewval ) {
 
 	var sel1 		= jQuery( '#'+tagsSel1 ).val();
 	var sel2 		= jQuery( '#'+tagsSel2 ).val();
@@ -820,7 +820,8 @@ function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPr
 									else {
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
-									}	
+									}
+									jQuery( '#'+tagsNewval ).attr( 'value', wppaTrim( result, ',' ) );
 									jQuery( '#'+tagsPrev ).html( wppaTrim( result, ',' ) );
 									wppaConsoleLog(result+' gepleurt op '+tagsPrev);
 								},
@@ -858,7 +859,7 @@ function wppaAjaxDestroyAlbum( album, nonce ) {
 										else {
 											theResult = JSON.parse( xresult );
 											result = theResult.txt;
-										}	
+										}
 										alert( result+'\n'+__( 'Page will be reloaded', 'wp-photo-album-plus' ) );
 										document.location.reload( true );
 									},
@@ -1027,7 +1028,7 @@ function _wppaRateIt( mocc, value ) {
 					type: 		'GET',
 					timeout: 	60000,
 					beforeSend: function( xhr ) {
-			
+
 									if ( wppaAjaxMethod == 'rest' ) {
 										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 									}
@@ -1129,11 +1130,11 @@ function _wppaOvlRateIt( id, value, mocc, reloadAfter ) {
 					type: 		'GET',
 					timeout: 	60000,
 					beforeSend: function( xhr ) {
-				
+
 									if ( wppaAjaxMethod == 'rest' ) {
 										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 									}
-								
+
 									// Set icon
 									jQuery( '.wppa-rate-'+mocc+'-'+value ).attr( 'src', wppaImageDirectory+'tick.png' );
 
@@ -1235,7 +1236,7 @@ function wppaAjaxDownloadAlbum( mocc, id ) {
 					type: 		'GET',
 					timeout: 	120000,
 					beforeSend: function( xhr ) {
-			
+
 									if ( wppaAjaxMethod == 'rest' ) {
 										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 									}
@@ -1316,7 +1317,7 @@ function wppaAjaxComment( mocc, id ) {
 									if ( wppaAjaxMethod == 'rest' ) {
 										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 									}
-								
+
 									// Show spinner
 									jQuery( "#wppa-comment-spin-"+mocc ).css( 'display', 'inline' );
 								},
@@ -1416,13 +1417,13 @@ function wppaUpdatePhotoNew(id,mocc) {
 									else {
 										result = JSON.parse( xresult );
 									}
-									
+
 									if ( result.error ) {
 										wppaConsoleLog('Failed to report updates', 'force' );
 										alert(result.error);
 									}
 									else {
-										
+
 										if ( typeof(result.description) != 'undefined' ) jQuery('.sdd-'+mocc).html(result.description);
 										if ( typeof(result.name) != 'undefined' ) jQuery('.sdn-'+mocc).html(result.name);
 										if ( typeof(result.fullname) != 'undefined' ) jQuery('.sdf-'+mocc).html(result.fullname);
@@ -1456,7 +1457,7 @@ function wppaUpdatePhotoNew(id,mocc) {
 function wppaFixHtml( txt ) {
 
 	if ( ! txt ) return '';
-	
+
 	txt = txt.replace(/\[/g, '<'); // [ to <
 	txt = txt.replace(/\]/g, '>'); // ] to >
 	txt = txt.replace(/&quot;/g, '"'); //
@@ -1535,11 +1536,11 @@ function wppaAjaxNotify( elm, list, user ) {
 					type: 		'POST',
 					timeout: 	10000,
 					beforeSend: function(xhr) {
-				
+
 						//			if ( wppaAjaxMethod == 'rest' ) {
 						//				xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 						//			}
-						
+
 									if ( user ) {
 										jQuery("#img_"+list+"-"+user).attr('src',wppaImageDirectory+'spinner.gif');
 									}
@@ -1590,11 +1591,11 @@ function wppaAjaxGetSsIptcExifList( mocc, s3, selid, retry, tagtype ) {
 					type: 		'GET',
 					timeout: 	10000,
 					beforeSend: function( xhr ) {
-			
+
 									if ( wppaAjaxMethod == 'rest' ) {
 										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 									}
-						
+
 									jQuery( '#wppa-ss-spinner-'+mocc ).css('display', '');
 								},
 					success: 	function( xresult, status, xhr ) {

@@ -1,5 +1,12 @@
 WP Photo Album Plus Changelog
 
+= 8.9.01 =
+
+* Autopages (if configured) are now immediately created on upload/import rather than when asked for.
+* Fixed a php 8.2 compatibility issue during application of watermarks.
+* Fixed response display at the end of a frontend upload when the ajax method is not using REST.
+* Security fix for the use of delayed shortcodes.
+
 = 8.8.08 =
 
 * Maintenance release. To better comply with the plugin guidelines.

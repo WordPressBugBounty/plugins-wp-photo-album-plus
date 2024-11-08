@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 8.8.08.002
+* Version 8.9.01.001
 *
 */
 
@@ -3436,7 +3436,8 @@ static $albums_granted;
 				'\'wppa-sel-'.$cralb.'-'.$mocc.'-3\',' .
 				'\'wppa-inp-'.$cralb.'-'.$mocc.'\',' .
 				'\'wppa-upload-album-'.$mocc.'-'.$seqno.'\',' .
-				'\'wppa-prev-'.$cralb.'-'.$mocc.'\');';
+				'\'wppa-prev-'.$cralb.'-'.$mocc.'\',' .
+				'\'wppa-newval-'.$cralb.'-'.$mocc.'\');';
 
 		// Selection boxes 1..3
 		for ( $i = '1'; $i < '4'; $i++ ) {
@@ -3496,14 +3497,9 @@ static $albums_granted;
 		// Preview area
 		if ( wppa_switch( 'up_tag_preview' ) ) {
 			$head = __( 'Preview tags', 'wp-photo-album-plus' );
-			$body = '<span id="wppa-prev-'.$cralb.'-'.$mocc.'">' .
-
-					( $yalb ? htmlspecialchars( trim( wppa_sanitize_tags( wppa_get_album_item( $yalb, 'default_tags' ), false, true ), ',' ) ) : '' ) .
-
-					'</span>';// .
-
-	//				( $yalb ? '' : wppa_js( 'jQuery(document).ready(function() {'.$onc.'});' ) );
-
+			$val  = ( $yalb ? htmlspecialchars( trim( wppa_sanitize_tags( wppa_get_album_item( $yalb, 'default_tags' ), false, true ), ',' ) ) : '' );
+			$body = '<input type="text" name="wppa-prev-tags" id="wppa-newval-'.$cralb.'-'.$mocc.'" value="' . $val . '">' .
+					'<span id="wppa-prev-'.$cralb.'-'.$mocc.'">' . $val . '</span>';
 			$result .= wppa_get_dlg_item( $head, $body, $big );
 		}
 	}

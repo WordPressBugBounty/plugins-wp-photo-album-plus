@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 8.8.07.001
+* Version: 8.9.01.001
 *
 */
 
@@ -381,12 +381,18 @@ global $other_deps;
 			$type = wppa_opt( 'auto_page_type' );
 			switch ( $type ) {
 				case 'photo':
+					wppa( 'start_photo', wppa( 'single_photo' ) );
+					wppa( 'is_single', true );
 					break;
 				case 'mphoto':
 					wppa( 'is_mphoto', true );
+					wppa( 'start_photo', wppa( 'single_photo' ) );
+					wppa( 'is_single', true );
 					break;
 				case 'xphoto':
 					wppa( 'is_xphoto', true );
+					wppa( 'start_photo', wppa( 'single_photo' ) );
+					wppa( 'is_single', true );
 					break;
 				case 'slphoto':
 					wppa( 'is_slide', true );
@@ -5370,18 +5376,8 @@ function wppa_fe_add_tags( $id ) {
 	// Custom tags
 	$tags = wppa_get_photo_item( $id, 'tags' );
 	$oldt = $tags;
-	for ( $i = '1'; $i < '4'; $i++ ) {
-		$dt = wppa_get( 'user-tags-' . $i, null, 'arraytxt' );
-		if ( $dt ) {	// A (multi) selection out of 4 selectionboxes of existing tags
-			$tags .= ',' . implode( ',', $dt );
-		}
-	}
-	if ( wppa_get( 'new-tags' ) ) {	// New tags
 
-		$tags .= ',' . wppa_get( 'new-tags' );
-	}
-
-	$tags = urldecode( $tags );
+	$tags = wppa_get( 'wppa-prev-tags', '', 'text' );
 	$tags = wppa_sanitize_tags( str_replace( array( '\'', '"' ), ',', wppa_filter_iptc( wppa_filter_exif( $tags, $id ), $id ) ) );
 
 	if ( $tags != $oldt ) {					// Added tag(s)
