@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '8.8.02.001';
+var wppaJsLightboxVersion = '8.9.02.003';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -23,13 +23,7 @@ jQuery(document).ready(function(e) {
 jQuery( window ).on('orientationchange',function() {
 
 	if ( wppaOvlOpen ) {
-
-		// Make sure a possible previous panorama dies
-//		jQuery('body').trigger('quitimage');
-
-		// Now start the actual function
 		setTimeout( function(){ wppaOvlShow( wppaOvlIdx )}, 200 );
-
 	}
 });
 
@@ -52,6 +46,7 @@ function wppaOvlKeyboardHandler( e ) {
 	switch ( keycode ) {
 		case escapeKey:
 			wppaStopVideo( 0 );
+			wppaStopAudio( 0 );
 			wppaOvlHide();
 			break;
 		case 37:
@@ -78,6 +73,7 @@ function wppaOvlKeyboardHandler( e ) {
 		case 'q':
 		case 'x':
 			wppaStopVideo( 0 );
+			wppaStopAudio( 0 );
 			wppaOvlHide();
 			break;
 	}
@@ -90,7 +86,7 @@ function wppaOvlKeyboardHandler( e ) {
 // 'this' for a single image or for the first of a set
 function wppaOvlShow( arg ) {
 
-	// To avoid conflicts with slideshows, pase them all
+	// To avoid conflicts with slideshows, pause them all
 	var i;
 	for ( i=0; i<wppaSlidePause.length; i++ ) {
 		wppaSlidePause[i]=true;
@@ -98,16 +94,8 @@ function wppaOvlShow( arg ) {
 	var panData;
 	var dotPos;
 
-
-	// Panorama requires image container top=0 left=0
-	// Non panorama: 50%
-	if ( wppaOvlActivePanorama > 0 ) {
-//		wppaSavedContainerWidth = 0; // reset
-//		wppaSavedContainerHeight = 0;
-	}
-
 	// Make sure background is present
-	jQuery( '#wppa-overlay-bg' ).css({display:'inline'}); // stop().fadeTo( 3, wppaOvlOpacity );
+	jQuery( '#wppa-overlay-bg' ).css({display:'inline'});
 
 	// Do the setup right after the invocation of the lightbox
 	if ( wppaOvlFirst ) {
@@ -125,14 +113,6 @@ function wppaOvlShow( arg ) {
 		jQuery(window).trigger( 'wppalightboxstart' );
 
 	}
-
-	// If fs policy == global and big browse, hide global fs buttons
-//	if ( wppaFsPolicy == 'global' && wppaOvlBigBrowse ) {
-//		setTimeout( function() {
-//			jQuery('#wppa-fulls-btn-1').hide();
-//			jQuery('#wppa-exit-fulls-btn-1').hide();
-//		}, 500 );
-//	}
 
 	// If arg = 'this', setup the array of data
 	if ( typeof( arg ) == 'object' ) {
@@ -344,11 +324,7 @@ function _wppaOvlShow( idx ) {
 	// A single image?
 	wppaOvlIsSingle = ( wppaOvlUrls.length == 1  );
 
-	// Panorama requires image container top=0 left=0
-	// Non panorama: 50%
 	wppaOvlActivePanorama = wppaOvlPanoramaIds[idx];
-	if ( wppaOvlActivePanorama ) {
-	}
 
 	// Fullsize?
 	if ( wppaIsFs() || wppaOvlActivePanorama ) {
@@ -484,20 +460,11 @@ function _wppaOvlShow( idx ) {
 		else {
 			wppaOvlFsPhotoId = 0;
 		}
-		wppaOvlFirst = false;
 
 		// Show
 		if ( wppaOvlTypes[idx] == '' ) {
 			jQuery("#wppa-overlay-ic").show();
 		}
-
-		// Update buttons
-		wppaFsShow();
-
-		// Optionally disable rightclick
-		wppaProtect();
-
-		return false;
 	}
 
 	// NOT fullsize
@@ -709,11 +676,9 @@ function _wppaOvlShow( idx ) {
 		// Insert the html
 		if ( wppaOvlActivePanorama == 0 ) {
 			jQuery( '#wppa-overlay-ic' ).html( html );
-//			jQuery( '#wppa-overlay-pc' ).html( '' );
 		}
 		else {
 			jQuery( '#wppa-overlay-pc' ).html( html );
-//			jQuery( '#wppa-overlay-ic' ).html( '' );
 		}
 
 		// Show
@@ -743,10 +708,30 @@ function _wppaOvlShow( idx ) {
 		wppaFsShow();
 
 		wppaAdjustControlbar();
-
-		// Done!
-		return false;
 	}
+
+	// Update buttons
+	wppaFsShow();
+
+	// Optionally disable rightclick
+	wppaProtect();
+
+	// Handle autostart slideshow
+	if ( wppaOvlFirst && wppaOvlSlideStart && ! wppaOvlIsSingle ) {
+		console.log('bendur');
+		wppaOvlRunning = true;
+
+		// Show stop, hide start buttn
+		jQuery( '#wppa-ovl-stop-btn' ).show();
+		jQuery( '#wppa-ovl-start-btn' ).hide();
+
+		wppaOvlTimer = setTimeout( wppaOvlRun, wppaOvlSlideSpeed );
+	}
+
+	// Done first
+	wppaOvlFirst = false;
+
+	console.log('done first');
 }
 
 // Adjust display sizes
@@ -966,8 +951,6 @@ function wppaOvlStartAudio() {
 // Start / stop lightbox slideshow
 function wppaOvlStartStop() {
 
-
-
 	// Running?
 	if ( wppaOvlRunning ) {
 
@@ -987,11 +970,12 @@ function wppaOvlStartStop() {
 				jQuery( '.wppa-ovl-next-btn' ).css('visibility', 'visible');
 			}
 		}
-			// Hide stop, show start buttn
+
+		// Hide stop, show start buttn
+		if ( wppaOvlShowStartStop ) {
 			jQuery( '#wppa-ovl-stop-btn' ).hide();
 			jQuery( '#wppa-ovl-start-btn' ).show();
-
-//		}
+		}
 	}
 
 	// Not running
@@ -1001,18 +985,18 @@ function wppaOvlStartStop() {
 		wppaOvlRunning = true;
 		wppaOvlRun();
 
-			// Hide stop, show start buttn
+		// Show stop, hide start buttn
+		if ( wppaOvlShowStartStop ) {
 			jQuery( '#wppa-ovl-stop-btn' ).show();
 			jQuery( '#wppa-ovl-start-btn' ).hide();
-
+		}
 	}
-
 }
 
 // Start lb slideshow
 function wppaOvlRun() {
 
-	// Already running?
+	// Are we stopped??
 	if ( ! wppaOvlRunning ) return;
 
 	// Wait until playing audio or video ends
@@ -1085,7 +1069,7 @@ function wppaOvlShowNext() {
 	var img = document.getElementById( 'wppa-pre-next' );
 	if ( wppaOvlVideoHtmls[idx] == '' && ! wppaIsIe && ! img.complete && wppaOvlOpen ) {
 
-		setTimeout( wppaOvlShowNext, 200 );
+		setTimeout( wppaOvlShowNext, 200 ); // show same? to prevent another bump index
 		return false;
 	}
 
@@ -1124,9 +1108,6 @@ function wppaOvlShowSame() {
 // Quit lightbox mode
 function wppaOvlHide(keepState) {
 
-
-//	if ( !keepState ) keepState = false;
-
 	// Record we are out
 	wppaOvlOpen = false;
 	wppaOvlClosing = ! wppaOvlClosing;
@@ -1161,11 +1142,7 @@ function wppaOvlHide(keepState) {
 
 	// Stop any panorama from running the wppaRenderer
 	wppaOvlActivePanorama = 0;
-//	if ( wppaRenderer ) wppaRenderer.resetGLState();
 	jQuery('body').trigger('quitimage');
-
-	// Record we are out
-//	wppaOvlOpen = false;
 
 	// Reatart slideshow if requested
 	var i;
@@ -1232,8 +1209,6 @@ function wppaOvlOnclick( event ) {
 
 // Initialize <a> tags with onclick and ontouchstart events to lightbox
 function wppaInitOverlay() {
-
-
 
 	// First find subtitles for non-wppa images
 	jQuery( '.wp-caption' ).each( function() {
@@ -1305,9 +1280,6 @@ function wppaInitOverlay() {
 		}
 	}
 
-	// Install orientationchange handler
-//	window.addEventListener( 'orientationchange', wppaOvlShowSame);
-
 	// Install fullscreen navigation bar positioning
 	jQuery(window).on('DOMContentLoaded load resize scroll orientationchange', wppaAdjustControlbar );
 }
@@ -1378,6 +1350,7 @@ function wppaOvlNavBar() {
 			'</span>';
 		}
 
+		if ( wppaOvlShowStartStop )
 		html +=
 		'<span' +
 			' id="wppa-ovl-start-btn"' +

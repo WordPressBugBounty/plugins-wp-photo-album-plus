@@ -4,7 +4,7 @@
 *
 * Contains dashboard widgets code
 *
-* Version 8.8.08.001
+* Version 8.9.02.004
 *
 */
 
@@ -100,7 +100,6 @@ global $wpdb;
 									wppa_get_video_html( array( 'id'			=> $id,
 																	 'width'		=> '100',
 																	 'controls' 	=> false,
-																	 'preload' 		=> 'metadata',
 																	 'use_thumb' 	=> true,
 																	 'autoplay' 	=> false
 																	 ) ) . '

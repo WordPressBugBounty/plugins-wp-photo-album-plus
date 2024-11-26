@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 8.8.05.003
+* Version 8.9.02.004
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -102,6 +102,10 @@ global $wppa_session;
 
 	// No valid session exists, start new
 	if ( $data === false ) {
+
+		// First destroy expired sessions older than 24 hrs
+		$n = wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
+		if ( $n ) wppa_log( 'misc', $n . ' old sessions removed while opening a new one' );
 
 		$iret = wppa_create_session_entry();
 

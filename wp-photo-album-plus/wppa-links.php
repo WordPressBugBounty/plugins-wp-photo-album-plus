@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 8.8.06.006
+* Version: 8.9.02.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -105,11 +105,11 @@ global $wppa_url_set_extension;
 	if ( wppa_is_meonly() ) {
 		$pl .= 'meonly=1&amp;';
 	}
-	
+
 	if ( $wppa_url_set_extension ) {
 		$pl .= wppa_encrypt_set() . '&amp;';
 	}
-	
+
 	if ( $key == 'js' ) {
 		$pl = str_replace( '&amp;', '&' );
 	}
@@ -208,7 +208,7 @@ global $wppa_url_set_extension;
 	}
 
 	$al .= '&amp;';
-	
+
 	if ( $key == 'js' ) {
 		$al = str_replace( '&amp;', '&', $al );
 	}
@@ -732,7 +732,7 @@ global $wppa_url_set_extension;
 			}
 		}
 	}
-	
+
 	if ( false && $wppa_url_set_extension ) {
 		$newuri .= '?' . $wppa_url_set_extension;
 	}
@@ -1499,7 +1499,7 @@ global $wpdb;
 				return $result;
 			}
 			if ( $type == 'thumbs' ) {
-				$result['url'] = wppa_encrypt_url( wppa_get_ss_to_tn_link( $page, $id ) );
+				$result['url'] = wppa_get_ss_to_tn_link( $page, $id );
 				$result['title'] = __('View thumbnails', 'wp-photo-album-plus' );
 				$result['is_url'] = true;
 				$result['is_lightbox'] = false;
@@ -2012,6 +2012,8 @@ static $trimmable;
 function wppa_get_ss_to_tn_link( $page = '0', $id = '0' ) {
 global $thumbs_ids;
 
+	$sa = wppa_encrypt_album( wppa( 'start_album' ) );
+
 	// Search ?
 	if ( wppa( 'src' ) && wppa( 'mocc' ) == '1' && ! wppa( 'is_related' ) ) {
 		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-searchstring='.stripslashes( wppa( 'searchstring' ) );
@@ -2019,7 +2021,7 @@ global $thumbs_ids;
 	// Uploader ?
 	elseif ( wppa( 'is_upldr' ) ) {
 		if ( wppa( 'start_album' ) ) {
-			$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-upldr='.wppa( 'is_upldr' ).'&amp;wppa-album='.wppa( 'start_album' );
+			$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-upldr='.wppa( 'is_upldr' ).'&amp;wppa-album='.$sa;
 		}
 		else {
 			$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-upldr='.wppa( 'is_upldr' );
@@ -2027,19 +2029,19 @@ global $thumbs_ids;
 	}
 	// Topten ?
 	elseif ( wppa( 'is_topten' ) ) {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-topten='.wppa( 'topten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-topten='.wppa( 'topten_count' ).'&amp;wppa-album='.$sa;
 	}
 	// Lasten ?
 	elseif ( wppa( 'is_lasten' ) ) {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-lasten='.wppa( 'lasten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-lasten='.wppa( 'lasten_count' ).'&amp;wppa-album='.$sa;
 	}
 	// Comten ?
 	elseif ( wppa( 'is_comten' ) ) {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-comten='.wppa( 'comten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-comten='.wppa( 'comten_count' ).'&amp;wppa-album='.$sa;
 	}
 	// Featen ?
 	elseif ( wppa( 'is_featen' ) ) {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-featen='.wppa( 'featen_count' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-featen='.wppa( 'featen_count' ).'&amp;wppa-album='.$sa;
 	}
 	// Related ?
 //	elseif ( wppa( 'is_related' ) ) {
@@ -2047,11 +2049,11 @@ global $thumbs_ids;
 //	}
 	// Tag ?
 	elseif ( wppa( 'is_tag' ) ) {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-tag='.wppa( 'is_tag' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-tag='.wppa( 'is_tag' ).'&amp;wppa-album='.$sa;
 	}
 	// Cat ?
 	elseif ( wppa( 'is_cat' ) ) {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-cat='.wppa( 'is_cat' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-cat='.wppa( 'is_cat' ).'&amp;wppa-album='.$sa;
 	}
 	// Last ?
 //	elseif ( wppa( 'last_albums' ) ) {
@@ -2059,7 +2061,7 @@ global $thumbs_ids;
 //	}
 	// Default ?
 	else {
-		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-album='.wppa( 'start_album' );
+		$thumbhref = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-occur='.wppa( 'mocc' ).'&amp;wppa-album='.$sa;
 	}
 
 	// $id is the id. See to what page we have to go

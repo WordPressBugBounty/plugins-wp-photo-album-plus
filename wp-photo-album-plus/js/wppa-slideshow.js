@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '8.8.04.001';
+var wppaJsSlideshowVersion = '8.9.02.001';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -161,7 +161,7 @@ function wppaStoreSlideInfo(
 	if ( _wppaIsVideo[mocc][id] ) {
 		var controls;
 		controls = 'wppa' == wppaLightBox[mocc] ? '' : 'controls';
-		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none;" '+controls+'>'+videohtml+'</video>';
+		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none;" '+controls+' preload="metadata">'+videohtml+'</video>';
 	}
 	else {
 		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none; vertical-align:middle;">';

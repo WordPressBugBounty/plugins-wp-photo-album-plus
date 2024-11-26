@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version: 8.8.08.005
+* Version: 8.9.02.005
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -418,23 +418,39 @@ global $wppa_lang;
 	}
 
 	// WPPA Native
-	if ( strpos( $text, '[:' ) !== false ) {
+	$s_pos = strpos( $text, '[:' );
+	while ( $s_pos !== false ) {
 
 		// Make sure there is a [:]
-		if ( strpos( $text, '[:]' ) === false ) {
+		$e_pos = strpos( $text, '[:]' );
+		if ( $e_pos === false ) {
 			$text .= '[:]';
+			$e_pos = strpos( $text, '[:]' );
 		}
 
+		// Clip the text in three parts:
+		// 1: before [:
+		// 3: after [:]
+		// 2: part inbetween
+		$text_1 = substr( $text, 0, $s_pos );
+		$text_2 = substr( $text, $s_pos, $e_pos + 3 - $s_pos );
+		$text_3 = substr( $text, $e_pos + 3 );
+
 		// Mark the one(s) we want to save
-		$text = str_replace( "[:$ln]", "[:save]", $text );
+		$text_2 = str_replace( "[:$ln]", "[:save]", $text_2 );
 
 		// Remove other languages
-		$text = preg_replace( '/\[:..]((?!\[:).)*/', '', $text );
+		$text_2 = preg_replace( '/\[:..]((?!\[:).)*/', '', $text_2 );
 
 		// Remove helpers
-		$text = str_replace( '[:]', '', $text );
-		$text = str_replace( '[:save]', '', $text );
+		$text_2 = str_replace( '[:]', '', $text_2 );
+		$text_2 = str_replace( '[:save]', '', $text_2 );
 
+		// Re-combine
+		$text = $text_1 . $text_2 . $text_3;
+
+		// Find new s_pos if present for a possible next set of languages
+		$s_pos = strpos( $text, '[:' );
 	}
 
 	return $text;

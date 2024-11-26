@@ -1,5 +1,17 @@
 WP Photo Album Plus Changelog
 
+= 8.9.02 =
+
+* Slideshow to thumbnails link failed due to unencrypted album id. Fixed.
+* Autostart video on slideshow not worked always. Fixed.
+* New album cover type: Cover image only.
+* New setting: Lightbox slides autostart. Default on. See Basic settings -> Lightbox -> I -> Item 26.
+* Hiding lightbox start/stop buttons did not work. Fixed. See Basic settings -> Lightbox > I -> Item 7.
+* Fixed a compatibiity issue with theme Sidney.
+* Minor cosmetic changes to the photo admin and you can now also remake poster files/thumbnails of videos.
+* Fixed an issue with the wppa internal qTranslate-like translation.
+* Fixed the external Simple Cart & Buy Now for WPPA plugin for compatibility with WP 6.7 and PHP 8.2
+
 = 8.9.01 =
 
 * Autopages (if configured) are now immediately created on upload/import rather than when asked for.

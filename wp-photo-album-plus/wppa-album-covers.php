@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 8.8.06.006
+* Version: 8.9.02.002
 *
 */
 
@@ -81,6 +81,9 @@ function wppa_album_cover( $id ) {
 			break;
 		case 'titleonly-mcr':
 			wppa_album_cover_titleonly( $id, true );
+			break;
+		case 'imageonly':
+			wppa_album_cover_imageonly( $id );
 			break;
 		default:
 			$err = 'Unimplemented covertype: ' . $cover_type;
@@ -712,8 +715,12 @@ global $cover_count_key;
 
 }
 
+function wppa_album_cover_imageonly( $id ) {
+	wppa_album_cover_grid( $id, true );
+}
+
 // The cover type grid
-function wppa_album_cover_grid( $id ) {
+function wppa_album_cover_grid( $id, $image_only = false ) {
 global $cover_count_key;
 
 	// Init
@@ -779,20 +786,15 @@ global $cover_count_key;
 	}
 
 	// Find the coverphoto details
-	$path 		= wppa_get_thumb_path( 	$coverphoto );
+	$path 		= $image_only ? wppa_get_photo_path( $coverphoto ) : wppa_get_thumb_path( $coverphoto );
 	$imgattr_a 	= wppa_get_imgstyle_a( 	$coverphoto,
 										$path,
 										wppa_opt( 'smallsize' ),
 										'',
 										'cover'
 									);
-	$src 		= wppa_get_thumb_url( 	$coverphoto,
-										true,
-										'',
-										$imgattr_a['width'],
-										$imgattr_a['height'],
-										wppa_switch( 'cover_use_thumb' )
-									);
+	$src 		= $image_only ? wppa_get_photo_url( $coverphoto, true, '', $imgattr_a['width'], $imgattr_a['height'], false ) :
+								wppa_get_thumb_url( $coverphoto, true, '', $imgattr_a['width'], $imgattr_a['height'], wppa_switch( 'cover_use_thumb' ) );
 
 	// Feed?
 	if ( is_feed() ) {
@@ -803,18 +805,23 @@ global $cover_count_key;
 	}
 
 	// Set up album cover style
-	$w = wppa_get_container_width();
-	if ( $w < 1 ) {
-		$w = $w * wppa_opt( 'initial_colwidth' );
+	if ( $image_only ) {
+		$style = 'float:left;padding:0;width:' . wppa_opt( 'smallsize' ) . 'px;margin:0;';
 	}
-	$c = ceil( $w / wppa_opt( 'max_cover_width' ) );
-	$style = 'float:left;padding:0;width:' . (100/$c) . '%;margin:0;';
+	else {
+		$w = wppa_get_container_width();
+		if ( $w < 1 ) {
+			$w = $w * wppa_opt( 'initial_colwidth' );
+		}
+		$c = ceil( $w / wppa_opt( 'max_cover_width' ) );
+		$style = 'float:left;padding:0;width:' . (100/$c) . '%;margin:0;';
+	}
 
 	// Open the album box
 	wppa_out( '
 	<div
 		id="album-' . $id . '-' . wppa( 'mocc' ) . '"
-		class="wppa-album-cover-grid-' . wppa( 'mocc' ) . ' album wppa-box wppa-cover-box wppa-cover-box-' . wppa( 'mocc' ) . ' "
+		class="wppa-album-cover-'.($image_only ? 'imageonly' : 'grid').'-' . wppa( 'mocc' ) . ' album wppa-box wppa-cover-box wppa-cover-box-' . wppa( 'mocc' ) . ' "
 		style="' . $style . '">' );
 
 	// The Cover photo
@@ -1178,7 +1185,7 @@ global $wpdb;
 
 						// the cover image
 						if ( $tid == $id ) {
-							if ( wppa_is_video( $tid ) ) {
+							if ( wppa_is_video( $tid ) && ! wppa_has_poster( $tid ) ) {
 								wppa_out( '
 								<video
 									preload="metadata"

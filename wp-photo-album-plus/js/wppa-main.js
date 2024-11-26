@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '8.8.08.006';
+wppaWppaVer = '8.9.02.004';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -718,28 +718,16 @@ window.onpopstate = function( event ) {
 		if ( event.state ) {
 			if ( event.state.type ) {
 				if ( event.state.type == 'slide' ) {
-				//	console.log('slide popstate ');
 					wppaNoStackPush = true;
 					_wppaGoto( event.state.occur, event.state.slide );
 					return;
 				}
 				if ( event.state.type == 'ajax' ) {
-				//	console.log('ajax postate');
-				//	alert('pres ok to continue');
 					document.location.reload();
 					return;
 				}
 			}
 		}
-	}
-
-	// Do we have to reload?
-	var url = document.location.href;
-	if ( url.indexOf( 'wp-admin/admin.php' ) != -1 ) {
-		return true; // is admin
-	}
-	else {
-		document.location.reload();
 	}
 };
 

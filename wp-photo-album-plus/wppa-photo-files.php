@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 8.8.05.001
+* Version: 8.9.02.002
 *
 */
 
@@ -1192,4 +1192,28 @@ function wppa_is_pdf_multiple( $id ) {
 	if ( $result ) wppa_unlink( $tempfile );
 
 	return $result;
+}
+
+
+// Create a poster file for a video
+function wppa_create_video_poster( $id ) {
+
+	// Is it a video?
+	$exts = wppa_is_video( $id );
+	if ( ! $exts ) return false; 	// Not a video
+
+	$first_ext = current( $exts );
+
+	$photo_file = wppa_get_photo_path( $id );
+	$video_file = str_replace( wppa_get_ext( $photo_file ), $first_ext, $photo_file );
+
+	$cmd = "convert -density 200 $video_file"."[1] -quality 90 -background white -alpha remove $photo_file";
+	$cmd = "convert $video_file"."[1] $photo_file";
+	wppa_log('misc', $cmd );
+	$iret = wppa_image_magick( $cmd );
+	wppa_log('misc', 'magick returned code '.$iret );
+	if ( wppa_is_file( $photo_file ) ) {
+		return true;
+	}
+	return false;
 }

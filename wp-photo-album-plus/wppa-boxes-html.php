@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 8.9.01.001
+* Version 8.9.02.004
 *
 */
 
@@ -269,7 +269,6 @@ global $wpdb;
 					'cursor' 		=> '',
 					'events' 		=> '',
 					'title' 		=> '',
-					'preload' 		=> 'metadata',
 					'onclick' 		=> '',
 					'lb' 			=> false,
 					'class' 		=> '',
@@ -6628,7 +6627,6 @@ function wppa_get_grid_image_html( $id ) {
 						'tagid' 		=> 'i-'.$xid.'-'.$mocc,
 						'cursor' 		=> 'cursor:pointer;',
 						'title' 		=> $title,
-						'preload' 		=> 'metadata',
 						'onclick' 		=> '',
 						'lb' 			=> false,
 						'class' 		=> '',
@@ -6680,7 +6678,6 @@ function wppa_get_grid_image_html( $id ) {
 						'tagid' 		=> 'i-'.$xid.'-'.$mocc,
 						'cursor' 		=> $cursor,
 						'title' 		=> wppa_zoom_in( $id ),
-						'preload' 		=> 'metadata',
 						'onclick' 		=> '',
 						'lb' 			=> false,
 						'class' 		=> '',
@@ -6721,7 +6718,6 @@ function wppa_get_grid_image_html( $id ) {
 					'tagid' 		=> 'i-'.$id.'-'.$mocc,
 					'cursor' 		=> '',
 					'title' 		=> $title,
-					'preload' 		=> 'metadata',
 					'onclick' 		=> '',
 					'lb' 			=> false,
 					'class' 		=> '',

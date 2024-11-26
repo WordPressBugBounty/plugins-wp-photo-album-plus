@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 8.9.01.001
+* Version: 8.9.02.002
 *
 */
 
@@ -3195,10 +3195,10 @@ function  wppa_has_poster( $id ) {
 
 	if ( ! $id ) return false;
 
-	if ( ! wppa_is_multi( $id ) ) return false;
+	if ( wppa_is_photo( $id ) ) return false;
 
 	$file = wppa_get_photo_path( $id );
-	if ( wppa_is_file( $file ) && basename( $file ) != 'audiostub.jpg' ) {
+	if ( wppa_is_file( $file ) && wppa_get_ext( $file ) == 'jpg' && basename( $file ) != 'audiostub.jpg' && basename( $file ) != 'documentstub.jpg' ) {
 
 		return true;
 	}

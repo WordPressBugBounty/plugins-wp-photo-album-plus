@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 8.8.08.002
+* Version: 8.9.02.003
 *
 */
 
@@ -1784,6 +1784,7 @@ global $wppa_hide_this;
 									__('Grid with images only', 'wp-photo-album-plus' ),
 									__('Album title only', 'wp-photo-album-plus' ),
 									__('Album title only mcr', 'wp-photo-album-plus' ),
+									__('Album image only', 'wp-photo-album-plus' ),
 								);
 					$vals = array(	'default',
 									'longdesc',
@@ -1794,6 +1795,7 @@ global $wppa_hide_this;
 									'grid',
 									'titleonly',
 									'titleonly-mcr',
+									'imageonly',
 								);
 					$html = wppa_select($slug, $opts, $vals);
 					wppa_setting_new($slug, '4', $name, $desc, $html, $help);
@@ -3649,6 +3651,13 @@ global $wppa_hide_this;
 						$slug = 'wppa_ovl_audio_start';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '25', $name, $desc, $html, $help);
+						
+						$name = __('Lightbox slides autostart', 'wp-photo-album-plus');
+						$desc = __('Lightbox slideshow starts running on entering lightbox', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_ovl_slide_start';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '26', $name, $desc, $html, $help);
 /*
 						$name = __('Lightbox start mode', 'wp-photo-album-plus' );
 						$desc = __('The mode lightbox starts in.', 'wp-photo-album-plus' );

@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 8.8.06.004
+* Version 8.9.02.003
 */
 
 // Place all wppa related js declarations in the header, both admin and frontend
@@ -207,6 +207,7 @@ global $wpdb;
 	wppaOvlLineHeight = "'.wppa_opt( 'fontsize_lightbox' ).'",
 	wppaOvlVideoStart = '.( wppa_switch( 'ovl_video_start' ) ? 'true' : 'false' ).',
 	wppaOvlAudioStart = '.( wppa_switch( 'ovl_audio_start' ) ? 'true' : 'false' ).',
+	wppaOvlSlideStart = '.( wppa_switch( 'ovl_slide_start' ) ? 'true' : 'false' ).',
 	wppaOvlShowStartStop = '.( wppa_switch( 'ovl_show_startstop' ) ? 'true' : 'false' ).',
 	wppaIsMobile = '.( wppa_is_mobile() ? 'true' : 'false' ).',
 	wppaIsIpad = '.( wppa_is_ipad() ? 'true' : 'false' ).',

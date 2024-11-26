@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 8.8.08.002
+* Version: 8.9.02.003
 *
 */
 
@@ -631,7 +631,7 @@ horizrailenabled:false,";
 						'wppa_lb_hres' 					=> 'yes',
 						'wppa_ovl_video_start' 			=> 'yes',
 						'wppa_ovl_audio_start' 			=> 'yes',
-
+						'wppa_ovl_slide_start' 			=> 'yes',
 						'wppa_ovl_big_browse' 			=> 'no',
 						'wppa_ovl_small_browse' 		=> 'no',
 

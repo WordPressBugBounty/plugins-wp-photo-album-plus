@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all video routines
-* Version 8.8.05.003
+* Version 8.9.02.004
 *
 */
 
@@ -53,7 +53,6 @@ function wppa_get_video_html( $args ) {
 					'cursor' 		=> '',
 					'events' 		=> '',
 					'title' 		=> '',
-					'preload' 		=> 'metadata',
 					'onclick' 		=> '',
 					'lb' 			=> false,
 					'class' 		=> '',
@@ -118,7 +117,7 @@ function wppa_get_video_html( $args ) {
 	if ( $mp4 || $ogv || $webm ) {
 
 		// Assume the browser supports html5
-		$result = '<video id="'.$tagid.'" '.$ctrl.$play.' style="'.$style.$w.$h.$t.$b.$cursor.'" '.$events.' '.$tit.$onc.$poster.' preload="'.$preload.'"'.$cls.' >';
+		$result = '<video id="'.$tagid.'" '.$ctrl.$play.' style="'.$style.$w.$h.$t.$b.$cursor.'" '.$events.' '.$tit.$onc.$poster.' preload="metadata"'.$cls.'>';
 
 		$result .= wppa_get_video_body( $id, false, $width, $height );
 
