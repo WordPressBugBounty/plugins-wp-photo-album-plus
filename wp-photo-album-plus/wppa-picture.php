@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 8.8.06.008
+* Version 9.0.00.005
 *
 */
 
@@ -29,7 +29,7 @@
 function wppa_get_picture_html( $args ) {
 
 	// Init
-	$defaults 	= array( 	'id' 		=> '0',
+	$defaults 	= array( 	'id' 		=> 0,
 							'type' 		=> '',
 							'class' 	=> '',
 							'width' 	=> false,
@@ -140,19 +140,19 @@ function wppa_get_picture_html( $args ) {
 						$style .= 	'padding:0;' .
 									'border:none;';
 						break;
-					case '0':
+					case 0:
 						$style .= 	'padding:0;' .
 									'border:1px solid ' . wppa_opt( 'bcolor_fullimg' ) . ';' .
 									'box-sizing:border-box;';
 						break;
 					default:
-						$style .= 	'padding:' . ( wppa_opt( 'fullimage_border_width' ) - '1' ) . 'px;' .
+						$style .= 	'padding:' . ( wppa_opt( 'fullimage_border_width' ) - 1 ) . 'px;' .
 									'border:1px solid ' . wppa_opt( 'bcolor_fullimg' ) . ';' .
 									'box-sizing:border-box;' .
 									'background-color:' . wppa_opt( 'bgcolor_fullimg' ) . ';';
 
 						// If we do round corners...
-						if ( wppa_opt( 'bradius' ) > '0' ) {
+						if ( wppa_opt( 'bradius' ) > 0 ) {
 
 							// then also here
 							$style .= 'border-radius:' . wppa_opt( 'fullimage_border_width' ) . 'px;';
@@ -253,13 +253,7 @@ function wppa_get_picture_html( $args ) {
 
 	// Video?
 	elseif ( wppa_is_video( $id ) ) {
-		$result .=
-		wppa_get_video_html( array( 'id' 		=> $id,
-									'controls' 	=> ! $link,
-									'style' 	=> $style,
-									'class' 	=> $class,
-									)
-							);
+		$result .= wppa_get_video_html( ['id' => $id, 'controls' => ! $link, 'style' => $style, 'class' => $class] );
 	}
 
 	// Pdf?
@@ -298,15 +292,7 @@ function wppa_get_picture_html( $args ) {
 			$imgid = 'ph-'.$id.'-'.$mocc;
 
 			$result .=
-			'<img' .
-				' id="' . $imgid . '"' .
-				' ' . ( wppa_lazy() ? 'data-' : '' ) . 'src="' . $href . '"' .
-				' ' . wppa_get_imgalt( $id ) .
-				( $class ? ' class="' . $class . '" ' : '' ) .
-				( $title ? ' title="' . $title . '" ' : '' ) .
-				' style="' . $style . '"' .
-				' alt="' . $id . '"' .
-			' />';
+			wppa_html_tag( 'img', ['id' => $imgid, 'src' => $href, 'alt' => wppa_alt($id), 'class' => $class, 'title' => $title, 'style' => $style] );
 		}
 	}
 
@@ -379,12 +365,12 @@ function wppa_get_lb_panorama_full_html( $id ) {
 		$result = ' data-panorama="' . esc_attr( $html ) . '"';
 
 		switch ( wppa_get_photo_item( $id, 'panorama' ) ) {
-			case '0': // none
+			case 0: // none
 				if ( wppa_is_zoomable( $id ) ) {
 					$result .= ' data-pantype="zoom"';
 				}
 				break;
-			case '1': // spheric
+			case 1: // spheric
 				$result .= ' data-pantype="spheric"';
 				break;
 			case '2': // flat
@@ -429,7 +415,7 @@ function wppa_get_panorama_html( $args ) {
 	else {
 		switch( wppa_is_panorama( $args['id'] ) ) {
 
-			case '1':
+			case 1:
 				$result = wppa_get_spheric_pan_html( $args );
 
 				// Save we have a spheric panorama on board for loading THREE.js
@@ -450,8 +436,8 @@ function wppa_get_panorama_html( $args ) {
 function wppa_get_spheric_pan_html( $args ) {
 
 	// Init
-	$defaults 	= array( 	'id' 				=> '0',
-							'mocc' 				=> '0',
+	$defaults 	= array( 	'id' 				=> 0,
+							'mocc' 				=> 0,
 							'width' 			=> false,
 							'height' 			=> false,
 							'haslink' 			=> false,
@@ -502,7 +488,7 @@ function wppa_get_spheric_pan_html( $args ) {
 		$result .= '<div id="wppa-ovl-sphericpan-container" >';
 	}
 	if ( $lightbox ) {
-		$mocc = '0';
+		$mocc = 0;
 	}
 
 	$result .=
@@ -727,12 +713,8 @@ function wppa_get_spheric_pan_html( $args ) {
 		wppaDoSphericPan(' . $mocc . ', data' . $mocc . ');
 		});';
 
-	$result .= '
-	<img
-		id="wppa-' . $mocc . '-' . $id . '"
-		src="' . esc_url( $url ) . '"
-		style="display:none"
-		onload="' . esc_attr( $onload ) . '" />';
+	$result .=
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'alt' => 'spin'] );
 
 	if ( $haslink ) {
 		$result .= '<a>';
@@ -747,8 +729,8 @@ function wppa_get_spheric_pan_html( $args ) {
 function wppa_get_flat_pan_html( $args ) {
 
 	// Init
-	$defaults 	= array( 	'id' 				=> '0',
-							'mocc' 				=> '0',
+	$defaults 	= array( 	'id' 				=> 0,
+							'mocc' 				=> 0,
 							'width' 			=> false,
 							'height' 			=> false,
 							'haslink' 			=> false,
@@ -770,7 +752,7 @@ function wppa_get_flat_pan_html( $args ) {
 	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
 	$haslink 			= $args['haslink'];
 	$lightbox 			= $args['lightbox'];
-	if ( $lightbox ) $mocc = '0';
+	if ( $lightbox ) $mocc = 0;
 	$iconsize 			= ( $lightbox ? wppa_nav_icon_size( 'lightbox' ) : wppa_nav_icon_size( 'panorama' ) ) . 'px;';
 	$controls 			= $args['controls'];
 	$autorun 			= $args['autorun'];
@@ -787,7 +769,7 @@ function wppa_get_flat_pan_html( $args ) {
 			 $deltaX = - $autorunspeed / 3;
 			 break;
 		default:
-			 $deltaX = '0';
+			 $deltaX = 0;
 	}
 
 	$url 	= esc_url( wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id ) );
@@ -1043,12 +1025,8 @@ function wppa_get_flat_pan_html( $args ) {
 		wppaDoFlatPanorama(' . $mocc . ', data' . $mocc . ');
 	});';
 
-	$result .= '
-	<img
-		id="wppa-' . $itemid . '"
-		src="' . esc_url( $url ) . '"
-		style="display:none"
-		onload="' . esc_attr( $onload ) . '" />';
+	$result .=
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'alt' => 'spin'] );
 
 	// wppa-ovl-flatpan-container
 	if ( $lightbox ) {
@@ -1067,8 +1045,8 @@ function wppa_get_flat_pan_html( $args ) {
 function wppa_get_zoom_pan_html( $args ) {
 
 	// Init
-	$defaults 	= array( 	'id' 				=> '0',
-							'mocc' 				=> '0',
+	$defaults 	= array( 	'id' 				=> 0,
+							'mocc' 				=> 0,
 							'width' 			=> false,
 							'height' 			=> false,
 							'haslink' 			=> false,
@@ -1099,7 +1077,7 @@ function wppa_get_zoom_pan_html( $args ) {
 
 	// Fake mooc = 0 for lightbox
 	if ( $lightbox ) {
-		$mocc = '0';
+		$mocc = 0;
 		$itemid = '0-' . $id;
 	}
 
@@ -1363,12 +1341,8 @@ function wppa_get_zoom_pan_html( $args ) {
 			wppaDoZoomPan(' . $mocc . ', data' . $mocc . ');
 		});';
 
-		$result .= '
-		<img
-			id="wppa-' . $itemid . '"
-			src="' . esc_url( $url ) . '"
-			style="display:none"
-			onload="' . esc_attr( $onload ) . '" />';
+		$result .=
+		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'alt' => 'spin'] );
 
 	// wppa-ovl-zoom-container
 	if ( $lightbox ) {

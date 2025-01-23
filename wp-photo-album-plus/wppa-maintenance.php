@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 8.8.08.001
+* Version: 9.0.00.000
 *
 */
 
@@ -115,7 +115,7 @@ function wppa_do_maintenance_proc( $slug ) {
 		wppa_log( wppa_logtype( $slug ), "Starting {b}$slug{/b} chunk # $chunk" );
 		$result = _wppa_do_maintenance_proc( $slug, true );
 		$t = $result ? explode( '||', $result ) : array();
-		$togo = isset( $t[3] ) ? $t[3] : '0';
+		$togo = isset( $t[3] ) ? $t[3] : 0;
 	}
 
 	// Time is up and togo != 0, reschedule
@@ -177,29 +177,29 @@ global $is_reschedule;
 	wppa_extend_session();
 
 	// Initialize
-	$chunksize 	= '100';
-	$lastid 	= strval( intval ( wppa_get_option( $slug . '_last', '0' ) ) );
+	$chunksize 	= 100;
+	$lastid 	= strval( intval ( wppa_get_option( $slug . '_last', 0 ) ) );
 	$errtxt 	= '';
-	$id 		= '0';
-	$topid 		= '0';
+	$id 		= 0;
+	$topid 		= 0;
 	$reload 	= '';
 	$to_delete_from_cloudinary = array();
 	$aborted 	= false;
 
 	if ( ! isset( $wppa_session ) ) $wppa_session = array();
-	if ( ! isset( $wppa_session[$slug.'_fixed'] ) )   $wppa_session[$slug.'_fixed'] = '0';
-	if ( ! isset( $wppa_session[$slug.'_added'] ) )   $wppa_session[$slug.'_added'] = '0';
-	if ( ! isset( $wppa_session[$slug.'_deleted'] ) ) $wppa_session[$slug.'_deleted'] = '0';
-	if ( ! isset( $wppa_session[$slug.'_skipped'] ) ) $wppa_session[$slug.'_skipped'] = '0';
+	if ( ! isset( $wppa_session[$slug.'_fixed'] ) )   $wppa_session[$slug.'_fixed'] = 0;
+	if ( ! isset( $wppa_session[$slug.'_added'] ) )   $wppa_session[$slug.'_added'] = 0;
+	if ( ! isset( $wppa_session[$slug.'_deleted'] ) ) $wppa_session[$slug.'_deleted'] = 0;
+	if ( ! isset( $wppa_session[$slug.'_skipped'] ) ) $wppa_session[$slug.'_skipped'] = 0;
 
-	if ( $lastid == '0' ) {
-		$wppa_session[$slug.'_fixed'] = '0';
-		$wppa_session[$slug.'_deleted'] = '0';
-		$wppa_session[$slug.'_skipped'] = '0';
+	if ( $lastid == 0 ) {
+		$wppa_session[$slug.'_fixed'] = 0;
+		$wppa_session[$slug.'_deleted'] = 0;
+		$wppa_session[$slug.'_skipped'] = 0;
 	}
 
 	// Pre-processing needed?
-	if ( $lastid == '0' ) {
+	if ( $lastid == 0 ) {
 		wppa_update_option( $slug.'_status', 'Busy' );
 		if ( in_array( $slug, ['wppa_remake_index_albums', 'wppa_remake_index_photos', 'wppa_cleanup_index'] ) ) {
 			wppa_log( $logtype, '{b}' . $slug . '{/b} started. Allowed runtime: ' . wppa_time_left() . 's.' );
@@ -258,7 +258,7 @@ global $is_reschedule;
 				break;
 			case 'wppa_cleanup_a':
 			case 'wppa_cleanup_b':
-				$orphan_album = wppa_get_option( 'wppa_orphan_album', '0' );
+				$orphan_album = wppa_get_option( 'wppa_orphan_album', 0 );
 				$album_exists = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $orphan_album ) );
 				if ( ! $album_exists ) $orphan_album = false;
 				if ( ! $orphan_album ) {
@@ -322,7 +322,7 @@ global $is_reschedule;
 		}
 	}
 
-	if ( $lastid != '0' ) {
+	if ( $lastid != 0 ) {
 		if ( wppa_is_cron() ) {
 			wppa_log( $logtype, '{b}' . $slug . '{/b} continued at item # ' . ( $lastid + 1 ) . '. Allowed runtime: ' . wppa_time_left() . 's.' );
 		}
@@ -489,9 +489,9 @@ global $is_reschedule;
 			// Process photos
 			$table 		= WPPA_PHOTOS;
 			if ( $slug == 'wppa_cleanup_a' ) {
-				$topid 		= wppa_get_option( 'wppa_'.WPPA_PHOTOS.'_lastkey', '1' ) * 10;
+				$topid 		= wppa_get_option( 'wppa_'.WPPA_PHOTOS.'_lastkey', 1 ) * 10;
 				$photos 	= array();
-				for ( $i = ( $lastid + '1'); $i <= $topid; $i++ ) {
+				for ( $i = ( $lastid + 1); $i <= $topid; $i++ ) {
 					$photos[]['id'] = $i;
 				}
 			}
@@ -703,7 +703,7 @@ global $is_reschedule;
 							// files left? process
 							if ( $photo_files ) foreach( $photo_files as $photo_file ) {
 								$basename 	= basename( $photo_file );
-								$ext 		= substr( $basename, strpos( $basename, '.' ) + '1');
+								$ext 		= substr( $basename, strpos( $basename, '.' ) + 1);
 								if ( ! wppa_get_count( WPPA_PHOTOS, ['id' => $id] ) ) { // no db entry for this photo
 									if ( wppa_is_id_free( WPPA_PHOTOS, $id ) ) {
 										if ( wppa_create_photo_entry( array( 'id' => $id, 'album' => get_option( 'wppa_orphan_album' ), 'ext' => $ext, 'filename' => $basename ) ) ) { 	// Can create entry
@@ -779,7 +779,7 @@ global $is_reschedule;
 							if ( wppa_is_int( $name ) ) {
 								$target_len = wppa_opt( 'zero_numbers' );
 								$name = strval( intval( $name ) );
-								while ( strlen( $name ) < $target_len ) $name = '0'.$name;
+								while ( strlen( $name ) < $target_len ) $name = 0 . $name;
 							}
 							if ( $name !== $photo['name'] ) {
 								wppa_update_photo( $id, ['name' => $name] );
@@ -909,7 +909,7 @@ global $is_reschedule;
 							if ( $iret === true ) {
 								$wppa_session[$slug.'_fixed']++;
 							}
-							if ( $iret === '0' ) {
+							if ( $iret === 0 ) {
 								$wppa_session[$slug.'_skipped']++;
 							}
 							break;
@@ -1093,104 +1093,116 @@ global $is_reschedule;
 						$aborted 		= false;
 						$index   		= $indexes[$idx];
 						$current_word 	= $index['slug'];
-						$albums 		= wppa_index_string_to_array( $indexes[$idx]['albums'] );
 
-						wppa_log( 'idx', 'Start cleanup index # ' . $indexes[$idx]['id'] . ' word {b}{span style="color:darkred"}' . $indexes[$idx]['slug'] . '{/b}' );
+						if ( strlen( $current_word ) < wppa_opt( 'search_min_length' ) ) {
+							wppa_del_row( $wpdb->wppa_index, 'slug', $current_word );
+							wppa_log( 'idx', '{b}wppa_cleanup_index{/b} removed word {b}{span style="color:darkred"}' . $current_word . '{/b} from index because it is too short' );
+						}
+						if ( ! $index['photos'] && ! $index['albums'] ) {
+							wppa_del_row( $wpdb->wppa_index, 'slug', $current_word );
+							wppa_log( 'idx', '{b}wppa_cleanup_index{/b} removed word {b}{span style="color:darkred"}' . $current_word . '{/b} from index because it has no items' );
+						}
 
-						if ( is_array( $albums ) ) foreach( array_keys( $albums ) as $aidx ) {
+						else {
+							$albums 		= wppa_index_string_to_array( $indexes[$idx]['albums'] );
 
-							if ( wppa_is_time_up() || wppa_is_memory_up() ) {
-								$aborted = true;
-							}
+							wppa_log( 'idx', 'Start cleanup index # ' . $indexes[$idx]['id'] . ' word {b}{span style="color:darkred"}' . $indexes[$idx]['slug'] . '{/b}' );
 
-							if ( ! $aborted ) {
+							if ( is_array( $albums ) ) foreach( array_keys( $albums ) as $aidx ) {
 
-								$alb 	= $albums[$aidx];
-
-								// If album gone, remove it from index
-								if ( ! wppa_album_exists( $alb ) ) {
-									unset( $albums[$aidx] );
-									wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $alb . ' from album index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because album vanished' );
-									$didsome = true;
+								if ( wppa_is_time_up() || wppa_is_memory_up() ) {
+									$aborted = true;
 								}
 
-								// Check if keyword appears in album data
-								else {
-									$words 	= wppa_index_raw_to_words( wppa_index_get_raw_album( $alb ) );
-									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
+								if ( ! $aborted ) {
+
+									$alb 	= $albums[$aidx];
+
+									// If album gone, remove it from index
+									if ( ! wppa_album_exists( $alb ) ) {
 										unset( $albums[$aidx] );
-										wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $alb . ' from album index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because word no longer in album' );
+										wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $alb . ' from album index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because album vanished' );
 										$didsome = true;
 									}
-									wppa_cache_album( 'invalidate', $alb );	// Prevent cache overflow
+
+									// Check if keyword appears in album data
+									else {
+										$words 	= wppa_index_raw_to_words( wppa_index_get_raw_album( $alb ) );
+										if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
+											unset( $albums[$aidx] );
+											wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $alb . ' from album index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because word no longer in album' );
+											$didsome = true;
+										}
+										wppa_cache_album( 'invalidate', $alb );	// Prevent cache overflow
+									}
 								}
+								else break;
 							}
-							else break;
-						}
 
-						// The photos
-						$photos = wppa_index_string_to_array( $indexes[$idx]['photos'] );
-						$cp 	= is_array( $photos ) ? count( $photos ) : 0;
-						$pidx 	= 0;
-						$last 	= wppa_get_option( $slug.'_last_photo', 0 );
+							// The photos
+							$photos = wppa_index_string_to_array( $indexes[$idx]['photos'] );
+							$cp 	= is_array( $photos ) ? count( $photos ) : 0;
+							$pidx 	= 0;
+							$last 	= wppa_get_option( $slug.'_last_photo', 0 );
 
-						if ( ! $aborted && is_array( $photos ) ) foreach( array_keys( $photos ) as $pidx ) {
+							if ( ! $aborted && is_array( $photos ) ) foreach( array_keys( $photos ) as $pidx ) {
 
-							if ( wppa_is_time_up() || wppa_is_memory_up() ) {
+								if ( wppa_is_time_up() || wppa_is_memory_up() ) {
+									$aborted = true;
+								}
+
+								if ( ! $aborted ) {
+
+									if ( $pidx < $last ) continue;	// Skip already done
+
+									if ( $last && $pidx == $last ) {
+										wppa_log( $logtype, 'Continuing cleanup index at slug = {b}' . $indexes[$idx]['slug'] . '{/b}, element # = {b}' . $last . '{/b}' );
+									}
+
+									$pho 	= $photos[$pidx];
+
+									// If photo gone, remove it from index
+									if ( ! wppa_photo_exists( $pho ) ) {
+										unset( $photos[$pidx] );
+										wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $pho . ' from photo index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because photo vanished' );
+										$didsome = true;
+									}
+
+									// Check if keyword appears in photo data
+									else {
+										$words = wppa_index_raw_to_words( wppa_index_get_raw_photo( $pho ) );
+										if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
+											unset( $photos[$pidx] );
+											wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $pho . ' from photo index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because word no longer in photo' );
+											$didsome = true;
+										}
+										wppa_cache_photo( 'invalidate' );	// Prevent cache overflow
+									}
+								}
+								else break;
+							}
+							if ( $cp && $pidx != ( $cp - 1 ) ) {
+								wppa_log( $logtype, 	'Could not complete scan of index item # {b}' . $indexes[$idx]['id'] . '{/b},' .
+													' slug = {b}' . $indexes[$idx]['slug'] . '{/b},' .
+													' count = {b}' . $cp . '{/b},' .
+													' photo id = {b}' . $photos[$pidx] .'{/b},' .
+													' next element # = {b}' . $pidx . '{/b},'
+										);
 								$aborted = true;
 							}
 
-							if ( ! $aborted ) {
-
-								if ( $pidx < $last ) continue;	// Skip already done
-
-								if ( $last && $pidx == $last ) {
-									wppa_log( $logtype, 'Continuing cleanup index at slug = {b}' . $indexes[$idx]['slug'] . '{/b}, element # = {b}' . $last . '{/b}' );
-								}
-
-								$pho 	= $photos[$pidx];
-
-								// If photo gone, remove it from index
-								if ( ! wppa_photo_exists( $pho ) ) {
-									unset( $photos[$pidx] );
-									wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $pho . ' from photo index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because photo vanished' );
-									$didsome = true;
-								}
-
-								// Check if keyword appears in photo data
-								else {
-									$words = wppa_index_raw_to_words( wppa_index_get_raw_photo( $pho ) );
-									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
-										unset( $photos[$pidx] );
-										wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Removed ' . $pho . ' from photo index word {b}{span style="color:darkred"}' . $current_word . '{/span}{/b} because word no longer in photo' );
-										$didsome = true;
-									}
-									wppa_cache_photo( 'invalidate' );	// Prevent cache overflow
-								}
+							$lastid = $indexes[$idx]['id'];
+							if ( $aborted ) {
+								$lastid--;
+								wppa_update_option( $slug.'_last_photo', $pidx );
 							}
-							else break;
-						}
-						if ( $cp && $pidx != ( $cp - 1 ) ) {
-							wppa_log( $logtype, 	'Could not complete scan of index item # {b}' . $indexes[$idx]['id'] . '{/b},' .
-												' slug = {b}' . $indexes[$idx]['slug'] . '{/b},' .
-												' count = {b}' . $cp . '{/b},' .
-												' photo id = {b}' . $photos[$pidx] .'{/b},' .
-												' next element # = {b}' . $pidx . '{/b},'
-									);
-							$aborted = true;
-						}
-
-						$lastid = $indexes[$idx]['id'];
-						if ( $aborted ) {
-							$lastid--;
-							wppa_update_option( $slug.'_last_photo', $pidx );
-						}
-						wppa_update_option( $slug.'_last', $lastid );
-						$albums = wppa_index_array_to_string( $albums );
-						$photos = wppa_index_array_to_string( $photos );
-						if ( $didsome ) {
-							wppa_update_index( $indexes[$idx]['id'], ['albums' => $albums, 'photos' => $photos] );
-							wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Updated index word {b}{span style="color:darkred"}' . $indexes[$idx]['slug'] . '{/span}{/b} with albums = ' . $albums . ' and photos = ' . $photos );
+							wppa_update_option( $slug.'_last', $lastid );
+							$albums = wppa_index_array_to_string( $albums );
+							$photos = wppa_index_array_to_string( $photos );
+							if ( $didsome ) {
+								wppa_update_index( $indexes[$idx]['id'], ['albums' => $albums, 'photos' => $photos] );
+								wppa_log( $logtype, '{b}wppa_cleanup_index{/b} Updated index word {b}{span style="color:darkred"}' . $indexes[$idx]['slug'] . '{/span}{/b} with albums = ' . $albums . ' and photos = ' . $photos );
+							}
 						}
 						break;
 
@@ -1234,7 +1246,7 @@ global $is_reschedule;
 				[$wpdb->wppa_albums, 'alt_thumbsize', 'SMALLINT(5)'],
 				[$wpdb->wppa_albums, 'cover_type', 'TINYTEXT'],
 				[$wpdb->wppa_albums, 'suba_order_by', 'TINYTEXT'],
-				[$wpdb->wppa_albums, 'views', 'BIGINT(20)', '0'],
+				[$wpdb->wppa_albums, 'views', 'BIGINT(20)', 0],
 				[$wpdb->wppa_albums, 'cats', 'TINYTEXT'],
 				[$wpdb->wppa_albums, 'scheduledtm', 'VARCHAR(20)'],
 				[$wpdb->wppa_albums, 'modified', 'CHAR(10)'],
@@ -1742,10 +1754,10 @@ global $wppa_log_file;
 							<td>' . htmlspecialchars( $rating['userid'] ) . '</td>
 							<td>' . htmlspecialchars( $rating['value'] ) . '</td>
 							<td>' . htmlspecialchars( $rating['photo'] ) . '</td>
-							<td style="width:250px; text-align:center;"><img src="' . esc_url( wppa_get_thumb_url( $rating['photo'] ) ) . '"
-								style="height: 40px;"
-								onmouseover="jQuery(this).stop().animate({height:this.naturalHeight}, 200);"
-								onmouseout="jQuery(this).stop().animate({height:\'40px\'}, 200);" /></td>
+							<td style="width:250px; text-align:center;">' .
+								wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $rating['photo'] ), 'style' => "height:40px;",
+													   'onmouseover' => "jQuery(this).stop().animate({height:this.naturalHeight},200);",
+													   'onmouseout' => "jQuery(this).stop().anima>te({height:'40px'}, 200);"] ) . '</td>
 							<td>' . htmlspecialchars( $thumb['rating_count'] ) . '</td>
 							<td>' . htmlspecialchars( $thumb['mean_rating'] ) . '</td>
 						</tr>';
@@ -1812,12 +1824,12 @@ global $wppa_log_file;
 												$result .=
 												')<br>';
 											}
-											/*
+
 											elseif ( is_object( $data[$key] ) ) {
 												$temp = var_export( $data[$key], true );
 												$result .= '['.$key.'] => ' . $temp;
 											}
-											*/
+
 											else {
 												$result .= '['.$key.'] => '.$data[$key].'<br>';
 											}
@@ -1899,13 +1911,10 @@ global $wppa_log_file;
 							<td>' . htmlspecialchars( $comment['userid'] ) . '</td>
 							<td>' . htmlspecialchars( $comment['email'] ) . '</td>
 							<td>' . htmlspecialchars( $comment['photo'] ) . '</td>
-							<td style="width:250px; text-align:center">
-								<img
-									src="' . esc_url( wppa_get_thumb_url( $comment['photo'] ) ) . '"
-									style="height: 40px;"
-									onmouseover="jQuery(this).stop().animate({height:this.naturalHeight}, 200);"
-									onmouseout="jQuery(this).stop().animate({height:\'40px\'}, 200);"
-								/>
+							<td style="width:250px; text-align:center">' .
+								wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $comment['photo'] ), 'style' => "height:40px;",
+													   'onmouseover' => "jQuery(this).stop().animate({height:this.naturalHeight},200);",
+													   'onmouseout' => "jQuery(this).stop().animate({height:'40px'}, 200);"] ) . '
 							</td>
 							<td>' . htmlspecialchars( $comment['comment'] ) . '</td>
 						</tr>';
@@ -1975,7 +1984,7 @@ function wppa_fix_source_path() {
 	if ( strpos( wppa_opt( 'source_dir' ), WPPA_ABSPATH ) === false ) {
 		if ( strpos( wppa_opt( 'source_dir' ), $wp_content ) !== false ) {	// Its below wp-content
 			$temp = explode( $wp_content, wppa_opt( 'source_dir' ) );
-			$temp['0'] = WPPA_ABSPATH;
+			$temp[0] = WPPA_ABSPATH;
 			wppa_update_option( 'wppa_source_dir', implode( $wp_content, $temp ) );
 			wppa_log( 'Fix', 'Sourcepath set to ' . wppa_opt( 'source_dir' ) );
 		}
@@ -2004,12 +2013,9 @@ function wppa_log_page() {
 
 		wp_nonce_field('wppa-nonce', 'wppa-nonce') . '
 
-		&nbsp;<img
-			id="wppa-spinner"
-			src="' . wppa_get_imgdir( 'spinner.gif' ) . '"
-			style="display:none;"
-			onload="setInterval(function(){wppaAjaxReplaceLog();}, 10000)"
-		/>
+		&nbsp;' .
+			wppa_html_tag( 'img', ['id' => "wppa-spinner", 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;",
+								   'onload' => "setInterval(function(){wppaAjaxReplaceLog();}, 10000)"] ) . '
 		<div id="wppa-logbody" >' .
 
 			ltrim( wppa_do_maintenance_popup( 'wppa_list_errorlog' ), '| ' ) .

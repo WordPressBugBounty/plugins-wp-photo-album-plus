@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 8.7.00.000
+* Version 9.0.00.000
 *
 */
 
@@ -11,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 function _wppa_edit_sequence() {
 
-	$album = wppa_get( 'album', '0' );
-	
+	$album = wppa_get( 'album', 0 );
+
 	$result = '
 	<div class="wrap">
 

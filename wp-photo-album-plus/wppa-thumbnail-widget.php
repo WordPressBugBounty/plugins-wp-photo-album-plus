@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 8.7.04.002
+* Version 9.0.00.005
 */
 
 class ThumbnailWidget extends WP_Widget {
@@ -57,12 +57,12 @@ class ThumbnailWidget extends WP_Widget {
 		// Make the widget content
 		$generic = ( $album == '-2' );
 		if ( $generic ) {
-			$album = '0';
+			$album = 0;
 			$max += '1000';
 		}
 		$separate = ( $album == '-1' );
 		if ( $separate ) {
-			$album = '0';
+			$album = 0;
 			$max += '1000';
 		}
 
@@ -82,7 +82,7 @@ class ThumbnailWidget extends WP_Widget {
 		$maxh += $lineheight;
 		if ( $name == 'yes' ) $maxh += $lineheight;
 
-		$count = '0';
+		$count = 0;
 		if ( $thumbs ) foreach ( $thumbs as $image ) {
 
 			$thumb = $image;
@@ -112,10 +112,11 @@ class ThumbnailWidget extends WP_Widget {
 				$file       = wppa_get_thumb_path($image['id']);
 				$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'twthumb');
 				$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $imgstyle_a['width'], $imgstyle_a['height'] );
-				$imgevents 	= wppa_get_imgevents('thumb', $image['id'], true);
+				$onmouseover  = wppa_mouseover( 'thumb', $image['id'], true );
+				$onmouseout   = wppa_mouseout( 'thumb' );
 				$title 		= $link ? esc_attr(stripslashes($link['title'])) : '';
 
-				$widget_content .= wppa_get_the_widget_thumb('thumbnail', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents);
+				$widget_content .= wppa_get_the_widget_thumb('thumbnail', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $onmouseover, $onmouseout);
 
 				$widget_content .= "\n\t".'<div style="font-size:'.wppa_opt( 'fontsize_widget_thumb' ).'px; line-height:'.$lineheight.'px;">';
 				if ( $name == 'yes' && $display == 'thumbs' ) {
@@ -214,7 +215,7 @@ class ThumbnailWidget extends WP_Widget {
 		wppa_widget_selection( $this, 'sortby', $instance['sortby'], __( 'Sort by', 'wp-photo-album-plus' ), $options, $values );
 
 		// Max number
-		wppa_widget_number( $this, 'limit', $instance['limit'], __( 'Max number', 'wp-photo-album-plus' ), '1', '100' );
+		wppa_widget_number( $this, 'limit', $instance['limit'], __( 'Max number', 'wp-photo-album-plus' ), 1, 100 );
 
 		// Display type
 		$options = array( 	__( 'thumbnail images', 'wp-photo-album-plus' ),
@@ -238,7 +239,7 @@ class ThumbnailWidget extends WP_Widget {
 		$result = '
 		<p>' .
 			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
-			' ' . wppa_setting_path( 'b', 'widget', '1', ['6', '7'] ) .
+			' ' . wppa_setting_path( 'b', 'widget', 1, ['6', '7'] ) .
 		'</p>';
 		wppa_echo( strip_tags( wp_check_invalid_utf8( $result), ["<br>", "<a>", "<i>", "<b>"] ) );
 
@@ -250,13 +251,13 @@ class ThumbnailWidget extends WP_Widget {
 		$defaults = array( 	'title'		=> __( 'Thumbnail Photos', 'wp-photo-album-plus' ),
 							'link'	 	=> '',
 							'linktitle' => '',
-							'album' 	=> '0',
+							'album' 	=> 0,
 							'name' 		=> 'no',
 							'display' 	=> 'thumbs',
-							'sortby' 	=> wppa_get_photo_order('0'),
+							'sortby' 	=> wppa_get_photo_order(0),
 							'limit' 	=> wppa_opt( 'thumbnail_widget_count' ),
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

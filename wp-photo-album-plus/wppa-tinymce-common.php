@@ -2,7 +2,7 @@
 /* wppa-tinymce-common.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 8.7.03.007
+* Version 9.0.00.000
 *
 */
 
@@ -245,7 +245,7 @@ global $wpdb;
 		foreach ( $my_photos as $photo ) {
 
 			$name = stripslashes(wppa_translate($photo['name']));
-			if ( strlen($name) > '50') $name = substr($name, '0', '50').'...';
+			if ( strlen($name) > '50') $name = substr($name, 0, '50').'...';
 
 			if ( wppa_get_option( 'wppa_file_system' ) == 'flat' ) {
 				$val = $photo['id'] . '.' . $photo['ext'];
@@ -309,7 +309,7 @@ global $wpdb;
 		foreach ( $all_photos as $photo ) {
 
 			$name = stripslashes(wppa_translate($photo['name']));
-			if ( strlen($name) > '50') $name = substr($name, '0', '50').'...';
+			if ( strlen($name) > '50') $name = substr($name, 0, '50').'...';
 			if ( wppa_get_option( 'wppa_file_system' ) == 'flat' ) {
 				$val = $photo['id'] . '.' . $photo['ext'];
 			}

@@ -4,7 +4,7 @@
 *
 * Contains dashboard widgets code
 *
-* Version 8.9.02.004
+* Version 9.0.00.005
 *
 */
 
@@ -83,7 +83,7 @@ global $wpdb;
 			$id = $photo['id'];
 			if ( wppa_is_photo_visible( $id ) ) {
 				if ( wppa_user_is_admin() ) {
-					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['id'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
+					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['crypt'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
 				}
 				else {
 					$href = wppa_get_photo_url( $id );
@@ -95,20 +95,13 @@ global $wpdb;
 
 							if ( wppa_is_video( $id ) ) {
 								$url = WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'video_icon' );
-								wppa_echo( '
-								<div style="position:relative">' .
-									wppa_get_video_html( array( 'id'			=> $id,
-																	 'width'		=> '100',
-																	 'controls' 	=> false,
-																	 'use_thumb' 	=> true,
-																	 'autoplay' 	=> false
-																	 ) ) . '
-									<img src="' . esc_url( $url ) . '" style="width:16px;height:16px;position:absolute;right:0;bottom:0;z-index:100;" />
-								</div>' );
+								wppa_echo( wppa_html_tag( 'div', ['style' => "position:relative"],
+									wppa_get_video_html( ['id' => $id, 'style' => 'width:100px;', 'controls' => false, 'use_thumb' => true] ) .
+									wppa_html_tag( 'img', ['src' => $url, 'style' => "width:16px;height:16px;position:absolute;right:0;bottom:0;z-index:100;"] )
+								) );
 							}
 							else {
-								wppa_echo( '
-								<img src="' . esc_url( wppa_get_thumb_url( $id ) ) . '" style="max-width:100px;" /> ' );
+								wppa_echo( wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ), 'style' => "max-width:100px;"] ) );
 							}
 
 						wppa_echo( '
@@ -155,17 +148,16 @@ global $wpdb;
 			$photo = wppa_cache_photo( $comment['photo'] );
 			if ( $photo ) {
 				if ( wppa_user_is_admin() ) {
-					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['id'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
+					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['crypt'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
 				}
 				else {
 					$href = wppa_get_photo_url( $photo['id'] );
 				}
 				wppa_echo( '
 				<tr>
-					<td>
-						<a href="' . esc_url( $href ) . '" target="_blank" >
-							<img src="' . esc_url( wppa_get_thumb_url( $photo['id'] ) ) . '" style="max-width:100px;" />
-						</a>
+					<td>' .
+						wppa_html_tag( 'a', ['href' => $href, 'target' => "_blank"],
+							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "max-width:100px;"] ) ) . '
 					</td>
 					<td>
 						<i>' . sanitize_text_field( $comment['comment'] ) . '</i>
@@ -219,17 +211,16 @@ function wppa_show_potd_log() {
 				$photo = wppa_cache_photo( $item['id'] );
 				$time  = $item['tm'];
 				if ( wppa_user_is_admin() ) {
-					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['id'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
+					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['crypt'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
 				}
 				else {
 					$href = wppa_get_photo_url( $photo['id'] );
 				}
 				wppa_echo( '
 				<tr style="border-bottom:1px solid #444">
-					<td>
-						<a href="' . esc_url( $href ) . '" target="_blank" >
-							<img src="' . esc_url( wppa_get_thumb_url( $photo['id'] ) ) . '" style="max-width:100px;" />
-						</a>
+					<td>' .
+						wppa_html_tag( 'a', ['href' => $href, 'target' => "_blank"],
+							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "max-width:100px;"] ) ) . '
 					</td>
 					<td>' .
 						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $time ) . '<br>' .

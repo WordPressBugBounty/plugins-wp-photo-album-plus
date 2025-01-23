@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version: 8.7.03.006
+* Version: 9.0.00.000
 *
 *
 */
@@ -273,7 +273,7 @@ function wppa_index_raw_to_words( $xtext, $no_skips = false, $minlen = '3', $no_
 		foreach ( array_keys( $result ) as $key ) {
 
 			// Strip leading zeroes
-			$t = ltrim( $result[$key], '0' );
+			$t = ltrim( $result[$key], 0 );
 
 			// If nothing left (zoroes only) or numeric, discard it
 			if ( ! $t || is_numeric( $t ) ) {
@@ -310,12 +310,12 @@ function wppa_index_string_to_array( $string ) {
 			// Range
 			else {
 				$range = explode( '..', $t );
-				$from = $range['0'];
-				$to = $range['1'];
+				$from = $range[0];
+				$to = $range[1];
 				if ( $from >= $to ) {
 					wppa_log( 'err', 'Illegal range: ' . $t );
-					$result[] = $range['0'];
-					$result[] = $range['1'];
+					$result[] = $range[0];
+					$result[] = $range[1];
 				}
 				else while ( $from <= $to ) {
 					$result[] = strval($from);
@@ -360,7 +360,7 @@ function wppa_index_array_to_string( $array ) {
 	$lastitem = '-1';
 	$isrange = false;
 	foreach ( $array as $item ) {
-		if ( $item == $lastitem+'1' ) {
+		if ( $item == $lastitem+1 ) {
 			$isrange = true;
 		}
 		else {

@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 8.9.01.001
+* Version 9.0.00.000
 *
 */
 
@@ -41,7 +41,7 @@ function wppa_create_textual_watermark_file( $args ) {
 	// See what we have
 	$args = wp_parse_args( ( array ) $args, array( 	'content' 		=> '---preview---',
 													'pos' 			=> 'cencen',
-													'id'			=> '0',
+													'id'			=> 0,
 													'font' 			=> wppa_opt( 'textual_watermark_font' ),
 													'text' 			=> '',
 													'style' 		=> wppa_opt( 'textual_watermark_type' ),
@@ -49,7 +49,7 @@ function wppa_create_textual_watermark_file( $args ) {
 													'url' 			=> false,
 													'width'			=> '',
 													'height' 		=> '',
-													'transp' 		=> '0',
+													'transp' 		=> 0,
 													 ) );
 
 	// We may have been called from wppa_get_water_file_and_pos() just to find the settings
@@ -358,9 +358,9 @@ function wppa_get_water_file_and_pos( $id ) {
 	$result['pos'] 	= wppa_opt( 'watermark_pos' );	// default
 
 	// Album specific overrule?
-	if ( $id > '0' ) {
+	if ( $id > 0 ) {
 		$alb 		= wppa_get_photo_item( $id, 'album' );
-		if ( $alb > '0' ) {
+		if ( $alb > 0 ) {
 			$albfile 	= wppa_get_album_item( $alb, 'wmfile' );
 			if ( $albfile ) {
 				$result['file'] = $albfile;
@@ -483,7 +483,7 @@ function wppa_add_watermark( $id ) {
 
 	// Scale the watermark image to a percentage width of the photo
 	$perc = wppa_opt( 'watermark_size' );
-	if ( strpos( $waterfile, WPPA_UPLOAD_PATH.'/temp/wmf' ) === false && $perc != '0' ) { 	// Not for a text, not when off
+	if ( strpos( $waterfile, WPPA_UPLOAD_PATH.'/temp/wmf' ) === false && $perc != 0 ) { 	// Not for a text, not when off
 
 		// Copy existing image
 		$oldwaterimage 	= $waterimage;
@@ -648,7 +648,7 @@ function wppa_imagecopymerge_alpha( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $s
     imagecopy( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h );
 }
 
-function wppa_watermark_file_select( $key, $album = '0' ) {
+function wppa_watermark_file_select( $key, $album = 0 ) {
 
 	// Init
 	$result = '';
@@ -714,7 +714,7 @@ function wppa_watermark_file_select( $key, $album = '0' ) {
 	return $result;
 }
 
-function wppa_watermark_pos_select( $key, $album = '0' ) {
+function wppa_watermark_pos_select( $key, $album = 0 ) {
 
 	// Init
 	$user = wppa_get_user();

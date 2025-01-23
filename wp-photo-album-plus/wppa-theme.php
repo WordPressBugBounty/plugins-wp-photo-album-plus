@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the albums/photos/slideshow in a page or post
-* Version 8.8.08.002
+* Version 9.0.00.003
 */
 function wppa_theme() {
 
@@ -13,8 +13,8 @@ global $wppa_empty_content;
 
 	$curpage = wppa_get_curpage();					// Get the page # we are on when pagination is on, or 1
 	$didsome = false;								// Required initializations for pagination
-	$n_album_pages = '0';							// "
-	$n_thumb_pages = '0';							// "
+	$n_album_pages = 0;							// "
+	$n_thumb_pages = 0;							// "
 	$mocc = wppa( 'mocc' );
 
 	// Open container
@@ -30,10 +30,10 @@ global $wppa_empty_content;
 	if ( wppa_page( 'albums' ) ) {													// Page 'Albums' requested
 
 		// Init for possible alt thumbsize on masonry
-		$counter_thumbs = '0';
+		$counter_thumbs = 0;
 		$is_alt_thumbsize = false;
 		$alb_id = wppa( 'start_album' );
-		if ( wppa_is_int( $alb_id ) && $alb_id > '0' ) {
+		if ( wppa_is_int( $alb_id ) && $alb_id > 0 ) {
 			$is_alt_thumbsize = wppa_get_album_item( $alb_id, 'alt_thumbsize' ) == 'yes';
 		}
 
@@ -48,12 +48,12 @@ global $wppa_empty_content;
 		$wanted_empty = wppa_is_wanted_empty( $thumbs );							// See if we need to display an empty thumbnail area
 
 		$n_thumb_pages = wppa_get_npages( 'thumbs', $thumbs );						// Get the number of thumb pages
-		if ( $n_thumb_pages == '0' && ! $wanted_empty ) $thumbs = false;			// No pages: no thumbs. Maybe want covers only
-		if ( $wanted_empty ) $n_thumb_pages = '1'; 									// Display empty thumb areas requested
-		if ( wppa_get('cover') ) $n_thumb_pages = '0'; 								// But not when explicetly cover asked
+		if ( $n_thumb_pages == 0 && ! $wanted_empty ) $thumbs = false;			// No pages: no thumbs. Maybe want covers only
+		if ( $wanted_empty ) $n_thumb_pages = 1; 									// Display empty thumb areas requested
+		if ( wppa_get('cover') ) $n_thumb_pages = 0; 								// But not when explicetly cover asked
 
 		// Get total number of pages
-		if ( ! wppa_is_pagination() ) $totpag = '1';								// If both pagination is off, there is only one page
+		if ( ! wppa_is_pagination() ) $totpag = 1;								// If both pagination is off, there is only one page
 		else $totpag = $n_album_pages + $n_thumb_pages;
 
 		// Make pagelinkbar if requested on top
@@ -64,7 +64,7 @@ global $wppa_empty_content;
 		// Process the albums
 		if ( ! wppa_switch( 'thumbs_first' ) ) {
 			if ( $albums ) {
-				$counter_albums = '0';
+				$counter_albums = 0;
 				wppa_album_list( 'open' );												// Open Albums sub-container
 					foreach ( $albums as $album ) { 									// Loop the albums
 						$counter_albums++;
@@ -83,7 +83,7 @@ global $wppa_empty_content;
 
 		// Process the thumbs
 		if ( $thumbs || $wanted_empty )
-		if ( ! $wanted_empty || ! wppa_switch( 'thumbs_first' ) || wppa_get_curpage() == '1' )
+		if ( ! $wanted_empty || ! wppa_switch( 'thumbs_first' ) || wppa_get_curpage() == 1 )
 		if ( ! $wanted_empty || wppa_switch( 'thumbs_first' ) || wppa_get_curpage() == $totpag )
 		if ( $n_thumb_pages > 0 ) {
 
@@ -139,16 +139,16 @@ global $wppa_empty_content;
 				}
 
 				// Process the thumbnails
-				$col = '0';
+				$col = 0;
 				if ( $thumbs ) foreach ( $thumbs as $tt ) {
 					$id = $tt['id'];
 					$counter_thumbs++;
 					if ( wppa_onpage( 'thumbs', $counter_thumbs, $relpage ) ) {
 						$col_contents[$col] .= wppa_get_thumb_masonry( $id );
 						$col_heights[$col] 	+= ( $correction + wppa_get_thumby( $id ) ) / ( $correction + wppa_get_thumbx( $id ) ) * $col_widths[$col];
-						$col += '1';
+						$col += 1;
 						if ( $col == $count_cols ) {
-							$col = '0';
+							$col = 0;
 						}
 						$didsome = true;
 					}
@@ -219,7 +219,7 @@ global $wppa_empty_content;
 				$row_width 			= 0;
 				$target_row_height 	= wppa_opt( $is_alt_thumbsize ? 'thumbsize_alt' : 'thumbsize' ) * 0.75 + $correction;
 				$rw_count 			= 0;
-				$tr_count 			= '1';
+				$tr_count 			= 1;
 				$done_count 		= 0;
 				$last 				= false;
 				$max_row_height 	= $target_row_height * 0.8; 	// Init keep track for last
@@ -236,7 +236,7 @@ global $wppa_empty_content;
 					$last 			= $done_count == count( $thumbs );
 					if ( $row_width > $cont_width || $last ) {
 						$tot_marg 		= $rw_count * $correction;
-						$row_height 	= $row_width ? ( ( $target_row_height - $correction ) * ( $cont_width - $tot_marg ) / ( $row_width ) + $correction )  : '0';
+						$row_height 	= $row_width ? ( ( $target_row_height - $correction ) * ( $cont_width - $tot_marg ) / ( $row_width ) + $correction )  : 0;
 						if ( ! $last ) {
 							$max_row_height = max( $max_row_height, $row_height );
 						}
@@ -258,7 +258,7 @@ global $wppa_empty_content;
 						$row_width 		= 0;
 						$row_height 	= wppa_opt( 'thumbsize' );
 						$rw_count 		= 0;
-						$tr_count 		+= '1';
+						$tr_count 		+= 1;
 					}
 				}
 				wppa_out( '<tr class="wppa-masonry" ><td class="wppa-dummy" style="padding:0;border:none;" ></td></tr>' );
@@ -292,7 +292,7 @@ global $wppa_empty_content;
 					<div
 						id="grid-' . $mocc . '"
 						class="grid-' . $mocc . ' grid-masonryplus"
-						style="padding-top:6px;padding-bottom:6px;padding-right:6px;margin:0 auto;"
+						style="padding-top:6px;padding-bottom:6px;padding-right:6px;margin:0 auto;line-height:0;"
 						>';
 
 					// Add css
@@ -371,12 +371,12 @@ global $wppa_empty_content;
 		}	// If thumbs
 
 		if ( $didsome && wppa_is_pagination() ) $albums = false;					// Pag on and didsome: force a pagebreak by faking no albums
-		if ( ! wppa_is_pagination() ) $n_thumb_pages = '0';							// Still on page one
+		if ( ! wppa_is_pagination() ) $n_thumb_pages = 0;							// Still on page one
 
 		// Process the albums
 		if ( wppa_switch( 'thumbs_first' ) ) {
 			if ( $albums ) {
-				$counter_albums = '0';
+				$counter_albums = 0;
 				wppa_album_list( 'open' );												// Open Albums sub-container
 					foreach ( $albums as $album ) { 									// Loop the albums
 						$counter_albums++;
@@ -459,7 +459,7 @@ function wppa_get_extra_url() {
 
 	// cover
 	$cover = wppa_get( 'cover', wppa( 'is_cover' ) );
-	if ( ! $cover ) $cover = '0';
+	if ( ! $cover ) $cover = 0;
 	$extra_url .= '&amp;wppa-cover='.$cover;
 
 	// album

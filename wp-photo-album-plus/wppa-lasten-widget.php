@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the last uploaded photos
-* Version 8.7.03.007
+* Version 9.0.00.005
 */
 
 class LasTenWidget extends WP_Widget {
@@ -61,10 +61,10 @@ class LasTenWidget extends WP_Widget {
 				}
 				$album = str_replace( '.', ',', $album );
 				break;
-			case '0': // ---all---
+			case 0: // ---all---
 				break;
 			case '-2': // ---generic---
-				$albs = wppa_get_results( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = '0'" );
+				$albs = wppa_get_results( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = 0" );
 				$album = '';
 				foreach ( $albs as $alb ) {
 					$album .= '.' . $alb['id'];
@@ -130,7 +130,7 @@ class LasTenWidget extends WP_Widget {
 
 		if ( $timesince == 'yes' ) $maxh += $lineheight;
 
-		$count = '0';
+		$count = 0;
 
 		if ( $thumbs ) foreach ( $thumbs as $image ) {
 
@@ -159,10 +159,11 @@ class LasTenWidget extends WP_Widget {
 				$file       = wppa_get_thumb_path($image['id']);
 				$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'ltthumb');
 				$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $imgstyle_a['width'], $imgstyle_a['height'] );
-				$imgevents 	= wppa_get_imgevents('thumb', $image['id'], true);
+				$onmouseover  = wppa_mouseover( 'thumb', $image['id'], true );
+				$onmouseout   = wppa_mouseout( 'thumb' );
 				$title 		= $link ? esc_attr(stripslashes($link['title'])) : '';
 
-				$widget_content .= wppa_get_the_widget_thumb('lasten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents);
+				$widget_content .= wppa_get_the_widget_thumb('lasten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $onmouseover, $onmouseout);
 
 				$widget_content .= "\n\t".'<div style="font-size:' . wppa_opt( 'fontsize_widget_thumb' ) . 'px; line-height:'.$lineheight.'px;">';
 				if ( $timesince == 'yes' ) {
@@ -263,7 +264,7 @@ class LasTenWidget extends WP_Widget {
 		$result = '
 		<p>' .
 			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
-			' ' . wppa_setting_path( 'b', 'widget', '1', ['8', '9'] ) . '
+			' ' . wppa_setting_path( 'b', 'widget', 1, ['8', '9'] ) . '
 		</p>';
 		wppa_echo( $result );
     }
@@ -272,13 +273,13 @@ class LasTenWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Last Ten Photos', 'wp-photo-album-plus' ),
-							'album' 		=> '0',
+							'album' 		=> 0,
 							'albumenum' 	=> '',
 							'timesince' 	=> 'no',
 							'display' 		=> 'thumbs',
 							'includesubs' 	=> 'no',
 							'logonly' 		=> 'no',
-							'cache' 		=> '0',
+							'cache' 		=> 0,
 							);
 		return $defaults;
 	}

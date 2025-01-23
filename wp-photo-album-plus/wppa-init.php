@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version: 8.9.02.005
+* Version: 9.0.00.009
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -278,7 +278,7 @@ function wppa_maintenance_messages() {
 
 	// Cron jobs postponed?
 	if ( wppa_get_option( 'wppa_maint_ignore_cron' ) == 'yes' ) {
-		wppa_warning_message( __( 'Please do not forget to re-enable cron jobs for wppa when you are ready doing your bulk actions', 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', '1', '0', '', '', true ) );
+		wppa_warning_message( __( 'Please do not forget to re-enable cron jobs for wppa when you are ready doing your bulk actions', 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', 1, 0, '', '', true ) );
 	}
 
 	// Check for pending actions
@@ -295,13 +295,13 @@ function wppa_maintenance_messages() {
 		wppa_warning_message( __( 'Removing from photo description needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', '2', '8', '', '', true ) );
 	}
 	if ( wppa_get_option( 'wppa_remove_file_extensions_status' ) 	&& wppa_get_option( 'wppa_remove_file_extensions_user' ) == wppa_get_user() ) {
-		wppa_warning_message( __( 'Removing file extensions needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', '2', '10', '', '', true ) );
+		wppa_warning_message( __( 'Removing file extensions needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', '2', 10, '', '', true ) );
 	}
 	if ( wppa_get_option( 'wppa_regen_thumbs_status' ) 				&& wppa_get_option( 'wppa_regen_thumbs_user' ) == wppa_get_user() ) {
-		wppa_warning_message( __( 'Regenerating the Thumbnails needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', '1', '4', '', '', true ) );
+		wppa_warning_message( __( 'Regenerating the Thumbnails needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', 1, '4', '', '', true ) );
 	}
 	if ( wppa_get_option( 'wppa_rerate_status' ) 					&& wppa_get_option( 'wppa_rerate_user' ) == wppa_get_user() ) {
-		wppa_warning_message( __( 'Rerating needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', '1', '5', '', '', true ) );
+		wppa_warning_message( __( 'Rerating needs completion.' , 'wp-photo-album-plus' ) . wppa_see_also( 'maintenance', 1, '5', '', '', true ) );
 	}
 }
 
@@ -309,7 +309,7 @@ function wppa_check_tag_system() {
 global $wpdb;
 
 	if ( current_user_can( 'wppa_settings' ) ) {
-		if ( wppa_get_option( 'wppa_tags_ok' ) != '1' ) {
+		if ( wppa_get_option( 'wppa_tags_ok' ) != 1 ) {
 			$tag = wppa_get_var( "SELECT tags FROM $wpdb->wppa_photos WHERE tags <> '' ORDER BY id DESC LIMIT 1" );
 			if ( $tag ) {
 				if ( substr( $tag, 0, 1 ) != ',' ) {
@@ -317,7 +317,7 @@ global $wpdb;
 					wppa_update_option( 'wppa_sanitize_tags_status', 'required' );
 				}
 				else {
-					wppa_update_option( 'wppa_tags_ok', '1' );
+					wppa_update_option( 'wppa_tags_ok', 1 );
 				}
 			}
 		}
@@ -333,7 +333,7 @@ function wppa_check_cat_system() {
 global $wpdb;
 
 	if ( current_user_can( 'wppa_settings' ) ) {
-		if ( wppa_get_option( 'wppa_cats_ok' ) != '1' ) {
+		if ( wppa_get_option( 'wppa_cats_ok' ) != 1 ) {
 			$tag = wppa_get_var( "SELECT cats FROM $wpdb->wppa_albums WHERE cats <> '' ORDER BY id DESC LIMIT 1" );
 			if ( $tag ) {
 				if ( substr( $tag, 0, 1 ) != ',' ) {
@@ -341,7 +341,7 @@ global $wpdb;
 					wppa_update_option( 'wppa_sanitize_cats_status', 'required' );
 				}
 				else {
-					wppa_update_option( 'wppa_cats_ok', '1' );
+					wppa_update_option( 'wppa_cats_ok', 1 );
 				}
 			}
 		}
@@ -405,6 +405,10 @@ add_action( 'admin_notices', 'wppa_check_scabn_compatibility' );
 // Do translation for wpGlobus and native wppa translator for qTranslate syntax
 function wppa_translate( $text = '' ) {
 global $wppa_lang;
+
+	if ( $text == '-none-' ) {
+		return '<i>'.__('None', 'wp-photo-album-plus').'</i>';
+	}
 
 	// Get default language
 	if ( ! $wppa_lang ) {
@@ -550,7 +554,7 @@ function wppa_fix_aioseo() {
 global $wppa;
 
 	if ( $wppa['mocc'] ) {
-		$wppa['mocc'] = '0';
+		$wppa['mocc'] = 0;
 	}
 }
 add_action( 'wp_head', 'wppa_fix_aioseo', '99' );

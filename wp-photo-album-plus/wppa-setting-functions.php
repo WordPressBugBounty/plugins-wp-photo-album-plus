@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 8.8.05.003
+* Version 9.0.00.005
 *
 */
 
@@ -25,13 +25,8 @@ global $wppa_opt;
 				wppaAjaxUpdateOptionValue(\'' . $slug . '\', this);"
 			placeholder="' . $placeholder . '"
 			value="' . esc_attr( $val ) . '"
-		/>
-		<img
-			id="img_' . $slug . '"
-			src="' . wppa_get_imgdir() . 'star.ico"
-			title="' . __( 'Setting unmodified', 'wp-photo-album-plus' ) . '"
-			style="padding:0 4px;float:left;height:16px;width:16px;"
-		/>
+		/>' .
+		wppa_star_html( $slug ) . '
 		<span
 			style="float:left">' .
 			$text . '
@@ -54,7 +49,7 @@ function wppa_number($xslug, $min, $max, $text = '', $onchange = '') {
 	if ($onchange != '') $html .= ' onchange="'. esc_attr( $onchange.';wppaAjaxUpdateOptionValue(\''.$slug.'\', this);').'"';
 	else $html .= ' onchange="wppaAjaxUpdateOptionValue(\''.$slug.'\', this)"';
 	$html .= ' value="'.$val.'" min="'.$min.'" max="'.$max.'" />';
-	$html .= '<img id="img_'.$slug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding:0 4px; float:left; height:16px; width:16px;" />';
+	$html .= wppa_star_html( $slug );
 	$html .= '<span style="float:left">'.$text.'</span>';
 
 	$html .= wppa_setting_star( $onchange );
@@ -76,7 +71,7 @@ global $wppa_opt;
 	else $html .= ' onchange="wppaAjaxUpdateOptionValue(\''.$slug.'\', this)"';
 	if ( $placeholder ) $html .= ' placeholder="'.$placeholder.'"';
 	$html .= ' value="'.$val.'" />';
-	$html .= '<img id="img_'.$slug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding:0 4px;float:left;height:16px;width:16px" />';
+	$html .= wppa_star_html( $slug );
 	$html .= '<span style="float:left">'.$text.'</span>';
 
 	$html .= wppa_setting_star( $onchange );
@@ -112,13 +107,7 @@ function wppa_edit( $xslug, $value, $width = '90%', $minwidth = '', $text = '', 
 		style="' . esc_attr( $style ) . '"
 		value="' . esc_attr( $value ) . '"
 		onchange="' . esc_attr( $onchange ) . '"
-	/>
-	<img
-		id="' . esc_attr( 'img_' . str_replace( '#', 'H', $slug ) ) . '"
-		src="' . esc_url( wppa_get_imgdir() . 'star.ico' ) . '"
-		title="' . esc_attr( __( 'Setting unmodified', 'wp-photo-album-plus' ) ) . '"
-		style="padding:0 4px;float:left;height:16px;width:16px"
-	/>' .
+	/>' . wppa_star_html( $slug ) .
 	$text;
 
 	$html .= wppa_setting_star( $onchange );
@@ -142,7 +131,7 @@ function wppa_textarea($xslug, $buttonlabel = '', $repair_php = false ) {
 	}
 	$html .= '</textarea>';
 
-	$html .= '<img id="img_'.$slug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding:0 4px;float:left;height:16px;width:16px" />';
+	$html .= wppa_star_html( $slug );
 
 	return $html;
 }
@@ -161,11 +150,8 @@ global $wppa_hide_this;
 	if ( wppa_switch( $slug ) ) $html .= ' checked';
 	if ($onchange != '') $html .= ' onchange="'.esc_attr($onchange.';wppaAjaxUpdateOptionCheckBox(\''.$slug.'\', this);').'"';
 	else $html .= ' onchange="wppaAjaxUpdateOptionCheckBox(\''.$slug.'\', this)"';
-
 	if ($class != '') $html .= ' class="'.$class.'"';
-	$html .= ' /><img id="img_'.$slug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding-left:4px;float:left;height:16px;width:16px"';
-	if ($class != '') $html .= ' class="'.$class.'"';
-	$html .= ' />';
+	$html .= ' />' . wppa_star_html( $slug, $class );
 
 	$html .= wppa_setting_star( $onchange );
 	$html .= '</div>';
@@ -183,9 +169,7 @@ function wppa_checkbox_e($xslug, $curval, $onchange = '', $class = '', $enabled 
 	else $html .= ' onchange="wppaAjaxUpdateOptionCheckBox(\''.$xslug.'\', this)"';
 
 	if ($class != '') $html .= ' class="'.$class.'"';
-	$html .= '/><img id="img_'.$xslug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding-left:4px;float:left;height:16px;width:16px"';
-	if ($class != '') $html .= ' class="'.$class.'"';
-	$html .= '/>';
+	$html .= '/>' . wppa_star_html( $slug, $class );
 
 	return $html;
 }
@@ -251,7 +235,7 @@ global $wppa_hide_this;
 		$idx++;
 	}
 	$html .= '</select>';
-	$html .= '<img id="img_'.str_replace( '#', 'H', $slug ).'" class="'.$class.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding:0 4px;float:left;height:16px;width:16px" />';
+	$html .= wppa_star_html( $slug, $class );
 
 	$html .= wppa_setting_star( $onchange );
 	$html .= wppa_setting_star( $postaction );
@@ -313,7 +297,7 @@ global $wppa_opt;
 		$idx++;
 	}
 	$html .= '</select>';
-	$html .= '<img id="img_'.$slug.'" class="'.$class.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding:0 4px;float:left;height:16px;width:16px" />';
+	$html .= wppa_star_html( $slug, $class );
 
 	$html .= wppa_setting_star( $onchange );
 
@@ -347,7 +331,7 @@ function wppa_select_e( $xslug, $curval, $opts, $vals, $onchange = '', $class = 
 		$idx++;
 	}
 	$html .= '</select>';
-	$html .= '<img id="img_'.str_replace( '#', 'H', $slug ).'" class="'.$class.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding-left:4px;float:left;height:16px;width:16px" />';
+	$html .= wppa_star_html( $slug, $class );
 
 	return $html;
 }
@@ -502,7 +486,7 @@ function wppa_popup_button( $slug, $height = '18' ) {
 	return $result;
 }
 
-function wppa_ajax_button( $label, $slug, $elmid = '0', $no_confirm = false ) {
+function wppa_ajax_button( $label, $slug, $elmid = 0, $no_confirm = false ) {
 	if ( $label == '' ) $label = __('Do it!', 'wp-photo-album-plus' );
 
 	$result = '
@@ -521,7 +505,7 @@ function wppa_ajax_button( $label, $slug, $elmid = '0', $no_confirm = false ) {
 		$result .= 'wppaAjaxUpdateOptionValue(\''.$slug.'\', 0)" />';
 	}
 
-	$result .= '<img id="img_'.$slug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Not done yet', 'wp-photo-album-plus' ).'" style="padding:0 4px;float:left;height:16px;width:16px" />';
+	$result .= wppa_html_tag( 'img', ['id' => 'img_'.$slug, 'src' => wppa_get_imgdir('star.ico'), 'title' => __('Not done yet', 'wp-photo-album-plus' ), 'style' => "padding:0 4px;float:left;height:16px;width:16px"] );
 
 	return $result;
 }
@@ -636,7 +620,7 @@ global $wppa_opt;
 	}
 
 	// A page number 0 or -1 is allowed ( same post/page )
-	if ( $wppa_opt[$xslug] == '0' || $wppa_opt[$xslug] == '-1' ) {
+	if ( $wppa_opt[$xslug] == 0 || $wppa_opt[$xslug] == '-1' ) {
 		return;
 	}
 
@@ -648,7 +632,7 @@ global $wppa_opt;
 											 AND post_status = 'publish'
 											 AND ID = %s", wppa_opt( $slug )));
 	if ( ! $iret ) {
-		wppa_update_option($slug, '0');
+		wppa_update_option($slug, 0);
 	}
 }
 
@@ -904,7 +888,7 @@ global $wppa_cur_subtab_id;
 	$wppa_cur_subtab = md5( $desc );
 	wppa_bump_subtab_id();
 
-	$greek = array('0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X');
+	$greek = array(0, 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X');
 	$the_js = '
 	jQuery(document).ready(function(){
 		var cookie = wppa_getCookie(\'' . $wppa_cur_subtab . '\');
@@ -1058,17 +1042,12 @@ function wppa_get_potd_preview_html( $photo ) {
 		if ( wppa_is_video( $photo['id'] ) ) {
 			$html = '
 			<div id="potdpreview" style="display:inline-block;width:25%;text-align:center;float:left">' .
-				wppa_get_video_html( array( 'id' => $photo['id'], 'width' => '180' ) ) . '
+				wppa_get_video_html( ['id' => $photo['id'], 'style="width:180px;"'] ) . '
 			</div>';
 		}
 		else {
-			$html = '
-			<div id="potdpreview" style="display:inline-block;width:25%;text-align:center;float:left">
-				<img
-					src="' . esc_url( wppa_get_thumb_url( $photo['id'] ) ) . '"
-					style="width: 180px;"
-				/>
-			</div>';
+			$html = wppa_html_tag( 'div', ['id' => "potdpreview", 'style' => "display:inline-block;width:25%;text-align:center;float:left"],
+						wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "width:180px;"] ) );
 		}
 		$html .= '
 			<div style="display:inline-block;width:75%;text-align:center;vertical-align:middle">' .
@@ -1116,10 +1095,10 @@ function wppa_get_potd_pool_html() {
 					}
 
 					// See if we do this
-					if ( $cnt == '0' ) {
+					if ( $cnt == 0 ) {
 						$html .= __( 'No photos in the selection', 'wp-photo-album-plus' );
 					}
-					elseif ( $cnt > '100' ) {
+					elseif ( $cnt > 100 ) {
 						/* translators: integer number */
 						$html .= sprintf( __( 'There are too many photos in the selection to show a preview ( %d )', 'wp-photo-album-plus' ), $cnt );
 					}
@@ -1144,20 +1123,14 @@ function wppa_get_potd_pool_html() {
 
 									// The image if a video
 									if ( wppa_is_video( $id ) ) {
-										$html .= wppa_get_video_html( array( 	'id' 		=> $id,
-																				'style' 	=> 'width:180px;'
-																	));
+										$html .= wppa_get_video_html( ['id' => $id, 'style' => 'width:180px;'] );
 									}
 
 									// The image if a photo
 									else {
-										$html .= '
-										<img
-											src="' . esc_url( wppa_get_thumb_url( $id ) ) . '"
-											style="max-width:180px;max-height:135px;margin:auto;"
-											alt="' . esc_attr( wppa_get_photo_name( $id ) ) . '"
-											/>';
-
+										$html .= wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ),
+																		'style' => "max-width:180px;max-height:135px;margin:auto;",
+																		'alt' => wppa_get_photo_name( $id )] );
 										// Audio ?
 										if ( wppa_has_audio( $id ) ) {
 											$html .= wppa_get_audio_html( array( 	'id' 		=> 	$id,
@@ -1182,7 +1155,7 @@ function wppa_get_potd_pool_html() {
 										(#' . strval( intval( $photo['p_order'] ) ) . ')
 									</div>';
 
-									if ( wppa_get_option( 'wppa_potd_method' ) == '1' ) { 	// Only if fixed photo
+									if ( wppa_get_option( 'wppa_potd_method' ) == 1 ) { 	// Only if fixed photo
 										$html .= '
 										<input
 											style="float:right;"
@@ -1230,4 +1203,10 @@ function wppa_get_potd_pool_html() {
 
 	$result = wppa_compress_html( $html );
 	return $result;
+}
+
+function wppa_star_html( $slug ) {
+
+		return	wppa_html_tag( 'img', ['id' => 'img_'.str_replace('#','H',$slug), 'src' => wppa_get_imgdir('star.ico'),
+									   'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ), 'style' => "padding:0 4px;float:left;height:16px;width:16px;"] );
 }

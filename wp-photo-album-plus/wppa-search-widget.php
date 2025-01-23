@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version: 8.7.03.007
+* Version: 9.0.00.000
 *
 */
 
@@ -143,7 +143,7 @@ class SearchPhotos extends WP_Widget {
 
 		// Landing page
 		$options 	= array( __( '--- default ---', 'wp-photo-album-plus' ) );
-		$values  	= array( '0' );
+		$values  	= array( 0 );
 		$disabled 	= array( false );
 
 		$query = 	"SELECT ID, post_title, post_content, post_parent " .
@@ -194,7 +194,7 @@ class SearchPhotos extends WP_Widget {
 							'label' 		=> '',
 							'root' 			=> false,
 							'sub' 			=> false,
-							'album' 		=> '0',
+							'album' 		=> 0,
 							'landingpage' 	=> '',
 							'catbox' 		=> false,
 							'selboxes' 		=> false,

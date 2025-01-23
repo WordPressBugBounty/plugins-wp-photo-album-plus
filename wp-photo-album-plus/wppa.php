@@ -2,7 +2,7 @@
 /*
  * Plugin Name: WP Photo Album Plus
  * Description: Easily manage and display your photo albums and slideshows within your WordPress site.
- * Version: 8.9.02.005
+ * Version: 9.0.00.010
  * Author: J.N. Breetvelt a.k.a. OpaJaap
  * Author URI: http://wppa.opajaap.nl/
  * Plugin URI: https://wppa.nl/
@@ -22,14 +22,14 @@ global $wpdb;
 global $wp_version;
 
 /* WPPA Version */
-global $wppa_version; 		$wppa_version = '8.9.02.005';							// WPPA software version
+global $wppa_version; 		$wppa_version = '9.0.00.010';							// WPPA software version
 global $wppa_revno; 		$wppa_revno = str_replace( '.', '', $wppa_version );	// WPPA db version
 
 /* Init page js data */
 global $wppa_js_page_data; 	$wppa_js_page_data = '';
 
 /* start timers */
-add_action( 'plugins_loaded', 'wppa_init_timer', '1' );
+add_action( 'plugins_loaded', 'wppa_init_timer', 1 );
 function wppa_init_timer() {
 global $wppa_endtime;
 

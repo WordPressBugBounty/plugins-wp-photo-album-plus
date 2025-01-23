@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 8.8.08.002
+* Version 9.0.00.000
 *
 */
 
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 // instead of characters of unexpected output.
 // register_activation_hook(WPPA_FILE, 'wppa_activate_plugin'); is in wppa.php
 function wppa_activate_plugin() {
-	$old_rev = wppa_get_option( 'wppa_revision', '100' );
+	$old_rev = wppa_get_option( 'wppa_revision', 100 );
 	$new_rev = $old_rev - '0.01';
 	wppa_update_option( 'wppa_revision', $new_rev );
 }
@@ -35,7 +35,7 @@ global $current_user;
 global $wppa_error;
 global $wppa_cron_maintenance_slugs;
 
-	$old_rev = wppa_get_option( 'wppa_revision', '100' );
+	$old_rev = wppa_get_option( 'wppa_revision', 100 );
 
 	if ( $old_rev == $wppa_revno && ! $force ) return; // Nothing to do here
 
@@ -60,7 +60,7 @@ global $wppa_cron_maintenance_slugs;
 					default_tags tinytext NOT NULL,
 					cover_type tinytext NOT NULL,
 					suba_order_by tinytext NOT NULL,
-					views bigint(20) NOT NULL default '0',
+					views bigint(20) NOT NULL default 0,
 					cats text NOT NULL,
 					scheduledtm tinytext NOT NULL,
 					custom text NOT NULL,
@@ -96,34 +96,34 @@ global $wppa_cron_maintenance_slugs;
 					owner text NOT NULL,
 					timestamp tinytext NOT NULL,
 					status tinytext NOT NULL,
-					rating_count bigint(20) NOT NULL default '0',
+					rating_count bigint(20) NOT NULL default 0,
 					tags text NOT NULL,
 					alt tinytext NOT NULL,
 					filename tinytext NOT NULL,
 					modified tinytext NOT NULL,
 					location tinytext NOT NULL,
-					views bigint(20) NOT NULL default '0',
-					clicks bigint(20) NOT NULL default '0',
-					page_id bigint(20) NOT NULL default '0',
+					views bigint(20) NOT NULL default 0,
+					clicks bigint(20) NOT NULL default 0,
+					page_id bigint(20) NOT NULL default 0,
 					exifdtm tinytext NOT NULL,
-					videox smallint(5) NOT NULL default '0',
-					videoy smallint(5) NOT NULL default '0',
-					thumbx smallint(5) NOT NULL default '0',
-					thumby smallint(5) NOT NULL default '0',
-					photox smallint(5) NOT NULL default '0',
-					photoy smallint(5) NOT NULL default '0',
+					videox smallint(5) NOT NULL default 0,
+					videoy smallint(5) NOT NULL default 0,
+					thumbx smallint(5) NOT NULL default 0,
+					thumby smallint(5) NOT NULL default 0,
+					photox smallint(5) NOT NULL default 0,
+					photoy smallint(5) NOT NULL default 0,
 					scheduledtm tinytext NOT NULL,
 					scheduledel tinytext NOT NULL,
 					custom text NOT NULL,
-					stereo smallint NOT NULL default '0',
+					stereo smallint NOT NULL default 0,
 					crypt tinytext NOT NULL,
 					magickstack text NOT NULL,
 					indexdtm tinytext NOT NULL,
-					panorama smallint(5) NOT NULL default '0',
-					angle smallint(5) NOT NULL default '0',
+					panorama smallint(5) NOT NULL default 0,
+					angle smallint(5) NOT NULL default 0,
 					sname text NOT NULL,
-					dlcount bigint(20) NOT NULL default '0',
-					thumblock smallint(5) default '0',
+					dlcount bigint(20) NOT NULL default 0,
+					thumblock smallint(5) default 0,
 					duration tinytext NOT NULL,
 					rml_id tinytext NOT NULL,
 					usedby tinytext NOT NULL,
@@ -199,7 +199,7 @@ global $wppa_cron_maintenance_slugs;
 					ip tinytext NOT NULL,
 					status tinytext NOT NULL,
 					data text NOT NULL,
-					count bigint(20) NOT NULL default '0',
+					count bigint(20) NOT NULL default 0,
 					PRIMARY KEY  (id),
 					KEY sessionkey (session(20))
 					) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci";
@@ -275,7 +275,7 @@ global $wppa_cron_maintenance_slugs;
 	delete_option( 'wppa_cache_misses' );
 
 	// Convert any changed and remove obsolete setting options
-	if ( $old_rev > '100' ) {	// On update only
+	if ( $old_rev > 100 ) {	// On update only
 
 		if ( $old_rev <= '7211' ) {
 
@@ -302,7 +302,7 @@ global $wppa_cron_maintenance_slugs;
 		}
 
 		if ( $old_rev <= '7702006' ) {
-			wppa_query( "UPDATE $wpdb->wppa_albums SET upload_limit_tree = '0' WHERE upload_limit_tree = ''" );
+			wppa_query( "UPDATE $wpdb->wppa_albums SET upload_limit_tree = 0 WHERE upload_limit_tree = ''" );
 			if ( wppa_opt( 'area_size' ) == '' ) delete_option( 'wppa_area_size' );
 		}
 
@@ -455,7 +455,7 @@ global $wppa_cron_maintenance_slugs;
 	}
 
 	// Make sure virtual album crypt exist
-	$albs = array( '0', '1', '2', '3', '9' );
+	$albs = array( 0, 1, '2', '3', '9' );
 	foreach( $albs as $alb ) {
 		if ( ! wppa_get_option( 'wppa_album_crypt_' . $alb ) ) {
 			wppa_update_option( 'wppa_album_crypt_' . $alb, wppa_get_unique_crypt() );
@@ -598,7 +598,7 @@ static $user;
 				else {
 					foreach( array_keys( $grant_parents ) as $key ) {
 						if ( $grant_parents[$key] == 'zero' ) {
-							$grant_parents[$key] = '0';
+							$grant_parents[$key] = 0;
 						}
 					}
 				}
@@ -678,7 +678,7 @@ static $user;
 	foreach( $parents as $parent ) {
 
 		// Create only grant album if: parent is either -1 or existing
-		if ( $parent == '-1' || $parent == '0' || wppa_album_exists( $parent ) ) {
+		if ( $parent == '-1' || $parent == 0 || wppa_album_exists( $parent ) ) {
 			if ( ! in_array( $parent, $my_albs_parents, true ) ) {
 
 				// make an album for this user

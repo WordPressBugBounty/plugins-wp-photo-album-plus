@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 8.8.08.004
+* Version 9.0.00.000
 *
 */
 
@@ -11,7 +11,7 @@
 function wppa_get_unique_crypt() {
 global $wpdb;
 
-	$result = '0';
+	$result = 0;
 	while ( wppa_is_int( $result ) ) {
 		$result = substr( md5( microtime( true ) ), wp_rand( 0, 16 ), 16 );
 	}
@@ -144,7 +144,7 @@ function wppa_encrypt_album( $album ) {
 				$crypt = wppa_get_option( 'wppa_album_crypt_1', false );
 				break;
 			case '':
-			case '0':
+			case 0:
 				$crypt = wppa_get_option( 'wppa_album_crypt_0', false );
 				break;
 			case '999999':
@@ -177,7 +177,7 @@ global $wpdb;
 static $cache;
 static $hits;
 
-	if ( ! $album ) return '0';
+	if ( ! $album ) return 0;
 
 	// Check for not encryoted single item
 	if ( wppa_is_posint( $album ) ) {
@@ -215,7 +215,7 @@ static $hits;
 		if ( ! $cache ) {
 			$cache = array();
 			$cache[wppa_get_option( 'wppa_album_crypt_9' )] = false;
-			$cache[wppa_get_option( 'wppa_album_crypt_0' )] = '0';
+			$cache[wppa_get_option( 'wppa_album_crypt_0' )] = 0;
 			$cache[wppa_get_option( 'wppa_album_crypt_1' )] = '-1';
 			$cache[wppa_get_option( 'wppa_album_crypt_2' )] = '-2';
 			$cache[wppa_get_option( 'wppa_album_crypt_3' )] = '-3';
@@ -264,29 +264,29 @@ function wppa_encrypt_url( $url ) {
 	$temp = explode( '?', $url );
 
 	// Has it a querystring?
-	if ( count( $temp ) == '1' ) {
+	if ( count( $temp ) == 1 ) {
 		return $url;
 	}
 
 	// Disassemble querystring
-	$qarray = explode( '&', str_replace( '&amp;', '&', $temp['1'] ) );
+	$qarray = explode( '&', str_replace( '&amp;', '&', $temp[1] ) );
 
 	// Search and replace album and photo ids by crypts
 	$i = 0;
 	while ( $i < count( $qarray ) ) {
 		$item = $qarray[$i];
 		$t = explode( '=', $item );
-		if ( isset( $t['1'] ) ) {
-			switch ( $t['0'] ) {
+		if ( isset( $t[1] ) ) {
+			switch ( $t[0] ) {
 				case 'wppa-album':
 				case 'album':
-					if ( ! $t['1'] ) $t['1'] = '0';
-					$t['1'] = wppa_encrypt_album( $t['1'] );
+					if ( ! $t[1] ) $t[1] = 0;
+					$t[1] = wppa_encrypt_album( $t[1] );
 					break;
 				case 'wppa-photo':
 				case 'wppa-photos':
 				case 'photo':
-					$t['1'] = wppa_encrypt_photo( $t['1'] );
+					$t[1] = wppa_encrypt_photo( $t[1] );
 					break;
 				default:
 					break;
@@ -298,7 +298,7 @@ function wppa_encrypt_url( $url ) {
 	}
 
 	// Re-assemble url
-	$temp['1'] = implode( '&', $qarray );
+	$temp[1] = implode( '&', $qarray );
 	$newurl = implode( '?', $temp );
 	if ( $hasamp ) {
 		$newurl = str_replace( '&', '&amp;', $newurl );

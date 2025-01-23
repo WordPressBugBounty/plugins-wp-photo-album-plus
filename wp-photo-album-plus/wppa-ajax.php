@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 8.9.01.001
+* Version: 9.0.00.000
 *
 */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 function wppa_ajax_include() {
 global $wp_query;
 
-	if ( $wp_query->get( 'wppa_ajax' ) === '1' ) {
+	if ( $wp_query->get( 'wppa_ajax' ) === 1 ) {
 		include_once ABSPATH . '/wp-admin/admin-ajax.php';
 		exit;
 	}
@@ -54,14 +54,14 @@ global $wppa_url_set_extension;
 	if ( ! defined( 'DOING_WPPA_AJAX' ) ) {
 		define( 'DOING_WPPA_AJAX', true );
 	}
-	wppa( 'error', '0' );
+	wppa( 'error', 0 );
 	wppa( 'out', '' );
 	if ( ! isset( $wppa_session['page'] ) ) {
 //		wppa_begin_session();
 	}
 	if ( ! isset( $wppa_session['page'] ) ) {
-		$wppa_session['page'] = '0';
-		$wppa_session['ajax'] = '0';
+		$wppa_session['page'] = 0;
+		$wppa_session['ajax'] = 0;
 	}
 	$wppa_session['page']--;
 	$wppa_session['ajax']++;
@@ -259,7 +259,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 		case 'getssiptclist':
 			$tag 		= '';
-			$mocc 		= '1';
+			$mocc 		= 1;
 			$oldvalue 	= '';
 
 			$tag 	= str_replace( 'H', '#', wppa_get( 'iptctag' ) );
@@ -268,8 +268,8 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			if ( strpos( $wppa_session['supersearch'], ',' ) !== false ) {
 				$ss_data = explode( ',', $wppa_session['supersearch'] );
 				if ( count( $ss_data ) == '4' ) {
-					if ( $ss_data['0'] == 'p' ) {
-						if ( $ss_data['1'] == 'i' ) {
+					if ( $ss_data[0] == 'p' ) {
+						if ( $ss_data[1] == 'i' ) {
 							if ( $ss_data['2'] == wppa_get( 'iptctag' ) ) {
 								$oldvalue = $ss_data['3'];
 							}
@@ -313,7 +313,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			$tag 		= '';
 			$brand 		= '';
-			$mocc 		= '1';
+			$mocc 		= 1;
 			$oldvalue 	= '';
 			$ss_data 	= array();
 			$result 	= '';
@@ -333,8 +333,8 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					$ss_data[3] = implode( ',', $data );
 
-					if ( $ss_data['0'] == 'p' ) {
-						if ( $ss_data['1'] == 'e' ) {
+					if ( $ss_data[0] == 'p' ) {
+						if ( $ss_data[1] == 'e' ) {
 							if ( $ss_data['2'] == wppa_get( 'exiftag' ) ) {
 								$oldvalue = $ss_data['3'];
 							}
@@ -568,7 +568,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Security check
 			if ( wppa_switch( 'direct_comment' ) ) {
-				if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < '1' ) ) {
+				if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
 					wppa_echo( wp_json_encode( ['txt' => esc_html__( 'Missing or invalid photo id' , 'wp-photo-album-plus' )] ) );
 					wppa_exit();
 				}
@@ -578,7 +578,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '70', true )] ) );
 					wppa_exit();
 				}
-				if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < '1' ) ) {
+				if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
 					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '71', true )] ) );
 					wppa_exit();
 				}
@@ -756,7 +756,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Validate args
 			$alb = wppa_get( 'album-id' );
-
+wppa_log('misc', 'alb='.$alb);
 			// Get all items in the album
 			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d", $alb );
 			$photos = wppa_get_col( $query );
@@ -769,8 +769,9 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 
 			// Anything left?
-			if ( ! $photos || count( $photos ) == '0' ) {
+			if ( ! $photos || count( $photos ) == 0 ) {
 				wppa_echo( wp_json_encode( ['txt' => '||ER||' . __( 'The album is empty', 'wp-photo-album-plus' )] ) );
+wppa_log('misc', 'leeg');
 				wppa_exit();
 			}
 
@@ -1334,7 +1335,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Security check
 			if ( wppa_switch( 'direct_comment' ) ) {
-				if ( ! $photo || ( wppa_get_photo_item( $photo, 'album' ) < '1' ) ) {
+				if ( ! $photo || ( wppa_get_photo_item( $photo, 'album' ) < 1 ) ) {
 					wppa_echo( wp_json_encode( ['txt' => '0||100||'.__( 'Missing or invalid photo id', 'wp-photo-album-plus' )] ) );
 					wppa_exit();
 				}
@@ -1344,7 +1345,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					wppa_echo( wp_json_encode( ['txt' => '0||100||'.$errtxt] ) );
 					wppa_exit();
 				}
-				if ( ! $photo || ( wppa_get_photo_item( $photo, 'album' ) < '1' ) ) {
+				if ( ! $photo || ( wppa_get_photo_item( $photo, 'album' ) < 1 ) ) {
 					wppa_echo( wp_json_encode( ['txt' => '0||100||'.__( 'Missing or invalid photo id', 'wp-photo-album-plus' )] ) );
 					wppa_exit();
 				}
@@ -1357,15 +1358,15 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 
 			// Check on validity
-			if ( wppa_opt( 'rating_max' ) == '1' && $rating != '1' ) {
+			if ( wppa_opt( 'rating_max' ) == 1 && $rating != 1 ) {
 				wppa_echo( wp_json_encode( ['txt' => '0||106||'.$errtxt.':'.$rating] ) );
 				wppa_exit();																// Value out of range
 			}
-			elseif ( wppa_opt( 'rating_max' ) == '5' && ! in_array( $rating, array( '-1', '1', '2', '3', '4', '5' ) ) ) {
+			elseif ( wppa_opt( 'rating_max' ) == '5' && ! in_array( $rating, array( '-1', 1, '2', '3', '4', '5' ) ) ) {
 				wppa_echo( wp_json_encode( ['txt' => '0||106||'.$errtxt.':'.$rating] ) );
 				wppa_exit();																// Value out of range
 			}
-			elseif ( wppa_opt( 'rating_max' ) == '10' && ! in_array( $rating, array( '-1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' ) ) ) {
+			elseif ( wppa_opt( 'rating_max' ) == 10 && ! in_array( $rating, array( '-1', 1, '2', '3', '4', '5', '6', '7', '8', '9', 10 ) ) ) {
 				wppa_echo( wp_json_encode( ['txt' => '0||106||'.$errtxt.':'.$rating] ) );
 				wppa_exit();																// Value out of range
 			}
@@ -1385,7 +1386,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			$mylast   = wppa_get_my_last_vote( $photo );
 
-			$myavgrat = '0';			// Init
+			$myavgrat = 0;			// Init
 
 			$user     = wppa_get_user( 'display' );
 
@@ -1481,13 +1482,13 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 											  WHERE photo = %d
 											  AND user = %s", $photo, $user );
 					wppa_query( $query );
-					$myavgrat = '0';
+					$myavgrat = 0;
 				}
 				else {
 
 					// Add my like
-					wppa_create_rating_entry( array( 'photo' => $photo, 'value' => '1', 'user' => $user ) );
-					$myavgrat = '1';
+					wppa_create_rating_entry( array( 'photo' => $photo, 'value' => 1, 'user' => $user ) );
+					$myavgrat = 1;
 				}
 
 				// Update photo data
@@ -1514,13 +1515,13 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				}
 
 				// I did a dislike, can not modify
-				if ( $mylast < '0' ) {
+				if ( $mylast < 0 ) {
 					wppa_echo( wp_json_encode( ['txt' => '0||900||'.__('You can not change a dislike', 'wp-photo-album-plus' )] ) );
 					wppa_exit();
 				}
 
 				// I did a rating, can not change into dislike
-				if ( $mylast > '0' && $rating == '-1' ) {
+				if ( $mylast > 0 && $rating == '-1' ) {
 					wppa_echo( wp_json_encode( ['txt' => '0||900||'.__('You can not change your vote into a dislike', 'wp-photo-album-plus' )] ) );
 					wppa_exit();
 				}
@@ -1613,11 +1614,11 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				}
 				$myavgrat = $sum/$cnt;
 				$i = wppa_opt( 'rating_prec' );
-				$j = $i + '1';
+				$j = $i + 1;
 				$myavgrat = sprintf( '%'.$j.'.'.$i.'f', $myavgrat );
 			}
 			else {
-				$myavgrat = '0';
+				$myavgrat = 0;
 			}
 
 			// Compute new allavgrat
@@ -1638,9 +1639,9 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					$cnt++;
 				}
 				$allavgrat = $sum/$cnt;
-				if ( $allavgrat == '10' ) $allavgrat = '9.99999999';	// For sort order reasons text field
+				if ( $allavgrat == 10 ) $allavgrat = '9.99999999';	// For sort order reasons text field
 			}
-			else $allavgrat = '0';
+			else $allavgrat = 0;
 
 			// Store it in the photo info
 			$iret = wppa_update_photo( $photo, ['mean_rating' => $allavgrat] );
@@ -1677,7 +1678,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 			$distext = wppa_get_distext( $discount, $rating );
 			if ( ! $distext ) {
-				$distext = '0';
+				$distext = 0;
 			}
 
 			// Test for possible medal
@@ -1949,7 +1950,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					if ( ! wppa_has_many_albums() ) {
 						$value = wppa_decrypt_album( $value );
 					}
-					if ( $value < '-1' || $value == $album || ( $value > '0' && ! wppa_album_exists( $value ) ) ) {
+					if ( $value < '-1' || $value == $album || ( $value > 0 && ! wppa_album_exists( $value ) ) ) {
 						wppa_echo( '||3||' . sprintf( __( 'Invalid parent value', 'wp-photo-album-plus' ), $itemname, $album ) );
 						wppa_exit();
 					}
@@ -2067,7 +2068,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					for ( $i = 0; $i < 4; $i++ ) {
 						if ( ! isset( $opts[$i] ) ) {
-							$opts[$i] = '0';
+							$opts[$i] = 0;
 						}
 					}
 					$i = substr( $item , 10 );
@@ -2213,7 +2214,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			$photo 		= wppa_get( 'photo-id' );
 			$nonce 		= wppa_get( 'nonce' );
 			$item  		= wppa_get( 'item' );
-			$err 		= '0';
+			$err 		= 0;
 			$txt 		= '';
 			$dbfields 	= array(); 	// Fields for update
 			$jsfields 	= array(); 	// Fields for JSON response
@@ -2238,7 +2239,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			// Check validity
 			if ( ! wp_verify_nonce( $nonce, 'wppa-nonce_'.$photo ) ) {
 				$txt = __( 'Security check failure: wrong noncefield value' , 'wp-photo-album-plus' );
-				wppa_json_photo_update( $photo, $txt, '1' );															// Nonce check failed
+				wppa_json_photo_update( $photo, $txt, 1 );															// Nonce check failed
 				wppa_exit();
 			}
 
@@ -2265,7 +2266,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 					// Length ok?
 					if ( strlen( $value ) != 19 ) {
-						$err = '1';
+						$err = 1;
 					}
 
 					// Check on digits, colons and space
@@ -2273,19 +2274,19 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						$d = substr( $value, $i, 1 );
 						$f = substr( $format, $i, 1 );
 						switch ( $f ) {
-							case '0':
-								if ( ! in_array( $d, array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ) ) ) {
-									$err = '2';
+							case 0:
+								if ( ! in_array( $d, array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ) ) ) {
+									$err = 2;
 								}
 								break;
 							case ':':
 							case ' ':
 								if ( $d != $f ) {
-									$err = '3';
+									$err = 3;
 								}
 								break;
 							default:
-								$err = '9';
+								$err = 9;
 								break;
 						}
 					}
@@ -2293,18 +2294,18 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					// Check on values if format correct, report first error only
 					if ( ! $err ) {
 						$temp = explode( ':', str_replace( ' ', ':', $value ) );
-						if ( $temp['0'] < '1970' ) 					$err = '11';	// Before UNIX epoch
-						if ( ! $err && $temp['0'] > wp_date( 'Y' ) ) 	$err = '12';	// Future
-						if ( ! $err && $temp['1'] < '1' )			$err = '13'; 	// Before january
-						if ( ! $err && $temp['1'] > '12' )			$err = '14';	// After december
-						if ( ! $err && $temp['2'] < '1' ) 			$err = '15'; 	// Before first of month
-						if ( ! $err && $temp['2'] > '31' ) 			$err = '17';	// After 31st ( forget about feb and months with 30 days )
-						if ( ! $err && $temp['3'] < '0' ) 			$err = '18'; 	// Before first hour
-						if ( ! $err && $temp['3'] > '23' )			$err = '19'; 	// Hour > 23
-						if ( ! $err && $temp['4'] < '0' ) 			$err = '20';	// Min < 0
-						if ( ! $err && $temp['4'] > '59' ) 			$err = '21';	// Min > 59
-						if ( ! $err && $temp['5'] < '0' ) 			$err = '22';	// Sec < 0
-						if ( ! $err && $temp['5'] > '59' ) 			$err = '23';	// Sec > 59
+						if ( $temp[0] < 1970 ) 					$err = 11;	// Before UNIX epoch
+						if ( ! $err && $temp[0] > wp_date( 'Y' ) ) 	$err = 12;	// Future
+						if ( ! $err && $temp[1] < 1 )			$err = 13; 	// Before january
+						if ( ! $err && $temp[1] > 12 )			$err = 14;	// After december
+						if ( ! $err && $temp[2] < 1 ) 			$err = 15; 	// Before first of month
+						if ( ! $err && $temp[2] > 31 ) 			$err = 17;	// After 31st ( forget about feb and months with 30 days )
+						if ( ! $err && $temp[3] < 0 ) 			$err = 18; 	// Before first hour
+						if ( ! $err && $temp[3] > 23 )			$err = 19; 	// Hour > 23
+						if ( ! $err && $temp[4] < 0 ) 			$err = 20;	// Min < 0
+						if ( ! $err && $temp[4] > 59 ) 			$err = 21;	// Min > 59
+						if ( ! $err && $temp[5] < 0 ) 			$err = 22;	// Sec < 0
+						if ( ! $err && $temp[5] > 59 ) 			$err = 23;	// Sec > 59
 					}
 					if ( $err ) {
 						/* translators: error code */
@@ -2317,24 +2318,24 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					break;
 				case 'lat':
 					$itemname = __( 'Latitude', 'wp-photo-album-plus' );
-					if ( ! is_numeric( $value ) || $value < '-90.0' || $value > '90.0' ) {
+					if ( ! is_numeric( $value ) || $value < -90.0 || $value > 90.0 ) {
 						$txt = __( 'Enter a value > -90 and < 90' , 'wp-photo-album-plus' );
-						$err = '1';
+						$err = 1;
 					}
 					else {
 						$geo = wppa_get_photo_item( $photo, 'location' );
 						if ( ! $geo ) $geo = '///';
 						$geo = explode( '/', $geo );
-						$geo = wppa_format_geo( $value, $geo['3'] );
+						$geo = wppa_format_geo( $value, $geo[3] );
 						$dbfields['location'] = $geo;
 					}
 					$jsfields[$item] = true;
 					break;
 				case 'lon':
 					$itemname = __( 'Longitude', 'wp-photo-album-plus' );
-					if ( ! is_numeric( $value ) || $value < '-180.0' || $value > '180.0' ) {
+					if ( ! is_numeric( $value ) || $value < -180.0 || $value > 180.0 ) {
 						$txt = __( 'Enter a value > -180 and < 180' , 'wp-photo-album-plus' );
-						$err = '1';
+						$err = 1;
 					}
 					else {
 						$geo = wppa_get_photo_item( $photo, 'location' );
@@ -2362,7 +2363,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					else {
 						$txt = __( 'Could not remake thumbnail', 'wp-photo-album-plus' );
-						$err ='1';
+						$err =1;
 					}
 					$jsfields['thumbmod'] = true;
 					break;
@@ -2382,7 +2383,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					else {
 						$txt = __( 'Could not rotate thumbnail', 'wp-photo-album-plus' );
-						$err ='1';
+						$err =1;
 					}
 					break;
 				case 'rotdisplayleft':
@@ -2395,7 +2396,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					else {
 						$txt = __( 'Could not rotate display', 'wp-photo-album-plus' );
-						$err ='1';
+						$err =1;
 					}
 					break;
 				case 'rotright':
@@ -2441,7 +2442,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					else {
 						$txt = __( 'An error occurred while trying to rotate or flip photo' , 'wp-photo-album-plus' );
-						$err = '1';
+						$err = 1;
 					}
 					$jsfields['thumbmod'] = true;
 					$jsfields['photomod'] = true;
@@ -2632,7 +2633,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 						// Do the magick command
 						$err = wppa_image_magick( 'convert ' . $path . ' ' . trim( $commands[$i] ) . ' ' . $path );
-						$newstack .= ( $i != '0' ? ' | ' : '' ) . $commands[$i];
+						$newstack .= ( $i != 0 ? ' | ' : '' ) . $commands[$i];
 						$i++;
 					}
 
@@ -2653,7 +2654,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 						/* translators: album id */
 						$txt = sprintf( __( 'Album %d does not exist', 'wp-photo-album-plus' ), $toalb );
-						$err = '1';
+						$err = 1;
 					}
 					else {
 
@@ -2663,7 +2664,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 							/* translators: file name, album id */
 							$txt = sprintf ( __( 'A photo with filename %1$s already exists in album %2$d.' , 'wp-photo-album-plus' ), $photodata['filename'], $toalb );
-							$err = '1';
+							$err = 1;
 						}
 						else {
 							wppa_invalidate_treecounts( $photodata['album'] );	// Current album
@@ -2681,7 +2682,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 								/* translators: photo id */
 								$txt = sprintf( __( 'An error occurred while trying to move photo %s' , 'wp-photo-album-plus' ), $photo );
-								$err = '1';
+								$err = 1;
 							}
 						}
 					}
@@ -2695,7 +2696,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 						/* translators: album id */
 						$txt = sprintf( __( 'Album %d does not exist', 'wp-photo-album-plus' ), $toalb );
-						$err = '1';
+						$err = 1;
 					}
 					else {
 
@@ -2705,7 +2706,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 							/* translators: photo filename, album id */
 							$txt = sprintf( __( 'A photo with filename %1$s already exists in album %2$d.' , 'wp-photo-album-plus' ), $photodata['filename'], $toalb );
-							$err = '1';
+							$err = 1;
 						}
 						else {
 							$err = wppa_copy_photo( $photo, $toalb );
@@ -2719,7 +2720,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 								/* translators: photo id */
 								$txt = sprintf( __( 'An error occurred while trying to copy photo %s' , 'wp-photo-album-plus' ), $photo );
-								$err = '1';
+								$err = 1;
 							}
 						}
 					}
@@ -2742,7 +2743,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 							$itemname = __( 'Status', 'wp-photo-album-plus' );
 							if ( ! current_user_can( 'wppa_moderate' ) && ! current_user_can( 'wppa_admin' ) ) {
 								$txt = __( 'Security check failure', 'wp-photo-album-plus' ) . ' #78';
-								$err = '1';
+								$err = 1;
 							}
 							else {
 								wppa_invalidate_treecounts( wppa_get_photo_item( $photo, 'album' ) );
@@ -2795,16 +2796,16 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 							break;
 						case 'videox':
 							$itemname = __( 'Video width' , 'wp-photo-album-plus' );
-							if ( ! wppa_is_int( $value ) || $value < '0' ) {
+							if ( ! wppa_is_int( $value ) || $value < 0 ) {
 								$txt = __( 'Please enter an integer value >= 0', 'wp-photo-album-plus' );
-								wppa_json_photo_update( $photo, $txt, '1' );
+								wppa_json_photo_update( $photo, $txt, 1 );
 							}
 							break;
 						case 'videoy':
 							$itemname = __( 'Video height', 'wp-photo-album-plus' );
-							if ( ! wppa_is_int( $value ) || $value < '0' ) {
+							if ( ! wppa_is_int( $value ) || $value < 0 ) {
 								$txt = __( 'Please enter an integer value >= 0', 'wp-photo-album-plus' );
-								wppa_json_photo_update( $photo, $txt, '1' );
+								wppa_json_photo_update( $photo, $txt, 1 );
 							}
 							break;
 
@@ -2929,7 +2930,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					}
 					else {
 						$txt = __( 'No rights', 'wp-photo-album-plus' );
-						$err = '1';
+						$err = 1;
 					}
 					break;
 
@@ -2961,20 +2962,20 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				case 'file':
 
 					// Re-upload file, called from the photo admin page
-					$err = '0';
+					$err = 0;
 
 					// Check on valid file
 					$file = current( $_FILES );
 					$file_is_ok = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], wppa_get_mime_types() );
 					if ( ! $file_is_ok['ext'] || ! $file_is_ok['type'] ) {
 						$txt = __( 'Invalid file, upload failed', 'wp-photo-album-plus' );
-						$err = '1';
+						$err = 1;
 					}
 
 					// Check on upload error
 					if ( $file['error'] ) {
 						$txt = __( 'Error during upload.', 'wp-photo-album-plus' );
-						$err = '1';
+						$err = 1;
 					}
 
 					if ( ! $err ) {
@@ -3007,7 +3008,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 							// Update timestamps and sizes
 							$alb = wppa_get_photo_item( $photo, 'album' );
 							wppa_update_album( $alb );
-							$dbfields = array_merge( $dbfields, ['modified' => time(), 'thumbx' => '0', 'thumby' => '0', 'photox' => '0', 'photoy' => '0'] );
+							$dbfields = array_merge( $dbfields, ['modified' => time(), 'thumbx' => 0, 'thumby' => 0, 'photox' => 0, 'photoy' => 0] );
 
 							// Report success
 							$txt = __( 'Photo files updated.', 'wp-photo-album-plus' );
@@ -3016,7 +3017,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 							// Report fail
 							$txt = __( 'Could not update files.', 'wp-photo-album-plus' );
-							$err = '1';
+							$err = 1;
 						}
 						$jsfields['thumbmod'] = true;
 						$jsfields['photomod'] = true;
@@ -3037,7 +3038,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 					// If it was 360 and now different, delete o1 file and remake files
 					$cur = wppa_get_photo_item( $photo, 'panorama' );
-					if ( $cur == '1' && $value != '1' ) {
+					if ( $cur == 1 && $value != 1 ) {
 						$s = wppa_get_o1_source_path( $photo );
 						if ( wppa_is_file( $s ) ) {
 							wppa_unlink( $s );
@@ -3050,12 +3051,12 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					$y = wppa_get_photoy( $photo, true );
 
 					// See if spheric and needs conversion, assume its for 360
-					if ( $value == '1' && $x > 2.01 * $y ) {
+					if ( $value == 1 && $x > 2.01 * $y ) {
 						$bret = wppa_make_360( $photo, 360 );
 						if ( $bret ) {
 							$x = wppa_get_photox( $photo, true );
 							$y = wppa_get_photoy( $photo, true );
-							$dbfields = array_merge( $dbfields, ['panorama' => '1', 'angle' => '360', 'photox' => $x, 'photoy' => $y] );
+							$dbfields = array_merge( $dbfields, ['panorama' => 1, 'angle' => '360', 'photox' => $x, 'photoy' => $y] );
 							wppa_remake_files( '', $photo );
 							/* translators: type */
 							$txt = sprintf( __( 'Panorama set to %s and converted', 'wp-photo-album-plus' ), $value );
@@ -3068,7 +3069,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 					// Not spheric or no conversion needed
 					else {
-						$dbfields = array_merge( $dbfields, ['panorama' => $value, 'photox' => $x, 'photoy' => $y, 'angle' => '0'] );
+						$dbfields = array_merge( $dbfields, ['panorama' => $value, 'photox' => $x, 'photoy' => $y, 'angle' => 0] );
 
 						/* translators: type */
 						$txt = sprintf( __( 'Panorama set to %s', 'wp-photo-album-plus' ), $value );
@@ -3077,7 +3078,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					break;
 
 				case 'thumblock':
-					$dbfields['thumblock'] = $value ? '1' : '0';
+					$dbfields['thumblock'] = $value ? 1 : 0;
 					$txt = __( 'Thumbfile', 'wp-photo-album-plus' ) . ( $value ? ' ' : ' un' ) . 'locked';
 					break;
 
@@ -3101,7 +3102,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						}
 					}
 					else {
-						$dbfields['angle'] = '0';
+						$dbfields['angle'] = 0;
 						wppa_remake_files( '', $photo );
 						$txt = __( 'Converted photo removed', 'wp-photo-album-plus' );
 					}
@@ -3135,7 +3136,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						if ( ! wppa_is_file( $pdf ) ) $err += 10;
 						if ( wppa_is_pdf_multiple( $id ) ) $err += 1;
 						$txt = __( 'Conversion failed', 'wp-photo-album-plus' ) . ' ' . $err;
-						$err = '1';
+						$err = 1;
 					}
 					wppa_json_photo_update( $photo, $txt, $err, $jsfields );
 					wppa_exit();
@@ -3143,7 +3144,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 				default:
 					$txt = 'This update action is not implemented yet (' . $item . ')';
-					$err = '1';
+					$err = 1;
 				break;
 			}
 
@@ -3159,7 +3160,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			if ( $iret === false ) {
 				/* Translators: item name, media type, id */
 				$txt = sprintf( __( 'An error occurred while trying to update %1$s of %2$s %3$d', 'wp-photo-album-plus' ), $itemname, wppa_get_type( $photo, true ), $photo );
-				$err = '1';
+				$err = 1;
 			}
 			if ( ! $txt ) {
 				if ( $err ) {
@@ -3232,14 +3233,14 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			$photo 	= wppa_get( 'photo-id' );
 			$nonce 	= wppa_get( 'nonce' );
 			$item  	= wppa_get( 'item' );
-			$value 	= wppa_get( 'value' );
+			$value 	= wppa_get( 'value', '', 'textarea' );
 			$value 	= wppa_decode( $value );
 			$tag 	= wppa_get( 'tagname' );
 
 			// Check validity
 			if ( ! wp_verify_nonce( $nonce, 'wppa-nonce_'.$photo ) ) {
 				$txt = __( 'You do not have the rights to update photo information' , 'wp-photo-album-plus' );
-				wppa_json_photo_update( $photo, $txt, '1' );
+				wppa_json_photo_update( $photo, $txt, 1 );
 			}
 
 			// Valid update request
@@ -3331,7 +3332,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			$value 	= trim( $value ); 	// Remaove surrounding spaces
 			$alert  = '';				// Init the return string data
-			wppa( 'error', '0' );		//
+			wppa( 'error', 0 );		//
 			$title  = '';				//
 
 
@@ -3347,9 +3348,9 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 																	'display' 	=> 'inline',
 																	'lightbox' 	=> false,
 																	'position' 	=> 'relative',
-																	'left' 		=> '0',
-																	'top' 		=> '0',
-																	'margin' 	=> '0',
+																	'left' 		=> 0,
+																	'top' 		=> 0,
+																	'margin' 	=> 0,
 					) ) );
 				}
 				elseif ( wppa_get( 'type' ) == 'lightbox' ) {
@@ -3357,9 +3358,9 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 																	'display' 	=> 'inline',
 																	'lightbox' 	=> true,
 																	'position' 	=> 'relative',
-																	'left' 		=> '0',
-																	'top' 		=> '0',
-																	'margin' 	=> '0',
+																	'left' 		=> 0,
+																	'top' 		=> 0,
+																	'margin' 	=> 0,
 					) ) );
 				}
 				else {
@@ -3388,7 +3389,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			if ( substr( $option, 0, 16 ) == 'wppa_iptc_label_' ) {
 				$tag   = substr( $option, 16 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET description = %s WHERE tag = %s AND photo = '0'", $value, $tag );
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET description = %s WHERE tag = %s AND photo = 0", $value, $tag );
 				$bret  = wppa_query( $query );
 				// Produce the response text
 				if ( $bret ) {
@@ -3402,7 +3403,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 			elseif ( substr( $option, 0, 17 ) == 'wppa_iptc_status_' ) {
 				$tag   = substr( $option, 17 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = %s WHERE tag = %s AND photo = '0'", $value, $tag );
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = %s WHERE tag = %s AND photo = 0", $value, $tag );
 				$bret  = wppa_query( $query );
 				// Produce the response text
 				if ( $bret ) {
@@ -3416,7 +3417,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 			elseif ( substr( $option, 0, 16 ) == 'wppa_exif_label_' ) {
 				$tag   = substr( $option, 16 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET description = %s WHERE tag = %s AND photo = '0'", $value, $tag );
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET description = %s WHERE tag = %s AND photo = 0", $value, $tag );
 				$bret  = wppa_query( $query );
 				// Produce the response text
 				if ( $bret ) {
@@ -3430,7 +3431,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 			elseif ( substr( $option, 0, 17 ) == 'wppa_exif_status_' ) {
 				$tag   = substr( $option, 17 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET status = %s WHERE tag = %s AND photo = '0'", $value, $tag );
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET status = %s WHERE tag = %s AND photo = 0", $value, $tag );
 				$bret  = wppa_query( $query );
 				// Produce the response text
 				if ( $bret ) {
@@ -3468,8 +3469,8 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						wp_delete_file( $cache );
 					}
 				}
-				wppa_update_option( 'wppa_qr_cache_hits', '0' );
-				wppa_update_option( 'wppa_qr_cache_miss', '0' );
+				wppa_update_option( 'wppa_qr_cache_hits', 0 );
+				wppa_update_option( 'wppa_qr_cache_miss', 0 );
 				wppa_update_option( $option, $value );
 				/* Translators: setting name, setting value */
 				$title = sprintf( __( 'Setting %1$s updated to %2$s', 'wp-photo-album-plus' ), $option, $value );
@@ -3530,68 +3531,68 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					break;
 
 				case 'wppa_initial_colwidth'://??  fixed   low	  high	  title
-					wppa_ajax_check_range( $value, false, '100', false, __( 'Initial width.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 100, false, __( 'Initial width.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_fullsize':
-					wppa_ajax_check_range( $value, false, '100', false, __( 'Full size.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 100, false, __( 'Full size.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_maxheight':
-					wppa_ajax_check_range( $value, false, '100', false, __( 'Max height.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 100, false, __( 'Max height.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_film_thumbsize':
 				case 'wppa_thumbsize':
 				case 'wppa_thumbsize_alt':
-					wppa_ajax_check_range( $value, false, '50', false, __( 'Thumbnail size.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 50, false, __( 'Thumbnail size.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_tf_width':
 				case 'wppa_tf_width_alt':
-					wppa_ajax_check_range( $value, false, '50', false, __( 'Thumbnail frame width' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 50, false, __( 'Thumbnail frame width' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_tf_height':
 				case 'wppa_tf_height_alt':
-					wppa_ajax_check_range( $value, false, '50',false,  __( 'Thumbnail frame height' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 50,false,  __( 'Thumbnail frame height' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_tn_margin':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Thumbnail Spacing' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Thumbnail Spacing' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_thumb_page_size':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Thumb page size.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Thumb page size.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_smallsize':
-					wppa_ajax_check_range( $value, false, '50', false, __( 'Cover photo size.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 50, false, __( 'Cover photo size.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_smallsize_percentage':
-					wppa_ajax_check_range( $value, false, '10', '100', __( 'Cover photo size.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 10, 100, __( 'Cover photo size.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_album_page_size':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Album page size.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Album page size.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_topten_count':
-					wppa_ajax_check_range( $value, false, '2', false, __( 'Number of TopTen photos' , 'wp-photo-album-plus' ), '40' );
+					wppa_ajax_check_range( $value, false, 2, false, __( 'Number of TopTen photos' , 'wp-photo-album-plus' ), '40' );
 					break;
 				case 'wppa_topten_size':
-					wppa_ajax_check_range( $value, false, '32', false, __( 'Widget image thumbnail size' , 'wp-photo-album-plus' ), wppa_get_minisize() );
+					wppa_ajax_check_range( $value, false, 32, false, __( 'Widget image thumbnail size' , 'wp-photo-album-plus' ), wppa_get_minisize() );
 					break;
 				case 'wppa_max_cover_width':
-					wppa_ajax_check_range( $value, false, '150', false, __( 'Max Cover width' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 150, false, __( 'Max Cover width' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_text_frame_height':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Minimal description height' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Minimal description height' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_cover_minheight':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Minimal cover height' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Minimal cover height' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_head_and_text_frame_height':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Minimal text frame height' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Minimal text frame height' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_bwidth':
-					wppa_ajax_check_range( $value, '', '0', false, __( 'Border width' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, '', 0, false, __( 'Border width' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_bradius':
-					wppa_ajax_check_range( $value, '', '0', false, __( 'Border radius' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, '', 0, false, __( 'Border radius' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_box_spacing':
-					wppa_ajax_check_range( $value, '', '-20', '100', __( 'Box spacing' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, '', -20, 100, __( 'Box spacing' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_popupsize':
 					$floor = wppa_opt( 'thumbsize' );
@@ -3600,106 +3601,106 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					wppa_ajax_check_range( $value, false, $floor, wppa_opt( 'fullsize' ), __( 'Popup size' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_fullimage_border_width':
-					wppa_ajax_check_range( $value, '', '0', false, __( 'Fullsize border width' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, '', 0, false, __( 'Fullsize border width' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_lightbox_bordersize':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Lightbox Bordersize' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Lightbox Bordersize' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_ovl_border_width':
-					wppa_ajax_check_range( $value, false, '0', '16', __( 'Lightbox Borderwidth' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 16, __( 'Lightbox Borderwidth' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_ovl_border_radius':
-					wppa_ajax_check_range( $value, false, '0', '16', __( 'Lightbox Borderradius' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 16, __( 'Lightbox Borderradius' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_comment_count':
-					wppa_ajax_check_range( $value, false, '2', '40', __( 'Number of Comment widget entries' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 2, 40, __( 'Number of Comment widget entries' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_comment_size':
-					wppa_ajax_check_range( $value, false, '32', wppa_get_minisize(), __( 'Comment Widget image thumbnail size' , 'wp-photo-album-plus' ), wppa_get_minisize() );
+					wppa_ajax_check_range( $value, false, 32, wppa_get_minisize(), __( 'Comment Widget image thumbnail size' , 'wp-photo-album-plus' ), wppa_get_minisize() );
 					break;
 				case 'wppa_thumb_opacity':
-					wppa_ajax_check_range( $value, false, '0', '100', __( 'Opacity.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 100, __( 'Opacity.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_cover_opacity':
-					wppa_ajax_check_range( $value, false, '0', '100', __( 'Opacity.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 100, __( 'Opacity.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_star_opacity':
-					wppa_ajax_check_range( $value, false, '0', '50', __( 'Opacity.' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 50, __( 'Opacity.' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_gravatar_size':
-					wppa_ajax_check_range( $value, false, '10', '256', __( 'Avatar size' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 10, 256, __( 'Avatar size' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_watermark_opacity':
-					wppa_ajax_check_range( $value, false, '0', '100', __( 'Watermark opacity' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 100, __( 'Watermark opacity' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_watermark_opacity_text':
-					wppa_ajax_check_range( $value, false, '0', '100', __( 'Watermark opacity' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 100, __( 'Watermark opacity' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_ovl_txt_lines':
-					wppa_ajax_check_range( $value, 'auto', '0', '24', __( 'Number of text lines' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, 'auto', 0, 24, __( 'Number of text lines' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_ovl_opacity':
-					wppa_ajax_check_range( $value, false, '0', '100', __( 'Overlay opacity' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 100, __( 'Overlay opacity' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_upload_limit_count':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Upload limit' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Upload limit' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_dislike_mail_every':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Notify inappropriate' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Notify inappropriate' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_dislike_set_pending':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Dislike pending' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Dislike pending' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_dislike_delete':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Dislike delete' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Dislike delete' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_cp_points_comment':
 				case 'wppa_cp_points_comment_appr':
 				case 'wppa_cp_points_rating':
 				case 'wppa_cp_points_upload':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'myCRED / Cube Points' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'myCRED / Cube Points' , 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_jpeg_quality':
-					wppa_ajax_check_range( $value, false, '20', '100', __( 'JPG Image quality' , 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 20, 100, __( 'JPG Image quality' , 'wp-photo-album-plus' ) );
 					if ( wppa_cdn( 'admin' ) == 'cloudinary' && ! wppa( 'out' ) ) {
 						wppa_delete_derived_from_cloudinary();
 					}
 					break;
 				case 'wppa_imgfact_count':
-					wppa_ajax_check_range( $value, false, '1', '24', __( 'Number of coverphotos', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 1, 24, __( 'Number of coverphotos', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_dislike_value':
-					wppa_ajax_check_range( $value, false, '-10', '0', __( 'Dislike value', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, -10, 0, __( 'Dislike value', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_slideshow_pagesize':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideshow pagesize', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Slideshow pagesize', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_slideonly_max':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideonly max', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Slideonly max', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_pagelinks_max':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Max Pagelinks', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Max Pagelinks', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_area_size':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Thumbnail area max size', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Thumbnail area max size', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_area_size_slide':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideshow area max size', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, false, __( 'Slideshow area max size', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_cover_spacing':
-					wppa_ajax_check_range( $value, false, '0', '50', __( 'Cover spacing', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 50, __( 'Cover spacing', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_user_create_max_level':
-					wppa_ajax_check_range( $value, false, '0', '99', __( 'Max nesting level', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 99, __( 'Max nesting level', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_sticky_header_size':
-					wppa_ajax_check_range( $value, false, '0', '400', __('Sticky header size', 'wp-photo-album-plus' ) );
+					wppa_ajax_check_range( $value, false, 0, 400, __('Sticky header size', 'wp-photo-album-plus' ) );
 					break;
 
 				case 'wppa_rating_clear':
 					$iret = wppa_clear_table( WPPA_RATING ) &&
-							wppa_clear_col( WPPA_PHOTOS, 'mean_rating', '0' ) &&
-							wppa_clear_col( WPPA_PHOTOS, 'rating_count', '0' );
+							wppa_clear_col( WPPA_PHOTOS, 'mean_rating', 0 ) &&
+							wppa_clear_col( WPPA_PHOTOS, 'rating_count', 0 );
 
 					if ( $iret !== false ) {
 						delete_option( 'wppa_'.WPPA_RATING.'_lastkey' );
@@ -3708,19 +3709,19 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					else {
 						$title = __( 'Could not clear ratings' , 'wp-photo-album-plus' );
 						$alert = $title;
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					break;
 				case 'wppa_viewcount_clear':
-					$iret = wppa_clear_col( WPPA_PHOTOS, 'views', '0' ) &&
-							wppa_clear_col( WPPA_ALBUMS, 'views', '0' );
+					$iret = wppa_clear_col( WPPA_PHOTOS, 'views', 0 ) &&
+							wppa_clear_col( WPPA_ALBUMS, 'views', 0 );
 					if ( $iret !== false ) {
 						$title = __( 'Viewcounts cleared' , 'wp-photo-album-plus' );
 					}
 					else {
 						$title = __( 'Could not clear viewcounts' , 'wp-photo-album-plus' );
 						$alert = $title;
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					break;
 
@@ -3734,7 +3735,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					else {
 						$title = __( 'Could not clear IPTC data' , 'wp-photo-album-plus' );
 						$alert = $title;
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					break;
 
@@ -3748,7 +3749,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					else {
 						$title = __( 'Could not clear EXIF data' , 'wp-photo-album-plus' );
 						$alert = $title;
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					break;
 
@@ -3761,11 +3762,11 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				case 'wppa_bgcolor_thumbnail':
 					$value = trim( strtolower( $value ) );
 					if ( strlen( $value ) != '7' || substr( $value, 0, 1 ) != '#' ) {
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					else for ( $i=1; $i<7; $i++ ) {
 						if ( ! in_array( substr( $value, $i, 1 ), array( '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' ) ) ) {
-							wppa( 'error', '1' );
+							wppa( 'error', 1 );
 						}
 					}
 					if ( ! wppa( 'error' ) ) $old_minisize--;	// Trigger regen message
@@ -3777,7 +3778,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					break;
 
 				case 'wppa_rating_max':
-					if ( $value == '5' && wppa_opt( 'rating_max' ) == '10' ) {
+					if ( $value == 5 && wppa_opt( 'rating_max' ) == 10 ) {
 						$query = "SELECT id, value FROM $wpdb->wppa_rating";
 						$rats  = wppa_get_results( $query );
 						if ( $rats ) {
@@ -3786,7 +3787,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 							}
 						}
 					}
-					if ( $value == '10' && wppa_opt( 'rating_max' ) == '5' ) {
+					if ( $value == 10 && wppa_opt( 'rating_max' ) == 5 ) {
 						$query = "SELECT id, value FROM $wpdb->wppa_rating";
 						$rats  = wppa_get_results( $query );
 						if ( $rats ) {
@@ -3801,7 +3802,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					$alert .= ' '.__( 'Please run the appropriate maintenance procedure.' , 'wp-photo-album-plus' );
 
 					wppa_update_option( $option, $value );
-					wppa( 'error', '0' );
+					wppa( 'error', 0 );
 					break;
 
 				case 'wppa_newphoto_description':
@@ -3810,7 +3811,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						$value = wppa_compress_html( $value );
 					}
 					wppa_update_option( $option, $value );
-					wppa( 'error', '0' );
+					wppa( 'error', 0 );
 					$alert = '';
 					wppa_index_compute_skips();
 					break;
@@ -3819,7 +3820,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					$dir = wppa_opt( 'source_dir' );
 					if ( ! wppa_is_dir( $dir ) ) wppa_mkdir( $dir );
 					if ( ! wppa_is_dir( $dir ) || ! wppa_is_writable( $dir ) ) {
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 						/* translators: directory */
 						$alert = sprintf( __( 'Unable to create or write to %s' , 'wp-photo-album-plus' ), $dir );
 					}
@@ -3829,14 +3830,14 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					$olddir = wppa_opt( 'source_dir' );
 					$value = rtrim( $value, '/' );
 					if ( strpos( $value.'/', WPPA_UPLOAD_PATH.'/' ) !== false ) {
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 						$alert = sprintf( __( 'Source can not be inside the wppa folder.' , 'wp-photo-album-plus' ) );
 					}
 					else {
 						$dir = $value;
 						if ( ! wppa_is_dir( $dir ) ) wppa_mkdir( $dir );
 						if ( ! wppa_is_dir( $dir ) || ! wppa_is_writable( $dir ) ) {
-							wppa( 'error', '1' );
+							wppa( 'error', 1 );
 							/* translators: directory */
 							$alert = sprintf( __( 'Unable to create or write to %s' , 'wp-photo-album-plus' ), $dir );
 						}
@@ -3846,14 +3847,14 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				case 'wppa_newpag_content':
 					if ( strpos( $value, 'w#album' ) === false ) {
 						$alert = __( 'The content must contain w#album' , 'wp-photo-album-plus' );
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					break;
 
 				case 'wppa_gpx_shortcode':
 					if ( strpos( $value, 'w#lat' ) === false || strpos( $value, 'w#lon' ) === false ) {
 						$alert = __( 'The content must contain w#lat and w#lon' , 'wp-photo-album-plus' );
-						wppa( 'error', '1' );
+						wppa( 'error', 1 );
 					}
 					break;
 
@@ -3862,9 +3863,11 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				case 'wppa_search_tags':
 				case 'wppa_search_cats':
 				case 'wppa_search_comments':
+					ob_start();
 					wppa_clear_taglist();
 					wppa_schedule_maintenance_proc( 'wppa_remake_index_photos', true );
 					wppa_schedule_maintenance_proc( 'wppa_remake_index_albums', true );
+					ob_get_clean();
 					break;
 
 				case 'wppa_blacklist_user':
@@ -3904,7 +3907,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						}
 						wppa_update_option( 'wppa_black_listed_users', $black_listed_users );
 					}
-					$value = '0';
+					$value = 0;
 					break;
 
 				case 'wppa_superuser_user':
@@ -3940,7 +3943,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 						}
 						wppa_update_option( 'wppa_super_users', $super_users );
 					}
-					$value = '0';
+					$value = 0;
 					break;
 
 				case 'wppa_fotomoto_on':
@@ -3989,26 +3992,26 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					break;
 
 				case 'wppa_regen_thumbs_skip_one':
-					$last = wppa_get_option( 'wppa_regen_thumbs_last', '0' );
-					$skip = $last + '1';
+					$last = wppa_get_option( 'wppa_regen_thumbs_last', 0 );
+					$skip = $last + 1;
 					wppa_update_option( 'wppa_regen_thumbs_last',  $skip );
 					break;
 
 				case 'wppa_remake_skip_one':
-					$last = wppa_get_option( 'wppa_remake_last', '0' );
-					$skip = $last + '1';
+					$last = wppa_get_option( 'wppa_remake_last', 0 );
+					$skip = $last + 1;
 					wppa_update_option( 'wppa_remake_last',  $skip );
 					break;
 
 				case 'wppa_create_o1_files_skip_one':
-					$last = wppa_get_option( 'wppa_create_o1_files_last', '0' );
-					$skip = $last + '1';
+					$last = wppa_get_option( 'wppa_create_o1_files_last', 0 );
+					$skip = $last + 1;
 					wppa_update_option( 'wppa_create_o1_files_last',  $skip );
 					break;
 
 				case 'wppa_optimize_ewww_skip_one':
-					$last = wppa_get_option( 'wppa_optimize_ewww_last', '0' );
-					$skip = $last + '1';
+					$last = wppa_get_option( 'wppa_optimize_ewww_last', 0 );
+					$skip = $last + 1;
 					wppa_update_option( 'wppa_optimize_ewww_last',  $skip );
 					break;
 
@@ -4068,7 +4071,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 				case 'wppa_rating_display_type':
 					if ( $value == 'likes' ) {
 						wppa_update_option( 'wppa_rating_multi', 'yes' );
-						wppa_update_option( 'wppa_rating_dayly', '0' );
+						wppa_update_option( 'wppa_rating_dayly', 0 );
 						wppa_update_option( 'wppa_vote_needs_comment', 'no' );
 					}
 					break;
@@ -4122,7 +4125,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					break;
 				case 'wppa_retry_mails':
 					$all = array_merge( wppa_get_option( 'wppa_failed_mails', array() ), wppa_get_option( 'wppa_perm_failed_mails', array() ) );
-					$value = max( $value, '1' );
+					$value = max( $value, 1 );
 					foreach( array_keys( $all ) as $key ) {
 						$all[$key]['retry'] = $value;
 					}
@@ -4130,7 +4133,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 					wppa_update_option( 'wppa_perm_failed_mails', array() );
 					break;
 				case 'wppa_main_photo_reset':
-					wppa_clear_col( WPPA_ALBUMS, 'main_photo', '0' );
+					wppa_clear_col( WPPA_ALBUMS, 'main_photo', 0 );
 					$value = 'no';
 					$alert = __('All album cover images set to default', 'wp-photo-album-plus' );
 					break;
@@ -4146,7 +4149,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 				default:
 
-					wppa( 'error', '0' );
+					wppa( 'error', 0 );
 					$alert = '';
 			}
 
@@ -4265,13 +4268,13 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Check User capability
 			if ( ! current_user_can( 'wppa_import' ) ) {
-				wppa_secfail( '91' );
+				wppa_secfail( 91 );
 			}
 
 			// Check nonce
 			$nonce = wppa_get( 'import-upload-nonce', '', 'text' );
 			if ( ! wp_verify_nonce( $nonce, 'wppa-import-upload-nonce' ) ) {
-				wppa_echo( '0' . __( 'Security check failure', 'wp-photo-album-plus' ) );
+				wppa_echo( 0 . __( 'Security check failure', 'wp-photo-album-plus' ) );
 			}
 			else {
 				require_once 'wppa-import.php';
@@ -4283,7 +4286,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 		case 'sanitizetags':
 			$tags 		= wppa_get( 'tags' );
 			$album 		= wppa_get( 'album' );
-			$deftags 	= ( wppa_is_int( $album ) && $album > '0' ) ? wppa_get_album_item( $album, 'default_tags' ) : '';
+			$deftags 	= ( wppa_is_int( $album ) && $album > 0 ) ? wppa_get_album_item( $album, 'default_tags' ) : '';
 			$tags 		= $deftags ? $tags . ',' . $deftags : $tags;
 			echo wp_json_encode( ['txt' => wppa_sanitize_tags( $tags, false, true )] );
 			wppa_exit();
@@ -4364,7 +4367,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 		case 'updatewatermarkpreview':
 
 			$tr = floor( 127 * ( 100 - wppa_opt( 'watermark_opacity_text' ) ) / 100 );
-			$args = array( 'id' => '0', 'url' => true, 'width' => '1000', 'height' => '400', 'transp' => $tr );
+			$args = array( 'id' => 0, 'url' => true, 'width' => 1000, 'height' => 400, 'transp' => $tr );
 			$url = wppa_create_textual_watermark_file( $args ).'?ver='.wp_rand(0, 4711);
 
 			wppa_create_all_textual_watermark_files();
@@ -4426,7 +4429,7 @@ function wppa_secfail( $id, $return = false ) {
 }
 
 // Get the JSON formatted photo update data
-function wppa_json_photo_update( $id, $txt, $err = '0', $flags = array() ) {
+function wppa_json_photo_update( $id, $txt, $err = 0, $flags = array() ) {
 
 	$defaults = array( 'thumbmod' 	=> false,
 					   'photomod' 	=> false,
@@ -4532,7 +4535,7 @@ function wppa_json_photo_update( $id, $txt, $err = '0', $flags = array() ) {
 		$data['tags'] = trim( wppa_get_photo_item( $id, 'tags' ), ',' );
 	}
 
-	if ( ! $err ) $err = '0';
+	if ( ! $err ) $err = 0;
 	echo esc_html( '||' . $err . '||' ) . wp_json_encode( $data );
 	wppa_exit();
 }

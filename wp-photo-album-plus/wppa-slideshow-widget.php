@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a slideshow in the sidebar
-* Version: 8.8.00.003
+* Version: 9.0.00.000
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -88,11 +88,11 @@ class SlideshowWidget extends WP_Widget {
 			wppa( 'is_random', wppa_checked( $instance['random'] ) );
 
 			// Including sub albums?
-			if ( $album > '0' && wppa_checked( $instance['incsubs'] ) ) {
+			if ( $album > 0 && wppa_checked( $instance['incsubs'] ) ) {
 				$album = wppa_alb_to_enum_children( $album );
 			}
 			elseif ( $album == '-2' ) {
-				$album = wppa_alb_to_enum_children( '0' );
+				$album = wppa_alb_to_enum_children( 0 );
 			}
 			$album = implode( '.', wppa_strip_void_albums( explode( '.', $album ) ) );
 
@@ -199,11 +199,11 @@ class SlideshowWidget extends WP_Widget {
 
 		// Max
 		$body =
-		'<option value="10" ' . ( $instance['maxslides'] == '10' ? 'selected' : '' ) . ' >10</option>' .
+		'<option value="10" ' . ( $instance['maxslides'] == 10 ? 'selected' : '' ) . ' >10</option>' .
 		'<option value="25" ' . ( $instance['maxslides'] == '25' ? 'selected' : '' ) . ' >25</option>' .
 		'<option value="50" ' . ( $instance['maxslides'] == '50' ? 'selected' : '' ) . ' >50</option>' .
 		'<option value="75" ' . ( $instance['maxslides'] == '75' ? 'selected' : '' ) . ' >75</option>' .
-		'<option value="100" ' . ( $instance['maxslides'] == '100' ? 'selected' : '' ) . ' >100</option>' .
+		'<option value="100" ' . ( $instance['maxslides'] == 100 ? 'selected' : '' ) . ' >100</option>' .
 		'<option value="150" ' . ( $instance['maxslides'] == '150' ? 'selected' : '' ) . ' >150</option>' .
 		'<option value="200" ' . ( $instance['maxslides'] == '200' ? 'selected' : '' ) . ' >200</option>' .
 		'<option value="250" ' . ( $instance['maxslides'] == '250' ? 'selected' : '' ) . ' >250</option>' .
@@ -228,7 +228,7 @@ class SlideshowWidget extends WP_Widget {
 			wppa_widget_number( $this, 'width', $instance['width'], __( 'Width in pixels', 'wp-photo-album-plus' ), '50', '500', '', 'float' );
 
 			// Height
-			wppa_widget_number( $this, 'height', $instance['height'], __( 'Height in pixels', 'wp-photo-album-plus' ), '0', '500', '', 'float' );
+			wppa_widget_number( $this, 'height', $instance['height'], __( 'Height in pixels', 'wp-photo-album-plus' ), 0, '500', '', 'float' );
 
 			// Portrait only
 			wppa_widget_checkbox( 	$this,
@@ -264,7 +264,7 @@ class SlideshowWidget extends WP_Widget {
 		wppa_echo( '</div>' );
 
 		// Timeout
-		wppa_widget_number( $this, 'timeout', $instance['timeout'], __( 'Slideshow timeout in seconds', 'wp-photo-album-plus' ), '1', '60' );
+		wppa_widget_number( $this, 'timeout', $instance['timeout'], __( 'Slideshow timeout in seconds', 'wp-photo-album-plus' ), 1, '60' );
 
 		// Linkurl
 		if ( wppa_opt( 'slideonly_widget_linktype' ) == 'widget' ) {
@@ -328,7 +328,7 @@ class SlideshowWidget extends WP_Widget {
 		$defaults = array( 	'title' 	=> __( 'Sidebar Slideshow', 'wp-photo-album-plus' ),
 							'album' 	=> '-2',
 							'width' 	=> wppa_get_option( 'wppa_widget_width' ),
-							'height' 	=> '0',
+							'height' 	=> 0,
 							'ponly' 	=> 'no',
 							'linkurl' 	=> '',
 							'linktitle' => '',
@@ -341,7 +341,7 @@ class SlideshowWidget extends WP_Widget {
 							'name' 		=> 'no',
 							'numbar'	=> 'no',
 							'desc' 		=> 'no',
-							'maxslides' => '100',
+							'maxslides' => 100,
 							'random' 	=> 'no',
 							'incsubs' 	=> 'no',
 							'logonly' 	=> 'no',

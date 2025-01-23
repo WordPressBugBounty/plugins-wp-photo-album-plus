@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaDeclsVersion = '8.6.03.004';
+wppaDeclsVersion = '9.0.00.006';
 
 // Global declarations
 var	wppaFullValign = [],
@@ -37,7 +37,6 @@ var	wppaFullValign = [],
 	wppaColWidth = [],
 	wppaMCRWidth = [],
 	wppaPhotoView = [],
-	wppaPopupOnclick = [],
 	wppaRel = "rel",
 	wppaSlideOffset = [],
 	wppaThumbPage = [],
@@ -156,4 +155,6 @@ var	wppaFullValign = [],
 	wppaMobileTimeStart = 0,
 	wppaRel = "data-rel",
 	wppaCropper = [],
-	wppaNoStackPush = true;
+	wppaNoStackPush = true,
+	wppaOvlTimeout = [],
+	wppaOvlSlideStart = [];

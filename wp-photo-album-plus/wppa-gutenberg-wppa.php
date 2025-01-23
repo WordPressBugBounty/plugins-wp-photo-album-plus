@@ -2,7 +2,7 @@
 /* wppa-gutenberg-wppa.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 8.7.03.007
+* Version 9.0.00.000
 */
 
 function wppa_gutenberg_wppa_block() {
@@ -427,7 +427,7 @@ global $wpdb;
 							foreach ( $photos as $photo ) {
 
 								$name = stripslashes( wppa_translate( $photo['name'] ) );
-								if ( strlen($name) > '50') $name = substr($name, '0', '50') . '...';
+								if ( strlen($name) > '50') $name = substr($name, 0, '50') . '...';
 
 								if ( wppa_get_option( 'wppa_file_system' ) == 'flat' ) {
 									$val = $photo['id'] . '.' . $photo['ext'];

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 8.8.08.002
+* Version: 9.0.00.010
 *
 */
 
@@ -147,7 +147,7 @@ global $wpdb;
 	// Alt thumbsize
 	if ( isset( $args['alt_thumbsize'] ) ) {
 		$a = $args['alt_thumbsize'];
-		if ( $a == '0' || $a == 'yes' ) {
+		if ( $a == 0 || $a == 'yes' ) {
 			$fields['alt_thumbsize'] = $args['alt_thumbsize'];
 		}
 	}
@@ -170,7 +170,7 @@ global $wpdb;
 	// Sub album order
 	if ( isset( $args['suba_order_by'] ) ) {
 		$s = $args['suba_order_by'];
-		if ( in_array( $s, ['0', '3', '1', '-1', '2', '-2', '5', '-5'] ) ) {
+		if ( in_array( $s, [0, '3', 1, '-1', '2', '-2', '5', '-5'] ) ) {
 			$fields['suba_order_by'] = $args['suba_order_by'];
 		}
 	}
@@ -183,6 +183,7 @@ global $wpdb;
 	// Cats
 	if ( isset( $args['cats'] ) ) {
 		$fields['cats'] = wppa_sanitize_cats( $args['cats'] );
+		$fields['cats'] = str_replace( '-none-,', '', $fields['cats'] );
 		wppa_clear_catlist();
 		$modified = true;
 	}
@@ -425,6 +426,7 @@ global $wpdb;
 		$t = wppa_filter_iptc( $t, $id );
 		$t = wppa_filter_exif( $t, $id );
 		$fields['tags'] = wppa_sanitize_tags( $t );
+		$fields['tags'] = str_replace( '-none-,', '', $fields['tags'] );
 		wppa_clear_taglist();
 		$modified = true;
 	}
@@ -548,7 +550,7 @@ global $wpdb;
 	// Stereo
 	if ( isset( $args['stereo'] ) ) {
 		$n = $args['stereo'];
-		if ( in_array( $n, ['-1', '0', '1']  ) ) {
+		if ( in_array( $n, ['-1', 0, 1]  ) ) {
 			$fields['stereo'] = $n;
 		}
 	}
@@ -575,7 +577,7 @@ global $wpdb;
 	// Panorama
 	if ( isset( $args['panorama'] ) ) {
 		$n = $args['panorama'];
-		if ( in_array( $n, ['0', '1', '2']  ) ) {
+		if ( in_array( $n, [0, 1, '2']  ) ) {
 			$fields['panorama'] = $n;
 		}
 	}
@@ -604,7 +606,7 @@ global $wpdb;
 	// Thumbnail lock
 	if ( isset( $args['thumblock'] ) ) {
 		$n = $args['thumblock'];
-		if ( in_array( $n, ['0', '1'] ) ) {
+		if ( in_array( $n, [0, 1] ) ) {
 			$fields['thumblock'] = $n;
 		}
 	}
@@ -848,12 +850,12 @@ global $wpdb;
 	return $iret;
 }
 
-// Cleart a column by setting it to '' or '0'
+// Cleart a column by setting it to '' or 0
 function wppa_clear_col( $table, $col, $val = '' ) {
 global $wpdb;
 
 	if ( $val !== '' ) {
-		$val = '0';
+		$val = 0;
 	}
 	$query = $wpdb->prepare( "UPDATE %s SET %s = `%s`", $table, $col, $val );
 	$query = wppa_fix_query( $query );

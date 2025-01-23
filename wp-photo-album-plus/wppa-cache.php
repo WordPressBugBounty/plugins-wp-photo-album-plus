@@ -3,7 +3,7 @@
 /*
 /* Contains all wppa smart cache functions
 /*
-/* Version 8.8.06.006
+/* Version 9.0.00.000
 */
 
 // Test for caching
@@ -584,7 +584,7 @@ global $wpdb;
 						if ( $meta['photos'] == '*' ) $meta['photos'] = __( 'All', 'wp-photo-album-plus' );
 						if ( $meta['other'] == 'R' ) $meta['other'] = __( 'Any rating', 'wp-photo-album-plus' );
 						if ( $meta['other'] == 'C' ) $meta['other'] = __( 'Any comment', 'wp-photo-album-plus' );
-						if ( $meta['page'] == '0' ) $meta['page'] = '';
+						if ( $meta['page'] == 0 ) $meta['page'] = '';
 					}
 					$result .= '
 					<tr>
@@ -607,8 +607,8 @@ global $wpdb;
 				$result .= '<br><b>' . sprintf( __( '%d cachefiles deleted', 'wp-photo-album-plus' ), $count ) . '</br>';
 			}
 			else {
-				$hits = wppa_get_option( 'wppa_cache_hits', '0' );
-				$miss = wppa_get_option( 'wppa_cache_misses', '1' );
+				$hits = wppa_get_option( 'wppa_cache_hits', 0 );
+				$miss = wppa_get_option( 'wppa_cache_misses', 1 );
 				$perc = sprintf( '%5.2f', 100 * $hits / ( $hits + $miss ) );
 				$result .= '
 					<p>' .

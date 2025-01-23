@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the tagcloud widget
-* Version 8.7.03.006
+* Version 9.0.00.000
 */
 
 class TagcloudPhotos extends WP_Widget {
@@ -112,7 +112,7 @@ class TagcloudPhotos extends WP_Widget {
 		wppa_widget_selection_frame( $this, 'tags', $body, __( 'Select multiple tags or --- all ---', 'wp-photo-album-plus' ), 'multi' );
 
 		// Show current selection
-		if ( isset( $instance['tags']['0'] ) && $instance['tags']['0'] ) {
+		if ( isset( $instance['tags'][0] ) && $instance['tags'][0] ) {
 			$s = implode( ',', $instance['tags'] );
 		}
 		else {
@@ -133,7 +133,7 @@ class TagcloudPhotos extends WP_Widget {
 		$defaults = array( 	'title' 	=> __( 'Photo Tag Cloud', 'wp-photo-album-plus' ),
 							'tags' 		=> '',
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

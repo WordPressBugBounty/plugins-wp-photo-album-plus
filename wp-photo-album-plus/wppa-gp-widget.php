@@ -4,7 +4,7 @@
 *
 * A text widget that interpretes wppa shortcodes
 *
-* Version 8.8.00.003
+* Version 9.0.00.000
 */
 
 class WppaGpWidget extends WP_Widget {
@@ -131,7 +131,7 @@ class WppaGpWidget extends WP_Widget {
 							'text' 		=> '',
 							'filter' 	=> 'no',
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

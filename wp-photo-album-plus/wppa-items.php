@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version: 8.8.07.001
+* Version: 9.0.00.000
 *
 */
 
@@ -70,7 +70,7 @@ static $cache;
 	}
 
 	// Valid id?
-	if ( ! wppa_is_int( $id ) || $id < '1' ) {
+	if ( ! wppa_is_int( $id ) || $id < 1 ) {
 		wppa_log( 'err', 'Invalid arg wppa_cache_album(' . serialize( $id ) . ')' );
 		return false;
 	}
@@ -153,7 +153,7 @@ static $cache;
 	}
 
 	// Error in arg?
-	if ( ! wppa_is_int( $id ) || $id < '1' ) {
+	if ( ! wppa_is_int( $id ) || $id < 1 ) {
 		wppa_log( 'err', 'Invalid arg wppa_cache_photo(' . serialize( $id ) . ')' );
 		return false;
 	}
@@ -185,7 +185,7 @@ global $wppa_skip_alb_to_gal;
 	$result = '';
 
 	// Verify args
-	if ( ! is_numeric( $id ) || $id < '1' ) {
+	if ( ! is_numeric( $id ) || $id < 1 ) {
 		return $result;
 	}
 
@@ -281,14 +281,25 @@ global $wppa_skip_alb_to_gal;
 
 function wppa_the_medal_html( $id ) {
 
-	$thumb = wppa_cache_photo( $id );
-	$result = '';
-	$color = wppa_opt( 'medal_color' );
-	$wppa_url = is_ssl() ? str_replace( 'http://', 'https://', WPPA_URL ) : WPPA_URL;	// Probably redundant... but it is not clear in to the codex if plugins_url() returns https
-	if ( $thumb['status'] == 'gold' ) $result .= '<img src="'.$wppa_url.'/img/medal_gold_'.$color.'.png" title="'.esc_attr(__('Gold medal', 'wp-photo-album-plus' )).'" alt="'.__('Gold', 'wp-photo-album-plus' ).'" style="border:none; margin:0; padding:0; box-shadow:none; height:32px;" />';
-	if ( $thumb['status'] == 'silver' ) $result .= '<img src="'.$wppa_url.'/img/medal_silver_'.$color.'.png" title="'.esc_attr(__('Silver medal', 'wp-photo-album-plus' )).'" alt="'.__('Silver', 'wp-photo-album-plus' ).'" style="border:none; margin:0; padding:0; box-shadow:none; height:32px;" />';
-	if ( $thumb['status'] == 'bronze' ) $result .= '<img src="'.$wppa_url.'/img/medal_bronze_'.$color.'.png" title="'.esc_attr(__('Bronze medal', 'wp-photo-album-plus' )).'" alt="'.__('Bronze', 'wp-photo-album-plus' ).'" style="border:none; margin:0; padding:0; box-shadow:none; height:32px;" />';
-	return $result;
+	$status = wppa_get_photo_item( $id, 'status' );
+	$color  = wppa_opt( 'medal_color' );
+
+	switch( $status ) {
+		case 'gold':
+			return wppa_html_tag( 'img', ['src' => wppa_get_imgdir('medal_gold_'.$color.'.png'), 'title' => __('Gold medal', 'wp-photo-album-plus'),
+										  'alt' => __('Gold medal', 'wp-photo-album-plus'), 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
+			break;
+		case 'silver':
+			return wppa_html_tag( 'img', ['src' => wppa_get_imgdir('medal_silver_'.$color.'.png'), 'title' => __('Silver medal', 'wp-photo-album-plus'),
+										  'alt' => __('Silver medal', 'wp-photo-album-plus'), 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
+			break;
+		case 'bronze':
+			return wppa_html_tag( 'img', ['src' => wppa_get_imgdir('medal_bronze_'.$color.'.png'), 'title' => __('Bronze medal', 'wp-photo-album-plus'),
+										  'alt' => __('Bronze medal', 'wp-photo-album-plus'), 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
+			break;
+		default:
+			return '';
+	}
 }
 
 // get the description of an image
@@ -296,7 +307,7 @@ function wppa_get_photo_desc( $id, $xargs = array() ) {
 global $wppa_skip_alb_to_gal;
 
 	// Verify args
-	if ( ! is_numeric( $id ) || $id < '1' ) {
+	if ( ! is_numeric( $id ) || $id < 1 ) {
 		return '';
 	}
 
@@ -388,7 +399,7 @@ global $wpdb;
 		}
 		if ( $thumb['location'] && strpos( $result, 'w#gpx' ) !== false ) {
 			$geo = explode( '/', $thumb['location'] );
-			$loc = str_replace( '&deg;', '<sup>o</sup>', $geo['0'].' '.$geo['1'] );
+			$loc = str_replace( '&deg;', '<sup>o</sup>', $geo[0].' '.$geo[1] );
 			$result = str_replace( 'w#gpx', htmlspecialchars( $loc ), $result );
 		}
 		if ( strpos( $result, 'w#mime' ) !== false ) {
@@ -510,7 +521,7 @@ global $wpdb;
 			if ( ! is_array( $custom_data ) ) {
 				$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
 			}
-			for ( $i = '0'; $i < '10'; $i++ ) {
+			for ( $i = 0; $i < 10; $i++ ) {
 				$wppa_skip_alb_to_gal = true;
 				$rep = wppa_translate( stripslashes( $custom_data[$i] ) ); 					// Replacement, qTranslate style translated
 
@@ -599,11 +610,11 @@ global $wppa_skip_alb_to_gal;
 	$args = wp_parse_args( $xargs, $defaults );
 
 	// Init
- 	$album = $id > '0' ? wppa_cache_album( $id ) : false;
+ 	$album = $id > 0 ? wppa_cache_album( $id ) : false;
 
 	if ( $args['extended'] ) {
 		switch( $id ) {
-			case '0':
+			case 0:
 				return __( '--- none ---', 'wp-photo-album-plus' );
 				break;
 			case '-1':
@@ -635,7 +646,7 @@ global $wppa_skip_alb_to_gal;
 				return __( 'My and public albums', 'wp-photo-album-plus' );
 				break;
 			default:
-				if ( ! is_numeric( $id ) || ! $id || $id < '1' ) return '';
+				if ( ! is_numeric( $id ) || ! $id || $id < 1 ) return '';
 		}
 	}
 
@@ -669,7 +680,7 @@ function wppa_get_album_desc( $id, $xargs = array() ) {
 global $wppa_skip_alb_to_gal;
 
 	// Sanitize args
-	if ( ! is_numeric( $id ) || $id < '1' ) {
+	if ( ! is_numeric( $id ) || $id < 1 ) {
 		return '';
 	}
 
@@ -800,7 +811,7 @@ function wppa_translate_album_keywords( $id, $text, $translate = true ) {
 			}
 
 			// Process max all 10 sub-items
-			for ( $i = '0'; $i < '10'; $i++ ) {
+			for ( $i = 0; $i < 10; $i++ ) {
 				if ( wppa_opt( 'album_custom_caption_'.$i ) ) {					// Field defined
 					if ( wppa_switch( 'album_custom_visible_'.$i ) ) {			// May be displayed
 						if ( $translate ) {
@@ -891,7 +902,7 @@ function wppa_get_thumbx( $id, $force = false ) {
 	if ( ! $result && wppa_has_audio( $id ) ) {
 		$result = wppa_opt( 'thumbsize' );
 	}
-	return $result;
+	return intval( $result );
 }
 function wppa_get_thumby( $id, $force = false ) {
 	if ( ! wppa_is_file( wppa_get_thumb_path( $id ) ) ) {
@@ -910,17 +921,17 @@ function wppa_get_thumby( $id, $force = false ) {
 	if ( ! $result && wppa_has_audio( $id ) ) {
 		$result = wppa_opt( 'thumbsize' );// * 1080 / 1920;
 		$siz = getimagesize( WPPA_UPLOAD_PATH . '/' . wppa_opt( 'audiostub' ) );
-		$result *= $siz['1'] / $siz['0'];
+		$result *= $siz[1] / $siz[0];
 	}
-	return $result;
+	return intval( $result );
 }
 function wppa_get_photox( $id, $force = false ) {
 	$result = wppa_get_thumbphotoxy( $id, 'photox', $force );
 	if ( wppa_is_stereo( $id ) ) {
-		return floor( $result / 2 );
+		return floor( intval( $result ) / 2 );
 	}
 	else {
-		return $result;
+		return intval( $result );
 	}
 }
 function wppa_get_photoy( $id, $force = false ) {
@@ -931,34 +942,24 @@ function wppa_get_thumbratioxy( $id ) {
 		$result = wppa_get_videox( $id ) / wppa_get_videoy( $id );
 	}
 	else {
-		if ( is_numeric( wppa_get_thumbx( $id ) ) && is_numeric( wppa_get_thumby( $id ) ) ) {
+		if ( wppa_get_thumbx( $id ) && wppa_get_thumby( $id ) ) {
 			$result = wppa_get_thumbx( $id ) / wppa_get_thumby( $id );
 		}
 		else {
-			$result = '1';
+			$result = 1;
 		}
 	}
-	return $result;
+	return floatval( $result );
 }
 function wppa_get_thumbratioyx( $id ) {
-	if ( wppa_is_video( $id ) ) {
-		$result = wppa_get_videoy( $id ) / wppa_get_videox( $id );
-	}
-	else {
-		if ( wppa_get_thumbx( $id ) ) {
-			$result = wppa_get_thumby( $id ) / wppa_get_thumbx( $id );
-		}
-		else {
-			$result = '1';
-		}
-	}
-	return $result;
+
+	return 1 / wppa_get_thumbratioxy( $id );
 }
 function wppa_get_thumbphotoxy( $id, $key, $force = false ) {
 
 	$result = wppa_get_photo_item( $id, $key );
 	if ( $result && ! $force ) {
-		return $result; 			// Value found
+		return intval( $result ); 			// Value found
 	}
 
 	if ( $key == 'thumbx' || $key == 'thumby' ) {
@@ -969,14 +970,14 @@ function wppa_get_thumbphotoxy( $id, $key, $force = false ) {
 	}
 
 	if ( ! wppa_is_file( $file ) && ! $force ) {
-		return '1';	// File not found
+		return 1;	// File not found
 	}
 
 	if ( wppa_is_file( $file ) ) {
 		$size = getimagesize( $file );
 	}
 	else {
-		$size = array( '1', '1');
+		$size = array( 1, 1);
 	}
 	if ( is_array( $size ) ) {
 		if ( $key == 'thumbx' || $key == 'thumby' ) {
@@ -988,10 +989,10 @@ function wppa_get_thumbphotoxy( $id, $key, $force = false ) {
 		wppa_cache_photo( 'invalidate', $id );
 
 		if ( $key == 'thumbx' || $key == 'photox' ) {
-			return $size[0];
+			return intval( $size[0] );
 		}
 		else {
-			return $size[1];
+			return intval( $size[1] );
 		}
 	}
 
@@ -1064,7 +1065,7 @@ function _wppa_is_item_displayable( $alb, $item, $default_slug ) {
 
 	$default = wppa_switch( $default_slug );
 
-	if ( in_array( $alb, array( '', '0', '-1' ) ) ) return $default;
+	if ( in_array( $alb, array( '', 0, '-1' ) ) ) return $default;
 
 	// Validate args
 	if ( ! is_numeric( $alb ) ) {
@@ -1086,10 +1087,10 @@ function _wppa_is_item_displayable( $alb, $item, $default_slug ) {
 		$opts = explode( ',', $display_opts );
 	}
 
-	// Add missing items to be the default ('0')
+	// Add missing items to be the default (0)
 	for ( $i = 0; $i < 4; $i++ ) {
 		if ( ! isset( $opts[$i] ) ) {
-			$opts[$i] = '0';
+			$opts[$i] = 0;
 		}
 	}
 
@@ -1097,10 +1098,10 @@ function _wppa_is_item_displayable( $alb, $item, $default_slug ) {
 	$indexes = array( 'name' => 0, 'description' => 1, 'rating' => 2, 'comments' => 3 );
 
 	// $opts[$indexes[item]] can have 3 values: -1 = no, 0 = use default, 1 = yes
-	if ( $opts[$indexes[$item]] == '0' ) {
+	if ( $opts[$indexes[$item]] == 0 ) {
 		return $default;
 	}
 	else {
-		return $opts[$indexes[$item]] == '1';
+		return $opts[$indexes[$item]] == 1;
 	}
 }

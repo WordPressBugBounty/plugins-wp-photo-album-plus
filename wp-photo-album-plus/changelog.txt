@@ -1,5 +1,24 @@
 WP Photo Album Plus Changelog
 
+= 9.0.00 =
+
+* New shortcode attribute: lbtimeout="t" where t is integer number of seconds.
+* Fixed a problem with adding tags at frontend uploads.
+* New shortcode attribute: lbstart="yes|no" indicating if the lightbox show shoud start after initializing.
+* When rating display on lightbox is selected, it will be in graphic dispay also when numeric display is configured; but now it is displayed but it was not before.
+* IPTC items longer than 255 chars will no longer be discarded.
+* IPTC items are now editable on the photo admin page. However, no tags or linebreaks will be displayed.
+* Fixed a possible fatal error when certain thumbnail sizes are unknown.
+* Fixed possible incomplete import of IPTC data Keywords.
+* Hundreds of code changes to improve security, reliability and performance.
+* The up/down arrows in the subalbum list on the album admin page did not work. Fixed.
+* Lightbox on album cover image did not use high resolution files when hi res files for lightbox is configured. Fixed.
+* Improved lazy load algorithm.
+* Click on filmstrip thumbnail will bring corresponding item as slide, double click on current film thumbnail will start/stop slideshow running (as it used to do long ago).
+* Lightbox background opacity setting did not work. Fixed.
+* New setting: Basic settings -> Misc -> Item 10: Empty tags selectable. When on: adds a selecion option to the tagcloud and multitag widgets/shortcodes.
+* New attribute to the virtual album spec #tags: -none- to select the items without any tags. Example: [wppa type="slide" album="#tags,-none-"]
+
 = 8.9.02 =
 
 * Slideshow to thumbnails link failed due to unencrypted album id. Fixed.

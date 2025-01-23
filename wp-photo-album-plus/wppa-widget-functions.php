@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 8.7.04.002
+/* Version 9.0.00.000
 /*
 */
 
@@ -99,7 +99,7 @@ global $wpdb;
 	// Is it SEP?
 	elseif ( $alb == 'sep' ) {
 		$albs = wppa_get_results( "SELECT id, a_parent FROM $wpdb->wppa_albums" );
-		$query = "SELECT id, p_order FROM $wpdb->wppa_photos WHERE ( album = '0' ";
+		$query = "SELECT id, p_order FROM $wpdb->wppa_photos WHERE ( album = 0 ";
 		$first = true;
 		foreach ( $albs as $a ) {
 			if ( $a['a_parent'] == '-1' ) {
@@ -112,7 +112,7 @@ global $wpdb;
 	// Is it ALL-SEP?
 	elseif ( $alb == 'all-sep' ) {
 		$albs = wppa_get_results( "SELECT id, a_parent FROM $wpdb->wppa_albums" );
-		$query = "SELECT id, p_order FROM $wpdb->wppa_photos WHERE ( album IN ('0'";
+		$query = "SELECT id, p_order FROM $wpdb->wppa_photos WHERE ( album IN (0";
 		foreach ( $albs as $a ) {
 			if ( $a['a_parent'] != '-1' ) {
 				$query .= ",'" . $a['id'] . "'";
@@ -227,18 +227,18 @@ global $wpdb;
 			if ( $album != '' ) {
 				$per = wppa_opt( 'potd_period' );
 				$photos = wppa_get_widgetphotos( $album, " LIMIT 366" );
-				if ( $per == '0' ) {
+				if ( $per == 0 ) {
 					if ( $photos ) {
 						$id = $photos[wp_rand( 0, count( $photos )-1 )]['id'];
 					}
 				}
 				elseif ( $per == 'day-of-week' ) {
-					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', '0' ) ) % 7 );
+					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', 0 ) ) % 7 );
 					wppa_update_option( 'wppa_potd_offset', $offset );
 					if ( $photos ) {
 						$d = date_i18n( "w" );
-						$d -= wppa_get_option( 'wppa_potd_offset', '0' );
-						while ( $d < '1' ) $d += '7';
+						$d -= wppa_get_option( 'wppa_potd_offset', 0 );
+						while ( $d < 1 ) $d += '7';
 						$seqno = $d;
 						foreach ( $photos as $img ) {
 							if ( $img['p_order'] == $d ) $id = $img['id'];
@@ -246,12 +246,12 @@ global $wpdb;
 					}
 				}
 				elseif ( $per == 'day-of-month' ) {
-					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', '0' ) ) % 31 );
+					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', 0 ) ) % 31 );
 					wppa_update_option( 'wppa_potd_offset', $offset );
 					if ( $photos ) {
 						$d = strval(intval(date_i18n( "d" )));
-						$d -= wppa_get_option( 'wppa_potd_offset', '0' );
-						while ( $d < '1' ) $d += '31';
+						$d -= wppa_get_option( 'wppa_potd_offset', 0 );
+						while ( $d < 1 ) $d += '31';
 						$seqno = $d;
 						foreach ( $photos as $img ) {
 							if ( $img['p_order'] == $d ) $id = $img['id'];
@@ -259,12 +259,12 @@ global $wpdb;
 					}
 				}
 				elseif ( $per == 'day-of-year' ) {
-					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', '0' ) ) % 366 );
+					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', 0 ) ) % 366 );
 					wppa_update_option( 'wppa_potd_offset', $offset );
 					if ( $photos ) {
 						$d = strval(intval(date_i18n( "z" )));
-						$d -= wppa_get_option( 'wppa_potd_offset', '0' );
-						while ( $d < '0' ) $d += '366';
+						$d -= wppa_get_option( 'wppa_potd_offset', 0 );
+						while ( $d < 0 ) $d += '366';
 						$seqno = $d;
 						foreach ( $photos as $img ) {
 							if ( $img['p_order'] == $d ) $id = $img['id'];
@@ -272,7 +272,7 @@ global $wpdb;
 					}
 				}
 				elseif ( $per == 'week' ) {
-					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', '0' ) ) % 53 );
+					$offset = strval( intval( wppa_get_option( 'wppa_potd_offset', 0 ) ) % 53 );
 					wppa_update_option( 'wppa_potd_offset', $offset );
 					if ( $photos ) {
 						$w = strval(intval(date_i18n( "W" )));
@@ -553,8 +553,8 @@ function wppa_checked( $arg ) {
 		$result = '';
 	}
 
-	// '0'
-	elseif ( $arg == '0' ) {
+	// 0
+	elseif ( $arg == 0 ) {
 		$result = '';
 	}
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 8.8.02.002
+* Version 9.0.00.000
 *
 */
 
@@ -83,17 +83,17 @@ global $wppa_import_errors;
 	}
 
 	// Verify last albums still exist
-	if ( ! wppa_album_exists( wppa_get_option( 'wppa-photo-album-import-' . wppa_get_user(), '0' ) ) ) {
-		wppa_update_option( 'wppa-photo-album-import-' . wppa_get_user(), '0' );
+	if ( ! wppa_album_exists( wppa_get_option( 'wppa-photo-album-import-' . wppa_get_user(), 0 ) ) ) {
+		wppa_update_option( 'wppa-photo-album-import-' . wppa_get_user(), 0 );
 	}
-	if ( ! wppa_album_exists( wppa_get_option( 'wppa-video-album-import-' . wppa_get_user(), '0' ) ) ) {
-		wppa_update_option( 'wppa-video-album-import-' . wppa_get_user(), '0' );
+	if ( ! wppa_album_exists( wppa_get_option( 'wppa-video-album-import-' . wppa_get_user(), 0 ) ) ) {
+		wppa_update_option( 'wppa-video-album-import-' . wppa_get_user(), 0 );
 	}
-	if ( ! wppa_album_exists( wppa_get_option( 'wppa-audio-album-import-' . wppa_get_user(), '0' ) ) ) {
-		wppa_update_option( 'wppa-audio-album-import-' . wppa_get_user(), '0' );
+	if ( ! wppa_album_exists( wppa_get_option( 'wppa-audio-album-import-' . wppa_get_user(), 0 ) ) ) {
+		wppa_update_option( 'wppa-audio-album-import-' . wppa_get_user(), 0 );
 	}
-	if ( ! wppa_album_exists( wppa_get_option( 'wppa-document-album-import-' . wppa_get_user(), '0' ) ) ) {
-		wppa_update_option( 'wppa-document-album-import-' . wppa_get_user(), '0' );
+	if ( ! wppa_album_exists( wppa_get_option( 'wppa-document-album-import-' . wppa_get_user(), 0 ) ) ) {
+		wppa_update_option( 'wppa-document-album-import-' . wppa_get_user(), 0 );
 	}
 
 	// Set local / remote
@@ -186,8 +186,8 @@ global $wppa_import_errors;
 			$photocount 	= wppa_get_photocount( $files );
 			$videocount 	= wppa_get_video_count( $files );
 			$audiocount 	= wppa_get_audio_count( $files );
-			$dircount		= $is_depot ? wppa_get_dircount( $files ) : '0';
-			$csvcount 		= $is_depot ? wppa_get_csvcount( $files ) : '0';
+			$dircount		= $is_depot ? wppa_get_dircount( $files ) : 0;
+			$csvcount 		= $is_depot ? wppa_get_csvcount( $files ) : 0;
 			$documentcount 	= wppa_get_documentcount( $files );
 
 			if ( $ngg_opts ) {
@@ -216,16 +216,16 @@ global $wppa_import_errors;
 			$is_depot 		= false;
 			$is_sub_depot 	= false;
 			$files 			= wppa_get_import_files();
-			$zipcount 		= '0';
-			$albumcount 	= '0';
-			$photocount 	= $files ? count( $files ) : '0';
-			$videocount 	= '0';
-			$audiocount 	= '0';
-			$dircount		= '0';
-			$csvcount 		= '0';
-			$documentcount 	= '0';
+			$zipcount 		= 0;
+			$albumcount 	= 0;
+			$photocount 	= $files ? count( $files ) : 0;
+			$videocount 	= 0;
+			$audiocount 	= 0;
+			$dircount		= 0;
+			$csvcount 		= 0;
+			$documentcount 	= 0;
 			$is_ngg 		= false;
-			$remote_max 	= wppa_get_option( 'wppa_import_remote_max_'.$user, '10' );
+			$remote_max 	= wppa_get_option( 'wppa_import_remote_max_'.$user, 10 );
 		}
 
 	// The nonce fields
@@ -371,14 +371,14 @@ global $wppa_import_errors;
 	// Something to import?
 	if ( $photocount || $albumcount || $zipcount || $dircount || $videocount || $audiocount || $csvcount || $documentcount || ( $is_depot && wppa_has_realmedia() ) ) {
 
-		$idx = '0';
+		$idx = 0;
 
 		// Open the form
 		wppa_echo( '
 		<div>' );
 
 			// Display the zips
-			if ( PHP_VERSION_ID >= 50207 && $zipcount > '0' ) {
+			if ( PHP_VERSION_ID >= 50207 && $zipcount > 0 ) {
 				wppa_import_header( __( 'Zip files', 'wp-photo-album-plus' ) );
 				/* translators: integer number */
 				wppa_import_header_subtitle( sprintf( _n( 'There is %d zipfile in the depot', 'There are %d zipfiles in the depot', $zipcount, 'wp-photo-album-plus' ), $zipcount ) );
@@ -612,13 +612,9 @@ global $wppa_import_errors;
 										$img_url = str_replace( 'http://', 'https://', $img_url );
 									}
 								}
-								wppa_echo( '
-								<img src="' . esc_url( $img_url ) . '"
-									alt="' . esc_attr( _x( 'n.a.', 'not available', 'wp-photo-album-plus' ) ) . '"
-									style="max-height:48px;"
-									onmouseover="if (jQuery(\'#wppa-zoom\').prop(\'checked\')) jQuery(this).css(\'max-height\', \'144px\')"
-									onmouseout="if (jQuery(\'#wppa-zoom\').prop(\'checked\')) jQuery(this).css(\'max-height\', \'48px\')"
-								/>' );
+								wppa_echo( wppa_html_tag( 'img', ['src' => $img_url, ' alt' => _x( 'n.a.', 'not available', 'wp-photo-album-plus' ), 'style' => "max-height:48px;",
+																  'onmouseover' => "if (jQuery('#wppa-zoom').prop('checked')) jQuery(this).css('max-height', '144px')",
+																  'onmouseout' => "if (jQuery('#wppa-zoom').prop('checked')) jQuery(this).css('max-height', '48px')"] ) );
 							}
 
 						wppa_echo( '</td>' );
@@ -811,7 +807,7 @@ global $wppa_import_errors;
 	<fieldset class="wppa-fieldset" id="wppa-error-legenda" style="display:none;width:fit-content;">
 		<legend>' . __( 'Table of defined error codes', 'wp-photo-album-plus' ) . '</legend>
 		<ol>' );
-			$i = '1';
+			$i = 1;
 			foreach( $wppa_import_errors as $er ) {
 				wppa_echo( '<li id="err-'.$i.'">' . $er . '</li>' );
 				$i++;
@@ -912,14 +908,14 @@ global $wppa_supported_document_extensions;
 		$result .= wp_nonce_field( 'wppa-import-upload-nonce', 'wppa-import-upload-nonce', true, false );
 
 		// Make caption
-		$caption = $allow_sys == '1' ? __( 'Select File', 'wp-photo-album-plus' ) : __( 'Select File(s)', 'wp-photo-album-plus' );
+		$caption = $allow_sys == 1 ? __( 'Select File', 'wp-photo-album-plus' ) : __( 'Select File(s)', 'wp-photo-album-plus' );
 
 		// The (hidden) functional button
 		$result .= '
 		<input
 			type="file"
 			accept="' . $accept . '"' .
-			( $allow_sys > '1' ? ' multiple' : '' ) . '
+			( $allow_sys > 1 ? ' multiple' : '' ) . '
 			style="display:none;"
 			id="wppa-upload"
 			name="wppa-upload[]"
@@ -989,9 +985,9 @@ function wppa_do_import_upload() {
 		return;
 	}
 
-	$result 	= '1'; // Assume success
-	$ok 		= '0';
-	$fail 		= '0';
+	$result 	= 1; // Assume success
+	$ok 		= 0;
+	$fail 		= 0;
 	$files 		= current( $_FILES ); // ['wppa-upload'];
 	$filecount 	= is_array( $files ) ? count( $files['error'] ) : 0;
 	$supp 		= wppa_get_supported_extensions( 'import' );
@@ -1073,18 +1069,16 @@ function wppa_do_import_upload() {
 		if ( $ok ) {
 			update_option( 'wppa_import_source_type_'.wppa_get_user(), 'local' );
 			update_option( 'wppa_import_source_'.wppa_get_user(), WPPA_DEPOT_PATH );
-			$result .= '
-			<br>
-			<div style="font-weight:bold">' .
-				__( 'Reloading to include the new files, please stand by...', 'wp-photo-album-plus' ) . '
-				<img src="" onerror="wppaImportReload(\'php\')">
-			</div>';
-
+			$result .=
+			wppa_html_tag( 'br' ) .
+			wppa_html_tag( 'div', ['style' => "font-weight:bold"],
+				__( 'Reloading to include the new files, please stand by...', 'wp-photo-album-plus' ) .
+				wppa_html_tag( 'img', ['src' =>"", 'onerror' => "wppaImportReload('php')"] ) );
 		}
 	}
 
 	else {
-		$result = '0' . __( 'Upload failed', 'wp-photo-album-plus' );
+		$result = 0 . __( 'Upload failed', 'wp-photo-album-plus' );
 	}
 
 	wppa_echo( $result, ['onerror' => true] );
@@ -1276,7 +1270,7 @@ function wppa_import_album_select( $type, $extra = '' ) {
 		</label>
 		<br>' .
 		wppa_album_select_a( array( 'path' 				=> true,
-									'selected' 			=> wppa_get_option( 'wppa-' . $type . '-album-import-'.wppa_get_user(), '0' ),
+									'selected' 			=> wppa_get_option( 'wppa-' . $type . '-album-import-'.wppa_get_user(), 0 ),
 									'addpleaseselect'	=> true,
 									'checkowner' 		=> true,
 									'checkupload' 		=> true,

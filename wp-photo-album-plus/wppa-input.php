@@ -3,12 +3,12 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 8.9.01.001
+* Version: 9.0.00.009
 *
 */
 
 /* CHECK REDIRECTION */
-add_action( 'plugins_loaded', 'wppa_redirect', '1' );
+add_action( 'plugins_loaded', 'wppa_redirect', 1 );
 
 function wppa_redirect() {
 
@@ -110,6 +110,7 @@ function wppa_get_get_filter( $name ) {
 		case 'zoom':
 		case 'parent_id':
 		case 'timeout':
+		case 'lbtimeout':
 		case 'mocc':
 			$result = 'int';
 			break;
@@ -294,16 +295,16 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			break;
 
 		case 'posint':
-			return isset( $_REQUEST[$key] ) ? max( '1', strval( intval ( wp_unslash( $_REQUEST[$key] ) ) ) ) : $default;
+			return isset( $_REQUEST[$key] ) ? max( 1, strval( intval ( wp_unslash( $_REQUEST[$key] ) ) ) ) : $default;
 			break;
 
 		case 'bool':
 			$value = isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : $default;
 			if ( $value !== '0' && $value != 'nil' && $value != 'no' ) {
-				$result = '1';
+				$result = 1;
 			}
 			else {
-				$result = '0';
+				$result = 0;
 			}
 			return $result;
 			break;
@@ -325,7 +326,8 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 		case 'tag':
 		case 'tags':
 		case 'cat':
-			return isset( $_REQUEST[$key] ) ? trim( wppa_sanitize_tags( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), ',' ) ) : $default;
+			if ( $filter == 'tag' && isset( $_REQUEST[$key] ) && strpos( $_REQUEST[$key], '-none-' ) !== false ) return '-none-';
+			return isset( $_REQUEST[$key] ) ? trim( wppa_sanitize_tags( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), ',;' ) ) : $default;
 			break;
 
 		case 'textarea':

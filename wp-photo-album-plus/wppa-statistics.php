@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 8.8.00.001
+* Version: 9.0.00.010
 *
 */
 
@@ -25,7 +25,7 @@ function wppa_show_statistics() {
 	$result .= ' '.__('The last album added is', 'wp-photo-album-plus' ).' ';
 	$result .= '<a href="'.wppa_get_permalink().'wppa-album='.$y_id.'&amp;wppa-cover=0&amp;wppa-occur=1">'.$y_name.'</a>';
 
-	if ($p_id > '0') {
+	if ($p_id > 0) {
 		$result .= __(', a sub album of', 'wp-photo-album-plus' ).' ';
 		$result .= '<a href="'.wppa_get_permalink().'wppa-album='.$p_id.'&amp;wppa-cover=0&amp;wppa-occur=1">'.$p_name.'</a>';
 	}
@@ -81,11 +81,11 @@ global $wpdb;
 }
 
 // get youngest photo id
-function wppa_get_youngest_photo_id( $alb = '0' ) {
+function wppa_get_youngest_photo_id( $alb = 0 ) {
 global $wpdb;
 
 	if ( ! is_numeric( $alb ) ) {
-		$alb = '0';
+		$alb = 0;
 	}
 	if ( $alb ) {
 		$result = wppa_get_var( "SELECT id FROM $wpdb->wppa_photos
@@ -141,7 +141,7 @@ global $wppa_session;
 	}
 
 	// Sanitize input
-	if ( ! wppa_is_int( $id ) || $id < '1' ) {
+	if ( ! wppa_is_int( $id ) || $id < 1 ) {
 		return;
 	}
 
@@ -169,7 +169,7 @@ global $wppa_session;
 	// Feature enabled?
 	if ( ! wppa_switch( 'track_viewcounts') ) return;
 
-	wppa_log( 'dbg', "Trying to bump viewcount type for $type number $id" );
+//	wppa_log( 'dbg', "Trying to bump viewcount type for $type number $id" );
 
 	// Validate args
 	if ( ! wppa_is_int( $id ) ) {
@@ -340,7 +340,7 @@ global $wpdb;
 	$result = array();
 
 	// Need Update
-	$result['needupdate'] 			= '0';
+	$result['needupdate'] 			= 0;
 
 	// Self albums
 	$result['selfalbums'] 			= wppa_get_var( 	"SELECT COUNT(*) " .
@@ -442,12 +442,12 @@ function wppa_mark_treecounts( $alb ) {
 	if ( $alb ) {
 		$treecounts = wppa_get_treecounts_a( $alb );
 		if ( is_array( $treecounts ) ) {
-			$treecounts['needupdate'] = '1';
+			$treecounts['needupdate'] = 1;
 			wppa_save_treecount_a( $alb, $treecounts );
 			$parent = wppa_get_album_item( $alb, 'a_parent' );
 
 			// Bubble up
-			if ( $parent > '0' ) {
+			if ( $parent > 0 ) {
 				wppa_mark_treecounts( $parent );
 			}
 		}
@@ -473,7 +473,7 @@ function wppa_save_treecount_a( $alb, $treecounts ) {
 	// Do it
 	if ( $alb && is_array( $treecounts ) ) {
 
-		$keys 	= array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' );
+		$keys 	= array( 0, 1, '2', '3', '4', '5', '6', '7', '8', '9', 10 );
 		if ( count( $keys ) == count( $treecounts ) ) {
 			$result = array_combine( $keys, $treecounts );
 			$result = serialize( $result );
@@ -491,8 +491,8 @@ function wppa_save_treecount_a( $alb, $treecounts ) {
 function wppa_get_treecounts_a( $alb, $update = false ) {
 
 	// Array index defintions
-	$needupdate 			= '0';
-	$selfalbums 			= '1';
+	$needupdate 			= 0;
+	$selfalbums 			= 1;
 	$treealbums 			= '2';
 	$selfphotos 			= '3';
 	$treephotos 			= '4';
@@ -501,7 +501,7 @@ function wppa_get_treecounts_a( $alb, $update = false ) {
 	$scheduledselfphotos 	= '7';
 	$scheduledtreephotos 	= '8';
 	$selfphotoviews 		= '9';
-	$treephotoviews 		= '10';
+	$treephotoviews 		= 10;
 
 	// Sanitize arg
 	if ( $alb ) {
@@ -605,7 +605,7 @@ static $admin;
 static $login;
 
 	// Validate arg
-	if ( ! wppa_is_int( $id ) || $id < '1' || ! wppa_cache_album( $id ) ) {
+	if ( ! wppa_is_int( $id ) || $id < 1 || ! wppa_cache_album( $id ) ) {
 		return false;
 	}
 
@@ -673,10 +673,10 @@ static $login;
 // Get number of visible 1st generation albums
 function wppa_get_visible_album_count( $id ) {
 
-	$result = '0';
+	$result = 0;
 
 	if ( ! wppa_is_album_visible( $id ) ) {
-		return '0';
+		return 0;
 	}
 
 	$albs = wppa_get_sub_album_ids( $id );
@@ -698,7 +698,7 @@ static $cache;
 	if ( isset( $cache[$id] ) ) {
 		return $cache[$id];
 	}
-	$result = '0';
+	$result = 0;
 
 	$albs = wppa_get_sub_album_ids( $id );
 	if ( $albs ) {
@@ -709,7 +709,7 @@ static $cache;
 		}
 	}
 
-	if ( ! $first ) $result += '1'; // Myself
+	if ( ! $first ) $result += 1; // Myself
 	$cache[$id] = $result;
 	return $result;
 }
@@ -721,10 +721,18 @@ static $admin;
 static $login;
 
 	// Validate arg
-	if ( ! wppa_is_int( $id ) || $id < '0' ) {
+	if ( ! wppa_is_int( $id ) || $id < 0 ) {
 		wppa_log( 'err', 'Invalid arg in wppa_is_photo_visible: '.serialize($id) );
 		return false;
 	}
+
+	// If no files available, return false
+	if ( ! wppa_is_file( wppa_get_source_path( $id ) ) &&
+		 ! wppa_is_file( wppa_get_photo_path( $id ) ) &&
+		 ! wppa_is_file( wppa_get_thumb_path( $id ) ) &&
+		 ! wppa_is_video( $id ) &&
+		 ! wppa_is_pdf( $id ) &&
+		 ! wppa_has_audio( $id ) ) return false;
 
 	// Get usefull data
 	$status = wppa_get_photo_item( $id, 'status' );
@@ -774,7 +782,7 @@ static $cache;
 	}
 
 	if ( ! wppa_is_album_visible( $id ) ) {
-		return '0';
+		return 0;
 	}
 
 	if ( wppa_user_is_admin() ) {
@@ -798,7 +806,7 @@ static $cache;
 	if ( isset( $cache[$id] ) ) {
 		return $cache[$id];
 	}
-	$result = '0';
+	$result = 0;
 
 	$albs = wppa_get_sub_album_ids( $id );
 	if ( $albs ) {

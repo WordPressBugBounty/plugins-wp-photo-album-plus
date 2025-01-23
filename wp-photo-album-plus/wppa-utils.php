@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 8.9.02.002
+* Version: 9.0.00.010
 *
 */
 
@@ -21,7 +21,7 @@ function wppa_url( $arg ) {
 }
 
 // get url of thumb
-function wppa_get_thumb_url( $id, $fix_poster_ext = true, $system = 'flat', $x = '0', $y = '0', $use_thumbfile = false ) {
+function wppa_get_thumb_url( $id, $fix_poster_ext = true, $system = 'flat', $x = 0, $y = 0, $use_thumbfile = false ) {
 global $blog_id;
 
 	// Does photo exist?
@@ -101,14 +101,14 @@ global $blog_id;
 		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
 	}
 
-	$result .= '?ver=' . wppa_get_option( 'wppa_thumb_version', '1' );
+	$result .= '?ver=' . wppa_get_option( 'wppa_thumb_version', 1 );
 
 	return $result;
 }
 
 // Bump thumbnail version number
 function wppa_bump_thumb_rev() {
-	wppa_update_option('wppa_thumb_version', wppa_get_option('wppa_thumb_version', '1') + '1');
+	wppa_update_option('wppa_thumb_version', wppa_get_option('wppa_thumb_version', 1) + 1);
 }
 
 // get path of thumb
@@ -137,7 +137,7 @@ function wppa_get_thumb_path( $id, $fix_poster_ext = true, $system = 'flat' ) {
 }
 
 // get url of a full sized image
-function wppa_get_photo_url( $id, $fix_poster_ext = true, $system = 'flat', $x = '0', $y = '0' ) {
+function wppa_get_photo_url( $id, $fix_poster_ext = true, $system = 'flat', $x = 0, $y = 0 ) {
 global $blog_id;
 global $wppa_supported_stereo_types;
 
@@ -154,6 +154,13 @@ global $wppa_supported_stereo_types;
 	// Feed returns thumb
 	if ( is_feed() ) {
 		return wppa_get_thumb_url( $id, true, $system );
+	}
+
+	if ( $x && $y ) {
+		$ts = max( wppa_opt( 'thumbsize' ), wppa_opt( 'thumbsize_alt' ) );
+		if ( $x <= $ts && $y <= $ts ) {
+			return wppa_get_thumb_url( $id, true, $system );
+		}
 	}
 
 	// If in the cloud...
@@ -203,10 +210,10 @@ global $wppa_supported_stereo_types;
 
 		// Build the url
 		if ( $st == '_flat' ) {
-			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '.jpg' . '?ver=' . wppa_get_option( 'wppa_photo_version', '1' );
+			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '.jpg' . '?ver=' . wppa_get_option( 'wppa_photo_version', 1 );
 		}
 		else {
-			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '-' . $sg . '.jpg' . '?ver=' . wppa_get_option( 'wppa_photo_version', '1' );
+			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '-' . $sg . '.jpg' . '?ver=' . wppa_get_option( 'wppa_photo_version', 1 );
 		}
 
 		// Done
@@ -229,7 +236,7 @@ global $wppa_supported_stereo_types;
 
 	// Social media do not like querystrings
 	if ( ! wppa( 'no_ver' ) ) {
-		$result .= '?ver=' . wppa_get_option( 'wppa_photo_version', '1' );
+		$result .= '?ver=' . wppa_get_option( 'wppa_photo_version', 1 );
 	}
 
 	return $result;
@@ -237,7 +244,7 @@ global $wppa_supported_stereo_types;
 
 // Bump Fullsize photo version number
 function wppa_bump_photo_rev() {
-	wppa_update_option('wppa_photo_version', wppa_get_option('wppa_photo_version', '1') + '1');
+	wppa_update_option('wppa_photo_version', wppa_get_option('wppa_photo_version', 1) + 1);
 }
 
 // Bump Download counter
@@ -277,7 +284,7 @@ function wppa_expand_id( $xid, $makepaththumb = false, $makepathphoto = false ) 
 	$id = $xid;
 	$len = strlen( $id );
 	while ( $len > '2' ) {
-		$result .= substr( $id, '0', '2' ) . '/';
+		$result .= substr( $id, 0, '2' ) . '/';
 		$id = substr( $id, '2' );
 		$len = strlen( $id );
 		if ( $makepathphoto ) {
@@ -348,7 +355,7 @@ function wppa_is_separate( $id ) {
 	if ( $id == '' ) return false;
 	if ( ! wppa_is_int( $id ) ) return false;
 	if ( $id == '-1' ) return true;
-	if ( $id < '1' ) return false;
+	if ( $id < 1 ) return false;
 	$alb = wppa_get_parentalbumid( $id );
 
 	return wppa_is_separate( $alb );
@@ -357,7 +364,7 @@ function wppa_is_separate( $id ) {
 // Get the albums parent
 function wppa_get_parentalbumid( $id ) {
 
-	if ( ! wppa_is_int( $id ) || $id < '1' ) return '0';
+	if ( ! wppa_is_int( $id ) || $id < 1 ) return 0;
 
 	$album = wppa_cache_album( $id );
 	if ( $album === false ) return '-9'; // Parent died, i am an orphan
@@ -377,14 +384,14 @@ function wppa_html( $str ) {
 // get a photos album id
 function wppa_get_album_id_by_photo_id( $id ) {
 
-	if ( ! wppa_is_int($id) || $id < '1' ) return '';
+	if ( ! wppa_is_int($id) || $id < 1 ) return '';
 	$thumb = wppa_cache_photo($id);
 	return $thumb['album'];
 }
 
 function wppa_get_rating_count_by_id($id) {
 
-	if ( ! wppa_is_int($id) || $id < '1' ) return '';
+	if ( ! wppa_is_int($id) || $id < 1 ) return '';
 	$thumb = wppa_cache_photo($id);
 	return $thumb['rating_count'];
 }
@@ -392,12 +399,12 @@ function wppa_get_rating_count_by_id($id) {
 function wppa_get_rating_by_id($id, $opt = '') {
 global $wpdb;
 
-	if ( ! wppa_is_int($id) || $id < '1' ) return '';
+	if ( ! wppa_is_int($id) || $id < 1 ) return '';
 	$thumb = wppa_cache_photo( $id );
 	$rating = $thumb['mean_rating'];
 	if ( $rating ) {
 		$i = wppa_opt( 'rating_prec' );
-		$j = $i + '1';
+		$j = $i + 1;
 		$val = sprintf('%'.$j.'.'.$i.'f', $rating);
 		if ($opt == 'nolabel') $result = $val;
 		/* translators: float number */
@@ -415,7 +422,7 @@ static $cache;
 		$cache = array();
 	}
 
-	if ( ! wppa_is_int( $id ) || $id < '1' ) return '';
+	if ( ! wppa_is_int( $id ) || $id < 1 ) return '';
 
 	if ( isset( $cache[$id] ) ) {
 		$result = $cache[$id];
@@ -436,7 +443,7 @@ static $cache;
 		$cache = array();
 	}
 
-	if ( ! wppa_is_int( $id ) || $id < '1' ) return '';
+	if ( ! wppa_is_int( $id ) || $id < 1 ) return '';
 
 	if ( isset( $cache[$id] ) ) {
 		$my_ratings = $cache[$id];
@@ -455,17 +462,17 @@ static $cache;
 		$rating /= count( $my_ratings );
 	}
 	else {
-		$rating = '0';
+		$rating = 0;
 	}
 	if ( $rating ) {
 		$i = wppa_opt( 'rating_prec' );
-		$j = $i + '1';
+		$j = $i + 1;
 		$val = sprintf('%'.$j.'.'.$i.'f', $rating);
 		if ($opt == 'nolabel') $result = $val;
 		/* translators: float number */
 		else $result = sprintf(__('Rating: %s', 'wp-photo-album-plus' ), $val);
 	}
-	else $result = '0';
+	else $result = 0;
 	return $result;
 }
 
@@ -520,7 +527,16 @@ global $wppa_opt;
 			wppa_log( 'dbg', '$wppa_opt['.$key.'] is a yes/no setting, not a value' );
 			return ( $wppa_opt[$key] == 'yes' ); // Return the right value afterall
 		}
-		return trim( $wppa_opt[$key] );
+		$result = trim( $wppa_opt[$key] );
+		if ( is_numeric( $result ) ) {
+			if ( wppa_is_int( $result ) ) {
+				$result = intval( $result );
+			}
+			else {
+				$result = floatval( $result );
+			}
+		}
+		return $result;
 	}
 
 	wppa_log( 'dbg', '$wppa_opt['.$key.'] is not a setting' );
@@ -618,9 +634,9 @@ function wppa_add_paths( $albums ) {
 	if ( is_array( $albums ) ) foreach ( array_keys( $albums ) as $index ) {
 		$tempid = $albums[$index]['id'];
 		$albums[$index]['name'] = wppa_translate( stripslashes( $albums[$index]['name'] ) );	// Translate name
-		while ( $tempid > '0' ) {
+		while ( $tempid > 0 ) {
 			$tempid = wppa_get_parentalbumid($tempid);
-			if ( $tempid > '0' ) {
+			if ( $tempid > 0 ) {
 				$albums[$index]['name'] = wppa_get_album_name($tempid).' &gt; '.$albums[$index]['name'];
 			}
 			elseif ( $tempid == '-1' ) $albums[$index]['name'] = '-s- '.$albums[$index]['name'];
@@ -809,7 +825,7 @@ function wppa_create_catlist() {
 global $wpdb;
 
 	$result = array();
-	$total  = '0';
+	$total  = 0;
 	$query  = "SELECT id, cats FROM $wpdb->wppa_albums WHERE cats <> ''";
 	$albums = wppa_get_results( $query );
 	if ( $albums ) foreach ( $albums as $album ) {
@@ -818,7 +834,7 @@ global $wpdb;
 			if ( $cat ) {
 				if ( ! isset($result[$cat]) ) {	// A new cat
 					$result[$cat]['cat'] = $cat;
-					$result[$cat]['count'] = '1';
+					$result[$cat]['count'] = 1;
 					$result[$cat]['ids'][] = $album['id'];
 				}
 				else {							// An existing cat
@@ -886,18 +902,9 @@ static $cache;
 
 function wppa_photo_exists( $id ) {
 global $wpdb;
-static $cache;
 
-	if ( ! $cache ) {
-		$cache = array();
-	}
-
-	if ( ! isset( $cache[$id] ) ) {
-		$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE id = %s", $id );
-		$cache[$id] = wppa_get_var( $query );
-	}
-
-	return $cache[$id];
+	$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE id = %s", $id );
+	return wppa_get_var( $query );
 }
 
 function wppa_albumphoto_exists($alb, $photo) {
@@ -913,13 +920,13 @@ global $wpdb;
 	$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %s AND value = -1", $photo );
 	$count = wppa_get_var( $query );
 
-	if ( wppa_opt( 'dislike_mail_every' ) > '0') {		// Feature enabled?
-		if ( $count % wppa_opt( 'dislike_mail_every' ) == '0' ) {	// Mail the admin
+	if ( wppa_opt( 'dislike_mail_every' ) > 0) {		// Feature enabled?
+		if ( $count % wppa_opt( 'dislike_mail_every' ) == 0 ) {	// Mail the admin
 			$to        = get_bloginfo('admin_email');
 			$subj 	   = __('Notification of inappropriate image', 'wp-photo-album-plus' );
 			/* translators: integer id, count */
-			$cont['0'] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
-			$cont['1'] = '<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo', 'wp-photo-album-plus' ).'</a>';
+			$cont[0] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
+			$cont[1] = '<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo', 'wp-photo-album-plus' ).'</a>';
 			wppa_send_mail( array( 'to' 	=> $to,
 								   'subj' 	=> $subj,
 								   'cont' 	=> $cont,
@@ -928,15 +935,15 @@ global $wpdb;
 		}
 	}
 
-	if ( wppa_opt( 'dislike_set_pending' ) > '0') {		// Feature enabled?
+	if ( wppa_opt( 'dislike_set_pending' ) > 0) {		// Feature enabled?
 		if ( $count == wppa_opt( 'dislike_set_pending' ) ) {
 			wppa_update_photo( $photo, ['status' => 'pending'] );
 			$to        = get_bloginfo('admin_email');
 			$subj 	   = __('Notification of inappropriate image', 'wp-photo-album-plus' );
 			/* translators: integer id, count */
-			$cont['0'] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
-			$cont['0'] .= "\n".__('The status has been changed to \'pending\'.', 'wp-photo-album-plus' );
-			$cont['1'] = '<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo', 'wp-photo-album-plus' ).'</a>';
+			$cont[0] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
+			$cont[0] .= "\n".__('The status has been changed to \'pending\'.', 'wp-photo-album-plus' );
+			$cont[1] = '<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo', 'wp-photo-album-plus' ).'</a>';
 			wppa_send_mail( array( 'to' 	=> $to,
 								   'subj' 	=> $subj,
 								   'cont' 	=> $cont,
@@ -945,14 +952,14 @@ global $wpdb;
 		}
 	}
 
-	if ( wppa_opt( 'dislike_delete' ) > '0') {			// Feature enabled?
+	if ( wppa_opt( 'dislike_delete' ) > 0 ) {			// Feature enabled?
 		if ( $count == wppa_opt( 'dislike_delete' ) ) {
 			$to        = get_bloginfo('admin_email');
 			$subj 	   = __('Notification of inappropriate image', 'wp-photo-album-plus' );
 			/* translators: integer id, count */
-			$cont['0'] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
-			$cont['0'] .= "\n".__('It has been deleted.', 'wp-photo-album-plus' );
-			$cont['1'] = '';//<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo').'</a>';
+			$cont[0] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
+			$cont[0] .= "\n".__('It has been deleted.', 'wp-photo-album-plus' );
+			$cont[1] = '';//<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo').'</a>';
 			wppa_send_mail( array( 'to' 	=> $to,
 								   'subj' 	=> $subj,
 								   'cont' 	=> $cont,
@@ -982,7 +989,11 @@ global $wpdb;
 	return $count;
 }
 
-function wppa_get_imgalt( $id, $lb = false ) {
+function wppa_alt( $id ) {
+	return wppa_get_imgalt( $id, false, true );
+}
+
+function wppa_get_imgalt( $id, $lb = false, $raw = false ) {
 
 	// Get photo data
 	$thumb = wppa_cache_photo( $id );
@@ -1005,7 +1016,12 @@ function wppa_get_imgalt( $id, $lb = false ) {
 
 	// Default if empty result
 	if ( ! $result ) {
-		$result = '0';
+		$result = 0;
+	}
+
+	// Raw for use in wppa_html_tag()
+	if ( $raw ) {
+		return $result;
 	}
 
 	// Format for use in lightbox or direct use html
@@ -1102,7 +1118,7 @@ function wppa_set_last_album( $id = '' ) {
 // get last album
 function wppa_get_last_album() {
 
-	$album = wppa_get_option( 'wppa_last_album_used-' . wppa_get_user( 'login' ), '0' );
+	$album = wppa_get_option( 'wppa_last_album_used-' . wppa_get_user( 'login' ), 0 );
 	if ( ! wppa_album_exists( $album ) ) {
 		$album = false;
 	}
@@ -1110,40 +1126,40 @@ function wppa_get_last_album() {
 }
 
 // Combine margin or padding style
-function wppa_combine_style($type, $top = '0', $left = '0', $right = '0', $bottom = '0') {
+function wppa_combine_style($type, $top = 0, $left = 0, $right = 0, $bottom = 0) {
 
 	$result = $type.':';			// Either 'margin:' or 'padding:'
 	if ( $left == $right ) {
 		if ( $top == $bottom ) {
 			if ( $top == $left ) {	// All the same: one size fits all
 				$result .= $top;
-				if ( is_numeric($top) && $top > '0' ) $result .= 'px';
+				if ( is_numeric($top) && $top > 0 ) $result .= 'px';
 			}
 			else {					// Top=Bot and Lft=Rht: two sizes
 				$result .= $top;
-				if ( is_numeric($top) && $top > '0' ) $result .= 'px '; else $result .= ' ';
+				if ( is_numeric($top) && $top > 0 ) $result .= 'px '; else $result .= ' ';
 				$result .= $left;
-				if ( is_numeric($left) && $left > '0' ) $result .= 'px';
+				if ( is_numeric($left) && $left > 0 ) $result .= 'px';
 			}
 		}
 		else {						// Top, Lft=Rht, Bot: 3 sizes
 			$result .= $top;
-			if ( is_numeric($top) && $top > '0' ) $result .= 'px '; else $result .= ' ';
+			if ( is_numeric($top) && $top > 0 ) $result .= 'px '; else $result .= ' ';
 			$result .= $left;
-			if ( is_numeric($left) && $left > '0' ) $result .= 'px '; else $result .= ' ';
+			if ( is_numeric($left) && $left > 0 ) $result .= 'px '; else $result .= ' ';
 			$result .= $bottom;
-			if ( is_numeric($bottom) && $bottom > '0' ) $result .= 'px';
+			if ( is_numeric($bottom) && $bottom > 0 ) $result .= 'px';
 		}
 	}
 	else {							// Top, Rht, Bot, Lft: 4 sizes
 		$result .= $top;
-		if ( is_numeric($top) && $top > '0' ) $result .= 'px '; else $result .= ' ';
+		if ( is_numeric($top) && $top > 0 ) $result .= 'px '; else $result .= ' ';
 		$result .= $right;
-		if ( is_numeric($right) && $right > '0' ) $result .= 'px '; else $result .= ' ';
+		if ( is_numeric($right) && $right > 0 ) $result .= 'px '; else $result .= ' ';
 		$result .= $bottom;
-		if ( is_numeric($bottom) && $bottom > '0' ) $result .= 'px '; else $result .= ' ';
+		if ( is_numeric($bottom) && $bottom > 0 ) $result .= 'px '; else $result .= ' ';
 		$result .= $left;
-		if ( is_numeric($left) && $left > '0' ) $result .= 'px';
+		if ( is_numeric($left) && $left > 0 ) $result .= 'px';
 	}
 	$result .= ';';
 	return $result;
@@ -1154,9 +1170,9 @@ function wppa_fix_source_extensions() {
 global $wpdb;
 
 	$start_time = time();
-	$end = $start_time + '15';
-	$count = '0';
-	$start = wppa_get_option( 'wppa_sourcefile_fix_start', '0' );
+	$end = $start_time + 15;
+	$count = 0;
+	$start = wppa_get_option( 'wppa_sourcefile_fix_start', 0 );
 	if ( $start == '-1' ) return; // Done!
 
 	$query = $wpdb->prepare( "SELECT id, album, name, filename FROM $wpdb->wppa_photos WHERE filename <> ''  AND filename <> name AND id > %d ORDER BY id", $start );
@@ -1228,7 +1244,7 @@ global $wpdb;
 
 	// Really delete only as cron job
 	if ( ! wppa_is_cron() && ! $immediate ) {
-		if ( $album > '0' ) {
+		if ( $album > 0 ) {
 			$newalb = - ( $album + '9' );
 			wppa_update_photo( $photo, ['album' => $newalb, 'modified' => time()] );
 			wppa_mark_treecounts( $album );
@@ -1470,7 +1486,7 @@ function wppa_sanitize_tags( $value, $keepsemi = false, $keephash = false ) {
 //		if ( wppa_switch( 'capitalize_tags' ) ) {
 		if ( wppa_get_option( 'wppa_capitalize_tags', 'yes' ) == 'yes' ) {
 			foreach ( array_keys($temp) as $idx ) {
-				if ( strlen( $temp[$idx] ) > '1' ) {
+				if ( strlen( $temp[$idx] ) > 1 ) {
 					$words = explode( ' ', $temp[$idx] );
 					foreach( array_keys($words) as $i ) {
 						$words[$i] = ucfirst( strtolower( $words[$i] ) );
@@ -1502,7 +1518,7 @@ function wppa_sanitize_tags( $value, $keepsemi = false, $keephash = false ) {
 		$first = true;
 		$previdx = '';
 		foreach ( array_keys($temp) as $idx ) {
-			if ( strlen( $temp[$idx] ) > '1' ) {
+			if ( strlen( $temp[$idx] ) > 1 ) {
 
 				// Remove duplicates
 				if ( $temp[$idx] ) {
@@ -1579,7 +1595,7 @@ function wppa_series_to_array($xtxt) {
 	if ( substr($txt, -1) == '.' ) {
 		return wppa_stx_err('Missing ending number. '.$txt);
 	}
-	$t = str_replace(array('.','0','1','2','3','4','5','6','7','8','9'), '',$txt);
+	$t = str_replace(array('.',0,1,'2','3','4','5','6','7','8','9'), '',$txt);
 	if ( $t ) {
 		return wppa_stx_err('Illegal character(s): "'.$t.'" found. '.$txt);
 	}
@@ -1594,10 +1610,10 @@ function wppa_series_to_array($xtxt) {
 
 	foreach ( array_keys($temp) as $i ) {
 		if ( ! $temp[$i] ) { 							// found a '..'
-			if ( $temp[$i-'1'] >= $temp[$i+'1'] ) {
+			if ( $temp[$i-1] >= $temp[$i+1] ) {
 				return wppa_stx_err('Start > end. '.$txt);
 			}
-			for ( $j=$temp[$i-'1']+'1'; $j<$temp[$i+'1']; $j++ ) {
+			for ( $j=$temp[$i-1]+1; $j<$temp[$i+1]; $j++ ) {
 				$tempcopy[] = $j;
 			}
 		}
@@ -1659,16 +1675,16 @@ function wppa_is_int( $var ) {
 }
 
 function wppa_is_posint( $var ) {
-	return wppa_is_int( $var ) && $var > '0';
+	return wppa_is_int( $var ) && $var > 0;
 }
 
 function wppa_is_notnegint( $var ) {
-	return wppa_is_int( $var ) && $var >= '0';
+	return wppa_is_int( $var ) && $var >= 0;
 }
 
 // return true if $var only contains digits and points
 function wppa_is_enum( $var ) {
-	return '' === str_replace( array( '0','1','2','3','4','5','6','7','8','9','.' ), '', $var );
+	return '' === str_replace( array( 0,1,'2','3','4','5','6','7','8','9','.' ), '', $var );
 }
 
 // Log a wppa message.
@@ -1700,6 +1716,9 @@ static $repeat_count;
 	if ( ! $wppa_log_file ) {
 		return;
 	}
+
+	// Debug mode on?
+	$dbg = wppa_switch( 'enable_debug' );
 
 	// Sanitize message
 	$msg = wp_strip_all_tags( $msg );
@@ -1899,7 +1918,7 @@ static $repeat_count;
 	}
 
 	// Get stacktrace 5 levels
-	if ( $trace ) {
+	if ( $trace && $dbg ) {
 
 		$data = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 6 );
 		$traceline = ' Stack: ';
@@ -1926,11 +1945,8 @@ static $repeat_count;
 	array_push( $contents, '{b}'.$type.'{/b}: on:'.wppa_local_date( 'd.m.Y H:i:s', time()).': '.wppa_get_user().' ('.getmypid().'): '.$msg. "\n" );
 
 	// Log url
-	if ( $url ) {
+	if ( $url && $dbg ) {
 		array_push( $contents, '{b}url{/b}: '.str_replace(home_url(),'...',wppa_request_uri())."\n" );
-//		if ( count( $_POST ) ) {
-//			array_push( $contents, '{b}post{/b}: '.str_replace('\\','',var_export($_POST,true))."\n" );
-//		}
 	}
 
 	// Done
@@ -1950,7 +1966,7 @@ function wppa_is_landscape($img_attr) {
 
 function wppa_get_the_id() {
 
-	$id = '0';
+	$id = 0;
 	if ( wppa( 'ajax' ) ) {
 		if ( wppa_get( 'page_id' ) ) $id = wppa_get( 'page_id' );
 		elseif ( wppa_get( 'p' ) ) $id = wppa_get( 'p' );
@@ -1981,7 +1997,7 @@ function wppa_get_artmonkey_size_a( $photo ) {
 		$imgattr = @ getimagesize( $source );
 		if ( is_array( $imgattr ) ) {
 			$fs = wppa_get_filesize( $source );
-			$result = array( 'x' => $imgattr['0'], 'y' => $imgattr['1'], 's' => $fs );
+			$result = array( 'x' => $imgattr[0], 'y' => $imgattr[1], 's' => $fs );
 			return $result;
 		}
 	}
@@ -2034,11 +2050,11 @@ function wppa_get_the_landing_page( $slug, $title ) {
 function wppa_get_the_auto_page( $photo ) {
 
 	// Feature enabled?
-	if ( ! wppa_switch( 'auto_page' ) ) return '0';
+	if ( ! wppa_switch( 'auto_page' ) ) return 0;
 
 	// Validate args
-	if ( ! $photo ) return '0';					// No photo id, no page
-	if ( ! wppa_is_posint( $photo ) ) return '0';	// $photo not numeric
+	if ( ! $photo ) return 0;					// No photo id, no page
+	if ( ! wppa_is_posint( $photo ) ) return 0;	// $photo not numeric
 
 	$thumb = wppa_cache_photo( $photo );		// Get photo info
 
@@ -2061,15 +2077,15 @@ function wppa_get_the_auto_page( $photo ) {
 
 function wppa_remove_the_auto_page( $photo ) {
 
-	if ( ! $photo ) return '0';					// No photo id, no page
-	if ( ! wppa_is_int( $photo ) ) return '0';	// $photo not numeric
+	if ( ! $photo ) return 0;					// No photo id, no page
+	if ( ! wppa_is_int( $photo ) ) return 0;	// $photo not numeric
 
 	$thumb = wppa_cache_photo( $photo );		// Get photo info
 
 	// Page exists ?
 	if ( wppa_page_exists( $thumb['page_id'] ) ) {
 		wp_delete_post( $thumb['page_id'], true );
-		wppa_update_photo( $photo, ['page_id' => '0'] );
+		wppa_update_photo( $photo, ['page_id' => 0] );
 	}
 }
 
@@ -2184,7 +2200,7 @@ global $wppa_supported_photo_extensions;
 	$album = $thumb['album'];
 
 	// Trashed?
-	if ( $album < '0' ) {
+	if ( $album < 0 ) {
 		$album = - ( $album + '9' );
 	}
 
@@ -2218,7 +2234,7 @@ function wppa_get_hires_url( $id ) {
 	if ( wppa_is_video( $id ) || wppa_has_audio( $id ) ) {
 		$url = wppa_get_photo_url( $id );
 		$temp = explode( '?', $url );
-		$url = $temp['0'];
+		$url = $temp[0];
 		return $url;
 	}
 */
@@ -2270,18 +2286,18 @@ function wppa_get_hires_url( $id ) {
 	// The medium res url
 	$hires_url = wppa_get_photo_url( $id );
 	$temp = explode( '?', $hires_url );
-	return $temp['0'];
+	return $temp[0];
 }
 function wppa_get_lores_url( $id ) {
 	$lores_url = wppa_get_photo_url( $id );
 	$temp = explode( '?', $lores_url );
-	$lores_url = $temp['0'];
+	$lores_url = $temp[0];
 	return $lores_url;
 }
 function wppa_get_tnres_url( $id ) {
 	$tnres_url = wppa_get_thumb_url( $id );
 	$temp = explode( '?', $tnres_url );
-	$tnres_url = $temp['0'];
+	$tnres_url = $temp[0];
 	return $tnres_url;
 }
 
@@ -2552,13 +2568,13 @@ global $wpdb;
 		$key = $rating['photo'];
 		if ( ! isset( $data[$key] ) ) {
 			$data[$key] = array();
-			$data[$key]['ratingcount'] 		= '1';
-			$data[$key]['maxratingcount'] 	= $rating['value'] == $ratmax ? '1' : '0';
+			$data[$key]['ratingcount'] 		= 1;
+			$data[$key]['maxratingcount'] 	= $rating['value'] == $ratmax ? 1 : 0;
 			$data[$key]['totvalue'] 		= $rating['value'];
 		}
 		else {
-			$data[$key]['ratingcount'] 		+= '1';
-			$data[$key]['maxratingcount'] 	+= $rating['value'] == $ratmax ? '1' : '0';
+			$data[$key]['ratingcount'] 		+= 1;
+			$data[$key]['maxratingcount'] 	+= $rating['value'] == $ratmax ? 1 : 0;
 			$data[$key]['totvalue'] 		+= $rating['value'];
 		}
 	}
@@ -2592,14 +2608,14 @@ global $wpdb;
 		$data = array();
 		foreach ( array_keys( $temp ) as $key ) {
 			if ( ! isset( $data[$temp[$key]['user']] ) ) {
-				$data[$temp[$key]['user']]['photos'] 			= '1';
+				$data[$temp[$key]['user']]['photos'] 			= 1;
 				$data[$temp[$key]['user']]['ratingcount'] 		= $temp[$key]['ratingcount'];
 				$data[$temp[$key]['user']]['maxratingcount'] 	= $temp[$key]['maxratingcount'];
 				$data[$temp[$key]['user']]['totvalue'] 			= $temp[$key]['totvalue'];
 				$data[$temp[$key]['user']]['owner'] 			= $temp[$key]['owner'];
 			}
 			else {
-				$data[$temp[$key]['user']]['photos'] 			+= '1';
+				$data[$temp[$key]['user']]['photos'] 			+= 1;
 				$data[$temp[$key]['user']]['ratingcount'] 		+= $temp[$key]['ratingcount'];
 				$data[$temp[$key]['user']]['maxratingcount'] 	+= $temp[$key]['maxratingcount'];
 				$data[$temp[$key]['user']]['totvalue'] 			+= $temp[$key]['totvalue'];
@@ -2612,9 +2628,9 @@ global $wpdb;
 	}
 
 	// Phase 5, truncate to the desired length
-	$c = '0';
+	$c = 0;
 	foreach ( array_keys( $data ) as $key ) {
-		$c += '1';
+		$c += 1;
 		if ( $c > $count ) unset ( $data[$key] );
 	}
 
@@ -2667,7 +2683,7 @@ function wppa_alb_to_enum_children( $xparents ) {
 	}
 	$result = '';
 	foreach( $albums as $alb ) {
-		if ( ! $alb ) $alb = '0';
+		if ( ! $alb ) $alb = 0;
 		$result .= _wppa_alb_to_enum_children( $alb );
 		$result = trim( $result, '.' ).'.';
 	}
@@ -2695,7 +2711,7 @@ static $child_list;
 	}
 
 	// Get the data
-	if ( $alb > '0' ) {
+	if ( $alb > 0 ) {
 		$result = $alb;
 	}
 	$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = %s", $alb );
@@ -2778,7 +2794,7 @@ global $wpdb;
 		$count = wppa_get_var( $query );
 
 		// Update photo
-		wppa_update_photo( $id, ['rating_count' => $count, 'mean_rating' => '0'] );
+		wppa_update_photo( $id, ['rating_count' => $count, 'mean_rating' => 0] );
 	}
 	else {
 
@@ -2787,8 +2803,8 @@ global $wpdb;
 		$ratings = wppa_get_results( $query );
 
 		// Init
-		$the_value = '0';
-		$the_count = '0';
+		$the_value = 0;
+		$the_count = 0;
 
 		// Compute mean value and count
 		if ( $ratings ) {
@@ -2806,8 +2822,8 @@ global $wpdb;
 			}
 		}
 		if ( $the_count ) $the_value /= $the_count;
-		if ( wppa_opt( 'rating_max' ) == '1' ) $the_value = '0';
-		if ( $the_value == '10' ) $the_value = '9.9999999';	// mean_rating is a text field. for sort order reasons we make 10 into 9.99999
+		if ( wppa_opt( 'rating_max' ) == 1 ) $the_value = 0;
+		if ( $the_value == 10 ) $the_value = '9.9999999';	// mean_rating is a text field. for sort order reasons we make 10 into 9.99999
 
 		// Update photo
 		wppa_update_photo( $id, ['mean_rating' => $the_value, 'rating_count' => $the_count] );
@@ -3395,7 +3411,7 @@ function get_browser_name() {
 
 // Like wp_nonce_field
 // To prevent duplicate id's, we externally add an id number ( e.g. album ) and internally the mocc number.
-function wppa_nonce_field( $action = -1, $name = "_wpnonce", $referer = true, $wppa_id = '0' ) {
+function wppa_nonce_field( $action = -1, $name = "_wpnonce", $referer = true, $wppa_id = 0 ) {
 
 	$name = esc_attr( $name );
 	$nonce_field = 	'<input' .
@@ -3638,7 +3654,7 @@ static $usercache;
 				return true;
 			}
 			else {
-				return '0';
+				return 0;
 			}
 		}
 	}
@@ -3676,7 +3692,7 @@ static $cache;
 // @6: string: border radius in %: light
 // @7: string: border radius in %: medium
 // @8: string: border radius in %: heavy
-function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = false, $none = '0', $light = '10', $medium = '20', $heavy = '50' ) {
+function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = false, $none = 0, $light = 10, $medium = '20', $heavy = '50' ) {
 
 	// Find the colors
 	if ( $lightbox ) {
@@ -4183,7 +4199,7 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 	$defaults = array(
 					'id' 		=> 'wppa-spinner',
 					'class' 	=> 'wppa-spinner',
-					'size' 		=> '120',
+					'size' 		=> 120,
 					'position' 	=> 'fixed',
 					'lightbox' 	=> false,
 					'display' 	=> 'none',
@@ -4280,7 +4296,7 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 				$bradius = round( $args['size'] / 2 );
 				break;
 			default: // case 'gif': case 'none':
-				$bradius = '0';
+				$bradius = 0;
 				break;
 		}
 
@@ -4826,27 +4842,13 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 
 	// No .svg possible / requested, default to .gif
 	else {
-		$result =
-			'<img' .
-				' id="' . $args['id'] . '"' .
-				' src="' . wppa_get_imgdir() . 'loader.gif"' .
-				' class="' . $args['class'] . ' wppa-ajax-spin"' .
-				' alt="spinner"' .
-				' style="' .
-					'width:' . $args['size'] . 'px;' .
-					'height:' . $args['size'] . 'px;' .
-					'position:' . $args['position'] . ';' .
-					'top:50%;' .
-					'margin-top:-' . $args['margin'] . 'px;' .
-					'left:50%;' .
-					'margin-left:-' . $args['margin'] . 'px;' .
-					'z-index:200100;' .
-					'opacity:1;' .
-					'display:' . $args['display'] . ';' .
-					'background-color:' . $bgcol . ';' .
-					'box-shadow:none;' .
-					'"' .
-			' />';
+		$s = $args['size'];
+		$p = $args['position'];
+		$m = $args['margin'];
+		$d = $args['display'];
+		$result = wppa_html_tag( 'img', ['id' => $args['id'], 'src' => wppa_get_imgdir('loader.gif'), 'class' => $args['class'].' wppa-ajax-spin', 'alt' => "spinner",
+										 'style' => 'width:'.$s.'px;height:'.$s.'px;position:'.$p.';top:50%;margin-top:-'.$m.'px;left:50%;margin-left:-'.$m.'px;' .
+										 'z-index:200100;opacity:1;display:'.$d.';background-color:'.$bgcol.';box-shadow:none;'] );
 	}
 
 	if ( is_ssl() ) {
@@ -5067,7 +5069,7 @@ function wppa_icon_size( $default = '', $type = 0, $factor = 1 ) {
 function wppa_is_panorama( $id ) {
 
 	$result = wppa_get_photo_item( $id, 'panorama' );
-	if ( $result == '1' && ! wppa_switch( 'enable_panorama' ) ) {
+	if ( $result == 1 && ! wppa_switch( 'enable_panorama' ) ) {
 		$result = '';
 	}
 	return $result;
@@ -5152,7 +5154,7 @@ function wppa_get_thumb_aspect() {
 		$t = explode( ':', wppa_opt( 'thumb_aspect' ) );
 		$aspect = $t[0] / $t[1];
 	}
-	elseif ( wppa_opt( 'resize_to' ) != '-1' && wppa_opt( 'resize_to' ) != '0' ) {
+	elseif ( wppa_opt( 'resize_to' ) != '-1' && wppa_opt( 'resize_to' ) != 0 ) {
 		$t = explode( 'x', wppa_opt( 'resize_to' ) );
 		$aspect = $t[1] / $t[0];
 	}
@@ -5245,13 +5247,13 @@ static $level;
 }
 function _wppa_get_nesting_level( $id ) {
 
-	if ( ! $id ) return '0';
+	if ( ! $id ) return 0;
 	$alb = wppa_cache_album( $id );
-	if ( is_array( $alb ) && $alb['a_parent'] > '0' ) {
-		return _wppa_get_nesting_level( $alb['a_parent'] ) + '1';
+	if ( is_array( $alb ) && $alb['a_parent'] > 0 ) {
+		return _wppa_get_nesting_level( $alb['a_parent'] ) + 1;
 	}
 	else {
-		return '0';
+		return 0;
 	}
 }
 
@@ -5767,7 +5769,7 @@ function wppa_is_photo_deleted( $id ) {
 	if ( ! $photo ) {
 		return true; 	// Deleted long ago
 	}
-	if ( $photo['album'] < '1' ) {
+	if ( $photo['album'] < 1 ) {
 		return true; 	// Deleted pending removal
 	}
 	return false; 		// Still there
@@ -5776,14 +5778,14 @@ function wppa_is_photo_deleted( $id ) {
 function wppa_is_anon() {
 
 	if ( wppa( 'anon' ) ) return true;
-	if ( wppa_get( 'occur' ) == wppa( 'mocc' ) && wppa_get( 'anon', '0', 'int' ) ) return true;
+	if ( wppa_get( 'occur' ) == wppa( 'mocc' ) && wppa_get( 'anon', 0, 'int' ) ) return true;
 	return false;
 }
 
 function wppa_is_meonly() {
 
 	if ( wppa( 'meonly' ) ) return true;
-	if ( wppa_get( 'occur' ) == wppa( 'mocc' ) && wppa_get( 'meonly', '0', 'int' ) ) return true;
+	if ( wppa_get( 'occur' ) == wppa( 'mocc' ) && wppa_get( 'meonly', 0, 'int' ) ) return true;
 	return false;
 }
 
@@ -5911,6 +5913,9 @@ function wppa_fix_query( $query ) {
 	$query = str_replace( "'", "", $query );
 	$query = str_replace( "`", "'", $query );
 	$query = trim( $query );
+	if ( strpos( $query, 'IN ()' ) !== false ) {
+		wppa_log( 'dbg', 'IN () found in query' );
+	}
 	return $query;
 }
 
@@ -5979,7 +5984,7 @@ global $wpdb;
 
 		// Init for findong the sequence method
 		$method = '';
-		$m = '0';
+		$m = 0;
 
 		// Parent is physical album
 		if ( $album ) {
@@ -5987,13 +5992,13 @@ global $wpdb;
 		}
 
 		// Parent is virtual album OR album method is use default, find the system default
-		if ( ! $album || $m == '0' ) {
+		if ( ! $album || $m == 0 ) {
 			$m = wppa_opt( 'list_albums_by' );
 		}
 
 		// Find method
 		switch( $m ) {
-			case '1':
+			case 1:
 				$method = 'order';
 				break;
 			case '-1':
@@ -6052,11 +6057,11 @@ global $wpdb;
 		$m = wppa_get_album_item( $media['album'], 'p_order_by' );
 
 		// If use default, find the system default
-		if ( $m == '0' ) {
+		if ( $m == 0 ) {
 			$m = wppa_opt( 'list_photos_by' );
 		}
 		switch( $m ) {
-			case '1':
+			case 1:
 				$method = 'order';
 				break;
 			case '-1':
@@ -6102,3 +6107,86 @@ global $wpdb;
 
 	return;
 }
+
+// Retaurn a vaild escaped complete html tag
+function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
+
+	$no_lazy = false;
+	if ( $tag == 'source' ) {
+		$no_lazy = true;
+	}
+	if ( isset( $attribs['alt'] ) ) {
+		$alt = $attribs['alt'];
+		if ( $alt == 'spin' ||
+			 $alt == __('Gold medal', 'wp-photo-album-plus') ||
+			 $alt == __('Silver medal', 'wp-photo-album-plus') ||
+			 $alt == __('Bronze medal', 'wp-photo-album-plus') ) {
+			$no_lazy = true;
+		}
+	}
+	if ( defined( 'DOING_CRON' ) ) { 									// Not on emails etc
+		$no_lazy = true;
+	}
+
+	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio'] );
+
+	if ( ! in_array( $tag, $allowed_tags ) ) {
+		wppa_log( 'err', "Unsupported tag {b}$tag{/b} in wppa_html_tag()" );
+		return '';
+	}
+
+	$result = '<' . $tag;
+
+	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'data-title', 'data-day', 'data-from', 'type', 'preload',
+					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'disabled', 'selected'];
+	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
+
+	foreach( array_keys( $attribs ) as $attr ) {
+		if ( ! in_array( $attr, $allowed_attrs ) && ! in_array( $attr, $may_empty_attrs ) ) {
+			wppa_log( 'err', "Unsupported attribute {b}$attr{/b} in wppa_html_tag()" );
+		}
+		else {
+			switch ( $attr ) {
+				case 'src':
+					if ( wppa_lazy() && ! $no_lazy ) {
+						$result .= ' data-src="' . esc_url( $attribs[$attr] ) . '" decoding="async"';
+					}
+					else {
+						$result .= ' src="' . esc_url( $attribs[$attr] ) . '"';
+					}
+					break;
+				case 'href':
+					$result .= ' ' . $attr . '="' . esc_url( $attribs[$attr] ) . '"';
+					break;
+				default:
+					if ( ! $attribs[$attr] ) {
+						if ( in_array( $attr, $may_empty_attrs ) ) {
+							$result .= ' ' . $attr;
+						}
+					}
+					else {
+						$result .= ' ' . $attr . '="' . esc_attr( $attribs[$attr] ) . '"';
+					}
+			}
+		}
+	}
+
+	if ( wppa_switch( 'enable_debug' ) ) {
+		$stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+		$result .= ' data-stack="'.substr(wppa_strip_ext(basename($stack[0]['file'])),5).':'.$stack[0]['line'].':'.
+								  substr(wppa_strip_ext(basename($stack[1]['file'])),5).':'.$stack[1]['line'].'"';
+	}
+
+	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+	if ( in_array( $tag, $self_closing ) ) {
+		$result .= '/>';
+	}
+	else {
+		$result .= '>' . $content . '</' . $tag . '>';
+	}
+
+	return $result;
+}
+

@@ -4,7 +4,7 @@
 *
 * A wppa widget to upload photos
 *
-* Version: 8.8.00.003
+* Version: 9.0.00.000
 */
 
 class WppaUploadWidget extends WP_Widget {
@@ -40,7 +40,7 @@ class WppaUploadWidget extends WP_Widget {
 		$album = $instance['album'];
 
 		if ( ! wppa_album_exists( $album ) ) {
-			$album = '0';	// Album vanished
+			$album = 0;	// Album vanished
 		}
 
 		wppa_user_upload();	// Do the upload if required
@@ -114,9 +114,9 @@ class WppaUploadWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Upload photos', 'wp-photo-album-plus' ),
-							'album' 	=> '0',
+							'album' 	=> 0,
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 8.8.05.003
+* Version 9.0.00.000
 *
 */
 
@@ -258,7 +258,7 @@ global $wp_roles;
 
 		// Find firste role the user has
 		if ( wppa_user_is( $role ) ) {
-			$rmax = wppa_get_option( 'wppa_'.$role.'_album_limit_count', '0' );
+			$rmax = wppa_get_option( 'wppa_'.$role.'_album_limit_count', 0 );
 			if ( ! $rmax || $albs < $rmax ) {
 				return true;
 			}
@@ -283,7 +283,7 @@ function wppa_can_create_top_album() {
 		return false;
 	}
 	if ( wppa_switch( 'grant_an_album' ) &&
-		'0' != wppa_opt( 'grant_parent' ) ) {
+		0 != wppa_opt( 'grant_parent' ) ) {
 			return false;
 		}
 
@@ -686,20 +686,12 @@ function wppa_get_premium_html( $userid ) {
 	}
 
 	if ( in_array( $premium, array( 'gold', 'silver', 'bronze' ) ) ) {
-		$result = '
-		<img
-			src="' . wppa_get_imgdir( 'medal_' . $premium . '_' . wppa_opt( 'medal_color' ) . '.png' ) . '"
-			style="height:1em;cursor:pointer"
-			title="' . esc_attr( $title ) . '"
-		/>';
+		$result =
+		wppa_html_tag( 'img', ['src' => wppa_get_imgdir( 'medal_' . $premium . '_' . wppa_opt( 'medal_color' ) . '.png' ), 'style' => "height:1em;cursor:pointer", 'title' => $title] );
 	}
 	elseif ( $premium == 'plus' ) {
-		$result = '
-		<img
-			src="' . wppa_get_imgdir( 'plus.png' ) . '"
-			style="height:1em;cursor:pointer"
-			title="' . esc_attr( $title ) . '"
-		/>';
+		$result =
+		wppa_html_tag( 'img', ['src' => wppa_get_imgdir( 'plus.png' ), 'style' => "height:1em;cursor:pointer", 'title' => $title] );
 	}
 
 	return $result;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all video routines
-* Version 8.9.02.004
+* Version 9.0.00.007
 *
 */
 
@@ -42,23 +42,19 @@ global $wppa_supported_video_extensions;
 function wppa_get_video_html( $args ) {
 
 	extract( wp_parse_args( (array) $args, array (
-					'id'			=> '0',
-					'width'			=> '0',
-					'widthp' 		=> '0',
-					'height' 		=> '0',
-					'controls' 		=> true,
-					'margin_top' 	=> '0',
-					'margin_bottom' => '0',
-					'tagid' 		=> 'video-' . wppa( 'mocc' ),
-					'cursor' 		=> '',
-					'events' 		=> '',
+					'id'			=> 0,
+					'tagid' 		=> 'video-'.wppa('mocc'),
 					'title' 		=> '',
-					'onclick' 		=> '',
-					'lb' 			=> false,
 					'class' 		=> '',
 					'style' 		=> '',
+					'onmouseover' 	=> '',
+					'onmouseout' 		=> '',
+					'onclick' 		=> '',
+					'ondblclick' 	=> '',
+					'onload' 		=> '',
+					'controls' 		=> true,
+					'autoplay' 		=> false,
 					'use_thumb' 	=> false,
-					'autoplay' 		=> false
 					) ) );
 
 	// No id? no go
@@ -78,20 +74,6 @@ function wppa_get_video_html( $args ) {
 					'webm' 	=> false
 					) ) );
 
-	// Prepare attributes
-	$w 		= $width ? 'width:'.$width.'px;' : '';
-	$w 		= $widthp ? 'width:'.$widthp.'%;' : $w;
-	$h 		= $height ? 'height:'.$height.'px;' : '';
-	$t 		= $margin_top ? 'margin-top:'.$margin_top.'px;' : '';
-	$b 		= $margin_bottom ? 'margin-bottom:'.$margin_bottom.'px;' : '';
-	$ctrl 	= $controls ? ' controls' : '';
-	$tit 	= $title ? ' title="'.$title.'"' : '';
-	$onc 	= $onclick ? ' onclick="'.$onclick.'"' : '';
-	$cls 	= $class ? ' class="'.$class.'"' : '';
-	$style 	= $style ? trim( $style, '; ' ) : '';
-	$play 	= $autoplay ? ' autoplay' : '';
-	$cursor = $cursor ? 'cursor:'.$cursor.';' : '';
-
 	// See if there is a poster image
 	$poster_photo_path = wppa_get_photo_path( $id );
 	$poster_thumb_path = wppa_get_thumb_path( $id );
@@ -108,21 +90,15 @@ function wppa_get_video_html( $args ) {
 		$poster = $poster_photo;
 	}
 
-	// If the poster exists and no controls, we need no preload at all.
-	if ( $poster && ! $controls ) {
-		$preload = 'none';
-	}
-
 	// Do we have html5 video tag supported filetypes on board?
 	if ( $mp4 || $ogv || $webm ) {
 
 		// Assume the browser supports html5
-		$result = '<video id="'.$tagid.'" '.$ctrl.$play.' style="'.$style.$w.$h.$t.$b.$cursor.'" '.$events.' '.$tit.$onc.$poster.' preload="metadata"'.$cls.'>';
-
-		$result .= wppa_get_video_body( $id, false, $width, $height );
-
-		// Close the video tag
-		$result .= '</video>';
+		$attribs = ['id' => $tagid, 'title' => $title, 'class' => $class, 'style' => $style, 'preload' => 'metadata',
+					'onload' => $onload, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout, 'onclick' => $onclick, 'ondblclick' => $ondblclick];
+		if ( $controls ) $attribs['controls'] = 'controls';
+		if ( $autoplay ) $attribs['autoplay'] = 'autoplay';
+		$result = wppa_html_tag( 'video', $attribs, wppa_get_video_body( $id ) );
 	}
 
 	// Done
@@ -139,13 +115,11 @@ function wppa_get_video_body( $id ) {
 	if ( ! $is_video ) return '';
 
 	// Find video url with no version and no extension
-//	wppa( 'no_ver', true );
 	$source = wppa_strip_ext( wppa_get_photo_url( $id, false ) );
-//	wppa( 'no_ver', false );
 
 	$result = '';
 	foreach ( $is_video as $ext ) {
-		$result .= '<source src="' . $source . '.' . $ext . '" type="' . str_replace( 'ogv', 'ogg', 'video/' . $ext ) . '">';
+		$result .= wppa_html_tag( 'source', ['src' => $source.'.'.$ext, 'type' => str_replace( 'ogv', 'ogg', 'video/'.$ext )] );
 	}
 	$result .= esc_js( __( 'There is no filetype available for your browser, or your browser does not support html5 video', 'wp-photo-album-plus' ) );
 
@@ -188,7 +162,7 @@ function wppa_get_videox( $id, $where = 'prod' ) {
 
 	$exts = wppa_is_video( $id );
 
-	if ( ! $exts ) return '0';
+	if ( ! $exts ) return 0;
 
 	if ( ! $thumb['videox'] ) {
 		if ( in_array( 'mp4', $exts ) ) {
@@ -220,7 +194,7 @@ function wppa_get_videoy( $id, $where = 'prod' ) {
 
 	$exts = wppa_is_video( $id );
 
-	if ( ! $exts ) return '0';
+	if ( ! $exts ) return 0;
 
 	if ( ! $thumb['videoy'] ) {
 		if ( in_array( 'mp4', $exts ) ) {

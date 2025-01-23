@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the stereo stuff
-* Version 8.8.01.005
+* Version 9.0.00.000
 *
 */
 
@@ -97,8 +97,8 @@ static $f114;
 	$fromfile 	= wppa_get_photo_path( $id );
 	$tofile 	= wppa_get_stereo_path( $id, $type, $glass );
 	$sizes 		= getimagesize( $fromfile );
-	$width 		= $sizes['0'] / 2;
-	$height 	= $sizes['1'];
+	$width 		= $sizes[0] / 2;
+	$height 	= $sizes[1];
 
 	$fromimage 	= wppa_imagecreatefromjpeg( $fromfile );
 	if ( ! $fromimage ) return false;

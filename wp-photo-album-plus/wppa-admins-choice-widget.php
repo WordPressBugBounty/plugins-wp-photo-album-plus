@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the admins-choice widget
-* Version 8.7.03.006
+* Version 9.0.00.000
 *
 */
 
@@ -80,7 +80,7 @@ class AdminsChoice extends WP_Widget {
 		if ( wppa_opt( 'admins_choice' ) == 'none' ) {
 			wppa_echo( '
 			<p style="color:red">' .
-				esc_html__( 'Please enable this feature', 'wp-photo-album-plus' ) . ' ' . wppa_see_also( 'system', '1', '28' ) . '
+				esc_html__( 'Please enable this feature', 'wp-photo-album-plus' ) . ' ' . wppa_see_also( 'system', 1, '28' ) . '
 			</p>' );
 		}
 
@@ -99,7 +99,7 @@ class AdminsChoice extends WP_Widget {
 
 		$defaults = array( 	'title' 	=> __( 'Admins Choice', 'wp-photo-album-plus' ),
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

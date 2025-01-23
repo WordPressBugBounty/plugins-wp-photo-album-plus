@@ -3,9 +3,13 @@
 // contains common functions
 //
 
-wppaWppaVer = '8.9.02.004';
+wppaWppaVer = '9.0.00.002';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
+
+// jQuery(window).on('scroll',function(){wppaConsoleLog('scroll');});
+// jQuery(window).on('resize',function(){wppaConsoleLog('resize');});
+// jQuery(window).on('wheel',function(){wppaConsoleLog('wheel');});
 
 // Tabby click function
 function wppaTabbyClick(){
@@ -77,7 +81,7 @@ jQuery(document).ready(function(){
 	}, 3000 );
 
 	// Responsive handlers
-	jQuery(window).on("DOMContentLoaded load resize scroll orientationchange",wppaDoAllAutocols);
+	jQuery(window).on("DOMContentLoaded load resize scroll wheel orientationchange",wppaDoAllAutocols);
 
 	// Size scrollable areas
 	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange',wppaSizeArea);
@@ -87,17 +91,18 @@ jQuery(document).ready(function(){
 	jQuery('.wppa-divnicewrap').on('DOMContentLoaded load resize scroll wheel orientationchange', function(){wppaMakeLazyVisible('scroll div nicewrap')});
 
 	// Init masonryplus
-	jQuery(window).on('DOMContentLoaded load resize scroll orientationchange', wppaInitMasonryPlus);
+	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange', wppaInitMasonryPlus);
 
 	// When the window size changes, filmstrip needs immediate adjustment
 	jQuery(window).on('resize', function(){wppaAdjustAllFilmstrips(wppaEasingSlide)});
 
 	// Resize nicescrollers, re-layout masonryplus
-	jQuery(window).on("DOMContentLoaded load resize scroll orientationchange", function(){
+	jQuery(window).on("DOMContentLoaded load resize scroll wheel orientationchange", function(){
 
 		setTimeout( function() {
 
 			wppaResizeNice('wppaDoInit');
+			wppaInitMasonryPlus();
 
 		}, 1000);
     });
@@ -154,7 +159,7 @@ jQuery(document).ready(function(){
 var wppaResizeNiceTimer;
 var wppaResizeNiceTimestamp;
 function wppaResizeNice(from) {
-console.log('Nice resize called from '+from);
+// console.log('Nice resize called from '+from);
 	clearTimeout(wppaResizeNiceTimer);
 	wppaResizeNiceTimestamp = Date.now();
 	wppaResizeNiceTimer = setTimeout(function(){_wppaResizeNice(from)}, Math.max(wppaResizeEndDelay, wppaScrollEndDelay));
@@ -165,14 +170,13 @@ function _wppaResizeNice(from) {
 	if ( from != 'wppaMakeLazyVisible' ) {
 		if ( typeof jQuery("body").getNiceScroll == "function" ) {
 			jQuery("body").getNiceScroll().resize();
-			console.log('Nice resized body after '+(Date.now() - wppaResizeNiceTimestamp)+' millisec');
+//			console.log('Nice resized body after '+(Date.now() - wppaResizeNiceTimestamp)+' millisec');
 		}
 	}
 
 	// Areas
 	jQuery(".wppa-nicescroll").each(function(){
 		jQuery(this).getNiceScroll().resize();
-		console.log('Nice resized ' + jQuery(this).attr('id') + ' after ' + ( Date.now() - wppaResizeNiceTimestamp ) + ' millisec' );
 	});
 }
 
@@ -226,7 +230,7 @@ function wppaDoAllAutocols(e) {
 }
 
 function _wppaDoAllAutocols(i) {
-
+// console.log('doing all autocols');
 	// Do occurrences that are responsive
 	jQuery(".wppa-container").each(function(){
 		var divId = jQuery(this).attr("id");
@@ -1291,7 +1295,7 @@ function wppaGetUploadOptions( yalb, mocc, where, onComplete ) {
 
 // (re)-initialize masonryplus using jQuery().masonry()
 function wppaInitMasonryPlus() {
-
+//wppaConsoleLog('doing initmasplus');
 	jQuery('.grid-masonryplus').each(function(){
 
 		var divId 		= jQuery(this).attr('id');
@@ -1306,7 +1310,8 @@ function wppaInitMasonryPlus() {
 		jQuery('#grid-' + mocc ).masonry({
 				itemSelector: '.grid-item-' + mocc,
 				columnWidth: colWidth,
-				fitWidth: true
+				fitWidth: true,
+				transitionDuration: 0
 			});
 	});
 }

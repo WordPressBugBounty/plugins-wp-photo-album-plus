@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 8.7.04.002
+* Version 9.0.00.005
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -47,7 +47,7 @@ class AlbumWidget extends WP_Widget {
 
 		// Other inits
 		$page 			= in_array( wppa_opt( 'album_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'album_widget_linkpage', __( 'Photo Albums', 'wp-photo-album-plus' ) );
-		$max  			= wppa_opt( 'album_widget_count' ) ? wppa_opt( 'album_widget_count' ) : '10';
+		$max  			= wppa_opt( 'album_widget_count' ) ? wppa_opt( 'album_widget_count' ) : 10;
 		$maxw 			= wppa_opt( 'album_widget_size' );
 		$maxh 			= wppa_checked( $instance['name'] ) ? $maxw + 14 + wppa_opt( 'fontsize_widget_thumb' ) : $maxw;
 		$parent 		= $instance['parent'];
@@ -132,7 +132,8 @@ class AlbumWidget extends WP_Widget {
 				if ( $image && ( $imgcount || $subalbumcount ) ) {
 					$link       = wppa_get_imglnk_a('albwidget', $image['id']);
 					$file       = wppa_get_thumb_path($image['id']);
-					$imgevents  = wppa_get_imgevents('thumb', $image['id'], true);
+					$onmouseover  = wppa_mouseover('thumb', $image['id'], true);
+					$onmouseout 	= wppa_mouseout('thumb');
 					$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'albthumb' );
 					$imgstyle   = $imgstyle_a['style'];
 					$width      = $imgstyle_a['width'];
@@ -145,7 +146,8 @@ class AlbumWidget extends WP_Widget {
 				else {
 					$link       = '';
 					$file 		= '';
-					$imgevents  = '';
+					$onmouseover  = '';
+					$onmouseout 	= '';
 					$imgstyle   = 'width:'.$maxw.';height:'.$maxh.';';
 					$width      = $maxw;
 					$height     = $maxw; // !!
@@ -160,7 +162,7 @@ class AlbumWidget extends WP_Widget {
 						$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $width, $height );
 					}
 					else {
-						$imgurl		= wppa_get_imgdir().'album32.png';
+						$imgurl		= wppa_get_imgdir('album32.png');
 					}
 				}
 
@@ -193,29 +195,19 @@ class AlbumWidget extends WP_Widget {
 
 							// Video?
 							if ( $imageid && wppa_is_video( $image['id'] ) ) {
-								$widget_content .= wppa_get_video_html( array( 	'id' 			=> $image['id'],
-																				'width' 		=> $width,
-																				'height' 		=> $height,
-																				'controls' 		=> false,
-																				'margin_top' 	=> $imgstyle_a['margin-top'],
-																				'margin_bottom' => $imgstyle_a['margin-bottom'],
-																				'cursor' 		=> 'pointer',
-																				'events' 		=> $imgevents,
-																				'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
-																				'title' 		=> $title
-																			 )
-																	 );
+								$widget_content .=
+								wppa_get_video_html( ['id' 			=> $image['id'],
+													  'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
+													  'title' 		=> $title,
+													  'style' 		=> $imgstyle.'cursor:pointer;',
+													  'controls' 	=> false,
+													  'onmouseover' => $onmouseover,
+													  'onmouseout'	=> $onmouseout] );
 							}
 							else {
-								$widget_content .= '
-								<img
-									id="i-' . strval( intval( $image['id'] ) ) . '-' . wppa( 'mocc' ) . '"
-									title="' . esc_attr( $title ) . '"
-									src="' . esc_url( $imgurl ) . '"
-									style="' . esc_attr( $imgstyle . ' cursor:pointer;' ) . '" ' .
-									$imgevents . ' ' .
-									wppa_get_imgalt( $image['id'] ) . '
-								/>';
+								$widget_content .=
+								wppa_html_tag( 'img', ['id' => 'i-'.$image['id'].'-'.wppa('mocc'), 'title' => $title, 'src' => $imgurl, 'style' => $imgstyle.'cursor:pointer;',
+													   'alt' => wppa_alt($image['id']), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 							}
 							$widget_content .= '
 							</a>';
@@ -228,14 +220,14 @@ class AlbumWidget extends WP_Widget {
 							if ( $thumbs ) foreach ( $thumbs as $thumb ) {
 								$title = wppa_get_lbtitle('alw', $thumb['id']);
 								if ( wppa_is_video( $thumb['id']  ) ) {
-									$siz['0'] = wppa_get_videox( $thumb['id'] );
-									$siz['1'] = wppa_get_videoy( $thumb['id'] );
+									$siz[0] = wppa_get_videox( $thumb['id'] );
+									$siz[1] = wppa_get_videoy( $thumb['id'] );
 								}
 								else {
-									$siz['0'] = wppa_get_photox( $thumb['id'] );
-									$siz['1'] = wppa_get_photoy( $thumb['id'] );
+									$siz[0] = wppa_get_photox( $thumb['id'] );
+									$siz[1] = wppa_get_photoy( $thumb['id'] );
 								}
-								$link 		= wppa_get_photo_url( $thumb['id'], true, '', $siz['0'], $siz['1'] );
+								$link 		= wppa_get_photo_url( $thumb['id'], true, '', $siz[0], $siz[1] );
 								$is_video 	= wppa_is_video( $thumb['id'] );
 								$has_audio 	= wppa_has_audio( $thumb['id'] );
 								$is_pdf 	= wppa_is_pdf( $thumb['id'] );
@@ -257,29 +249,19 @@ class AlbumWidget extends WP_Widget {
 										' >';
 								if ( $thumb['id'] == $image['id'] ) {		// the cover image
 									if ( wppa_is_video( $image['id'] ) ) {
-										$widget_content .= wppa_get_video_html( array( 	'id' 			=> $image['id'],
-																						'width' 		=> $width,
-																						'height' 		=> $height,
-																						'controls' 		=> false,
-																						'margin_top' 	=> $imgstyle_a['margin-top'],
-																						'margin_bottom' => $imgstyle_a['margin-bottom'],
-																					//	'cursor' 		=> $cursor,
-																						'events' 		=> $imgevents,
-																						'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
-																						'title' 		=> wppa_zoom_in( $image['id'] ),
-																					 )
-																			 );
+										$widget_content .= wppa_get_video_html( ['id' 			=> $image['id'],
+																				 'controls' 		=> false,
+																				 'onmouseover' 	=> $onmouseover,
+																				 'onmoueout' 	=> $onmouseout,
+																				 'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
+																				 'title' 		=> wppa_zoom_in( $image['id'] ),
+																				 'alt' 			=> wppa_alt($image['id']),
+																				 'style' 		=> $imgstyle] );
 									}
 									else {
-										$widget_content .= '
-										<img
-											id="i-' . strval( intval( $image['id'] ) ) . '-' . wppa( 'mocc' ) . '"
-											title="' . esc_attr( wppa_zoom_in( $image['id'] ) ) . '"
-											src="' . esc_url( $imgurl ) . '"
-											style="' . esc_attr( $imgstyle ) . '" ' .
-											$imgevents . ' ' .
-											wppa_get_imgalt( $image['id'] ) . '
-										/>';
+										$widget_content .=
+										wppa_html_tag( 'img', ['id' => 'i-'.$image['id'].'-'.wppa('mocc'), 'title' => wppa_zoom_in($image['id']), 'src' => $imgurl,
+															   'style' => $imgstyle, 'alt' => wppa_alt($image['id']), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 									}
 								}
 								$widget_content .= '
@@ -288,58 +270,37 @@ class AlbumWidget extends WP_Widget {
 						}
 						else { // Is an onclick unit
 							if ( $imageid && wppa_is_video( $image['id'] ) ) {
-								$widget_content .= wppa_get_video_html( array( 	'id' 			=> $image['id'],
-																				'width' 		=> $width,
-																				'height' 		=> $height,
-																				'controls' 		=> false,
-																				'margin_top' 	=> $imgstyle_a['margin-top'],
-																				'margin_bottom' => $imgstyle_a['margin-bottom'],
-																				'cursor' 		=> 'pointer',
-																				'events' 		=> $imgevents.' onclick="'.$link['url'].'"',
-																				'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
-																				'title' 		=> $title,
-																			 )
-																	 );
+								$widget_content .= wppa_get_video_html( ['id' 			=> $image['id'],
+																		 'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
+																		 'title' 		=> $title,
+																		 'style' 		=> $imgstyle.'cursor:pointer;',
+																		 'controls' 	=> false,
+																		 'onmouseover'	=> $onmouseover,
+																		 'onmoueout' 	=> $onmouseout,
+																		 'onclick' 		=> $link['url']] );
 							}
 							else {
-								$widget_content .= '
-								<img
-									id="i-' . strval( intval( $image['id'] ) ) . '-' . wppa( 'mocc' ) . '"
-									title="' . esc_attr( $title ) . '"
-									src="' . esc_url( $imgurl ) . '"
-									style="' . esc_attr( $imgstyle . ' cursor:pointer;' ) . '" ' .
-									$imgevents . ' ' . '
-									onclick="' . esc_url( $link['url'] ) . '" ' .
-									wppa_get_imgalt( $image['id'] ) . '
-								/>';
+								$widget_content .=
+								wppa_html_tag( 'img', ['id' => 'i-'.$imageid.'-'.wppa('mocc'), 'title' => $title, 'src' => $imgurl, 'style' => $imgstyle.'cursor:pointer;',
+													   'onclick' => $link['url'], 'alt' => wppa_alt($imageid), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 							}
 						}
 					}
 					else {
 						if ( $imageid && wppa_is_video( $image['id'] ) ) {
-							$widget_content .= wppa_get_video_html( array( 	'id' 			=> $image['id'],
-																			'width' 		=> $width,
-																			'height' 		=> $height,
-																			'controls' 		=> false,
-																			'margin_top' 	=> $imgstyle_a['margin-top'],
-																			'margin_bottom' => $imgstyle_a['margin-bottom'],
-																			'cursor' 		=> 'pointer',
-																			'events' 		=> $imgevents,
-																			'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
-																			'title' 		=> $title,
-																		 )
-																 );
+							$widget_content .= wppa_get_video_html( ['id' 			=> $image['id'],
+																	 'controls' 	=> false,
+																	 'style' 		=> $imgstyle,
+																	 'onmouseover' 	=> $onmouseover,
+																	 'onmouseout' 	=> $onmouseout,
+																	 'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
+																	 'title' 		=> $title,
+																	 'alt' 			=> wppa_alt($imageid)] );
 						}
 						else {
-							$widget_content .= '
-							<img
-								id="i-' . ( $imageid ? wppa_get_imgalt( $image['id'] ) : '' ) . '-' . wppa( 'mocc' ) . '"
-								title="' . esc_attr( $title ) . '"
-								src="' . esc_url( $imgurl ) . '"
-								style="' . esc_attr( $imgstyle ) . '" ' .
-								$imgevents . ' ' .
-								( $imageid ? wppa_get_imgalt( $image['id'] ) : '' ) . '
-							/>';
+							$widget_content .=
+							wppa_html_tag( 'img', ['id' => 'i-'.wppa('mocc'), 'title' => $title, 'src' => $imgurl, 'style' => $imgstyle,
+												   'alt' => wppa_alt($imageid), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 						}
 					}
 
@@ -423,7 +384,7 @@ class AlbumWidget extends WP_Widget {
 
 		$values 	= array(
 							'all',
-							'0',
+							0,
 							'-1',
 							'last',
 						);
@@ -466,7 +427,7 @@ class AlbumWidget extends WP_Widget {
 			'<p>' .
 				__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
 				' ' . __( 'Basic settings -> Widgets -> I -> Items 10 and 11', 'wp-photo-album-plus' ) .
-				wppa_see_also( 'widget', '1', '10.11' ) .
+				wppa_see_also( 'widget', 1, '10.11' ) .
 			'</p>' );
 		};
     }
@@ -475,7 +436,7 @@ class AlbumWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Thumbnail Albums', 'wp-photo-album-plus' ),
-							'parent' 	=> '0',
+							'parent' 	=> 0,
 							'subs' 		=> 'no',
 							'name' 		=> 'no',
 							'skip' 		=> 'no',

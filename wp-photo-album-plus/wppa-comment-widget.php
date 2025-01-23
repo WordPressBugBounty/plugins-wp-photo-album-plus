@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the recent commets on photos
-* Version 8.7.03.006
+* Version 9.0.00.005
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -86,14 +86,15 @@ class wppaCommentWidget extends WP_Widget {
 				$cursor		= $imgstyle_a['cursor'];
 				$imgurl 	= wppa_get_thumb_url($id, true, '', $width, $height);
 
-				$imgevents = wppa_get_imgevents( 'thumb', $id, true );
+				$onmouseover  = wppa_mouseover( 'thumb', $id, true );
+				$onmouseout   = wppa_mouseout( 'thumb' );
 
 				$title = '';
 				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE photo = %s AND status = 'approved' ORDER BY timestamp DESC", $id );
 				$comments = wppa_get_results( $query );
 				if ( $comments ) {
 					$first = true;
-					$first_comment = $comments['0'];
+					$first_comment = $comments[0];
 					foreach ( $comments as $comment ) {
 						if ( ! $first ) {
 							$title .= "&#013;&#010;&#013;&#010;";
@@ -105,10 +106,10 @@ class wppaCommentWidget extends WP_Widget {
 				}
 				$title = esc_attr( wp_strip_all_tags( trim ( $title ) ) );
 
-				$album = '0';
+				$album = 0;
 				$display = 'thumbs';
 
-				$widget_content .= wppa_get_the_widget_thumb( 'comten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents );
+				$widget_content .= wppa_get_the_widget_thumb( 'comten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $onmouseover, $onmouseout );
 
 			}
 
@@ -190,7 +191,7 @@ class wppaCommentWidget extends WP_Widget {
 
 		$defaults = array( 	'title' => __( 'Comments on photos', 'wp-photo-album-plus' ),
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

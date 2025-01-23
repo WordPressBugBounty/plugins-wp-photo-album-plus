@@ -1,7 +1,7 @@
 <?php
 /* Only loads when php version >= 5.3
 *
-* Version 8.7.04.004
+* Version 9.0.00.000
 *
 */
 
@@ -33,7 +33,7 @@ function wppa_upload_to_cloudinary( $id ) {
 	$prefix = ( is_multisite() && ! WPPA_MULTISITE_GLOBAL ) ? $blog_id.'-' : '';
 
 	$args 	= array(	"public_id" 	=> $prefix.$id,
-						"version"		=> wppa_get_option('wppa_photo_version', '1'),
+						"version"		=> wppa_get_option('wppa_photo_version', 1),
 						"invalidate" 	=> true
 					);
 
@@ -137,7 +137,7 @@ global $wppa_cloudinary_api;
 	$result = $wppa_cloudinary_api->delete_resources( $pub_id );
 
 	if ( isset( $result->rate_limit_allowed ) ) {
-		if( $result->rate_limit_remaining < '10' ) {
+		if( $result->rate_limit_remaining < 10 ) {
 			wppa_log( 'Obs', 'Running out of Cloudinary API calls' );
 			wppa_echo( 'Error: Running out of allowed Cloudinary Api calls. Please try to continue in an hour' );
 		}

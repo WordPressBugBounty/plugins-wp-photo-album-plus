@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains common upload functions
-* Version: 8.7.03.006
+* Version: 9.0.00.000
 *
 */
 
@@ -235,8 +235,8 @@ global $wppa_supported_document_extensions;
 
 			if ( $zip->open( $zipfile ) === true ) {
 
-				$done = '0';
-				$skip = '0';
+				$done = 0;
+				$skip = 0;
 				for ( $i = 0; $i < $zip->numFiles; $i++ ) {
 
 					$stat = $zip->statIndex( $i );
@@ -530,8 +530,8 @@ function wppa_fix_video_metadata( $id, $where ) {
 	}
 
 	// Find sizes
-	$videox = isset( $mp4info['width'] ) ? $mp4info['width'] : '0';
-	$videoy = isset( $mp4info['height'] ) ? $mp4info['height'] : '0';
+	$videox = isset( $mp4info['width'] ) ? $mp4info['width'] : 0;
+	$videoy = isset( $mp4info['height'] ) ? $mp4info['height'] : 0;
 
 	// Rotated?
 	if ( isset( $mp4info['rotate'] ) ) {

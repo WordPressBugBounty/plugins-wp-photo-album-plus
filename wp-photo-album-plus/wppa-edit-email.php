@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 8.7.03.003
+* Version: 9.0.00.000
 *
 */
 
@@ -30,8 +30,8 @@ global $wpdb;
 	if ( $parms['order'] == 'id' ) $parms['order'] = 'ID';
 
 	// Icon to use
-	$downimg 	= '<img src="'.wppa_get_imgdir().'Down-2.svg" alt="down" style="height:1em;" /><br>';
-	$upimg   	= '<img src="'.wppa_get_imgdir().'Up-2.svg" alt="up" style="height:1em" /><br>';
+	$downimg 	= wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Down-2.svg'), 'alt' => "down", 'style' => "height:1em;"] ) . wppa_html_tag( 'br' );
+	$upimg   	= wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Up-2.svg'), 'alt' => "up", 'style' => "height:1em;"] ) . wppa_html_tag( 'br' );
 	$useimg 	= $parms['dir'] == 'desc' ? $upimg : $downimg;
 
 	// Get users
@@ -102,7 +102,7 @@ global $wpdb;
 			wppa_echo( '
 				<span style="color:red;display:inline">' .
 					esc_html__( 'Email is not enabled', 'wp-photo-album-plus' ) .
-					( current_user_can( 'wppa_settings' ) ? wppa_see_also( 'general', '1', '7' ) : '' ) . '
+					( current_user_can( 'wppa_settings' ) ? wppa_see_also( 'general', 1, '7' ) : '' ) . '
 				</span>' );
 		}
 
@@ -205,14 +205,10 @@ global $wpdb;
 											style="float:left"
 											onchange="wppaAjaxNotify(this,\''.$type.'\','.$user -> ID.');"' .
 											( in_array( $user -> ID, $userarray[$type] ) ? ' checked' : '' ) . '
-										>
-										<img
-											id="img_'.$type.'-'.$user -> ID.'"
-											src="'.wppa_get_imgdir().'star.ico"
-											title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'"
-											style="padding-left:4px;float:left;height:16px;width:16px"
-										>
-									</td>' );
+										>' .
+										wppa_html_tag( 'img', ['id' => 'img_'.$type.'-'.$user->ID, 'src' => wppa_get_imgdir('star.ico'),
+															   'style' => "padding-left:4px;float:left;height:16px;width:16px"] ) .
+									'</td>' );
 								}
 								else {
 									wppa_echo( '

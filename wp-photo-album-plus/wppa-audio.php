@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all audio routines
-* Version 8.9.02.004
+* Version 9.0.00.007
 *
 */
 
@@ -12,7 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 // Audio files support. Define supported filetypes.
 global $wppa_supported_audio_extensions;
 	$wppa_supported_audio_extensions = array( 'mp3', 'wav', 'ogg' );
-
 
 // See if a photo has audio
 // Returns array with all available file extensions or false if not audio
@@ -48,12 +47,12 @@ function wppa_get_audio_html( $args ) {
 	}
 
 	extract( wp_parse_args( (array) $args, array (
-					'id'			=> '0',
-					'width'			=> '0',
-					'height' 		=> '0',
+					'id'			=> 0,
+					'width'			=> 0,
+					'height' 		=> 0,
 					'controls' 		=> true,
-					'margin_top' 	=> '0',
-					'margin_bottom' => '0',
+					'margin_top' 	=> 0,
+					'margin_bottom' => 0,
 					'tagid' 		=> 'audio-' . wppa ( 'mocc' ),
 					'cursor' 		=> '',
 					'events' 		=> '',
@@ -94,14 +93,11 @@ function wppa_get_audio_html( $args ) {
 			$w = 'width:auto;';
 		}
 	}
-//	$w 		= $width ? ' width:'.$width.'px;' : '';
 	$h 		= $height ? 'height:'.$height.'px;' : '';
 	$t 		= $margin_top ? 'margin-top:'.$margin_top.'px;' : '';
 	$b 		= $margin_bottom ? 'margin-bottom:'.$margin_bottom.'px;' : '';
 	$ctrl 	= $controls ? ' controls' : '';
-	$tit 	= $title ? ' title="'.$title.'"' : '';
-	$onc 	= $onclick ? ' onclick="'.$onclick.'"' : '';
-	$cls 	= $class ? ' class="'.$class.'"' : '';
+
 	$style 	= $style ? rtrim( trim( $style ), ';' ) . ';' : '';
 	$play 	= $autoplay ? ' autoplay' : '';
 
@@ -109,23 +105,10 @@ function wppa_get_audio_html( $args ) {
 	if ( $mp3 || $wav || $ogg ) {
 
 		// Assume the browser supports html5
-		$result = 	'
-		<audio
-			id="'.$tagid.'"
-			data-from="wppa" ' .
-			$ctrl.
-			$play.'
-			style="'.$style.$w.$h.$t.$b.$cursor.'" ' .
-			$events.
-			$tit.$onc.'
-			preload="metadata" '.
-			$cls.'
-			>';
-
-		$result .= wppa_get_audio_body( $id, false, $width, $height );
-
-		// Close the audio tag
-		$result .= '</audio>';
+		$attribs = ['id' => $tagid, 'data-from' => "wppa", 'class' => $class, 'style' => $style.$w.$h.$t.$b.$cursor, 'preload' => "metadata", 'title' => $title, 'onclick' => $onclick];
+		if ( $controls ) $attribs['controls'] = 'controls';
+		if ( $autoplay ) $attribs['autoplay'] = 'autoplay';
+		$result = wppa_html_tag( 'audio', $attribs, wppa_get_audio_body( $id ) );
 	}
 
 	// Done
@@ -133,7 +116,7 @@ function wppa_get_audio_html( $args ) {
 }
 
 // Get the content of the audio tag for photo(audio)id = $id
-function wppa_get_audio_body( $id, $for_lb = false, $w = '0', $h = '0' ) {
+function wppa_get_audio_body( $id ) {
 
 	// Audio enabled?
 	if ( ! wppa_switch( 'enable_audio' ) ) {
@@ -145,65 +128,14 @@ function wppa_get_audio_body( $id, $for_lb = false, $w = '0', $h = '0' ) {
 	// Not a audio? no go
 	if ( ! $is_audio ) return '';
 
-	// See what file types are present
-	extract( wp_parse_args( $is_audio, array( 	'mp3' => false,
-												'wav' => false,
-												'ogg' => false
-											)
-							)
-			);
-
-	// Collect other data
-	$width 		= $w ? $w : wppa_get_photox( $id );
-	$height 	= $h ? $h : wppa_get_photoy( $id );
-	$source 	= wppa_get_photo_url( $id, false );
-	$source 	= substr( $source, 0, strrpos( $source, '.' ) );
-	$class 		= $for_lb ? ' class="wppa-overlay-img"' : '';
-
-	if ( wppa_user_agent() ) {
-		$is_opera 	= strpos( wppa_user_agent(), 'OPR' );
-		$is_ie 		= strpos( wppa_user_agent(), 'Trident' );
-		$is_safari 	= strpos( wppa_user_agent(), 'Safari' );
-	}
-	else {
-		$is_opera = false;
-		$is_ie = false;
-		$is_safari = false;
-	}
-
-	// Assume the browser supports html5
-	$ext = '';
-	if ( $is_ie ) {
-		if ( $mp3 ) {
-			$ext = 'mp3';
-		}
-	}
-	elseif ( $is_safari ) {
-		if ( $mp3 ) {
-			$ext = 'mp3';
-		}
-		elseif ( $wav ) {
-			$ext = 'wav';
-		}
-	}
-	else {
-		if ( $mp3 ) {
-			$ext = 'mp3';
-		}
-		elseif( $wav ) {
-			$ext = 'wav';
-		}
-		elseif( $ogg ) {
-			$ext = 'ogg';
-		}
-	}
+	// Find video url with no version and no extension
+	$source = wppa_strip_ext( wppa_get_photo_url( $id, false ) );
 
 	$result = '';
-	if ( $ext ) {
-		$mime = str_replace( 'mp3', 'mpeg', 'audio/'.$ext );
-		$result .= '<source src="'.$source.'.'.$ext.'" type="'.$mime.'">';
+	foreach ( $is_audio as $ext ) {
+		$result .= wppa_html_tag( 'source', ['src' => $source.'.'.$ext, 'type' => 'audio/'.$ext] );
 	}
-	$result .= esc_js(__('There is no filetype available for your browser, or your browser does not support html5 audio', 'wp-photo-album-plus' ));
+	$result .= esc_js( __( 'There is no filetype available for your browser, or your browser does not support html5 audio', 'wp-photo-album-plus' ) );
 
 	return $result;
 }
@@ -236,27 +168,27 @@ global $wppa_supported_audio_extensions;
 function wppa_get_audio_control_height() {
 
 	if ( ! wppa_user_agent() ) {
-		$result = '24';
+		$result = 24;
 	}
 	elseif ( strpos( wppa_user_agent(), 'Edge' ) ) {
-		$result = '30';
+		$result = 30;
 	}
 	elseif ( strpos( wppa_user_agent(), 'Firefox' ) ) {
-		$result = '40';
+		$result = 40;
 	}
 	elseif ( strpos( wppa_user_agent(), 'Chrome' ) ) {
 		if ( wppa_is_mobile() ) {
-			$result = '48';
+			$result = 48;
 		}
 		else {
-			$result = '32';
+			$result = 32;
 		}
 	}
 	elseif ( strpos( wppa_user_agent(), 'Safari' ) ) {
-		$result = '16';
+		$result = 16;
 	}
 	else {
-		$result = '28';
+		$result = 28;
 	}
 
 	return $result;

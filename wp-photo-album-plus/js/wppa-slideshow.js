@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '8.9.02.001';
+var wppaJsSlideshowVersion = '8.9.02.002';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -1006,13 +1006,13 @@ function _wppaNextSlide_5( mocc ) {
 
 				// Just wait for next slide in current page
 				else {
-					setTimeout( '_wppaNextSlide( '+mocc+', "auto" )', wppaGetSlideshowTimeout( mocc, 'just wait for next in current(1)' ) );
+					wppaSlideTimer[mocc] = setTimeout( '_wppaNextSlide( '+mocc+', "auto" )', wppaGetSlideshowTimeout( mocc, 'just wait for next in current(1)' ) );
 				}
 			}
 
 			// Just wait for next slide in current page
 			else {
-				setTimeout( '_wppaNextSlide( '+mocc+', "auto" )', wppaGetSlideshowTimeout( mocc, 'just wait for next in current(2)' ) );
+				wppaSlideTimer[mocc] = setTimeout( '_wppaNextSlide( '+mocc+', "auto" )', wppaGetSlideshowTimeout( mocc, 'just wait for next in current(2)' ) );
 			}
 		}
 //		else {
@@ -1730,6 +1730,7 @@ function _wppaStart( mocc, idx ) {
 	if ( _wppaSSRuns[mocc] ) {
 		return;
 	}
+// console.log('start '+mocc);
 
 	if ( wppaSlideshowNavigationType == 'icons' ) {
 		_wppaStartIcons( mocc, idx );
@@ -1849,8 +1850,13 @@ function _wppaStartText( mocc, idx ) {
 	_wppaSetRatingDisplay( mocc );
 }
 
+var wppaSlideTimer = [];
 function _wppaStop( mocc ) {
+// console.log('stop '+mocc);
 //	_wppaStopping[mocc] = 1;//12;
+
+clearTimeout( wppaSlideTimer[mocc] );
+
 	if ( wppaSlideshowNavigationType == 'icons' ) {
 		_wppaStopIcons( mocc );
 	}

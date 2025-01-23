@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * date and time related functions
-* Version 8.7.03.006
+* Version 9.0.00.000
 *
 */
 
@@ -16,7 +16,7 @@ function wppa_get_timestamp( $key = false ) {
 	$local_date_time = wppa_local_date( $format, $timnow );
 
 	$data = explode( ':', $local_date_time );
-	$data[4] = ltrim( '0', $data[4] );
+	$data[4] = ltrim( 0, $data[4] );
 
 	$today_start = $timnow - $data[8] - 60 * $data[7] - 3600 * $data[6];
 	if ( $key == 'todaystart' ) return $today_start;
@@ -38,7 +38,7 @@ function wppa_get_timestamp( $key = false ) {
 	if ( $key == 'thismonthstart' ) return $thismonth_start;
 	if ( $key == 'lastmonthend' ) return $thismonth_start;
 
-	$monthdays = array ( '0', '31', '28', '31', '30', '31', '30', '31', '31', '30', '31', '30', '31' );
+	$monthdays = array ( 0, '31', '28', '31', '30', '31', '30', '31', '31', '30', '31', '30', '31' );
 	$monthdays[2] += wppa_local_date('L', $timnow );	// Leap year correction
 
 	$thismonth_end = $thismonth_start + $monthdays[$data[2]] * $daysec;
@@ -82,8 +82,10 @@ function wppa_get_date_time_select_html( $type, $id, $selectable = true ) {
 		wppa_error_message('Uniplemented type: '.$type.' in wppa_get_date_time_select_html()');
 	}
 
-	$opt_months = array( '1' => __('Jan', 'wp-photo-album-plus' ), '2' => __('Feb', 'wp-photo-album-plus' ), '3' => __('Mar', 'wp-photo-album-plus' ), '4' => __('Apr', 'wp-photo-album-plus' ), '5' => __('May', 'wp-photo-album-plus' ), '6' => __('Jun', 'wp-photo-album-plus' ), '7' => __('Jul', 'wp-photo-album-plus' ), '8' =>__('Aug', 'wp-photo-album-plus' ), '9' => __('Sep', 'wp-photo-album-plus' ), '10' => __('Oct', 'wp-photo-album-plus' ), '11' => __('Nov', 'wp-photo-album-plus' ), '12' => __('Dec', 'wp-photo-album-plus' ) );
-	$val_months = array( '1' => '01', '2' => '02', '3' => '03', '4' => '04', '5' => '05', '6' => '06', '7' => '07', '8' => '08', '9' => '09', '10' => '10', '11' => '11', '12' =>'12' );
+	$opt_months = array( 1 => __('Jan', 'wp-photo-album-plus' ), 2 => __('Feb', 'wp-photo-album-plus' ), 3 => __('Mar', 'wp-photo-album-plus' ), 4 => __('Apr', 'wp-photo-album-plus' ),
+						 5 => __('May', 'wp-photo-album-plus' ), 6 => __('Jun', 'wp-photo-album-plus' ), 7 => __('Jul', 'wp-photo-album-plus' ), 8 =>__('Aug', 'wp-photo-album-plus' ),
+						 9 => __('Sep', 'wp-photo-album-plus' ), 10 => __('Oct', 'wp-photo-album-plus' ), 11 => __('Nov', 'wp-photo-album-plus' ), 12 => __('Dec', 'wp-photo-album-plus' ) );
+	$val_months = array( 1 => '01', 2 => '02', 3 => '03', 4 => '04', 5 => '05', 6 => '06', 7 => '07', 8 => '08', 9 => '09', 10 => '10', 11 => '11', 12 =>'12' );
 	$Y = wppa_local_date( 'Y' );
 	$opt_years 	= array( $Y, $Y+1, $Y+2, $Y+3, $Y+4, $Y+5, $Y+6, $Y+7, $Y+8, $Y+9, $Y+10 );
 	$val_years 	= $opt_years;
@@ -293,7 +295,10 @@ function wppa_get_default_scheduledtm() {
 
 function wppa_format_scheduledtm( $sdtm ) {
 
-	$opt_months = array( '0' => '', '1' => __('Jan', 'wp-photo-album-plus' ), '2' => __('Feb', 'wp-photo-album-plus' ), '3' => __('Mar', 'wp-photo-album-plus' ), '4' => __('Apr', 'wp-photo-album-plus' ), '5' => __('May', 'wp-photo-album-plus' ), '6' => __('Jun', 'wp-photo-album-plus' ), '7' => __('Jul', 'wp-photo-album-plus' ), '8' =>__('Aug', 'wp-photo-album-plus' ), '9' => __('Sep', 'wp-photo-album-plus' ), '10' => __('Oct', 'wp-photo-album-plus' ), '11' => __('Nov', 'wp-photo-album-plus' ), '12' => __('Dec', 'wp-photo-album-plus' ) );
+	$opt_months = array( 0 => '', 1 => __('Jan', 'wp-photo-album-plus' ), 2 => __('Feb', 'wp-photo-album-plus' ), 3 => __('Mar', 'wp-photo-album-plus' ),
+								  4 => __('Apr', 'wp-photo-album-plus' ), 5 => __('May', 'wp-photo-album-plus' ), 6 => __('Jun', 'wp-photo-album-plus' ),
+								  7 => __('Jul', 'wp-photo-album-plus' ), 8 => __('Aug', 'wp-photo-album-plus' ), 9 => __('Sep', 'wp-photo-album-plus' ),
+								  10 => __('Oct', 'wp-photo-album-plus' ), 11 => __('Nov', 'wp-photo-album-plus' ), 12 => __('Dec', 'wp-photo-album-plus' ) );
 
 	$temp = explode( ',', $sdtm );
 	$cur_day 	= $temp[2];

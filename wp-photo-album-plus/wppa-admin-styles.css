@@ -1,7 +1,7 @@
 /* admin-styles.css
 *
 * wp-photo-album-plus
-* version 8.8.01.002
+* version 9.0.00.005
 */
 
 /* Seems to fix a layout issue on admin pages that i can not reproduce */
@@ -409,9 +409,13 @@ border:1px solid black;
 	background-color: rgb( 224, 255, 224 );
 	border-color: rgb( 85, 238, 85 )!important;
 }
-.wppa-pending, .wppa-scheduled, .wppa-private {
+.wppa-pending, .wppa-scheduled {
 	background-color: rgb( 255, 235, 232 );
 	border-color: rgb( 204, 0, 0 )!important;
+}
+.wppa-private {
+	background-color: rgb( 255, 255, 255 );
+	border-color: rgb( 204, 204, 204 )!important;
 }
 .wppa-bronze {
 	background-color: rgb( 221, 221, 187 );

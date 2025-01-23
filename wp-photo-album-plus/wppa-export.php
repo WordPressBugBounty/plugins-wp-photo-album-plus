@@ -3,13 +3,14 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version: 8.8.02.002
+* Version: 9.0.00.000
 *
 */
 
 function _wppa_page_export() {
 global $wpdb;
 global $wppa_try_continue;
+global $wppa_opt;
 
 	// Export Photos admin page
 	$can_zip = PHP_VERSION_ID >= 50207 && class_exists( 'ZipArchive' );
@@ -217,7 +218,7 @@ global $wppa_try_continue;
 							else {
 								wppa_echo( '
 								<td>
-									<input type="checkbox" class="exbox" name="album-' . $album['id'] . '"' . ( wppa_get( 'album-' . $id, '0', 'text' ) ? ' checked="checked"' : '' ) . '>&nbsp;' . $line . '
+									<input type="checkbox" class="exbox" name="album-' . $album['id'] . '"' . ( wppa_get( 'album-' . $id, 0, 'text' ) ? ' checked="checked"' : '' ) . '>&nbsp;' . $line . '
 								</td>' );
 							}
 							if ( $ct == 4 ) {
@@ -251,12 +252,8 @@ global $wppa_try_continue;
 					$js2 = '
 						clearInterval(wppaExpTmr);
 						jQuery(".wppaexpdelta").css("display","none")';
-					wppa_echo( '
-						<img
-							class="wppaexpdelta"
-							src="'.esc_attr($url).'"
-							onload="'.esc_attr($js1).'"
-						>
+					wppa_echo(
+						wppa_html_tag( 'img', ['class' => "wppaexpdelta", 'src' => $url, 'onload' => $js1, 'alt' => 'spin'] ) . '
 						<span class="wppaexpdelta">' .
 							/* translators: number if seconds */
 							sprintf( __( 'Trying to continue in %s seconds', 'wp-photo-album-plus' ), '<span id="extimer">10</span>' ) . '
@@ -283,7 +280,9 @@ global $wppa_zip;
 global $wppa_temp;
 global $wppa_temp_idx;
 global $wppa_try_continue;
+global $wppa_opt;
 
+	$wppa_opt['wppa_lazy'] = 'none';
 	$wppa_temp_idx 		= 0;
 	$wppa_try_continue 	= false;
 	$expected_endtime 	= wppa_local_date( 'h:i:s', time() + wppa_time_left( 10 ) );
@@ -311,7 +310,7 @@ global $wppa_try_continue;
 	$tmlft = '<span id="tmlft" style="font-size:1.25em;font-weight:bold;">' . wppa_time_left( 10 ) . '</span>';
 	wppa_echo( '
 	<h2>' .
-		__( 'Exporting', 'wp-photo-album-plus' ) . '...<img class="expspin" src="' . $url . '" onload="' . esc_attr( $js ) . '">
+		__( 'Exporting', 'wp-photo-album-plus' ) . '...' . wppa_html_tag( 'img', ['class' => "expspin", 'src' => $url, 'onload' => $js] ) . '
 	</h2>' .
 	/* translators: number of seconds */
 	sprintf( __( 'If you do not get a redisplay of the album table within %s seconds, your browser may be timed out.', 'wp-photo-album-plus' ), $tmlft ) . ' ' .
@@ -348,7 +347,7 @@ global $wppa_try_continue;
 	foreach( $albums as $id ) {
 
 		// Process this album?
-		if ( wppa_get( 'album-' . $id, '0', 'text' ) ) {
+		if ( wppa_get( 'album-' . $id, 0, 'text' ) ) {
 
 			if ( $can_zip ) {
 				wppa_echo( '<p>' . __( 'Opening zip output file...', 'wp-photo-album-plus' ) );
@@ -377,7 +376,7 @@ global $wppa_try_continue;
 
 			$usr = wppa_get_user();
 			$from = get_transient( "wppa-album-$id-last-export-$usr" );
-			if ( ! $from ) $from = '0';
+			if ( ! $from ) $from = 0;
 
 			if ( wppa_user_is_admin() ) {
 				$total = wppa_get_var( $wpdb->prepare(
@@ -637,7 +636,7 @@ global $wppa_temp_idx;
 					linktarget tinytext NOT NULL,
 					timestamp tinytext NOT NULL,
 					status tinytext NOT NULL,
-					rating_count bigint(20) NOT NULL default '0',
+					rating_count bigint(20) NOT NULL default 0,
 					tags tinytext NOT NULL,
 					alt tinytext NOT NULL,
 					filename tinytext NOT NULL,

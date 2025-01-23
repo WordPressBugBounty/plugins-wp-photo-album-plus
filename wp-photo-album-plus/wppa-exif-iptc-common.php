@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* Version: 8.8.05.003
+* Version: 9.0.00.000
 *
 *
 */
@@ -24,7 +24,7 @@ global $wppa_iptc_cache;
 
 	// Get te labels if not yet present
 	if ( ! is_array( $wppa_iptc_labels ) ) {
-		$wppa_iptc_labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = '0' ORDER BY tag" );
+		$wppa_iptc_labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = 0 ORDER BY tag" );
 	}
 
 	// If in cache, use it
@@ -117,7 +117,7 @@ global $wppa_exif_cache;
 
 	// Get the labels if not yet present
 	if ( ! is_array( $wppa_exif_labels ) ) {
-		$wppa_exif_labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = '0' ORDER BY tag" );
+		$wppa_exif_labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag" );
 	}
 
 	// If in cache, use it
@@ -1517,7 +1517,7 @@ global $wppa_exif_error_output;
 				$v = $y / $x;
 				$z = round( $v ) / $v;
 				if ( 0.99 < $z && $z < 1.01 ) {
-					if ( round( $v ) == '1' ) {
+					if ( round( $v ) == 1 ) {
 						$result = '1 s.';
 					}
 					else {
@@ -1529,7 +1529,7 @@ global $wppa_exif_error_output;
 					$i = 2;
 					$n = 0;
 					while ( $n < 2 && $i < strlen( $z ) ) {
-						if ( substr( $z, $i, 1 ) != '0' ) {
+						if ( substr( $z, $i, 1 ) != 0 ) {
 							$n++;
 						}
 						$i++;
@@ -1647,8 +1647,8 @@ global $wppa_exif_error_output;
 				if ( ! wppa_is_valid_integer( $data ) ) return $wppa_exif_error_output;
 
 				switch ( $data ) {
-					case '0': $result = __('Not Defined', 'wp-photo-album-plus' ); break;
-					case '1': $result = __('Manual', 'wp-photo-album-plus' ); break;
+					case 0: $result = __('Not Defined', 'wp-photo-album-plus' ); break;
+					case 1: $result = __('Manual', 'wp-photo-album-plus' ); break;
 					case '2': $result = __('Program AE', 'wp-photo-album-plus' ); break;
 					case '3': $result = __('Aperture-priority AE', 'wp-photo-album-plus' ); break;
 					case '4': $result = __('Shutter speed priority AE', 'wp-photo-album-plus' ); break;
@@ -1666,8 +1666,8 @@ global $wppa_exif_error_output;
 				if ( ! wppa_is_valid_integer( $data ) ) return $wppa_exif_error_output;
 
 				switch ( $data ) {
-					case '0': $result = __('Unknown', 'wp-photo-album-plus' ); break;
-					case '1': $result = __('Standard Output Sensitivity', 'wp-photo-album-plus' ); break;
+					case 0: $result = __('Unknown', 'wp-photo-album-plus' ); break;
+					case 1: $result = __('Standard Output Sensitivity', 'wp-photo-album-plus' ); break;
 					case '2': $result = __('Recommended Exposure Index', 'wp-photo-album-plus' ); break;
 					case '3': $result = __('ISO Speed', 'wp-photo-album-plus' ); break;
 					case '4': $result = __('Standard Output Sensitivity and Recommended Exposure Index', 'wp-photo-album-plus' ); break;
@@ -1683,8 +1683,8 @@ global $wppa_exif_error_output;
 				if ( ! wppa_is_valid_integer( $data ) ) return $wppa_exif_error_output;
 
 				switch ( $data ) {
-					case '0': $result = '-'; break;
-					case '1': $result = 'Y'; break;
+					case 0: $result = '-'; break;
+					case 1: $result = 'Y'; break;
 					case '2': $result = 'Cb'; break;
 					case '3': $result = 'Cr'; break;
 					case '4': $result = 'R'; break;
@@ -1699,7 +1699,7 @@ global $wppa_exif_error_output;
 				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
 
 				$t = explode( '/', $data );
-				if ( $t[1] == '1' ) {
+				if ( $t[1] == 1 ) {
 					$result = $t[0];
 				}
 				else {
@@ -1793,7 +1793,7 @@ global $wppa_exif_error_output;
 
 			case 'E#9207':	// Metering mode
 				switch ( $data ) {
-					case '1': $result = __('Average', 'wp-photo-album-plus' ); break;
+					case 1: $result = __('Average', 'wp-photo-album-plus' ); break;
 					case '2': $result = __('Center-weighted average', 'wp-photo-album-plus' ); break;
 					case '3': $result = __('Spot', 'wp-photo-album-plus' ); break;
 					case '4': $result = __('Multi-spot', 'wp-photo-album-plus' ); break;
@@ -1806,18 +1806,18 @@ global $wppa_exif_error_output;
 
 			case 'E#9208': 	// LghtSource
 				switch ( $data ) {
-					case '0': $result = __('unknown', 'wp-photo-album-plus' ); break;
-					case '1': $result = __('Daylight', 'wp-photo-album-plus' ); break;
+					case 0: $result = __('unknown', 'wp-photo-album-plus' ); break;
+					case 1: $result = __('Daylight', 'wp-photo-album-plus' ); break;
 					case '2': $result = __('Fluorescent', 'wp-photo-album-plus' ); break;
 					case '3': $result = __('Tungsten (incandescent light)', 'wp-photo-album-plus' ); break;
 					case '4': $result = __('Flash', 'wp-photo-album-plus' ); break;
 					case '9': $result = __('Fine weather', 'wp-photo-album-plus' ); break;
-					case '10': $result = __('Cloudy weather', 'wp-photo-album-plus' ); break;
+					case 10: $result = __('Cloudy weather', 'wp-photo-album-plus' ); break;
 					case '11': $result = __('Shade', 'wp-photo-album-plus' ); break;
 					case '12': $result = __('Daylight fluorescent (D 5700 – 7100K)', 'wp-photo-album-plus' ); break;
 					case '13': $result = __('Day white fluorescent (N 4600 – 5400K)', 'wp-photo-album-plus' ); break;
 					case '14': $result = __('Cool white fluorescent (W 3900 – 4500K)', 'wp-photo-album-plus' ); break;
-					case '15': $result = __('White fluorescent (WW 3200 – 3700K)', 'wp-photo-album-plus' ); break;
+					case 15: $result = __('White fluorescent (WW 3200 – 3700K)', 'wp-photo-album-plus' ); break;
 					case '17': $result = __('Standard light A', 'wp-photo-album-plus' ); break;
 					case '18': $result = __('Standard light B', 'wp-photo-album-plus' ); break;
 					case '19': $result = __('Standard light C', 'wp-photo-album-plus' ); break;
@@ -1833,14 +1833,14 @@ global $wppa_exif_error_output;
 
 			case 'E#9209':	// Flash
 				switch ( $data ) {
-					case '0': $result = __('No Flash', 'wp-photo-album-plus' ); break;
-					case '1': $result = __('Fired', 'wp-photo-album-plus' ); break;
+					case 0: $result = __('No Flash', 'wp-photo-album-plus' ); break;
+					case 1: $result = __('Fired', 'wp-photo-album-plus' ); break;
 					case '5': $result = __('Fired, Return not detected', 'wp-photo-album-plus' ); break;
 					case '7': $result = __('Fired, Return detected', 'wp-photo-album-plus' ); break;
 					case '8': $result = __('On, Did not fire', 'wp-photo-album-plus' ); break;
 					case '9': $result = __('On, Fired', 'wp-photo-album-plus' ); break;
 					case '13': $result = __('On, Return not detected', 'wp-photo-album-plus' ); break;
-					case '15': $result = __('On, Return detected', 'wp-photo-album-plus' ); break;
+					case 15: $result = __('On, Return detected', 'wp-photo-album-plus' ); break;
 					case '16': $result = __('Off, Did not fire', 'wp-photo-album-plus' ); break;
 					case '20': $result = __('Off, Did not fire, Return not detected', 'wp-photo-album-plus' ); break;
 					case '24': $result = __('Auto, Did not fire', 'wp-photo-album-plus' ); break;
@@ -2885,12 +2885,12 @@ function wppa_iptc_clean_garbage() {
 global $wpdb;
 
 	// Remove labels that are no longer used
-	$labels = wppa_get_results( "SELECT DISTINCT tag FROM $wpdb->wppa_iptc WHERE photo = '0'" );
+	$labels = wppa_get_results( "SELECT DISTINCT tag FROM $wpdb->wppa_iptc WHERE photo = 0" );
 	if ( ! empty( $labels ) ) {
 		foreach( $labels as $label ) {
-			$used = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_iptc WHERE tag = %s AND photo <> '0'", $label['tag'] ) );
+			$used = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_iptc WHERE tag = %s AND photo <> 0", $label['tag'] ) );
 			if ( $used == 0 ) {
-				wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = '0'", $label['tag'] ) );
+				wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", $label['tag'] ) );
 			}
 		}
 	}
@@ -2900,12 +2900,12 @@ function wppa_exif_clean_garbage() {
 global $wpdb;
 
 	// Remove labels that are no longer used
-	$labels = wppa_get_results( "SELECT DISTINCT tag FROM $wpdb->wppa_exif WHERE photo = '0'" );
+	$labels = wppa_get_results( "SELECT DISTINCT tag FROM $wpdb->wppa_exif WHERE photo = 0" );
 	if ( ! empty( $labels ) ) {
 		foreach( $labels as $label ) {
-			$used = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_exif WHERE tag = %s AND photo <> '0'", $label['tag'] ) );
+			$used = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_exif WHERE tag = %s AND photo <> 0", $label['tag'] ) );
 			if ( $used == 0 ) {
-				wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_exif WHERE tag = %s AND photo = '0'", $label['tag'] ) );
+				wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_exif WHERE tag = %s AND photo = 0", $label['tag'] ) );
 			}
 		}
 	}
@@ -2976,6 +2976,7 @@ static $labels;
 
 				// Parse
 				$iptc = iptcparse( $info['APP13'] );
+
 				if ( ! is_array( $iptc ) ) return false;		// No data avail
 			}
 			else return false;
@@ -2990,7 +2991,7 @@ static $labels;
 
 	// Find defined labels
 	if ( ! is_array( $labels ) ) {
-		$labels = wppa_get_col( "SELECT tag FROM $wpdb->wppa_iptc WHERE photo = '0' ORDER BY tag", ARRAY_N );
+		$labels = wppa_get_col( "SELECT tag FROM $wpdb->wppa_iptc WHERE photo = 0 ORDER BY tag", ARRAY_N );
 	}
 
 	// Now process the phots iptc entries
@@ -3087,7 +3088,7 @@ static $labels;
 					if ( ! wppa_get_var( $query ) ) {
 
 						// Does not exist yet, add it
-						$bret = wppa_create_iptc_entry( array( 'photo' => '0', 'tag' => $tag, 'description' => $desc, 'status' => 'display' ) );
+						$bret = wppa_create_iptc_entry( array( 'photo' => 0, 'tag' => $tag, 'description' => $desc, 'status' => 'display' ) );
 						if ( ! $bret ) wppa_log( 'War', 'Could not add IPTC label '.$tag );
 
 						// Add to labels cache
@@ -3100,7 +3101,7 @@ static $labels;
 			}
 
 			// Find the photos value for this tag
-			$value = $iptc[$tag][0];
+			$value = implode( ', ', $iptc[$tag] );
 			if ( $value == '%G' ) $value = ''; 	// Void nonsense
 			if ( ! $value ) $doit = false;
 
@@ -3206,7 +3207,7 @@ global $wppa;
 
 	// Find defined labels
 	if ( ! is_array( $labels ) ) {
-		$result = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = '0' ORDER BY tag" );
+		$result = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag" );
 
 		if ( ! is_array( $result ) ) $result = array();
 		$labels = array();
@@ -3243,7 +3244,7 @@ global $wppa;
 			$names[]  = $s.':';
 
 			// Add to db
-			$photo 	= '0';
+			$photo 	= 0;
 			$desc 	= $s.':';
 			$status = 'display';
 			if ( substr( $s, 0, 12 ) == 'UndefinedTag' ) {
@@ -3639,7 +3640,7 @@ if ( strlen($tag) != 6 ) {
 
 	// Fill $editabletags
 	if ( empty( $editabletags ) ) {
-		$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = '0'" );
+		$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0" );
 		$editabletags = array();
 		if ( is_array( $temp ) ) foreach ( $temp as $item ) {
 			$editabletags[ hexdec( substr( $item['tag'], 2, 4 ) ) ] = trim( $item['description'], ': ' );
@@ -4244,7 +4245,7 @@ static $labels;
 	if ( ! $labels ) {
 		$labels = wppa_get_results( "SELECT tag, description
 									   FROM $wpdb->wppa_iptc
-									   WHERE photo = '0'" );
+									   WHERE photo = 0" );
 	}
 
 	// Find it

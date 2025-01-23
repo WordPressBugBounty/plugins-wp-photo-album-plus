@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 8.7.03.007
+* Version 9.0.00.009
 *
 */
 
@@ -62,10 +62,10 @@ static $post_type_value;
 	// Get the album number
 	$alb = wppa_is_int( wppa( 'start_album' ) ) ?
 		wppa( 'start_album' ) :
-		'0';	// A single album or all ( all = 0 here )
-	if ( $alb < '0' ) $alb = '0';
+		0;	// A single album or all ( all = 0 here )
+	if ( $alb < 0 ) $alb = 0;
 
-	$is_albenum = strlen( wppa( 'start_album' ) ) > '0' && ! wppa_is_int( wppa( 'start_album' ) );
+	$is_albenum = strlen( wppa( 'start_album' ) ) > 0 && ! wppa_is_int( wppa( 'start_album' ) );
 
 	$virtual = wppa_is_virtual() || wppa( 'last_albums' );
 
@@ -80,7 +80,7 @@ static $post_type_value;
 	$slide = ( wppa_get_album_title_linktype( $alb ) == 'slide' ) ? '&amp;wppa-slide' : '';
 
 	// See if we link to covers or to contents
-	$to_cover = wppa_opt( 'thumbtype' ) == 'none' ? '1' : '0';
+	$to_cover = wppa_opt( 'thumbtype' ) == 'none' ? 1 : 0;
 
 	// Photo number?
 	$photo = wppa( 'start_photo' );
@@ -155,10 +155,10 @@ static $post_type_value;
 			$data = implode( ',', $data );
 			$ss_data[3] = $data;
 
-			switch ( $ss_data['0'] ) {
+			switch ( $ss_data[0] ) {
 				case 'a':
 					$value .= ' ' . __('Albums', 'wp-photo-album-plus' );
-					switch ( $ss_data['1'] ) {
+					switch ( $ss_data[1] ) {
 						case 'c':
 							$value .= ' ' . __('with category:', 'wp-photo-album-plus' );
 							break;
@@ -176,7 +176,7 @@ static $post_type_value;
 					break;
 				case 'p':
 					$value .= ' ' . __('Photos', 'wp-photo-album-plus' );
-					switch ( $ss_data['1'] ) {
+					switch ( $ss_data[1] ) {
 						case 'g':
 							$value .= ' ' . __('with tag:', 'wp-photo-album-plus' ) . ' <b>' . str_replace( '.', '</b> ' . __('and', 'wp-photo-album-plus' ) . ' <b>', $ss_data['3'] ) . '</b>';
 							break;
@@ -192,7 +192,7 @@ static $post_type_value;
 							$value .= ' ' . __('of owner:', 'wp-photo-album-plus' ) . ' <b>' . $ss_data['3'] . '</b>';
 							break;
 						case 'i':
-							$query = $wpdb->prepare( "SELECT description FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = '0'", str_replace( 'H', '#', $ss_data['2'] ) );
+							$query = $wpdb->prepare( "SELECT description FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", str_replace( 'H', '#', $ss_data['2'] ) );
 							$label = wppa_get_var( $query );
 							$label = trim( $label, ':' );
 							$value .= ' ' . __('with iptc tag:', 'wp-photo-album-plus' ) . ' <b>' . wppa_translate($label) . '</b> ' . __('with content:', 'wp-photo-album-plus' ) .' <b>' . $ss_data['3'] . '</b>';
@@ -576,7 +576,7 @@ static $post_type_value;
 		// 'Go to thumbnail display' - icon
 		if ( wppa( 'is_slide' ) && ! wppa( 'calendar' ) ) {
 			if ( wppa_switch( 'bc_slide_thumblink' ) ) {
-				$pg = ( ( wppa_opt( 'thumb_page_size' ) == wppa_opt( 'slideshow_pagesize' ) ) && wppa_get_curpage() != '1' ) ? '&wppa-paged='.wppa_get_curpage() : '&wppa-paged=1';
+				$pg = ( ( wppa_opt( 'thumb_page_size' ) == wppa_opt( 'slideshow_pagesize' ) ) && wppa_get_curpage() != 1 ) ? '&wppa-paged='.wppa_get_curpage() : '&wppa-paged=1';
 				$thumbhref .= $pg;
 
 				if ( $virtual ) {
@@ -589,7 +589,7 @@ static $post_type_value;
 										' class="wppa-nav-text"' .
 										' style="float:right; cursor:pointer; text-decoration:none;"' .
 										' >' .
-										wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, '10', '10', '10', '10' ) .
+										wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, 10, 10, 10, 10 ) .
 									'</a>' );
 					}
 				}
@@ -610,7 +610,7 @@ static $post_type_value;
 									' style="float:right; cursor:pointer"' .
 									' onclick="wppaDoAjaxRender('.wppa('mocc').', \''.$ajax_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.$href_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true)"' .
 									' >' .
-									wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, '10', '10', '10', '10' ) .
+									wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, 10, 10, 10, 10 ) .
 								'</span>' );
 				}
 			}
@@ -626,6 +626,8 @@ static $post_type_value;
 function wppa_bcitem( $value = '', $href = '', $title = '', $class = '', $ajax = '', $is_pname = false, $hash = '#wppa-container-' ) {
 static $sep;
 global $wppa_lang;
+
+	$value = str_replace( '-none-', wppa_translate( '-none-' ), $value );
 
 	// ucfirst translatable tags
 	$glue = '[:' . $wppa_lang . ']';
@@ -702,13 +704,7 @@ global $wppa_lang;
 				$size = wppa_opt( 'fontsize_nav' );
 				if ( $size == '' ) $size = '12';
 				$style = 'height:' . $size . 'px;';
-				$sep = 	' ' .
-						'<img' .
-							' src="' . wppa_opt( 'bc_url' ) . '"' .
-							' class="no-shadow"' .
-							' style="' . $style . '"' .
-						' />' .
-						' ';
+				$sep = 	' ' . wppa_html_tag( 'img', ['src' => wppa_opt('bc_url'), 'class' => "no-shadow", 'style' => $style] );
 				break;
 			case 'txt':
 				$sep = 	' ' .
@@ -739,7 +735,7 @@ global $wpdb;
     $parent = wppa_get_parentalbumid( $alb );
 
 	// No parent -> toplevel -> done.
-	if ( $parent < '1' ) {
+	if ( $parent < 1 ) {
 		return;
 	}
 
@@ -775,7 +771,7 @@ global $wpdb;
 }
 
 // Recursive process to display the ( grand )parent pages
-function wppa_crumb_page_ancestors( $page = '0' ) {
+function wppa_crumb_page_ancestors( $page = 0 ) {
 global $wpdb;
 static $parents;
 
@@ -790,7 +786,7 @@ static $parents;
 		$parents[$page] = $parent;
 	}
 
-	if ( ! is_numeric( $parent ) || $parent == '0' ) return;
+	if ( ! is_numeric( $parent ) || $parent == 0 ) return;
 
 	wppa_crumb_page_ancestors( $parent );
 

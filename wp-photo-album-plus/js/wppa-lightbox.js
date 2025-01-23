@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '8.9.02.003';
+var wppaJsLightboxVersion = '9.0.00.004';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -214,6 +214,29 @@ function wppaOvlShow( arg ) {
 					}
 				}
 			}
+
+			// Find the occ
+			temp = setname.replace(/]+$/, '');
+			if ( setname.substr(0,3) == 'occ' ) {
+				wppaFromMocc = temp.substr(3);
+			}
+			else if ( temp.substr(0,3) == 'alw' ) {
+				t = temp.split( '-' );
+				wppaFromMocc = t[1];
+			}
+			else {
+				wppaFromMocc = setname;
+			}
+
+			// Set slidespeed
+			if ( wppaOvlTimeout[wppaFromMocc] ) {
+				wppaOvlSlideSpeed = wppaOvlTimeout[wppaFromMocc];
+			}
+			else {
+				wppaOvlSlideSpeed = wppaOvlSlideSpeedDefault;
+			}
+
+//			console.log('setname = '+setname+' wppaFromMocc = '+wppaFromMocc+' wppaOvlSlideSpeed = '+wppaOvlSlideSpeed);
 		}
 
 		// Single image, treat as set with one element
@@ -652,7 +675,6 @@ function _wppaOvlShow( idx ) {
 					'min-height:36px;' +
 					'width:100%;' +
 					( wppaOvlTxtHeight == 'auto' ? 'max-height:200px;' : 'max-height:' + wppaOvlTxtHeight + 'px;' ) +
-					'overflow:auto;' +
 					'box-shadow:none;' +
 					'"' +
 			' >';
@@ -717,8 +739,12 @@ function _wppaOvlShow( idx ) {
 	wppaProtect();
 
 	// Handle autostart slideshow
-	if ( wppaOvlFirst && wppaOvlSlideStart && ! wppaOvlIsSingle ) {
-		console.log('bendur');
+	var runNow = wppaOvlSlideStartDefault;
+	if ( wppaOvlSlideStart[wppaFromMocc] == 'yes' ) runNow = true;
+	if ( wppaOvlSlideStart[wppaFromMocc] == 'no' ) runNow = false;
+
+	if ( wppaOvlFirst && runNow && ! wppaOvlIsSingle ) {
+//		console.log('bendur');
 		wppaOvlRunning = true;
 
 		// Show stop, hide start buttn
@@ -731,7 +757,7 @@ function _wppaOvlShow( idx ) {
 	// Done first
 	wppaOvlFirst = false;
 
-	console.log('done first');
+//	console.log('done first');
 }
 
 // Adjust display sizes

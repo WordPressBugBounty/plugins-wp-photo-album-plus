@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 8.8.08.004
+* Version 9.0.00.000
 *
 */
 
@@ -973,7 +973,7 @@ function wppa_is_user_in_mailinglist( $usr, $list ) {
 			$user_id = $user->ID;
 		}
 		else {
-			$user_id = '0';
+			$user_id = 0;
 		}
 	}
 	$mailinglist = wppa_get_option( 'wppa_mailinglist_' . $list, '' );
@@ -1069,11 +1069,15 @@ function wppa_unsubscribe_link( $user_id, $listtype ) {
 // Send a mail
 function wppa_send_mail( $args ) {
 
+global $wppa_opt;
+
+	$wppa_opt['wppa_lazy'] = 'none';
+
 	// Enhance $args
 	$defaults = array( 	'to' => '',
 						'subj' => '',
 						'cont' => '',
-						'photo' => '0',
+						'photo' => 0,
 						'email' => '',
 						'listtype' => '',
 						'replyurl' => '',
@@ -1145,11 +1149,8 @@ function wppa_send_mail( $args ) {
 						$i = 0;
 						if ( count( $photos ) ) {
 							foreach( $photos as $p ) if ( $p ) {
-								$message_part_1	.= '
-								<img
-									src="' . wppa_get_thumb_url($p) . '" ' . wppa_get_imgalt($p) . '
-									style="height:120px"
-								/>';
+								$message_part_1	.=
+								wppa_html_tag( 'img', ['src' => wppa_get_thumb_url($p), 'alt' => wppa_get_imgalt($p, false, true), 'style' => "height:120px"] );
 								$i++;
 								if ( 0 == ( $i % 5 ) ) {
 									$message_part_1	.= '</td></tr><tr><td style="padding:4px;text-align:center">';

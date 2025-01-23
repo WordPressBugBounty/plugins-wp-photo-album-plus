@@ -3,7 +3,7 @@
 // Contains popup modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsPopupVersion = '8.5.03.002';
+var wppaJsPopupVersion = '9.0.00.006';
 
 // Popup of thumbnail images
 function wppaPopUp( mocc, elm, id, name, desc, rating, ncom, videohtml, maxsizex, maxsizey ) {
@@ -96,8 +96,14 @@ function wppaPopDown() {
 	return;
 }
 
+var wppaFullPopupBusy = false;
 // Popup of fullsize image
 function wppaFullPopUp( mocc, id, url, xwidth, xheight, xname ) {
+
+	// To prevent double popups, set busy for 500 msec.
+	if ( wppaFullPopupBusy ) return;
+	wppaFullPopupBusy = true;
+	setTimeout( function(){wppaFullPopupBusy = false;}, 500 );
 
 	var xFactor = screen.width / ( xwidth + 14 );
 	var yFactor = screen.height / ( xheight + 80 );

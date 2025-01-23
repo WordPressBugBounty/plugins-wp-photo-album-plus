@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 8.8.08.005
+* Version 9.0.00.000
 *
 */
 
@@ -70,21 +70,13 @@ global $upload_album;
 		if ( $iret && wppa_get( 'go-edit-multiple', false, 'bool' ) ) {
 			if ( current_user_can( 'wppa_admin' ) ) {
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) );
-				wppa_echo( '
-					<img
-						src="dummy"
-						style="display:none"
-						onerror="document.location=\'' . get_admin_url() .
-									'admin.php?page=wppa_admin_menu&tab=edit&edit-id=' . wppa_encrypt_album( $upload_album ) .
-									'&wppa-nonce=' . wp_create_nonce( 'wppa-nonce', 'wppa-nonce' ) . '\'" >', ['onerror' => true] );
+				$link = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=' . wppa_encrypt_album( $upload_album ) . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce', 'wppa-nonce' );
+				wppa_echo( wppa_html_tag( 'img', ['src' => 'dummy', 'style' => 'display:none;', 'onerror' => 'document.location=\'' . $link . '\''] ), ['onerror' => true] );
 			}
 			elseif ( wppa_opt( 'upload_edit' ) != '-none-' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) );
-				wppa_echo( '
-					<img
-						src="dummy"
-						style="display:none"
-						onerror="document.location=\'' . get_admin_url().'admin.php?page=wppa_edit_photo\'" >', ['onerror' => true] );
+				$link = get_admin_url().'admin.php?page=wppa_edit_photo';
+				wppa_echo( wppa_html_tag( 'img', ['src' => 'dummy', 'style' => 'display:none;', 'onerror' => 'document.location=\'' . $link . '\''] ), ['onerror' => true] );
 			}
 		}
 	}
@@ -99,9 +91,9 @@ global $upload_album;
 		// Get some req'd data
 		$max_files = ini_get( 'max_file_uploads' );
 		$max_files_txt = $max_files;
-		if ( $max_files < '1' ) {
+		if ( $max_files < 1 ) {
 			$max_files_txt = __( 'unknown' , 'wp-photo-album-plus' );
-			$max_files = '15';
+			$max_files = 15;
 		}
 		$max_size = ini_get( 'upload_max_filesize' );
 		$max_tot_size = ini_get( 'post_max_size' );
@@ -113,7 +105,7 @@ global $upload_album;
 		$max_size_mbytes = substr( $max_size, 0, strlen( $max_size ) - 1 );
 		$max_size_bytes = $max_size_mbytes * 1024 * 1024;
 		$max_time = ini_get( 'max_input_time' );
-		if ( $max_time < '1' ) $max_time = __( 'unknown', 'wp-photo-album-plus' );
+		if ( $max_time < 1 ) $max_time = __( 'unknown', 'wp-photo-album-plus' );
 
 		// check if albums exist before allowing upload
 		if ( ! wppa_has_albums() ) {
@@ -359,10 +351,10 @@ global $upload_album;
 	$warning_given = false;
 	$uploaded_a_file = false;
 
-	$count = '0';
+	$count = 0;
 	$any_zip = false;
 	foreach( $_FILES as $the_file ) {	// Usually only one item: $_FILES['my_file']
-		for ( $i = '0'; $i < count( $the_file['error'] ); $i++ ) {
+		for ( $i = 0; $i < count( $the_file['error'] ); $i++ ) {
 
 			$file = array( 	'error' 	=> $the_file['error'][$i],
 							'tmp_name' 	=> $the_file['tmp_name'][$i],

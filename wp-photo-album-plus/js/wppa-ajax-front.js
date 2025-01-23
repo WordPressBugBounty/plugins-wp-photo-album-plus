@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '8.8.08.006';
+var wppaJsAjaxVersion = '9.0.00.000';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender( mocc, ajaxurl, newurl, addHilite ) {
@@ -37,7 +37,7 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, addHilite ) {
 
 
 										if ( typeof( xresult ) == 'string' && xresult.substr( 0, 1 ) != '{' ) {
-											wppaConsoleLog( 'Ajax render result starts with ' + xresult.substr(0,500), 'force');
+							//				wppaConsoleLog( 'Ajax render result starts with ' + xresult.substr(0,500), 'force');
 											if ( xresult.substr( 0, 8 ) == '<!DOCTYPE' || xresult.substr( 0, 5 ) == '<html' ) {
 												if ( newurl.length > 0 ) {
 													document.location.href = newurl;
@@ -233,7 +233,7 @@ function wppaDoFetchShortcodeRendered( mocc, shortcode, page ) {
 								if ( wppaAjaxMethod == 'rest' ) {
 									xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 								}
-								wppaConsoleLog('Fetching delayed shortcode content for mocc = '+mocc);
+					//			wppaConsoleLog('Fetching delayed shortcode content for mocc = '+mocc);
 								jQuery('#wppa-ajax-spin-'+mocc).show();
 							},
 				success: 	function(xresult, status, xhr) {
@@ -247,9 +247,9 @@ function wppaDoFetchShortcodeRendered( mocc, shortcode, page ) {
 										theResult = JSON.parse( xresult );
 										result = theResult.html + '<script>' + theResult.js + '</script>';
 									}
-									wppaConsoleLog('Recieved delayed shortcode content for mocc = '+mocc);
+						//			wppaConsoleLog('Recieved delayed shortcode content for mocc = '+mocc);
 									jQuery('#wppa-container-'+mocc).html(result);
-									wppaConsoleLog('Applied delayed shortcode content for mocc = '+mocc);
+						//			wppaConsoleLog('Applied delayed shortcode content for mocc = '+mocc);
 								}
 								catch(e) {
 									wppaConsoleLog('wppaDoFetchShortcodeRendered failed. Invalid json data');
@@ -786,16 +786,21 @@ function wppaEditPhoto( mocc, id ) {
 }
 
 // Preview tags in frontend upload dialog
-function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPrev, tagsNewval ) {
+function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPrev, tagsNewval, buttonId, waitText ) {
 
-	var sel1 		= jQuery( '#'+tagsSel1 ).val();
-	var sel2 		= jQuery( '#'+tagsSel2 ).val();
-	var sel3 		= jQuery( '#'+tagsSel3 ).val();
-	var edit		= jQuery( '#'+tagsEdit ).val();
-	var album 		= jQuery( '#'+tagsAlbum ).val();
+	var sel1 		= jQuery( '#'+tagsSel1 ).val() || '';
+	var sel2 		= jQuery( '#'+tagsSel2 ).val() || '';
+	var sel3 		= jQuery( '#'+tagsSel3 ).val() || '';
+	var edit		= jQuery( '#'+tagsEdit ).val() || '';
+	var album 		= jQuery( '#'+tagsAlbum ).val() || '';
 	var i 			= 0;
 	var j 			= 0;
 	var tags 		= '';
+
+	// Disable sumit button
+	var buttonText = jQuery( '#'+buttonId ).val() || '';
+	jQuery( '#'+buttonId ).val( waitText );
+	jQuery( '#'+buttonId ).attr('disabled','disabled');
 
 	var data = 'action=wppa&wppa-action=sanitizetags&tags=' + sel1 + ',' + sel2 + ',' + sel3 + ',' + edit + '&album=' + album;
 
@@ -810,7 +815,7 @@ function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPr
 										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
 									}
 									jQuery( '#'+tagsPrev ).html( 'Working...' );
-									wppaConsoleLog(data);
+		//							wppaConsoleLog(data);
 								},
 					success: 	function( xresult, status, xhr ) {
 									var result;
@@ -823,7 +828,9 @@ function wppaPrevTags( tagsSel1, tagsSel2, tagsSel3, tagsEdit, tagsAlbum, tagsPr
 									}
 									jQuery( '#'+tagsNewval ).attr( 'value', wppaTrim( result, ',' ) );
 									jQuery( '#'+tagsPrev ).html( wppaTrim( result, ',' ) );
-									wppaConsoleLog(result+' gepleurt op '+tagsPrev);
+									jQuery( '#'+buttonId ).val( buttonText );
+									jQuery( '#'+buttonId ).removeAttr('disabled');
+						//			wppaConsoleLog(result+' gepleurt op '+tagsPrev);
 								},
 					error: 		function( xhr, status, error ) {
 									jQuery( '#'+tagsPrev ).html( '<span style="color:red" >' + error + '</span>' );
@@ -1245,8 +1252,10 @@ function wppaAjaxDownloadAlbum( mocc, id ) {
 									jQuery( '#dwnspin-'+mocc+'-'+id ).css( 'display', '' );
 								},
 					success: 	function( xresult, status, xhr ) {
+
 									var result;
-									if ( wppaAjaxMethod == 'rest' ) {
+
+									if ( xresult.txt ) {
 										result = xresult.txt;
 									}
 									else {
@@ -1557,7 +1566,7 @@ function wppaAjaxNotify( elm, list, user ) {
 									}
 						*/
 									if ( user ) {
-										wppaConsoleLog( result, 'force' );
+						//				wppaConsoleLog( result, 'force' );
 										jQuery("#img_"+list+"-"+user).attr('src',wppaImageDirectory+'tick.png');
 									}
 								},

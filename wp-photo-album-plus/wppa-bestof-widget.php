@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version: 8.7.03.006
+* Version: 9.0.00.000
 *
 */
 
@@ -48,7 +48,7 @@ class BestOfWidget extends WP_Widget {
 		// Other inits
 		$widget_content = '';
 		$page 			= in_array( $instance['linktype'], wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'bestof_widget_linkpage', __( 'Best Of Photos', 'wp-photo-album-plus' ) );
-		$count 			= $instance['count'] ? $instance['count'] : '10';
+		$count 			= $instance['count'] ? $instance['count'] : 10;
 		$sortby 		= $instance['sortby'];
 		$display 		= $instance['display'];
 		$period 		= $instance['period'];
@@ -122,7 +122,7 @@ class BestOfWidget extends WP_Widget {
 		wppa_echo( wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) ) );
 
 		// Max number to diaplsy
-		wppa_widget_number( $this, 'count', $instance['count'], __( 'Max number of thumbnails', 'wp-photo-album-plus' ), '1', '25' );
+		wppa_widget_number( $this, 'count', $instance['count'], __( 'Max number of thumbnails', 'wp-photo-album-plus' ), 1, '25' );
 
 		// What to display
 		$options 	= array( 	__( 'Photos', 'wp-photo-album-plus' ),
@@ -210,7 +210,7 @@ class BestOfWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Best Of Photos', 'wp-photo-album-plus' ),
-							'count' 	=> '10',
+							'count' 	=> 10,
 							'sortby' 	=> 'maxratingcount',
 							'display' 	=> 'photo',
 							'period' 	=> 'thisweek',
@@ -220,7 +220,7 @@ class BestOfWidget extends WP_Widget {
 							'linktype' 	=> 'none',
 							'totvalue' 	=> '',
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

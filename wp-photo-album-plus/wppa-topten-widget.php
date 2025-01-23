@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 8.7.04.002
+* Version 9.0.00.005
 */
 
 class TopTenWidget extends WP_Widget {
@@ -90,7 +90,7 @@ class TopTenWidget extends WP_Widget {
 
 			// All albums ?
 			if ( $album == '-2' ) {
-				$album = '0';
+				$album = 0;
 			}
 
 			// Albums of owner is current logged in user or public?
@@ -287,10 +287,11 @@ class TopTenWidget extends WP_Widget {
 				$file       = wppa_get_thumb_path($image['id']);
 				$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'ttthumb');
 				$imgurl 	= wppa_get_thumb_url($image['id'], true, '', $imgstyle_a['width'], $imgstyle_a['height']);
-				$imgevents 	= wppa_get_imgevents('thumb', $image['id'], true);
+				$onmouseover  = wppa_mouseover( 'thumb', $image['id'], true );
+				$onmouseout   = wppa_mouseout( 'thumb' );
 				$title 		= $link ? esc_attr(stripslashes($link['title'])) : '';
 
-				$widget_content .= wppa_get_the_widget_thumb('topten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents);
+				$widget_content .= wppa_get_the_widget_thumb('topten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $onmouseover, $onmouseout);
 
 				$widget_content .= "\n\t".'<div style="font-size:'.wppa_opt( 'fontsize_widget_thumb' ).'px; line-height:'.$lineheight.'px;">';
 
@@ -304,7 +305,7 @@ class TopTenWidget extends WP_Widget {
 						$href = wppa_get_album_url( array( 'album' => $image['album'],
 														   'page' => $albumlinkpage,
 														   'type' => 'content',
-														   'mocc' => '1' ) );
+														   'mocc' => 1 ) );
 						$widget_content .= '<div>(<a href="' . $href . '" >' . wppa_get_album_name( $image['album'] ) . '</a>)</div>';
 					}
 
@@ -583,7 +584,7 @@ class TopTenWidget extends WP_Widget {
 		$result =
 		'<p>' .
 			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
-			' ' . wppa_setting_path( 'b', 'widget', '1', ['2', '3'] ) .
+			' ' . wppa_setting_path( 'b', 'widget', 1, ['2', '3'] ) .
 		'</p>';
 		wppa_echo( strip_tags( wp_check_invalid_utf8( $result), ["<br>", "<a>", "<i>", "<b>"] ) );
 
@@ -594,7 +595,7 @@ class TopTenWidget extends WP_Widget {
 
 		$defaults = array(	'title' 		=> __( 'Top Ten Photos', 'wp-photo-album-plus' ),
 							'sortby' 		=> 'mean_rating',
-							'album' 		=> '0',
+							'album' 		=> 0,
 							'display' 		=> 'thumbs',
 							'meanrat' 		=> 'no',
 							'ratcount' 		=> 'no',
@@ -605,7 +606,7 @@ class TopTenWidget extends WP_Widget {
 							'showowner' 	=> 'no',
 							'showalbum' 	=> 'no',
 							'logonly' 		=> 'no',
-							'cache' 		=> '0',
+							'cache' 		=> 0,
 							);
 		return $defaults;
 	}

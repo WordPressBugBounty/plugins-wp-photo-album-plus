@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * notify events to users
-* Version 8.7.03.006
+* Version 9.0.00.000
 */
 
 class wppaNotifyWidget extends WP_Widget {
@@ -90,7 +90,7 @@ class wppaNotifyWidget extends WP_Widget {
 
 		$defaults = array( 	'title' 	=> __( 'Notify me', 'wp-photo-album-plus' ),
 							'logonly' 	=> 'yes',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

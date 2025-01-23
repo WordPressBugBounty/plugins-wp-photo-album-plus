@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 8.9.02.003
+* Version: 9.0.00.009
 *
 */
 
@@ -38,6 +38,7 @@ global $wppa_hide_this;
 	// Initialize
 	wppa_initialize_runtime( true );
 	$opts_error = false;
+	$dbg = wppa_switch( 'enable_debug' );
 
 	// Re-animate crashec cron jobs
 	wppa_re_animate_cron();
@@ -66,16 +67,16 @@ global $wppa_hide_this;
 					$sequence = wppa_opt( 'slide_order_split' );
 					$indices = explode(',', $sequence);
 					$temp = $indices[$sub];
-					$indices[$sub] = $indices[$sub - '1'];
-					$indices[$sub - '1'] = $temp;
+					$indices[$sub] = $indices[$sub - 1];
+					$indices[$sub - 1] = $temp;
 					wppa_update_option('wppa_slide_order_split', implode(',', $indices));
 				}
 				else {
 					$sequence = wppa_opt( 'slide_order' );
 					$indices = explode(',', $sequence);
 					$temp = $indices[$sub];
-					$indices[$sub] = $indices[$sub - '1'];
-					$indices[$sub - '1'] = $temp;
+					$indices[$sub] = $indices[$sub - 1];
+					$indices[$sub - 1] = $temp;
 					wppa_update_option('wppa_slide_order', implode(',', $indices));
 				}
 				break;
@@ -405,7 +406,7 @@ global $wppa_hide_this;
 			wppa_opt( 'tf_width_alt') < wppa_opt( 'thumbsize_alt' ) ||
 			wppa_opt( 'tf_height' ) < wppa_opt( 'thumbsize' ) ||
 			wppa_opt( 'tf_height_alt') < wppa_opt( 'thumbsize_alt' ) ) ) {
-				wppa_warning_message( __( 'A thumbframe width or height should not be smaller than a thumbnail size.' , 'wp-photo-album-plus' ) . wppa_see_also( 'thumbs', '1', '1.2.5..8', '', '', true ) );
+				wppa_warning_message( __( 'A thumbframe width or height should not be smaller than a thumbnail size.' , 'wp-photo-album-plus' ) . wppa_see_also( 'thumbs', 1, '1.2.5..8', '', '', true ) );
 			}
 
 		// Check for 'many' albums
@@ -419,8 +420,8 @@ global $wppa_hide_this;
 		// Check for availability of hires urls in case panorama is on
 		if ( wppa_switch( 'enable_panorama' ) ) {
 			if ( ! wppa_switch( 'keep_source' ) ) {
-				wppa_warning_message( 	__( 'You enabled the display of complex panoramic photos', 'wp-photo-album-plus' ) . wppa_see_also( 'photos', '1', '3' ) . '<br>' .
-										__( 'It is strongly recommended that you save sourcefiles during upload in order to preserve resolution.', 'wp-photo-album-plus' ) . wppa_see_also( 'files', '1', '1', '', '', true ) );
+				wppa_warning_message( 	__( 'You enabled the display of complex panoramic photos', 'wp-photo-album-plus' ) . wppa_see_also( 'photos', 1, '3' ) . '<br>' .
+										__( 'It is strongly recommended that you save sourcefiles during upload in order to preserve resolution.', 'wp-photo-album-plus' ) . wppa_see_also( 'files', 1, 1, '', '', true ) );
 			}
 		}
 
@@ -431,12 +432,12 @@ global $wppa_hide_this;
 			$message = $stdmsg;
 			$doit = false;
 			if ( wppa_opt( 'max_cover_width' ) > wppa_opt( 'smallsize' ) ) {
-				$msg = __( 'Max Cover width may not be larger than Coverphoto size', 'wp-photo-album-plus' ) . wppa_see_also( 'covers', '1', '1.7', '', '', true ) . '<br>';
+				$msg = __( 'Max Cover width may not be larger than Coverphoto size', 'wp-photo-album-plus' ) . wppa_see_also( 'covers', 1, '1.7', '', '', true ) . '<br>';
 				$message .= $msg;
 				$doit = true;
 			}
 			if ( wppa_opt( 'thumb_aspect' ) == '0:0:none' && ! ( wppa_switch( 'cover_use_thumb' ) ) ) {
-				$msg = 	__( 'Thumbnail Aspect may not be set to "--- same as fullsize ---"','wp-photo-album-plus' ) . wppa_see_also( 'thumbs', '1', '3', '', '', true ) . '<br>' .
+				$msg = 	__( 'Thumbnail Aspect may not be set to "--- same as fullsize ---"','wp-photo-album-plus' ) . wppa_see_also( 'thumbs', 1, '3', '', '', true ) . '<br>' .
 						__( 'Alternatively you can activate Use thumb on cover', 'wp-photo-album-plus' ) . wppa_see_also( 'covers', '3', '8' );
 				$message .= $msg;
 				$doit = true;
@@ -491,7 +492,7 @@ global $wppa_hide_this;
 		if ( ! isset( $wppa_tab_names[$tab] ) ) {
 			$tab = 'general';
 		}
-		$subtab = wppa_get( 'subtab', '0', 'int' );
+		$subtab = wppa_get( 'subtab', 0, 'int' );
 
 		// Get the linkpages dependant of tab (if we need them)
 		if ( $tab == 'share' || $tab == 'links' ) {
@@ -504,9 +505,9 @@ global $wppa_hide_this;
 
 			// First
 			$opts_page_post[] = __('--- the same page or post ---', 'wp-photo-album-plus' );
-			$vals_page_post[] = '0';
+			$vals_page_post[] = 0;
 			$opts_page[] = __('--- please select a page ---', 'wp-photo-album-plus' );
-			$vals_page[] = '0';
+			$vals_page[] = 0;
 
 			// Pages if any
 			$pages = wppa_get_results( "SELECT ID, post_title, post_content, post_parent FROM $wpdb->posts
@@ -538,7 +539,7 @@ global $wppa_hide_this;
 			}
 			else {
 				$opts_page[] = __( '--- No page to link to (yet) ---', 'wp-photo-album-plus' );
-				$vals_page[] = '0';
+				$vals_page[] = 0;
 			}
 
 			$opts_page_auto = $opts_page;
@@ -573,7 +574,7 @@ global $wppa_hide_this;
 
 		// See if specific item is requested
 		$wppa_requested_subtab = $subtab;
-		$wppa_requested_items = wppa_get( 'item', array( '0' ) );
+		$wppa_requested_items = wppa_get( 'item', array( 0 ) );
 		if ( ! is_array( $wppa_requested_items ) ) {
 			$wppa_requested_items = explode( '.', wppa_expand_enum( $wppa_requested_items ) );
 		}
@@ -639,7 +640,7 @@ global $wppa_hide_this;
 				case 'generaladv': {
 					// On this tab you can select the features you want to use
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -647,16 +648,16 @@ global $wppa_hide_this;
 						$desc = __('Enables photo support', 'wp-photo-album-plus' );
 						$help = __('This item can not be unchecked, this is the core feature of the plugin', 'wp-photo-album-plus' );
 						$slug = '';
-						$html = '<input type="checkbox" style="float:left" checked disabled>' . wppa_see_also( 'photos', '1' );
-						wppa_setting_new($slug, '0', $name, $desc, $html, $help);
+						$html = '<input type="checkbox" style="float:left" checked disabled>' . wppa_see_also( 'photos', 1 );
+						wppa_setting_new($slug, 0, $name, $desc, $html, $help);
 
 						$name = __('Enable Video', 'wp-photo-album-plus' );
 						$desc = __('Enables video support.', 'wp-photo-album-plus' );
 						$help = __('Check this box to enable the upload and display of video files', 'wp-photo-album-plus' );
 						$slug = 'wppa_enable_video';
 						$onch = "wppaSlaveChecked(this,'enable_video');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'misc', '1', '7.8', 'enable_video' ) . wppa_see_also( 'users', '1', '2', 'enable_video' );
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'misc', 1, '7.8', 'enable_video' ) . wppa_see_also( 'users', 1, '2', 'enable_video' );
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Enable pdf', 'wp-photo-album-plus' );
 						$desc = __('Enables the support of pdf files', 'wp-photo-album-plus' );
@@ -670,7 +671,7 @@ global $wppa_hide_this;
 						$help = __('Check this box to enable the upload and playing of audio files', 'wp-photo-album-plus' );
 						$slug = 'wppa_enable_audio';
 						$onch = "wppaSlaveChecked(this,'enable_audio');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'users', '1', '3', 'enable_audio' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'users', 1, '3', 'enable_audio' );
 						wppa_setting_new($slug, '3', $name, $desc, $html, $help);
 
 						$name = __('Enable Comments', 'wp-photo-album-plus' );
@@ -678,7 +679,7 @@ global $wppa_hide_this;
 						$help = __('Display the comments box under the slideshow images and let users enter their comments on individual photos.', 'wp-photo-album-plus' );
 						$slug = 'wppa_show_comments';
 						$onch = "wppaSlaveChecked(this,'show_comments');wppaSlaveChecked(this,'comments');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'comments', '1', '', 'show_comments' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'comments', 1, '', 'show_comments' );
 						wppa_setting_new($slug, '4', $name, $desc, $html, $help);
 
 						$name = __('Enable Ratings', 'wp-photo-album-plus' );
@@ -686,7 +687,7 @@ global $wppa_hide_this;
 						$help = __('If checked, the photo rating system will be enabled.', 'wp-photo-album-plus' );
 						$slug = 'wppa_rating_on';
 						$onch = "wppaSlaveChecked(this,'rating_on');wppaSlaveChecked(this,'rating');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'rating', '1', '', 'rating_on' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'rating', 1, '', 'rating_on' );
 						wppa_setting_new($slug, '5', $name, $desc, $html, $help);
 
 						$name = __('Enable User uploads', 'wp-photo-album-plus' );
@@ -694,7 +695,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_user_upload_on';
 						$onch = "wppaSlaveChecked(this,'user_upload_on');wppaSlaveChecked(this,'users');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'users', '1', '', 'user_upload_on' ) . wppa_see_also( 'new', '1', '18..26', 'user_upload_on' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'users', 1, '', 'user_upload_on' ) . wppa_see_also( 'new', 1, '18..26', 'user_upload_on' );
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 
 						$name = __('Enable Email', 'wp-photo-album-plus' );
@@ -702,7 +703,7 @@ global $wppa_hide_this;
 						$help = __('See Tab Emails for detailed settings', 'wp-photo-album-plus' );
 						$slug = 'wppa_email_on';
 						$onch = "wppaSlaveChecked(this,'email_on');wppaSlaveChecked(this,'email');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'email', '1', '', 'email_on' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'email', 1, '', 'email_on' );
 						wppa_setting_new($slug, '7', $name, $desc, $html, $help);
 
 						$name = __('Enable EXIF', 'wp-photo-album-plus' );
@@ -710,7 +711,7 @@ global $wppa_hide_this;
 						$help = __('You will need this if you enabled the display of exif data in the photo descriptions.', 'wp-photo-album-plus' );
 						$slug = 'wppa_save_exif';
 						$onch = "wppaSlaveChecked(this,'save_exif');wppaSlaveChecked(this,'exif');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'exif', '1', '', 'save_exif' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'exif', 1, '', 'save_exif' );
 						wppa_setting_new($slug, '8', $name, $desc, $html, $help, function_exists('exif_read_data') );
 
 						$name = __('Enable IPTC', 'wp-photo-album-plus' );
@@ -718,7 +719,7 @@ global $wppa_hide_this;
 						$help = __('You will need this if you enabled the display of iptc data in the photo descriptions.', 'wp-photo-album-plus' );
 						$slug = 'wppa_save_iptc';
 						$onch = "wppaSlaveChecked(this,'save_iptc');wppaSlaveChecked(this,'iptc');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'iptc', '1', '', 'save_iptc' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'iptc', 1, '', 'save_iptc' );
 						wppa_setting_new($slug, '9', $name, $desc, $html, $help, function_exists('exif_read_data') );
 
 						$name = __('Enable GPX', 'wp-photo-album-plus' );
@@ -726,15 +727,15 @@ global $wppa_hide_this;
 						$help = __('You will need this if you enabled the display of gpx data in the photo descriptions.', 'wp-photo-album-plus' );
 						$slug = 'wppa_save_gpx';
 						$onch = "wppaSlaveChecked(this,'save_gpx');wppaSlaveChecked(this,'gpx');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'gpx', '1', '', 'save_gpx' );
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help, function_exists('exif_read_data') && wppa_switch( 'save_exif' ) );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'gpx', 1, '', 'save_gpx' );
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help, function_exists('exif_read_data') && wppa_switch( 'save_exif' ) );
 
 						$name = __('Enable Custom data albums', 'wp-photo-album-plus' );
 						$desc = __('Define up to 10 custom data fields for albums.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_album_custom_fields';
 						$onch = "wppaSlaveChecked(this,'album_custom_fields');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'custom', '1', '', 'album_custom_fields' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'custom', 1, '', 'album_custom_fields' );
 						wppa_setting_new($slug, '11', $name, $desc, $html, $help);
 
 						$name = __('Enable Custom data photos', 'wp-photo-album-plus' );
@@ -750,7 +751,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_watermark_on';
 						$onch = "wppaSlaveChecked(this,'watermark_on');wppaSlaveChecked(this,'watermark');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'watermark', '1', '', 'watermark_on' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'watermark', 1, '', 'watermark_on' );
 						wppa_setting_new($slug, '13', $name, $desc, $html, $help);
 
 						$name = __('Enable shortcode [photo ..]', 'wp-photo-album-plus' );
@@ -769,7 +770,7 @@ global $wppa_hide_this;
 				case 'layout': {
 					// General layout settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -781,7 +782,7 @@ global $wppa_hide_this;
 						$slug = array($slug1, $slug2);
 						$html = '<span style="float:left;padding-top:5px">' . __('Background:', 'wp-photo-album-plus' ) . '&nbsp;</span>' . wppa_input($slug1, '100px', '', '', "checkColor('".$slug1."')") . wppa_color_box($slug1);
 						$html .= '<span style="float:left;padding-top:5px;padding-left:12px">' . __('Border:', 'wp-photo-album-plus' ) . '&nbsp;</span>' . wppa_input($slug2, '100px', '', '', "checkColor('".$slug2."')") . wppa_color_box($slug2);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Border thickness', 'wp-photo-album-plus' );
 						$desc = __('Thickness of wppa+ box borders.', 'wp-photo-album-plus' );
@@ -847,7 +848,7 @@ global $wppa_hide_this;
 						$slug = array($slug1, $slug2);
 						$html = '<span style="float:left;padding-top:5px">' . __('Background:', 'wp-photo-album-plus' ) . '&nbsp;</span>' . wppa_input($slug1, '100px', '', '', "checkColor('".$slug1."')") . wppa_color_box($slug1);
 						$html .= '<span style="float:left;padding-top:5px;padding-left:12px">' . __('Border:', 'wp-photo-album-plus' ) . '&nbsp;</span>' . wppa_input($slug2, '100px', '', '', "checkColor('".$slug2."')") . wppa_color_box($slug2);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Modal render box', 'wp-photo-album-plus' );
 						$desc = __('The background for the Ajax modal rendering box.', 'wp-photo-album-plus' );
@@ -878,7 +879,7 @@ global $wppa_hide_this;
 						$help = __('Indicate whether a breadcrumb navigation should be displayed', 'wp-photo-album-plus' );
 						$slug = 'wppa_show_bread_posts';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Breadcrumb on pages', 'wp-photo-album-plus' );
 						$desc = __('Show breadcrumb navigation bars.', 'wp-photo-album-plus' );
@@ -941,7 +942,7 @@ global $wppa_hide_this;
 						$help = __('Indicate whether the breadcrumb navigation should start with a "Home"-link', 'wp-photo-album-plus' );
 						$slug = 'wppa_show_home';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Home text', 'wp-photo-album-plus' );
 						$desc = __('The text to use as "Home"', 'wp-photo-album-plus' );
@@ -981,7 +982,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('It may be as simple as \'-\' (without the quotes) or as complex as a tag like <div>..</div>.', 'wp-photo-album-plus' );
 						$slug = 'wppa_bc_txt';
 						$html = wppa_input($slug, '90%', '300px');
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Image Url', 'wp-photo-album-plus' );
 						$desc = __('Full url to separator image.', 'wp-photo-album-plus' );
@@ -1031,7 +1032,7 @@ global $wppa_hide_this;
 										'32',
 										);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Navigation icon size slideshow', 'wp-photo-album-plus' );
 						$desc = __('The size of navigation icons on the slide', 'wp-photo-album-plus' );
@@ -1210,7 +1211,7 @@ global $wppa_hide_this;
 										'48',
 										);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						wppa_setting_box_footer_new();
 						wppa_add_inline_script( 'wppa-admin', 'wppaAjaxGetSpinnerHtml("normal","wppa-spin-pre-1");wppaAjaxGetSpinnerHtml("lightbox","wppa-spin-pre-2");', false );
@@ -1238,8 +1239,8 @@ global $wppa_hide_this;
 						$opts = $icons;
 						$vals = $icons;
 						$onch = "wppaUpdateIcon('audio_icon','audioicon')";
-						$html = wppa_select( $slug, $opts, $vals, $onch ) . ' <img id="audioicon" src="' . esc_attr( WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'audio_icon' ) ) . '" style="height:24px;" />';
-						wppa_setting_new( $slug, '1', $name, $desc, $html, $help, wppa_switch( 'enable_audio' ) );
+						$html = wppa_select( $slug, $opts, $vals, $onch ) . wppa_html_tag( 'img', ['id' => 'audioicon', 'src' => WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'audio_icon' ), 'style' => 'height:24px;'] );
+						wppa_setting_new( $slug, 1, $name, $desc, $html, $help, wppa_switch( 'enable_audio' ) );
 
 						$name = __( 'Video icon', 'wp-photo-album-plus' );
 						$desc = __( 'Select the icon to use as video indicator', 'wp-photo-album-plus' );
@@ -1248,7 +1249,7 @@ global $wppa_hide_this;
 						$opts = $icons;
 						$vals = $icons;
 						$onch = "wppaUpdateIcon('video_icon','videoicon')";
-						$html = wppa_select( $slug, $opts, $vals, $onch ) . ' <img id="videoicon" src="' . esc_attr( WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'video_icon' ) ) . '" style="height:24px;" />';
+						$html = wppa_select( $slug, $opts, $vals, $onch ) . wppa_html_tag( 'img', ['id' => 'videoicon', 'src' => WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'video_icon' ), 'style' => 'height:24px;'] );
 						wppa_setting_new( $slug, '2', $name, $desc, $html, $help, wppa_switch( 'enable_video' ) );
 
 						$name = __( 'Document icon', 'wp-photo-album-plus' );
@@ -1258,7 +1259,7 @@ global $wppa_hide_this;
 						$opts = $icons;
 						$vals = $icons;
 						$onch = "wppaUpdateIcon('document_icon','documenticon')";
-						$html = wppa_select( $slug, $opts, $vals, $onch ) . ' <img id="documenticon" src="' . esc_attr( WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'document_icon' ) ) . '" style="height:24px;" />';
+						$html = wppa_select( $slug, $opts, $vals, $onch ) . wppa_html_tag( 'img', ['id' => 'documenticon', 'src' => WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'document_icon' ), 'style' => 'height:24px;'] );
 						wppa_setting_new( $slug, '3', $name, $desc, $html, $help, wppa_switch( 'enable_pdf' ) );
 
 						$name = __( 'Upload custom multimedia icon', 'wp-photo-album-plus' );
@@ -1310,8 +1311,8 @@ global $wppa_hide_this;
 											);
 						wppa_setting_box_header_new($tab, $coldef);
 
-						$opts = array(__('normal', 'wp-photo-album-plus' ), __('bold', 'wp-photo-album-plus' ), __('bolder', 'wp-photo-album-plus' ), __('lighter', 'wp-photo-album-plus' ), '100', '200', '300', '400', '500', '600', '700', '800', '900');
-						$vals = array('normal', 'bold', 'bolder', 'lighter', '100', '200', '300', '400', '500', '600', '700', '800', '900');
+						$opts = array(__('normal', 'wp-photo-album-plus' ), __('bold', 'wp-photo-album-plus' ), __('bolder', 'wp-photo-album-plus' ), __('lighter', 'wp-photo-album-plus' ), 100, '200', '300', '400', '500', '600', '700', '800', '900');
+						$vals = array('normal', 'bold', 'bolder', 'lighter', 100, '200', '300', '400', '500', '600', '700', '800', '900');
 
 						$name = __('Album titles', 'wp-photo-album-plus' );
 						$desc = __('Font used for album titles.', 'wp-photo-album-plus' );
@@ -1326,7 +1327,7 @@ global $wppa_hide_this;
 						$html3 = wppa_input($slug3, '120px', '', '');
 						$html4 = wppa_select($slug4, $opts, $vals);
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Slideshow desc', 'wp-photo-album-plus' );
 						$desc = __('Font for slideshow photo descriptions.', 'wp-photo-album-plus' );
@@ -1461,7 +1462,7 @@ global $wppa_hide_this;
 						$html3 = '';
 						$html4 = '';
 						$html = '</td><td>' . $html2 . '</td><td></td><td>';
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Calendar fontsize', 'wp-photo-album-plus' );
 						$desc = __('Old style calendar fontstyle', 'wp-photo-album-plus' );
@@ -1497,7 +1498,7 @@ global $wppa_hide_this;
 						$help = __('A number > 1 is pixelsize, a number < 1 is fraction of the viewport height, 0 is no limit', 'wp-photo-album-plus' );
 						$slug = 'wppa_area_size_audio';
 						$html = wppa_input($slug, '40px', '', __('pixels / fraction', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Show album name', 'wp-photo-album-plus');
 						$desc = __('Show album name as title above the album display', 'wp-photo-album-plus');
@@ -1544,7 +1545,7 @@ global $wppa_hide_this;
 
 				case 'covers': {
 					// Album cover size specifications
-					$desc = $wppa_subtab_names[$tab]['1'];
+					$desc = $wppa_subtab_names[$tab][1];
 					{
 					wppa_setting_tab_description($desc);
 					wppa_setting_box_header_new($tab);
@@ -1555,7 +1556,7 @@ global $wppa_hide_this;
 					$help .= '<br>'.__('This also applies for \'thumbnails as covers\', and will NOT apply to single items.', 'wp-photo-album-plus' );
 					$slug = 'wppa_max_cover_width';
 					$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-					wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 					$name = __('Min Cover height', 'wp-photo-album-plus' );
 					$desc = __('Minimal height of an album cover.', 'wp-photo-album-plus' );
@@ -1633,7 +1634,7 @@ global $wppa_hide_this;
 					$help .= '<br>'.__('This makes it easyer to make the covers of equal height.', 'wp-photo-album-plus' );
 					$slug = 'wppa_coversize_is_height';
 					$html = wppa_checkbox($slug);
-					wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 					$name = __('Page size', 'wp-photo-album-plus' );
 					$desc = __('Max number of covers per page.', 'wp-photo-album-plus' );
@@ -1662,7 +1663,7 @@ global $wppa_hide_this;
 					$help = __('Display the album decription on the album cover', 'wp-photo-album-plus' );
 					$slug = 'wppa_show_cover_text';
 					$html = wppa_checkbox($slug);
-					wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 					$name = __('Slideshow', 'wp-photo-album-plus' );
 					$desc = __('Enable the slideshow.', 'wp-photo-album-plus' );
@@ -1735,7 +1736,7 @@ global $wppa_hide_this;
 					$opts = array( __('none', 'wp-photo-album-plus' ), __('If user has edit access', 'wp-photo-album-plus' ), __('Always', 'wp-photo-album-plus' ) );
 					$vals = array( '-none-', 'access', 'all' );
 					$html = wppa_select($slug, $opts, $vals);
-					wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 					wppa_setting_box_footer_new();
 					}
@@ -1754,7 +1755,7 @@ global $wppa_hide_this;
 					$opts = array(__('Left', 'wp-photo-album-plus' ), __('Right', 'wp-photo-album-plus' ), __('Top', 'wp-photo-album-plus' ), __('Bottom', 'wp-photo-album-plus' ));
 					$vals = array('left', 'right', 'top', 'bottom');
 					$html = wppa_select($slug, $opts, $vals);
-					wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 					$name = __('Cover mouseover', 'wp-photo-album-plus' );
 					$desc = __('Apply coverphoto mouseover effect.', 'wp-photo-album-plus' );
@@ -1841,7 +1842,7 @@ global $wppa_hide_this;
 				case 'photos': {
 					// Photo specifications
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -1865,7 +1866,7 @@ global $wppa_hide_this;
 										'6000 x 3000 '.$px,
 										);
 						$vals = array( 	'-1',
-										'0',
+										0,
 										'640x480',
 										'800x600',
 										'1024x768',
@@ -1879,7 +1880,7 @@ global $wppa_hide_this;
 										'6000x3000',
 										);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Enable 3D Stereo', 'wp-photo-album-plus' );
 						$desc = __('Enables 3D stereo photo support.', 'wp-photo-album-plus' );
@@ -1925,7 +1926,7 @@ global $wppa_hide_this;
 										'slphoto',
 										);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Size', 'wp-photo-album-plus' );
 						$desc = __('Specify the size (width) of the image.', 'wp-photo-album-plus' );
@@ -2027,7 +2028,7 @@ global $wppa_hide_this;
 							$desc = __( 'Enter the url. Do\'nt forget the HTTP://', 'wp-photo-album-plus' );
 							$slug = 'wppa_potd_linkurl';
 							$html = wppa_input( $slug, '85%', '', '', '', __( 'Type your custom url here', 'wp-photo-album-plus' ) );
-							wppa_setting_new( $slug, '1', $name, $desc, $html, '' );
+							wppa_setting_new( $slug, 1, $name, $desc, $html, '' );
 
 							$name = __( 'Link Title', 'wp-photo-album-plus' );
 							$desc = __( 'The balloon text when hovering over the photo.', 'wp-photo-album-plus' );
@@ -2037,7 +2038,7 @@ global $wppa_hide_this;
 						}
 						else {
 							$name = __( 'Links', 'wp-photo-album-plus' );
-							$desc = __( 'Links are set on the Links tab.', 'wp-photo-album-plus' ) . wppa_see_also( 'links', '3', '1' );
+							$desc = __( 'Links are set on the Links tab.', 'wp-photo-album-plus' ) . wppa_see_also( 'links', '3', 1 );
 							$slug = 'wppa_potd_linkurl';
 							$html = '';
 							wppa_setting_new( $slug, '3', $name, $desc, $html, '' );
@@ -2120,13 +2121,9 @@ global $wppa_hide_this;
 																'multiple' 		=> true,
 																'sort' 			=> true,
 													) ) . '
-							</select>
-							<img
-								id="img_potd_album"
-								src="' . esc_url( wppa_get_imgdir() ) . 'star.ico"
-								title="' . esc_attr( __( 'Setting unmodified', 'wp-photo-album-plus' ) ) . '"
-								style="padding:0 4px; float:left; height:16px; width:16px;"
-							/>';
+							</select>' .
+							wppa_html_tag( 'img', ['id' => 'img_potd_album', 'src' => wppa_get_imgdir()  . 'star.ico', 'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ),
+												   'style' => 'padding:0 4px; float:left; height:16px; width:16px;'] );
 						}
 						$is_phys = wppa_opt( 'potd_album_type' ) == 'physical';
 						wppa_setting_new( $slug, '7', $name, $desc, $html, '', $is_phys, 'physical' );
@@ -2141,7 +2138,7 @@ global $wppa_hide_this;
 						$desc = __( 'Use any album, except the selection made above.', 'wp-photo-album-plus' );
 						$slug = 'wppa_potd_inverse';
 						$html = wppa_checkbox( $slug, 'wppaPlanPotdUpdate();' );
-						wppa_setting_new( $slug, '10', $name, $desc, $html, '', $is_phys, 'physical' );
+						wppa_setting_new( $slug, 10, $name, $desc, $html, '', $is_phys, 'physical' );
 
 						// Virtual albums
 						$name = __( 'Albums to use', 'wp-photo-album-plus' );
@@ -2192,7 +2189,7 @@ global $wppa_hide_this;
 										__( 'Last upload', 'wp-photo-album-plus' ),
 										__( 'Change every', 'wp-photo-album-plus' ),
 										);
-						$vals = array( 	'1',
+						$vals = array( 	1,
 										'2',
 										'3',
 										'4',
@@ -2217,8 +2214,8 @@ global $wppa_hide_this;
 										__( 'day of year is sequence #', 'wp-photo-album-plus' ),
 										__( 'week number is sequence #', 'wp-photo-album-plus' ),
 								);
-						$vals = array( 	'0',
-										'1',
+						$vals = array( 	0,
+										1,
 										'24',
 										'168',
 										'736',
@@ -2246,15 +2243,15 @@ global $wppa_hide_this;
 								wppa_number( $slug, 0, 365, '', 'wppaPlanPotdUpdate();' ) . '
 								<div style="float:left">' .
 									/* translators: number in html tag */
-									sprintf( __( 'Todays sequence # = %s.', 'wp-photo-album-plus' ), '<span id="potdseqno" ><img src="'.wppa_get_imgdir().'spinner.gif"></span>' ) . '
+									sprintf( __( 'Todays sequence # = %s.', 'wp-photo-album-plus' ), '<span id="potdseqno" >' . wppa_html_tag( 'img', ['src' => wppa_get_imgdir().'spinner.gif'] ) . '</span>' ) . '
 								</div>';
 						wppa_setting_new( $slug, '14', $name, $desc, $html, $help, $pom4 && $dof );
 
 						$name = __( 'Preview', 'wp-photo-album-plus' );
 						$desc = __( 'Current "photo of the day":', 'wp-photo-album-plus' );
 						$slug = 'wppa_potd_photo';
-						$html = '<div id="potdpreview"><img src="' . wppa_get_imgdir() . 'spinner.gif"></div>';
-						wppa_setting_new( $slug, '15', $name, $desc, $html );
+						$html = '<div id="potdpreview">' . wppa_html_tag( 'img', ['src' => wppa_get_imgdir() . 'spinner.gif'] ) . '</div>';
+						wppa_setting_new( $slug, 15, $name, $desc, $html );
 
 						$name = __( 'Show selection', 'wp-photo-album-plus' );
 						$desc = __( 'Show the photos in the current selection.', 'wp-photo-album-plus' );
@@ -2272,7 +2269,7 @@ global $wppa_hide_this;
 						$name = __( 'Log potd max', 'wp-photo-album-plus' );
 						$desc = __( 'Max length of the potd history (items)', 'wp-photo-album-plus' );
 						$slug = 'wppa_potd_log_max';
-						$opts = array( '5', '10', '15', '20', '30', '50', '100' );
+						$opts = array( '5', 10, 15, '20', '30', '50', 100 );
 						$html = wppa_select( $slug, $opts, $opts );
 						wppa_setting_new( $slug, '18', $name, $desc, $html );
 
@@ -2284,7 +2281,7 @@ global $wppa_hide_this;
 
 				case 'thumbs': {
 					// Thumbnail size specifications
-					$desc = $wppa_subtab_names[$tab]['1'];
+					$desc = $wppa_subtab_names[$tab][1];
 					{
 					wppa_setting_tab_description($desc);
 					wppa_setting_box_header_new($tab);
@@ -2295,7 +2292,7 @@ global $wppa_hide_this;
 					$help .= '<br>'.__('Changing the thumbnail size may result in all thumbnails being regenerated. this may take a while.', 'wp-photo-album-plus' );
 					$slug = 'wppa_thumbsize';
 					$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-					wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 					$name = __('Thumbnail Size Alt', 'wp-photo-album-plus' );
 					$desc = __('The alternative size of the thumbnail images.', 'wp-photo-album-plus' );
@@ -2404,7 +2401,7 @@ global $wppa_hide_this;
 					$help .= '<br>'.__('In this case, the thumbnail spacing value (setting I-9) will be regarded as a minimum value.', 'wp-photo-album-plus' );
 					$slug = 'wppa_thumb_auto';
 					$html = wppa_checkbox($slug);
-					wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 					$name = __('Page size', 'wp-photo-album-plus' );
 					$desc = __('Max number of thumbnails per page.', 'wp-photo-album-plus' );
@@ -2454,7 +2451,7 @@ global $wppa_hide_this;
 					$help = __('Display photo name under thumbnail images.', 'wp-photo-album-plus' );
 					$slug = 'wppa_thumb_text_name';
 					$html = wppa_checkbox($slug);
-					wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 					$name = __('Add (Owner)', 'wp-photo-album-plus' );
 					$desc = __('Add the uploaders display name in parenthesis to the name.', 'wp-photo-album-plus' );
@@ -2534,7 +2531,7 @@ global $wppa_hide_this;
 						$help = __('Display photo owner under thumbnail images on the popup.', 'wp-photo-album-plus' );
 						$slug = 'wppa_popup_text_owner';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help, $has_popup, 'popup');
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help, $has_popup, 'popup');
 
 						$name = __('Popup desc', 'wp-photo-album-plus' );
 						$desc = __('Display Thumbnail description on popup.', 'wp-photo-album-plus' );
@@ -2572,7 +2569,7 @@ global $wppa_hide_this;
 					$opts = array(__('None', 'wp-photo-album-plus' ), __('At the top', 'wp-photo-album-plus' ), __('At the bottom', 'wp-photo-album-plus' ));
 					$vals = array('none', 'top', 'bottom');
 					$html = wppa_select($slug, $opts, $vals);
-					wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 					$name = __('Show album desc on thumb area', 'wp-photo-album-plus' );
 					$desc = __('Select if and where to display the album description on the thumbnail display.', 'wp-photo-album-plus' );
@@ -2637,7 +2634,7 @@ global $wppa_hide_this;
 									'masonry-mix',
 									);
 					$html = wppa_select($slug, $opts, $vals);
-					wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+					wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 					$name = __('Placement', 'wp-photo-album-plus' );
 					$desc = __('Thumbnail image left or right.', 'wp-photo-album-plus' );
@@ -2726,7 +2723,7 @@ global $wppa_hide_this;
 				case 'slide': {
 					// Sllideshow component specifications
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -2734,10 +2731,10 @@ global $wppa_hide_this;
 						$desc = __('The maximum width photos will be displayed in slideshows.', 'wp-photo-album-plus' );
 						$help = __('Enter the largest size in pixels as how you want your photos to be displayed.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('This is usually the same as the Column Width, but it may differ.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'layout', '1', '5' );
+						$help .= '<br>'.wppa_see_also( 'layout', 1, '5' );
 						$slug = 'wppa_fullsize';
 						$html = wppa_input($slug, '40px', '', __('pixels wide', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Maximum Height', 'wp-photo-album-plus' );
 						$desc = __('The maximum height photos will be displayed in slideshows.', 'wp-photo-album-plus' );
@@ -2761,7 +2758,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('Additionally there may be a one pixel outline of a different color.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('The number you enter here is exclusive the one pixel outline.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('If you leave this entry empty, there will be no outline either.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'slide', '1', '35' );
+						$help .= '<br>'.wppa_see_also( 'slide', 1, '35' );
 						$slug = 'wppa_fullimage_border_width';
 						$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
 						$clas = '';
@@ -2805,7 +2802,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_share_on';
 						$onch = '';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Start/stop', 'wp-photo-album-plus' );
 						$desc = __('Show the Start/Stop slideshow bar.', 'wp-photo-album-plus' );
@@ -2860,7 +2857,7 @@ global $wppa_hide_this;
 						$desc = __('Enable invisible browsing buttons.', 'wp-photo-album-plus' );
 						$help = __('If checked, the fullsize image is covered by two invisible areas that act as browse buttons.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Make sure the Maximum height is properly configured to prevent these areas to overlap unwanted space.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'slide', '1', '2' );
+						$help .= '<br>'.wppa_see_also( 'slide', 1, '2' );
 						$slug = 'wppa_show_bbb';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '22', $name, $desc, $html, $help);
@@ -3031,12 +3028,12 @@ global $wppa_hide_this;
 								__('EXIF box', 'wp-photo-album-plus' ) . ( wppa_switch( 'show_exif') ? $enabled : $disabled ),
 								__('Social media share box', 'wp-photo-album-plus' ) . ( wppa_switch( 'share_on') ? $enabled : $disabled )
 								);
-							$i = '0';
+							$i = 0;
 							while ( $i < '12' ) {
 								if ( $indexes[$i] ) {
 									$name = $names[$indexes[$i]];
 									$desc = $descs[$indexes[$i]];
-									$html = $i == '0' ? '&nbsp;' : wppa_moveup_button( 'wppa_moveup', $i );
+									$html = $i == 0 ? '&nbsp;' : wppa_moveup_button( 'wppa_moveup', $i );
 									$help = '';
 									$slug = 'wppa_slide_order';
 									wppa_setting_new($slug, is_numeric( $indexes[$i] ) ? $indexes[$i]+1 : 99 , $name, $desc, $html, $help, wppa_switch( 'split_namedesc'), 'slide_split');
@@ -3075,12 +3072,12 @@ global $wppa_hide_this;
 								__('EXIF box', 'wp-photo-album-plus' ) . ( wppa_switch( 'show_exif') ? $enabled : $disabled ).' )</span>',
 								__('Social media share box', 'wp-photo-album-plus' ) . ( wppa_switch( 'share_on') ? $enabled : $disabled ).' )</span>'
 								);
-							$i = '0';
+							$i = 0;
 							while ( $i < '11' ) {
 								if ( $indexes[$i] ) {
 									$name = $names[$indexes[$i]];
 									$desc = $descs[$indexes[$i]];
-									$html = $i == '0' ? '&nbsp;' : wppa_moveup_button( 'wppa_moveup', $i );
+									$html = $i == 0 ? '&nbsp;' : wppa_moveup_button( 'wppa_moveup', $i );
 									$help = '';
 									$slug = 'wppa_slide_order';
 									wppa_setting_new($slug, is_numeric( $indexes[$i] ) ? $indexes[$i]+1 : 99, $name, $desc, $html, $help, ! wppa_switch( 'split_namedesc'), 'slide_unsplit');
@@ -3120,7 +3117,7 @@ global $wppa_hide_this;
 						$opts = array(__('--- none ---', 'wp-photo-album-plus' ), __('top', 'wp-photo-album-plus' ), __('center', 'wp-photo-album-plus' ), __('bottom', 'wp-photo-album-plus' ), __('fit', 'wp-photo-album-plus' ));
 						$vals = array('default', 'top', 'center', 'bottom', 'fit');
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('V align', 'wp-photo-album-plus' );
 						$desc = __('Vertical alignment of slideonly slidshow images.', 'wp-photo-album-plus' );
@@ -3154,7 +3151,7 @@ global $wppa_hide_this;
 						$name = __('Remove redundant space', 'wp-photo-album-plus' );
 						$desc = __('Removes unwanted &lt;p> and &lt;br> tags in fullsize descriptions.', 'wp-photo-album-plus' );
 						$help = __('This setting has only effect when Foreign Shortcodes is checked.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'miscadv', '4', '1' );
+						$help .= '<br>'.wppa_see_also( 'miscadv', '4', 1 );
 						$slug = 'wppa_clean_pbr';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '5', $name, $desc, $html, $help);
@@ -3214,7 +3211,7 @@ global $wppa_hide_this;
 										'norate'
 									);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Start slideonly', 'wp-photo-album-plus' );
 						$desc = __('Start slideonly slideshow running.', 'wp-photo-album-plus' );
@@ -3273,7 +3270,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('This is the time it takes a photo to fade in or out.', 'wp-photo-album-plus' );
 						$slug = 'wppa_animation_speed';
 						$opts = array(__('--- off ---', 'wp-photo-album-plus' ), '200 ms.', '400 ms.', '800 ms.', '1.2 s.', '2 s.', '4 s.', '6 s.', '8 s.', '10 s.');
-						$vals = array('10', '200', '400', '800', '1200', '2000', '4000', '6000', '8000', '10000');
+						$vals = array(10, '200', '400', '800', '1200', '2000', '4000', '6000', '8000', '10000');
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 
@@ -3296,7 +3293,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_slide_swipe';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('No animate on mobile', 'wp-photo-album-plus' );
 						$desc = __('Suppress slideshow animations on mobile devices.', 'wp-photo-album-plus' );
@@ -3333,7 +3330,7 @@ global $wppa_hide_this;
 						$help = __('If checked: display the filmstrip navigation bar under the slideshow', 'wp-photo-album-plus' );
 						$slug = 'wppa_filmstrip';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Film seam', 'wp-photo-album-plus' );
 						$desc = __('Show seam between end and start of film.', 'wp-photo-album-plus' );
@@ -3370,7 +3367,7 @@ global $wppa_hide_this;
 									'9:16 ' . __( 'portrait', 'wp-photo-album-plus' ),
 									'1:2 ' .  __( 'portrait', 'wp-photo-album-plus' ),
 								];
-						$vals = ['1', '1.25', '1.33333', '1.5', '1.6', '1.77777', '2', '0.8', '0.75', '0.66667', '0.625', '0.5625', '0.5', ];
+						$vals = [1, '1.25', '1.33333', '1.5', '1.6', '1.77777', '2', '0.8', '0.75', '0.66667', '0.625', '0.5625', '0.5', ];
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '4', $name, $desc, $html, $help, wppa_switch('film_type')=='canvas');
 
@@ -3415,7 +3412,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_filmonly_continuous';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Filmonly random', 'wp-photo-album-plus' );
 						$desc = __('Set sequence in filmonly to random', 'wp-photo-album-plus' );
@@ -3432,7 +3429,7 @@ global $wppa_hide_this;
 				case 'lightbox': {
 					// Lightbox overlay configuration settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -3443,7 +3440,7 @@ global $wppa_hide_this;
 						$opts = array(__('Black', 'wp-photo-album-plus' ), __('White', 'wp-photo-album-plus' ));
 						$vals = array('black', 'white');
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Theme background color', 'wp-photo-album-plus' );
 						$desc = __('The color of the outer background.', 'wp-photo-album-plus' );
@@ -3509,7 +3506,7 @@ global $wppa_hide_this;
 						$help = __('If checked, you can scroll through the non-WPPA images in the lightbox view.', 'wp-photo-album-plus' );
 						$slug = 'wppa_lightbox_global_set';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help, wppa_switch( 'lightbox_global' ) );
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help, wppa_switch( 'lightbox_global' ) );
 
 						$name = __('Navigation icon size lightbox', 'wp-photo-album-plus' );
 						$desc = __('The size of navigation icons on lightbox', 'wp-photo-album-plus' );
@@ -3565,7 +3562,7 @@ global $wppa_hide_this;
 						$onchange = 'jQuery(\'#wppa-cursor\').attr(\'alt\', jQuery(\'#magnifier\').val() );
 									 document.getElementById(\'wppa-cursor\').src=wppaImageDirectory+document.getElementById(\'magnifier\').value;';
 						$html = wppa_select( $slug, $opts, $vals, $onchange ) .
-								'&nbsp;&nbsp;<img id="wppa-cursor" src="'.wppa_get_imgdir().wppa_opt( substr( $slug, 5 ) ).'" />';
+								'&nbsp;&nbsp;' . wppa_html_tag( 'img', ['id' => 'wppa-cursor', 'src' => wppa_get_imgdir().wppa_opt( substr( $slug, 5 ) )] );
 						wppa_setting_new($slug, '14', $name, $desc, $html, $help);
 						wppa_add_inline_script( 'wppa-admin', $onchange, false );
 
@@ -3574,7 +3571,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_ovl_border_width';
 						$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Border radius', 'wp-photo-album-plus' );
 						$desc = __('Border radius for lightbox display.', 'wp-photo-album-plus' );
@@ -3618,7 +3615,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_ovl_anim';
 						$opts = array(__('--- off ---', 'wp-photo-album-plus' ), '200 ms.', '300 ms.', '400 ms.', '800 ms.', '1.2 s.', '2 s.', '4 s.');
-						$vals = array('10', '200', '300', '400', '800', '1200', '2000', '4000');
+						$vals = array(10, '200', '300', '400', '800', '1200', '2000', '4000');
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '21', $name, $desc, $html, $help);
 
@@ -3651,7 +3648,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_ovl_audio_start';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '25', $name, $desc, $html, $help);
-						
+
 						$name = __('Lightbox slides autostart', 'wp-photo-album-plus');
 						$desc = __('Lightbox slideshow starts running on entering lightbox', 'wp-photo-album-plus');
 						$help = '';
@@ -3724,7 +3721,7 @@ global $wppa_hide_this;
 				case 'comments': {
 					// Comments system related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -3733,7 +3730,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = '';
 						$html = $security_no_disable;
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Comments view login', 'wp-photo-album-plus' );
 						$desc = __('Users must be logged in to see comments on photos.', 'wp-photo-album-plus' );
@@ -3815,7 +3812,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_comment_clickable';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Comment needs vote', 'wp-photo-album-plus' );
 						$desc = __('User needs to give a rating to get his comment published', 'wp-photo-album-plus' );
@@ -3860,7 +3857,7 @@ global $wppa_hide_this;
 						$help = __('The size of the square avatar must be > 0 and < 256', 'wp-photo-album-plus' );
 						$slug = 'wppa_gravatar_size';
 						$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('List comments', 'wp-photo-album-plus' );
 						$desc = __('Show the content of the comments table.', 'wp-photo-album-plus' );
@@ -3908,7 +3905,7 @@ global $wppa_hide_this;
 				case 'rating': {
 					// Rating system related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -3917,7 +3914,7 @@ global $wppa_hide_this;
 						$help = __('Display the rating of the photo under the slideshow image.', 'wp-photo-album-plus' );
 						$slug = '';
 						$html = '<input type="checkbox" checked disabled >';
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Thumbnail rating', 'wp-photo-album-plus' );
 						$desc = __('Display Thumbnail Rating.', 'wp-photo-album-plus' );
@@ -3948,9 +3945,9 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_rating_max';
 						$opts = array(__('Standard: 5 stars', 'wp-photo-album-plus' ), __('Extended: 10 stars', 'wp-photo-album-plus' ), __('One button vote', 'wp-photo-album-plus' ));
-						$vals = array('5', '10', '1');
+						$vals = array('5', 10, 1);
 						$onch = "wppaSlaveSelected('wppa_rating_max-1','rating-1-26');wppaUnSlaveSelected('wppa_rating_max-1','rating_1');";
-						$html = wppa_select($slug, $opts, $vals, $onch) . wppa_see_also( 'maintenance', '1', '5' );
+						$html = wppa_select($slug, $opts, $vals, $onch) . wppa_see_also( 'maintenance', 1, '5' );
 						wppa_setting_new($slug, '5', $name, $desc, $html, $help);
 
 						$name = __('Display precision', 'wp-photo-album-plus' );
@@ -3958,7 +3955,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_rating_prec';
 						$opts = array('1 '.__('decimal places', 'wp-photo-album-plus' ), '2 '.__('decimal places', 'wp-photo-album-plus' ), '3 '.__('decimal places', 'wp-photo-album-plus' ), '4 '.__('decimal places', 'wp-photo-album-plus' ));
-						$vals = array('1', '2', '3', '4');
+						$vals = array(1, '2', '3', '4');
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 
@@ -3988,7 +3985,7 @@ global $wppa_hide_this;
 						$help = __('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' );
 						$slug = 'wppa_rating_change';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Rating multi', 'wp-photo-album-plus' );
 						$desc = __('Users may give multiple votes.', 'wp-photo-album-plus' );
@@ -4025,7 +4022,7 @@ global $wppa_hide_this;
 						$help = __('If checked, the visitor goes straight to the slide following the slide he voted. This will speed up mass voting.', 'wp-photo-album-plus' );
 						$slug = 'wppa_next_on_callback';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Star off opacity', 'wp-photo-album-plus' );
 						$desc = __('Rating star off state opacity value.', 'wp-photo-album-plus' );
@@ -4033,7 +4030,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.(__('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' ));
 						$slug = 'wppa_star_opacity';
 						$html = wppa_input($slug, '50px', '', __('%', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '16', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, '16', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Notify inappropriate', 'wp-photo-album-plus' );
 						$desc = __('Notify admin every x times.', 'wp-photo-album-plus' );
@@ -4044,7 +4041,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.(__('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' ));
 						$slug = 'wppa_dislike_mail_every';
 						$html = wppa_input($slug, '40px', '', __('reports', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '17', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, '17', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Dislike value', 'wp-photo-album-plus' );
 						$desc = __('This value counts dislike rating.', 'wp-photo-album-plus' );
@@ -4052,7 +4049,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' );
 						$slug = 'wppa_dislike_value';
 						$html = wppa_input($slug, '50px', '', __('points', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '18', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, '18', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Pending after', 'wp-photo-album-plus' );
 						$desc = __('Set status to pending after xx dislike votes.', 'wp-photo-album-plus' );
@@ -4060,7 +4057,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' );
 						$slug = 'wppa_dislike_set_pending';
 						$html = wppa_input($slug, '40px', '', __('reports', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '19', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, '19', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Delete after', 'wp-photo-album-plus' );
 						$desc = __('Delete photo after xx dislike votes.', 'wp-photo-album-plus' );
@@ -4068,7 +4065,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' );
 						$slug = 'wppa_dislike_delete';
 						$html = wppa_input($slug, '40px', '', __('reports', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '20', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, '20', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Show dislike count', 'wp-photo-album-plus' );
 						$desc = __('Show the number of dislikes in the rating bar.', 'wp-photo-album-plus' );
@@ -4076,7 +4073,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('If "One button vote" is selected in item 5, this setting has no meaning', 'wp-photo-album-plus' );
 						$slug = 'wppa_dislike_show_count';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '21', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != '1', 'rating_1' );
+						wppa_setting_new($slug, '21', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) != 1, 'rating_1' );
 
 						$name = __('Show average rating', 'wp-photo-album-plus' );
 						$desc = __('Display the avarage rating and/or vote count on the rating bar', 'wp-photo-album-plus' );
@@ -4098,14 +4095,14 @@ global $wppa_hide_this;
 						$desc = __('The text on the voting button.', 'wp-photo-album-plus' );
 						$help = __('This text may contain qTranslate compatible language tags.', 'wp-photo-album-plus' );
 						$slug = 'wppa_vote_button_text';
-						$html = wppa_input($slug, '100');
+						$html = wppa_input($slug, 100);
 						wppa_setting_new($slug, '24', $name, $desc, $html, $help);
 
 						$name = __('Single vote button text voted', 'wp-photo-album-plus' );
 						$desc = __('The text on the voting button when voted.', 'wp-photo-album-plus' );
 						$help = __('This text may contain qTranslate compatible language tags.', 'wp-photo-album-plus' );
 						$slug = 'wppa_voted_button_text';
-						$html = wppa_input($slug, '100');
+						$html = wppa_input($slug, 100);
 						wppa_setting_new($slug, '25', $name, $desc, $html, $help);
 
 						$name = __('Single vote button thumbnail', 'wp-photo-album-plus' );
@@ -4113,7 +4110,7 @@ global $wppa_hide_this;
 						$help = __('This works only in single vote mode: item 5 set to "one button vote"', 'wp-photo-album-plus' );
 						$slug = 'wppa_vote_thumb';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '26', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) == '1' );
+						wppa_setting_new($slug, '26', $name, $desc, $html, $help, wppa_opt( 'rating_max' ) == 1 );
 
 						$name = __('Medal bronze when', 'wp-photo-album-plus' );
 						$desc = __('Photo gets medal bronze when number of top-scores ( 5 or 10 ).', 'wp-photo-album-plus' );
@@ -4141,7 +4138,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_medal_color';
 						$opts = array( __('Red', 'wp-photo-album-plus' ), __('Green', 'wp-photo-album-plus' ), __('Blue', 'wp-photo-album-plus' ) );
-						$vals = array( '1', '2', '3' );
+						$vals = array( 1, '2', '3' );
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '30', $name, $desc, $html, $help);
 
@@ -4191,7 +4188,7 @@ global $wppa_hide_this;
 						$desc = __('The number of photos in the contest results display.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_contest_max';
-						$html = wppa_number($slug, '3', '100');
+						$html = wppa_number($slug, '3', 100);
 						wppa_setting_new($slug, '35', $name, $desc, $html, $help);
 
 						$name = __('Contest comment visibility', 'wp-photo-album-plus' );
@@ -4221,7 +4218,7 @@ global $wppa_hide_this;
 				case 'search': {
 					// Search albums and photos features related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -4239,7 +4236,7 @@ global $wppa_hide_this;
 						$opts = array();
 						$vals = array();
 						$opts[] = __('--- Please select a page ---', 'wp-photo-album-plus' );
-						$vals[] = '0';
+						$vals[] = 0;
 						if ($pages) {
 
 							// Translate
@@ -4261,12 +4258,12 @@ global $wppa_hide_this;
 						$html1 = wppa_select($slug, $opts, $vals, '', '', true);
 
 						$slug2 = 'wppa_search_oc';
-						$opts2 = array('1','2','3','4','5');
-						$vals2 = array('1','2','3','4','5');
+						$opts2 = array(1,'2','3','4','5');
+						$vals2 = array(1,'2','3','4','5');
 						$html2 = '<div style="float:right"><div style="font-size:9px;float:left;" class="" >'.__('Occur', 'wp-photo-album-plus' ).'</div>'.wppa_select($slug2, $opts2, $vals2).'</div>';
 
 						$html = $html1 . $html2;
-						wppa_setting_new(false, '1', $name, $desc, $html, $help);
+						wppa_setting_new(false, 1, $name, $desc, $html, $help);
 
 						$name = __('Exclude separate', 'wp-photo-album-plus' );
 						$desc = __('Do not search \'separate\' albums.', 'wp-photo-album-plus' );
@@ -4300,7 +4297,7 @@ global $wppa_hide_this;
 						$name = __('Include comments', 'wp-photo-album-plus' );
 						$desc = __('Do also search the comments on photos.', 'wp-photo-album-plus' );
 						$help = __('When checked, the comments of the photos will also be searched.', 'wp-photo-album-plus' );
-						$slug = 'wppa_search_comments' ;
+						$slug = 'wppa_search_comments';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 
@@ -4330,7 +4327,7 @@ global $wppa_hide_this;
 						$help = __('Hide the and/or radiobuttons and do the or method in the multitag widget and shortcode.', 'wp-photo-album-plus' );
 						$slug = 'wppa_tags_or_only';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Tags add Inverse', 'wp-photo-album-plus' );
 						$desc = __('Add a checkbox to invert the selection.', 'wp-photo-album-plus' );
@@ -4371,7 +4368,7 @@ global $wppa_hide_this;
 						$help = __('To limit the length of the selectionlist, enter the number of characters to show.', 'wp-photo-album-plus' );
 						$slug = 'wppa_ss_text_max';
 						$html = $html = wppa_input($slug, '50px');
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Search toptext', 'wp-photo-album-plus' );
 						$desc = __('The text at the top of the search box.', 'wp-photo-album-plus' );
@@ -4399,7 +4396,7 @@ global $wppa_hide_this;
 						$desc = __('The minmum number of chars in a search request.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_search_min_length';
-						$html = wppa_number($slug, '1', '6');
+						$html = wppa_number($slug, 1, '6');
 						wppa_setting_new($slug, '19', $name, $desc, $html, $help);
 
 						$name = __('Exclude from search', 'wp-photo-album-plus' );
@@ -4434,13 +4431,13 @@ global $wppa_hide_this;
 						$desc = __('Enter number of search selection boxes.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_search_selboxes';
-						$opts = array( '0', '1', '2', '3' );
+						$opts = array( 0, 1, '2', '3' );
 						$vals = $opts;
 						$html = wppa_select( $slug, $opts, $vals );
 						wppa_setting_new($slug, '24', $name, $desc, $html, $help);
 
 						/* translators: integer */
-						$name = sprintf(__('Box %d caption', 'wp-photo-album-plus' ), '1');
+						$name = sprintf(__('Box %d caption', 'wp-photo-album-plus' ), 1);
 						$desc = __('Enter caption text', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_search_caption_0';
@@ -4448,7 +4445,7 @@ global $wppa_hide_this;
 						wppa_setting_new($slug, '25', $name, $desc, $html, $help);
 
 						/* translators: integer */
-						$name = sprintf(__('Box %d content', 'wp-photo-album-plus' ), '1');
+						$name = sprintf(__('Box %d content', 'wp-photo-album-plus' ), 1);
 						$desc = __('Enter search tokens, one per line.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_search_selbox_0';
@@ -4541,7 +4538,7 @@ global $wppa_hide_this;
 				case 'widget': {
 					// General widget size settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -4550,7 +4547,7 @@ global $wppa_hide_this;
 						$help = __('Widget width for photo of the day, general purpose (default), slideshow (default) and upload widgets.', 'wp-photo-album-plus' );
 						$slug = 'wppa_widget_width';
 						$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('TopTen count', 'wp-photo-album-plus' );
 						$desc = __('Number of photos in TopTen widget.', 'wp-photo-album-plus' );
@@ -4623,7 +4620,7 @@ global $wppa_hide_this;
 						$help = __('Enter the maximum number of thumbnail photos of albums in the Album widget.', 'wp-photo-album-plus' );
 						$slug = 'wppa_album_widget_count';
 						$html = wppa_input($slug, '40px', '', __('albums', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Album widget size', 'wp-photo-album-plus' );
 						$desc = __('Size of thumbnails in Album widget.', 'wp-photo-album-plus' );
@@ -4664,7 +4661,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_tagcloud_max';
 						$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Tagcloud character sizing', 'wp-photo-album-plus' );
 						$desc = __('Formula to decide fontsizes', 'wp-photo-album-plus' );
@@ -4687,16 +4684,16 @@ global $wppa_hide_this;
 						$desc = __('Enable invisible browsing buttons in widget slideshows.', 'wp-photo-album-plus' );
 						$help = __('If checked, the fullsize image is covered by two invisible areas that act as browse buttons.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Make sure the Maximum height is properly configured to prevent these areas to overlap unwanted space.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'slide', '1', '2' );
+						$help .= '<br>'.wppa_see_also( 'slide', 1, '2' );
 						$slug = 'wppa_show_bbb_widget';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Ugly Browse Buttons in widget', 'wp-photo-album-plus' );
 						$desc = __('Enable ugly browsing buttons in widget slideshows.', 'wp-photo-album-plus' );
 						$help = __('If checked, the fullsize image is covered by browse buttons.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Make sure the Maximum height is properly configured to prevent these areas to overlap unwanted space.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'slide', '1', '2' );
+						$help .= '<br>'.wppa_see_also( 'slide', 1, '2' );
 						$slug = 'wppa_show_ubb_widget';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '2', $name, $desc, $html, $help);
@@ -4721,7 +4718,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_qr_size';
 						$html = wppa_input($slug, '50px', '', __('pixels', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('QR color', 'wp-photo-album-plus' );
 						$desc = __('The display color of the qr code (dark)', 'wp-photo-album-plus' );
@@ -4739,7 +4736,7 @@ global $wppa_hide_this;
 
 						$name = __('QR cache', 'wp-photo-album-plus' );
 						/* translators: integer count, integer count */
-						$desc = __('Enable caching QR codes', 'wp-photo-album-plus' ) . ' ' . sprintf( __( 'So far %1$d cache hits, %2$d miss with current settings', 'wp-photo-album-plus' ), wppa_get_option('wppa_qr_cache_hits', '0'), wppa_get_option('wppa_qr_cache_miss', '0'));
+						$desc = __('Enable caching QR codes', 'wp-photo-album-plus' ) . ' ' . sprintf( __( 'So far %1$d cache hits, %2$d miss with current settings', 'wp-photo-album-plus' ), wppa_get_option('wppa_qr_cache_hits', 0), wppa_get_option('wppa_qr_cache_miss', 0));
 						$help = __('Enable this to avoid DoS on heavy loads on the qrserver', 'wp-photo-album-plus' );
 						$slug = 'wppa_qr_cache';
 						$html = wppa_checkbox($slug);
@@ -4762,7 +4759,7 @@ global $wppa_hide_this;
 				case 'links': {
 					// System Links configuration
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -4771,7 +4768,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = '';
 						$html = $security_no_enable;
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Album names in urls', 'wp-photo-album-plus' );
 						$desc = __('Display album names in urls.', 'wp-photo-album-plus' );
@@ -4795,7 +4792,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('It is recommended to check this box. It shortens links dramatically and simplifies qr codes.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('However, you may encounter conflicts with themes and/or other plugins, so test it throughly!', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Photo names in urls must be UNchecked for this setting to work!', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'links', '1', '1' );
+						$help .= '<br>'.wppa_see_also( 'links', 1, 1 );
 						$slug = 'wppa_use_pretty_links';
 						$opts = array( 	__( 'None', 'wp-photo-album-plus' ),
 										__( 'Classic', 'wp-photo-album-plus' ),
@@ -4869,7 +4866,7 @@ global $wppa_hide_this;
 						$html3 = wppa_checkbox($slug3);
 						$html4 = wppa_checkbox($slug4);
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Thumbnail', 'wp-photo-album-plus' );
 						$desc = __('Thumbnail link.', 'wp-photo-album-plus' );
@@ -5140,7 +5137,7 @@ global $wppa_hide_this;
 						$html3 = wppa_checkbox($slug3);
 						$html4 = wppa_checkbox($slug4);
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('SlideWidget', 'wp-photo-album-plus' );
 						$desc = __('Slideshow widget photo link.', 'wp-photo-album-plus' );
@@ -5405,7 +5402,7 @@ global $wppa_hide_this;
 						$html3 = wppa_checkbox($slug3);
 						$html4 = wppa_checkbox($slug4);
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Tagcloud Link', 'wp-photo-album-plus' );
 						$desc = __('Configure the link from the tags in the tag cloud.', 'wp-photo-album-plus' );
@@ -5425,8 +5422,8 @@ global $wppa_hide_this;
 							'album',
 							'slide'
 						);
-						$opts4 = array('1','2','3','4','5');
-						$vals4 = array('1','2','3','4','5');
+						$opts4 = array(1,'2','3','4','5');
+						$vals4 = array(1,'2','3','4','5');
 						$onch = "wppaSlaveNeedPage(this,'$slug2');";
 						$html1 = wppa_select($slug1, $opts1, $vals1, $onch);
 						$wppa_hide_this = ! wppa_need_page($slug1);
@@ -5459,8 +5456,8 @@ global $wppa_hide_this;
 							'album',
 							'slide'
 						);
-						$opts4 = array('1','2','3','4','5');
-						$vals4 = array('1','2','3','4','5');
+						$opts4 = array(1,'2','3','4','5');
+						$vals4 = array(1,'2','3','4','5');
 						$onch = "wppaSlaveNeedPage(this,'$slug2');";
 						$html1 = wppa_select($slug1, $opts1, $vals1, $onch);
 						$wppa_hide_this = ! wppa_need_page($slug1);
@@ -5516,8 +5513,8 @@ global $wppa_hide_this;
 						$html2 = wppa_select($slug2, $opts_page_auto, $vals_page);
 						$wppa_hide_this = false;
 						$html3 = '';
-						$opts4 = array('1','2','3','4','5');
-						$vals4 = array('1','2','3','4','5');
+						$opts4 = array(1,'2','3','4','5');
+						$vals4 = array(1,'2','3','4','5');
 						$html4 = '<div style="font-size:9px;float:left;" class="" >'.__('Occur', 'wp-photo-album-plus' ).'</div>'.wppa_select($slug4, $opts4, $vals4);
 						$html = array($html1, $html2, $html3, $html4);
 						wppa_setting_new($slug, '14', $name, $desc, $html, $help);
@@ -5536,7 +5533,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_art_monkey_on';
 						$onch = "wppaSlaveChecked(this,'amo');";
 						$html = wppa_checkbox($slug, $onch);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$amo = wppa_switch( 'art_monkey_on' );
 
@@ -5678,7 +5675,7 @@ global $wppa_hide_this;
 						$html3 = '';
 						$html4 = '';
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Supersearch Landing', 'wp-photo-album-plus' );
 						$desc = __('Select the landing page for the Supersearch Box', 'wp-photo-album-plus' );
@@ -5770,7 +5767,7 @@ global $wppa_hide_this;
 						$slug4 = '';
 						$slug = array($slug1, $slug2, $slug3, $slug4);
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_see_also( 'covers', '2', '10' );;
+						$html2 = wppa_see_also( 'covers', '2', 10 );;
 						$slug3 = '';
 						$slug4 = '';
 						$html = array($html1, $html2, $html3, $html4);
@@ -5784,7 +5781,7 @@ global $wppa_hide_this;
 				case 'users': {
 					// Frontend (user) upload related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -5792,8 +5789,8 @@ global $wppa_hide_this;
 						$desc = __('Enable frontend upload.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = '';
-						$html = '<input type="checkbox" checked disabled >' . wppa_see_also( 'new', '1', '18..26' );
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						$html = '<input type="checkbox" checked disabled >' . wppa_see_also( 'new', 1, '18..26' );
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('User upload Video', 'wp-photo-album-plus' );
 						$desc = __('Enable frontend upload of video.', 'wp-photo-album-plus' );
@@ -5853,7 +5850,7 @@ global $wppa_hide_this;
 						$name = __('User name', 'wp-photo-album-plus' );
 						$desc = __('Uploading users may overrule the default name.', 'wp-photo-album-plus' );
 						$help = __('If checked, the default photo name may be overruled by the user.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'new', '1', '29' );
+						$help .= '<br>'.wppa_see_also( 'new', 1, '29' );
 						$slug1 = 'wppa_name_user';
 						$slug2 = 'wppa_name_user_mandatory';
 						$html = wppa_checkbox( $slug1 ) . '<span style="float:left">' . __( 'Mandatory', 'wp-photo-album-plus' ) . ':</span>' . wppa_checkbox( $slug2 );
@@ -5863,10 +5860,10 @@ global $wppa_hide_this;
 						$desc = __('Give each new frontend uploaded photo a standard description.', 'wp-photo-album-plus' );
 						$help = __('If checked, each new photo will get the default New photo description.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Note: If the next item is checked, the user can overwrite this', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'new', '1', '13' );
+						$help .= '<br>'.wppa_see_also( 'new', 1, '13' );
 						$slug = 'wppa_apply_newphoto_desc_user';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('User desc', 'wp-photo-album-plus' );
 						$desc = __('Uploading users may overrule the default description.', 'wp-photo-album-plus' );
@@ -5904,7 +5901,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_up_tagselbox_title_1';
 						$html = wppa_edit( $slug, wppa_get_option( $slug ), '300px' );
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help, wppa_switch( 'fe_upload_tags' ),'user-tags' );
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help, wppa_switch( 'fe_upload_tags' ),'user-tags' );
 
 						$name = __('Tags box', 'wp-photo-album-plus' ).' 1';
 						$desc = __('The tags in the selection box.', 'wp-photo-album-plus' );
@@ -6052,7 +6049,7 @@ global $wppa_hide_this;
 				case 'email': {
 					// Email configuration settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -6063,7 +6060,7 @@ global $wppa_hide_this;
 						$subs = count( wppa_index_string_to_array( wppa_get_option( 'wppa_mailinglist_newalbumnotify', '' ) ) );
 						/* translators: integer count */
 						$html = wppa_checkbox($slug) . '&nbsp;' . sprintf( __( '%d subscribers', 'wp-photo-album-plus' ), $subs );
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Mail on upload', 'wp-photo-album-plus' );
 						$desc = __('Enable mailing users when a frontend upload has been done', 'wp-photo-album-plus' );
@@ -6179,7 +6176,7 @@ global $wppa_hide_this;
 						$help = sprintf( __('This text will be placed between brackets like: %s', 'wp-photo-album-plus' ), '['.str_replace('&#039;', '', get_bloginfo('name') ).']');
 						$slug = 'wppa_email_from_site';
 						$html = wppa_input($slug,'90%');
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('From email', 'wp-photo-album-plus' );
 						$desc = __('Enter the from email address you want to be used', 'wp-photo-album-plus' );
@@ -6218,8 +6215,8 @@ global $wppa_hide_this;
 						$desc = __('Select number of retries for failed mails', 'wp-photo-album-plus' );
 						$help = __('Retries occur at the background every hour', 'wp-photo-album-plus' );
 						$slug = 'wppa_retry_mails';
-						$html = wppa_number($slug, '1', '24');
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						$html = wppa_number($slug, 1, '24');
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						wppa_setting_box_footer_new();
 					}
@@ -6288,7 +6285,7 @@ global $wppa_hide_this;
 				case 'share': {
 					// Social media related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -6297,7 +6294,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_share_hide_when_running';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Show Share Box Widget', 'wp-photo-album-plus' );
 						$desc = __('Display the share social media buttons box in widgets.', 'wp-photo-album-plus' );
@@ -6328,7 +6325,7 @@ global $wppa_hide_this;
 						$opts[0] = __('--- Select one or more pages ---', 'wp-photo-album-plus' );
 						$opts[] = __('--- none ---', 'wp-photo-album-plus' );
 						$vals = $vals_page_post;
-						$vals[] = '0';
+						$vals[] = 0;
 						$html = wppa_select_m($slug, $opts, $vals, '', '', true);
 						wppa_setting_new($slug, '5', $name, $desc, $html, $help);
 
@@ -6360,7 +6357,7 @@ global $wppa_hide_this;
 						$slug1 = 'wppa_share_pinterest';
 						$slug2 = 'wppa_pinterest_black';
 						$html = wppa_checkbox($slug1) . '<span style="float-left">' . __('Black circle icon', 'wp-photo-album-plus' ) . '</span>' . wppa_checkbox($slug2);
-						wppa_setting_new($slug1, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug1, 10, $name, $desc, $html, $help);
 
 						$name = __('Show LinkedIn button', 'wp-photo-album-plus' );
 						$desc = __('Display the LinkedIn button in the share box.', 'wp-photo-album-plus' );
@@ -6398,7 +6395,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_facebook_comments';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Facebook User Id', 'wp-photo-album-plus' );
 						$desc = __('Enter your facebook user id to be able to moderate comments and sends', 'wp-photo-album-plus' );
@@ -6441,7 +6438,7 @@ global $wppa_hide_this;
 						$help = __('If checked, the header of the page will contain metatags that refer to featured photos on the page in the page context.', 'wp-photo-album-plus' );
 						$slug = 'wppa_meta_page';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Meta all', 'wp-photo-album-plus' );
 						$desc = __('Meta tags for all featured photos.', 'wp-photo-album-plus' );
@@ -6475,7 +6472,7 @@ global $wppa_hide_this;
 				case 'system': {
 					// System behaviour related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -6484,7 +6481,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_ajax_render_modal';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Ajax scroll', 'wp-photo-album-plus' );
 						$desc = __('Scroll into position after an ajax call changed the page content', 'wp-photo-album-plus' );
@@ -6569,7 +6566,7 @@ global $wppa_hide_this;
 						$opts = array(__('none', 'wp-photo-album-plus' ), __('At the top', 'wp-photo-album-plus' ), __('At the bottom', 'wp-photo-album-plus' ), __('At top and bottom', 'wp-photo-album-plus' ));
 						$vals = array('none', 'top', 'bottom', 'both');
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Use customized style file', 'wp-photo-album-plus' );
 						$desc = __('This feature is highly discouraged.', 'wp-photo-album-plus' );
@@ -6622,7 +6619,7 @@ global $wppa_hide_this;
 						$desc = __('You must login to... links to login page.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_login_links';
-						$html = wppa_checkbox($slug) . wppa_see_also( 'miscadv', '1', '6', 'login_links' );
+						$html = wppa_checkbox($slug) . wppa_see_also( 'miscadv', 1, '6', 'login_links' );
 						wppa_setting_new($slug, '25', $name, $desc, $html, $help);
 
 						$name = __('Relative urls', 'wp-photo-album-plus' );
@@ -6720,7 +6717,7 @@ global $wppa_hide_this;
 										__( 'very fast', 'wp-photo-album-plus' ),
 										__( 'off', 'wp-photo-album-plus' ),
 										);
-						$vals = array( '750', '500', '350', '200', '100', '0' );
+						$vals = array( '750', '500', '350', '200', 100, 0 );
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new( $slug, '36', $name, $desc, $html, $help );
 
@@ -6821,7 +6818,7 @@ global $wppa_hide_this;
 						$desc = __('Initially loads album data in internal cache to reduce db queries', 'wp-photo-album-plus');
 						$help = __('The higher the better, but be carefull to avoid out of memeory errors', 'wp-photo-album-plus');
 						$slug = 'wppa_pre_cache_albums';
-						$opts = array('10', '20', '50', '100', '200', '500', '1000');
+						$opts = array(10, '20', '50', 100, '200', '500', '1000');
 						$html = wppa_select($slug, $opts, $opts);
 						wppa_setting_new($slug, '46', $name, $desc, $html, $help);
 
@@ -6829,7 +6826,7 @@ global $wppa_hide_this;
 						$desc = __('Initially loads photo data in internal cache to reduce db queries', 'wp-photo-album-plus');
 						$help = __('The higher the better, but be carefull to avoid out of memeory errors', 'wp-photo-album-plus');
 						$slug = 'wppa_pre_cache_photos';
-						$opts = array('100', '200', '500', '1000', '2000', '5000', '10000');
+						$opts = array(100, '200', '500', '1000', '2000', '5000', '10000');
 						$html = wppa_select($slug, $opts, $opts);
 						wppa_setting_new($slug, '47', $name, $desc, $html, $help);
 
@@ -6851,6 +6848,14 @@ global $wppa_hide_this;
 						$onch = '';
 						$html = wppa_select_m($slug, $opts, $vals, $onch, '', false, '', '220' );
 						wppa_setting_new($slug, '48', $name, $desc, $html, $help);
+
+						$name = __('Enable debug mode', 'wp-photo-album-plus');
+						$desc = __('Switch on for debugging purposes', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_enable_debug';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '99', $name, $desc, $html, $help);
+
 /*
 						if ( wppa_get( 'wppa_force_local_js', '' , 'text' ) == 'yes' ) {
 							update_option( 'wppa_force_local_js', 'yes' );
@@ -6883,7 +6888,7 @@ global $wppa_hide_this;
 				case 'files': {
 					// Original source file related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -6893,7 +6898,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('These files can be used to update the photos used in displaying in wppa+ and optionally for downloading original, un-downsized images.', 'wp-photo-album-plus' );
 						$slug = 'wppa_keep_source';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Source directory', 'wp-photo-album-plus' );
 						$desc = __('The path to the directory where the original photofiles will be saved.', 'wp-photo-album-plus' );
@@ -6920,15 +6925,15 @@ global $wppa_hide_this;
 				case 'new': {
 					// New albums / photos related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
 						$opts = array( 	__('--- off ---', 'wp-photo-album-plus' ),
 											/* translators: integer count */
-											sprintf( _n('%d hour', '%d hours', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d hour', '%d hours', 1, 'wp-photo-album-plus' ), 1),
 											/* translators: integer count */
-											sprintf( _n('%d day', '%d days', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d day', '%d days', 1, 'wp-photo-album-plus' ), 1),
 											/* translators: integer count */
 											sprintf( _n('%d day', '%d days', '2', 'wp-photo-album-plus' ), '2'),
 											/* translators: integer count */
@@ -6940,13 +6945,13 @@ global $wppa_hide_this;
 											/* translators: integer count */
 											sprintf( _n('%d day', '%d days', '6', 'wp-photo-album-plus' ), '6'),
 											/* translators: integer count */
-											sprintf( _n('%d week', '%d weeks', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d week', '%d weeks', 1, 'wp-photo-album-plus' ), 1),
 											/* translators: integer count */
 											sprintf( _n('%d day', '%d days', '8', 'wp-photo-album-plus' ), '8'),
 											/* translators: integer count */
 											sprintf( _n('%d day', '%d days', '9', 'wp-photo-album-plus' ), '9'),
 											/* translators: integer count */
-											sprintf( _n('%d day', '%d days', '10', 'wp-photo-album-plus' ), '10'),
+											sprintf( _n('%d day', '%d days', 10, 'wp-photo-album-plus' ), 10),
 											/* translators: integer count */
 											sprintf( _n('%d week', '%d weeks', '2', 'wp-photo-album-plus' ), '2'),
 											/* translators: integer count */
@@ -6954,7 +6959,7 @@ global $wppa_hide_this;
 											/* translators: integer count */
 											sprintf( _n('%d week', '%d weeks', '4', 'wp-photo-album-plus' ), '4'),
 											/* translators: integer count */
-											sprintf( _n('%d month', '%d months', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d month', '%d months', 1, 'wp-photo-album-plus' ), 1),
 										);
 						$vals = array( 	0,
 											60*60,
@@ -6979,7 +6984,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_max_album_newtime';
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('New Photo', 'wp-photo-album-plus' );
 						$desc = __('Maximum time a photo is indicated as New', 'wp-photo-album-plus' );
@@ -7096,8 +7101,8 @@ global $wppa_hide_this;
 						$desc = __('Limits the LasTen photos to those that are \'New\', or newly modified.', 'wp-photo-album-plus' );
 						$help = __('If you tick this box and configured the new photo time, you can even limit the number in LasTen Count, or set that number to an unlikely high value.', 'wp-photo-album-plus' );
 						$slug = 'wppa_lasten_limit_new';
-						$html = wppa_checkbox($slug) . wppa_see_also( 'widget', '1', '8' );
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						$html = wppa_checkbox($slug) . wppa_see_also( 'widget', 1, '8' );
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('LasTen use Modified', 'wp-photo-album-plus' );
 						$desc = __('Use the time modified rather than time upload for LasTen widget/shortcode.', 'wp-photo-album-plus' );
@@ -7153,16 +7158,16 @@ global $wppa_hide_this;
 											__('per week', 'wp-photo-album-plus' ),
 											__('per month', 'wp-photo-album-plus' ), 	// 30 days
 											__('per year', 'wp-photo-album-plus' ));	// 364 days
-						$vals = array( '0', '3600', '86400', '604800', '2592000', '31449600');
+						$vals = array( 0, '3600', '86400', '604800', '2592000', '31449600');
 						$html .= wppa_select($slug, $opts, $vals);
-						wppa_setting_new(false, '15', $name, $desc, $html, $help);
+						wppa_setting_new(false, 15, $name, $desc, $html, $help);
 
 						$name = __('Default parent', 'wp-photo-album-plus' );
 						$desc = __('The parent album of new albums.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_default_parent';
 						$opts = array( __('--- none ---', 'wp-photo-album-plus' ), __('--- separate ---', 'wp-photo-album-plus' ) );
-						$vals = array( '0', '-1');
+						$vals = array( 0, '-1');
 						$albs = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name" );
 						if ( $albs ) {
 							foreach ( $albs as $alb ) {
@@ -7283,7 +7288,7 @@ global $wppa_hide_this;
 						$desc = __('Only create albums for users with Album Admin rights', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_grant_restrict';
-						$html = wppa_checkbox($slug) . wppa_see_also( 'admin', '1' );
+						$html = wppa_checkbox($slug) . wppa_see_also( 'admin', 1 );
 						wppa_setting_new($slug, '26', $name, $desc, $html, $help, $show, $clas);
 
 						$name = __('Iptc 025 keywords to tags', 'wp-photo-album-plus' );
@@ -7440,7 +7445,7 @@ global $wppa_hide_this;
 				case 'admin': {
 					// WPPA+ related roles and capabilities
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 
 						$coldef = array(	__('Role', 'wp-photo-album-plus' ) => 'auto;',
@@ -7538,7 +7543,7 @@ global $wppa_hide_this;
 						$html1 = wppa_checkbox($slug, $onch);
 						$html2 = '';
 						$html = array( $html1, $html2 );
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('User create roles', 'wp-photo-album-plus' );
 						$desc = __('Optionally limit access to selected userroles', 'wp-photo-album-plus' );
@@ -7578,7 +7583,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_user_create_max_level';
 						$onch = '';
-						$html1 = wppa_number($slug, '0', '99');
+						$html1 = wppa_number($slug, 0, '99');
 						$html2 = '';
 						$html = array( $html1, $html2 );
 						wppa_setting_new($slug, '4', $name, $desc, $html, $help, wppa_switch( 'user_create_on' ), 'userroles');
@@ -7628,20 +7633,20 @@ global $wppa_hide_this;
 											__('per week', 'wp-photo-album-plus' ),
 											__('per month', 'wp-photo-album-plus' ), 	// 30 days
 											__('per year', 'wp-photo-album-plus' ));	// 364 days
-						$vals = array( '0', '3600', '86400', '604800', '2592000', '31449600');
+						$vals = array( 0, '3600', '86400', '604800', '2592000', '31449600');
 
 						$roles = $wp_roles->roles;
 						unset ( $roles['administrator'] );
 						foreach (array_keys($roles) as $role) {
 							$t_role = isset( $roles[$role]['name'] ) ? translate_user_role( $roles[$role]['name'] ) : $role;
-							if ( wppa_get_option('wppa_'.$role.'_upload_limit_count', 'nil') == 'nil') wppa_update_option('wppa_'.$role.'_upload_limit_count', '0');
-							if ( wppa_get_option('wppa_'.$role.'_upload_limit_time', 'nil') == 'nil') wppa_update_option('wppa_'.$role.'_upload_limit_time', '0');
+							if ( wppa_get_option('wppa_'.$role.'_upload_limit_count', 'nil') == 'nil') wppa_update_option('wppa_'.$role.'_upload_limit_count', 0);
+							if ( wppa_get_option('wppa_'.$role.'_upload_limit_time', 'nil') == 'nil') wppa_update_option('wppa_'.$role.'_upload_limit_time', 0);
 							/* translators: userrole */
 							$name = sprintf(__('Upload limit %s', 'wp-photo-album-plus' ), $t_role);
 							/* translators: userrole */
 							$desc = sprintf(__('Limit upload capacity for the user role %s.', 'wp-photo-album-plus' ), $t_role);
 							$help = __('This limitation only applies to frontend uploads when the same userrole does not have the Upload checkbox checked.', 'wp-photo-album-plus' );
-							$help .= '<br>'.__('A value of 0 means: no limit.', 'wp-photo-album-plus' ) . wppa_see_also( 'admin', '1' );
+							$help .= '<br>'.__('A value of 0 means: no limit.', 'wp-photo-album-plus' ) . wppa_see_also( 'admin', 1 );
 							$slug1 = 'wppa_'.$role.'_upload_limit_count';
 							$html1 = wppa_input($slug1, '50px', '', __('photos', 'wp-photo-album-plus' ));
 							$slug2 = 'wppa_'.$role.'_upload_limit_time';
@@ -7652,13 +7657,13 @@ global $wppa_hide_this;
 
 						foreach (array_keys($roles) as $role) {
 							$t_role = isset( $roles[$role]['name'] ) ? translate_user_role( $roles[$role]['name'] ) : $role;
-							if ( wppa_get_option('wppa_'.$role.'_album_limit_count', 'nil') == 'nil') wppa_update_option('wppa_'.$role.'_album_limit_count', '0');
+							if ( wppa_get_option('wppa_'.$role.'_album_limit_count', 'nil') == 'nil') wppa_update_option('wppa_'.$role.'_album_limit_count', 0);
 							/* translators: userrole */
 							$name = sprintf(__('Album limit %s', 'wp-photo-album-plus' ), $t_role);
 							/* translators: userrole */
 							$desc = sprintf(__('Limit number of albums for the user role %s.', 'wp-photo-album-plus' ), $t_role);
 							$help = __('This limitation only applies to frontend create albums when the same userrole does not have the Album admin checkbox checked.', 'wp-photo-album-plus' );
-							$help .= '<br>'.__('A value of 0 means: no limit.', 'wp-photo-album-plus' ) . wppa_see_also( 'admin', '1' );
+							$help .= '<br>'.__('A value of 0 means: no limit.', 'wp-photo-album-plus' ) . wppa_see_also( 'admin', 1 );
 							$slug1 = 'wppa_'.$role.'_album_limit_count';
 							$html1 = wppa_input($slug1, '50px', '', __('albums', 'wp-photo-album-plus' ));
 							$slug2 = '';
@@ -7680,7 +7685,7 @@ global $wppa_hide_this;
 						$desc = __('Uploaded photos need moderation.', 'wp-photo-album-plus' );
 						$help = __('If checked, photos uploaded by users who do not have photo album admin access rights need moderation.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Users who have photo album admin access rights can change the photo status to publish or featured.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'admin', '1' );
+						$help .= '<br>'.wppa_see_also( 'admin', 1 );
 						$slug = 'wppa_upload_moderate';
 						$html1 = wppa_checkbox($slug);
 						$html2 = '';
@@ -7712,7 +7717,7 @@ global $wppa_hide_this;
 						$html1 = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
 						$html2 = '';
 						$html = array( $html1, $html2 );
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Fe alert', 'wp-photo-album-plus' );
 						$desc = __('Show alertbox on front-end.', 'wp-photo-album-plus' );
@@ -7737,7 +7742,7 @@ global $wppa_hide_this;
 						$desc = __('Max number of albums in frontend upload selection box.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_fe_upload_max_albums';
-						$opts = array('0', '10', '20', '50', '100', '200', '500', '1000');
+						$opts = array(0, 10, '20', '50', 100, '200', '500', '1000');
 						$vals = $opts;
 						$html1 = wppa_select($slug, $opts, $vals).__('albums', 'wp-photo-album-plus' );
 						$html2 = '';
@@ -7758,7 +7763,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_newpag_create';
 						$onch = '';
 						$html = wppa_checkbox($slug, $onch);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Page content', 'wp-photo-album-plus' );
 						$desc = __('The content of the page. Must contain <b>w#album</b>', 'wp-photo-album-plus' );
@@ -7840,7 +7845,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_allow_import_source';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Import all', 'wp-photo-album-plus' );
 						$desc = __('Ticks all item checkboxes on the import page upon pageload', 'wp-photo-album-plus');
@@ -7869,7 +7874,7 @@ global $wppa_hide_this;
 						$help = __('If checked: alt thumbsize can not be set in album admin by users not having admin rights.', 'wp-photo-album-plus' );
 						$slug = 'wppa_alt_is_restricted';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Link is restricted', 'wp-photo-album-plus' );
 						$desc = __('Using <b>Link to</b> is a restricted action.', 'wp-photo-album-plus' );
@@ -7932,7 +7937,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_admin_separate';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Album download link restricted', 'wp-photo-album-plus' );
 						$desc = __('The album download link on covers shows only to admin', 'wp-photo-album-plus' );
@@ -7958,7 +7963,7 @@ global $wppa_hide_this;
 						$vals = array( '-none-', 'new' );
 						$clas = 'uploadedit';
 						$html = wppa_select($slug, $opts, $vals, "wppaSlaveSelected('wppa_upload_edit-new','" . $clas . "');" );
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$show = wppa_opt( 'upload_edit') == 'new';
 
@@ -8047,7 +8052,7 @@ global $wppa_hide_this;
 						$help = __('This setting requires "Uploader edit" to be enabled also.', 'wp-photo-album-plus' );
 						$slug = 'wppa_owner_moderate_comment';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Upload memory check', 'wp-photo-album-plus' );
 						$desc = __('Disable uploading photos that are too large.', 'wp-photo-album-plus' );
@@ -8079,15 +8084,15 @@ global $wppa_hide_this;
 						$slug = 'wppa_spam_maxage';
 						$opts = array(	__('--- off ---', 'wp-photo-album-plus' ),
 											/* translators: integer count */
-											sprintf( _n('%d minute', '%d minutes', '10', 'wp-photo-album-plus' ), '10'),
+											sprintf( _n('%d minute', '%d minutes', 10, 'wp-photo-album-plus' ), 10),
 											/* translators: integer count */
 											sprintf( _n('%d minute', '%d minutes', '30', 'wp-photo-album-plus' ), '30'),
 											/* translators: integer count */
-											sprintf( _n('%d hour', '%d hours', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d hour', '%d hours', 1, 'wp-photo-album-plus' ), 1),
 											/* translators: integer count */
-											sprintf( _n('%d day', '%d days', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d day', '%d days', 1, 'wp-photo-album-plus' ), 1),
 											/* translators: integer count */
-											sprintf( _n('%d week', '%d weeks', '1', 'wp-photo-album-plus' ), '1'),
+											sprintf( _n('%d week', '%d weeks', 1, 'wp-photo-album-plus' ), 1),
 										);
 
 						$vals = array(	'none',
@@ -8107,7 +8112,7 @@ global $wppa_hide_this;
 						$help = __('If checked: uploading, importing, copying or moving photos to other albums will be prevented when the destination album already contains a photo with the same filename.', 'wp-photo-album-plus' );
 						$slug = 'wppa_void_dups';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Blacklist user', 'wp-photo-album-plus' );
 						$desc = __('Set the status of all the users photos to \'pending\'.', 'wp-photo-album-plus' );
@@ -8118,7 +8123,7 @@ global $wppa_hide_this;
 						if ( wppa_get_user_count() <= wppa_opt( 'max_users' ) ) {
 							$users = wppa_get_users();
 							$opts = array( __('--- select a user to blacklist ---', 'wp-photo-album-plus' ) );
-							$vals = array( '0' );
+							$vals = array( 0 );
 							foreach ( $users as $usr ) {
 								if ( ! in_array( $usr['user_login'], $blacklist ) ) {	// skip already on blacklist
 									$opts[] = htmlspecialchars( $usr['display_name'] ).' ('.$usr['user_login'].')';
@@ -8141,7 +8146,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_un_blacklist_user';
 						$blacklist = wppa_get_option( 'wppa_black_listed_users', array() );
 						$opts = array( __('--- select a user to unblacklist ---', 'wp-photo-album-plus' ) );
-						$vals = array( '0' );
+						$vals = array( 0 );
 						foreach ( $blacklist as $usr ) {
 							$u = wppa_get_user_by( 'login', $usr );
 							$opts[] = htmlspecialchars( $u->display_name ).' ('.$u->user_login.')';
@@ -8162,7 +8167,7 @@ global $wppa_hide_this;
 						$desc = __('Give these users all rights in wppa.', 'wp-photo-album-plus' );
 						$help = __('This gives the user all the administrator privileges within wppa.', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Make sure the user also has a role that has all the capability boxes ticked', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'admin', '1' );
+						$help .= '<br>'.wppa_see_also( 'admin', 1 );
 						$slug = 'wppa_superuser_user';
 						$superlist = wppa_get_option( 'wppa_super_users', array() );
 
@@ -8170,7 +8175,7 @@ global $wppa_hide_this;
 						if ( wppa_get_user_count() <= wppa_opt( 'max_users' ) ) {
 							$users = wppa_get_users();
 							$opts = array( __('--- select a user to make superuser ---', 'wp-photo-album-plus' ) );
-							$vals = array( '0' );
+							$vals = array( 0 );
 							foreach ( $users as $usr ) {
 								if ( ! in_array( $usr['user_login'], $superlist ) ) {	// skip already on superlist
 									$opts[] = htmlspecialchars( $usr['display_name'] ).' ('.$usr['user_login'].')';
@@ -8191,7 +8196,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_un_superuser_user';
 						$superlist = wppa_get_option( 'wppa_super_users', array() );
 						$opts = array( __('--- select a user to unmake superuser ---', 'wp-photo-album-plus' ) );
-						$vals = array( '0' );
+						$vals = array( 0 );
 						foreach ( $superlist as $usr ) {
 							$u = wppa_get_user_by( 'login', $usr );
 							$opts[] = htmlspecialchars( $u->display_name ).' ('.$u->user_login.')';
@@ -8222,7 +8227,7 @@ global $wppa_hide_this;
 										'admin',
 										);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Admin bar menu admin', 'wp-photo-album-plus' );
 						$desc = __('Show menu on admin bar on admin pages.', 'wp-photo-album-plus' );
@@ -8242,8 +8247,8 @@ global $wppa_hide_this;
 						$desc = __('Max albums to show in album selectionbox.', 'wp-photo-album-plus' );
 						$help = __('If there are more albums in the system, display an input box asking for album id#', 'wp-photo-album-plus' );
 						$slug = 'wppa_photo_admin_max_albums';
-						$opts = array( __( '--- off ---', 'wp-photo-album-plus' ), '10', '20', '50', '100', '200', '500', '1000', '2000', '3000', '4000', '5000' );
-						$vals = array( '0', '10', '20', '50', '100', '200', '500', '1000', '2000', '3000', '4000', '5000' );
+						$opts = array( __( '--- off ---', 'wp-photo-album-plus' ), 10, '20', '50', 100, '200', '500', '1000', '2000', '3000', '4000', '5000' );
+						$vals = array( 0, 10, '20', '50', 100, '200', '500', '1000', '2000', '3000', '4000', '5000' );
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 
@@ -8266,7 +8271,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_shortcode_to_add';
 						$html = wppa_input($slug, '300px');
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Enable shortcode generator', 'wp-photo-album-plus' );
 						$desc = __('Show album icon above page/post edit window', 'wp-photo-album-plus' );
@@ -8286,7 +8291,7 @@ global $wppa_hide_this;
 						$desc = __('Maximum number of selectable photos in the shortcode generators', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_generator_max';
-						$opts = array( '5', '10', '20', '50', '100', '200', '500', '1000', '2000', '5000' );
+						$opts = array( '5', 10, '20', '50', 100, '200', '500', '1000', '2000', '5000' );
 						$vals = $opts;
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '13', $name, $desc, $html, $help);
@@ -8303,7 +8308,7 @@ global $wppa_hide_this;
 						$help = __('Use with care, it can damage the admin layout, depending of the theme used. It does only load the standard and child theme css, no inline css', 'wp-photo-album-plus');
 						$slug = 'wppa_admin_theme_css';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						$name = __('Backend inline styles', 'wp-photo-album-plus');
 						$desc = __('Here you can add inline styles to fix the damage caused by the previous setting', 'wp-photo-album-plus');
@@ -8332,7 +8337,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_opt_menu_search';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Logfile', 'wp-photo-album-plus' );
 						$desc = __('List logfile', 'wp-photo-album-plus' );
@@ -8377,7 +8382,7 @@ global $wppa_hide_this;
 				case 'maintenance': {
 					// Regular maintenance procedures
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 
 						$coldef = array( 	'#' => '24px;',
@@ -8401,7 +8406,7 @@ global $wppa_hide_this;
 						$html3 = '';
 						$html4 = '';
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '0', $name, $desc, $html, $help);
+						wppa_setting_new(false, 0, $name, $desc, $html, $help);
 
 						$name = __('Setup', 'wp-photo-album-plus' );
 						$desc = __('Re-initialize plugin.', 'wp-photo-album-plus' );
@@ -8413,7 +8418,7 @@ global $wppa_hide_this;
 						$html3 = '';
 						$html4 = '';
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '1', $name, $desc, $html, $help);
+						wppa_setting_new(false, 1, $name, $desc, $html, $help);
 
 						$name = __('Backup settings', 'wp-photo-album-plus' );
 						$desc = __('Save all settings into a backup file.', 'wp-photo-album-plus' );
@@ -8467,7 +8472,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug1 = 'wppa_regen_thumbs_skip_one';
 						$slug2 = 'wppa_regen_thumbs';
-						$html1 = wppa_cronjob_button( $slug2 ) . wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'regen_thumbs_skip_one', '0', true );
+						$html1 = wppa_cronjob_button( $slug2 ) . wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'regen_thumbs_skip_one', 0, true );
 						$html2 = wppa_maintenance_button( $slug2 );
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
@@ -8549,7 +8554,7 @@ global $wppa_hide_this;
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '10', $name, $desc, $html, $help);
+						wppa_setting_new(false, 10, $name, $desc, $html, $help);
 
 						$name = __('Clean Index', 'wp-photo-album-plus' );
 						$desc = __('Remove obsolete entries from index db table.', 'wp-photo-album-plus' );
@@ -8598,7 +8603,7 @@ global $wppa_hide_this;
 						$help = __('This action will remake the fullsize images, thumbnail images, and will refresh the iptc and exif data for all photos where the source is found in the corresponding album sub-directory of the source directory.', 'wp-photo-album-plus' );
 						$slug1 = 'wppa_remake_skip_one';
 						$slug2 = 'wppa_remake';
-						$html1 = wppa_cronjob_button( $slug2 ) . wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'remake_skip_one', '0', true );
+						$html1 = wppa_cronjob_button( $slug2 ) . wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'remake_skip_one', 0, true );
 						$html2 = wppa_maintenance_button( $slug2 );
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
@@ -8615,7 +8620,7 @@ global $wppa_hide_this;
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '15', $name, $desc, $html, $help);
+						wppa_setting_new(false, 15, $name, $desc, $html, $help);
 
 						$name = __('Missing only', 'wp-photo-album-plus' );
 						$desc = __('Remake missing photofiles only.',  'wp-photo-album-plus' );
@@ -8661,7 +8666,7 @@ global $wppa_hide_this;
 										__('week', 'wp-photo-album-plus' ),
 										__('month', 'wp-photo-album-plus' ),
 										);
-						$vals = array( '0', '1', '24', '168', '720' );
+						$vals = array( 0, 1, '24', '168', '720' );
 						$html = wppa_select( $slug, $opts, $vals ) . '<td></td><td></td><td></td>';
 						wppa_setting_new(false, '19', $name, $desc, $html, $help);
 
@@ -8686,7 +8691,7 @@ global $wppa_hide_this;
 										__('week', 'wp-photo-album-plus' ),
 										__('month', 'wp-photo-album-plus' ),
 										);
-						$vals = array( '0', '1', '24', '168', '720' );
+						$vals = array( 0, 1, '24', '168', '720' );
 						$html = wppa_select( $slug, $opts, $vals ) . '<td></td><td></td><td></td>';
 						wppa_setting_new(false, '21', $name, $desc, $html, $help);
 
@@ -8695,7 +8700,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug1 = 'wppa_create_o1_files_skip_one';
 						$slug2 = 'wppa_create_o1_files';
-						$html1 = wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'create_o1_files_skip_one', '0', true );
+						$html1 = wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'create_o1_files_skip_one', 0, true );
 						$html2 = wppa_maintenance_button( $slug2 );
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
@@ -8730,7 +8735,7 @@ global $wppa_hide_this;
 						$html3 = '';
 						$html4 = '';
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '1', $name, $desc, $html, $help, wppa_switch( 'rating_on' ) );
+						wppa_setting_new(false, 1, $name, $desc, $html, $help, wppa_switch( 'rating_on' ) );
 
 						$name = __('Clear viewcounts', 'wp-photo-album-plus' );
 						$desc = __('Reset all viewcounts.', 'wp-photo-album-plus' );
@@ -8768,7 +8773,7 @@ global $wppa_hide_this;
 						$name = __('Apply Default Photoname', 'wp-photo-album-plus' );
 						$desc = __('Apply Default photo name on all photos in the system.', 'wp-photo-album-plus' );
 						$help = __('Puts the content of Default photo name in all photo name.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'new', '1', '29' );
+						$help .= '<br>'.wppa_see_also( 'new', 1, '29' );
 						$slug2 = 'wppa_apply_default_photoname_all';
 						$html1 = '';
 						$html2 = wppa_maintenance_button( $slug2 );
@@ -8780,7 +8785,7 @@ global $wppa_hide_this;
 						$name = __('Apply New Photodesc', 'wp-photo-album-plus' );
 						$desc = __('Apply New photo description on all photos in the system.', 'wp-photo-album-plus' );
 						$help = __('Puts the content of New photo desc in all photo descriptions.', 'wp-photo-album-plus' );
-						$help .= '<br>'.wppa_see_also( 'new', '1', '13' );
+						$help .= '<br>'.wppa_see_also( 'new', 1, '13' );
 						$slug2 = 'wppa_apply_new_photodesc_all';
 						$html1 = '';
 						$html2 = wppa_maintenance_button( $slug2 );
@@ -8835,7 +8840,7 @@ global $wppa_hide_this;
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '10', $name, $desc, $html, $help);
+						wppa_setting_new(false, 10, $name, $desc, $html, $help);
 
 						$name = __('Re-add file-ext', 'wp-photo-album-plus' );
 						$desc = __('Revert the <b>Remove file-ext</b> action.', 'wp-photo-album-plus' );
@@ -8862,7 +8867,7 @@ global $wppa_hide_this;
 						$name = __('Create all autopages', 'wp-photo-album-plus' );
 						$desc = __('Create all the pages to display slides individually.', 'wp-photo-album-plus' );
 						$help = '<br>'.__('Make sure you have a custom menu and the "Automatically add new top-level pages to this menu" box UNticked!!', 'wp-photo-album-plus' );
-						$help .= wppa_see_also( 'system', '1', '8' );
+						$help .= wppa_see_also( 'system', 1, '8' );
 						$slug2 = 'wppa_create_all_autopages';
 						$html1 = '';
 						$html2 = wppa_maintenance_button( $slug2 );
@@ -8873,14 +8878,14 @@ global $wppa_hide_this;
 
 						$name = __('Delete all autopages', 'wp-photo-album-plus' );
 						$desc = __('Delete all the pages to display slides individually.', 'wp-photo-album-plus' );
-						$help = wppa_see_also( 'system', '1', '8' );
+						$help = wppa_see_also( 'system', 1, '8' );
 						$slug2 = 'wppa_delete_all_autopages';
 						$html1 = '';
 						$html2 = wppa_maintenance_button( $slug2 );
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '15', $name, $desc, $html, $help);
+						wppa_setting_new(false, 15, $name, $desc, $html, $help);
 
 						$name = __('Leading zeroes', 'wp-photo-album-plus' );
 						$desc = __('If photoname numeric, add leading zeros', 'wp-photo-album-plus' );
@@ -8919,9 +8924,9 @@ global $wppa_hide_this;
 						if ( function_exists( 'ewww_image_optimizer') ) {
 							$name = __('Optimize files', 'wp-photo-album-plus' );
 							$desc = __('Optimize with EWWW image optimizer', 'wp-photo-album-plus' );
-							$help = wppa_see_also('new', '1', '41');
+							$help = wppa_see_also('new', 1, '41');
 							$slug2 = 'wppa_optimize_ewww';
-							$html1 = wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'optimize_ewww_skip_one', '0', true );
+							$html1 = wppa_ajax_button(__('Skip one', 'wp-photo-album-plus' ), 'optimize_ewww_skip_one', 0, true );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
@@ -9020,13 +9025,9 @@ global $wppa_hide_this;
 																	'selected'=>wppa_get_option('wppa_move_all_photos_from')
 																	)).
 									'</select>' .
-									'<img' .
-										' id="img_move_all_photos_from"' .
-										' class=""' .
-										' src="'.wppa_get_imgdir().'star.ico"' .
-										' title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'"' .
-										' style="padding-left:4px; float:left; height:16px; width:16px;"' .
-									' />';
+									wppa_html_tag( 'img', ['id' => "img_move_all_photos_from", 'src' => wppa_get_imgdir().'star.ico',
+														   'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+														   'style' => "padding-left:4px; float:left; height:16px; width:16px;"] );
 							$html = array($html, '', '', '');
 							wppa_setting_new(false, '28', $name, $desc, $html, $help);
 
@@ -9045,13 +9046,9 @@ global $wppa_hide_this;
 																	'selected'=>wppa_get_option('wppa_move_all_photos_to')
 																	)).
 									'</select>' .
-									'<img' .
-										' id="img_move_all_photos_to"' .
-										' class=""' .
-										' src="'.wppa_get_imgdir().'star.ico"' .
-										' title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'"' .
-										' style="padding-left:4px; float:left; height:16px; width:16px;"' .
-									' />';
+									wppa_html_tag( 'img', ['id' => "img_move_all_photos_to", 'src' => wppa_get_imgdir().'star.ico',
+														   'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+														   'style' => "padding-left:4px; float:left; height:16px; width:16px;"] );
 							$html = array($html, '', '', '');
 							wppa_setting_new(false, '29', $name, $desc, $html, $help);
 						}
@@ -9208,7 +9205,7 @@ global $wppa_hide_this;
 						$html3 = wppa_status_field( $slug2 );
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
-						wppa_setting_new(false, '1', $name, $desc, $html, $help);
+						wppa_setting_new(false, 1, $name, $desc, $html, $help);
 
 						$name = __('Fix cats', 'wp-photo-album-plus' );
 						$desc = __('Make sure album cats format is uptodate', 'wp-photo-album-plus' );
@@ -9285,7 +9282,7 @@ global $wppa_hide_this;
 				case 'exif': {
 					// EXIF tags and their labels as found in the uploaded photos
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 
 						$coldef = array( 	__('#', 'wp-photo-album-plus' ) => '24px;',
@@ -9298,11 +9295,11 @@ global $wppa_hide_this;
 						wppa_setting_box_header_new($tab, $coldef);
 
 						$labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif
-													   WHERE photo = '0'
+													   WHERE photo = 0
 													   ORDER BY tag" );
 
 						if ( is_array( $labels ) ) {
-							$i = '1';
+							$i = 1;
 							foreach ( $labels as $label ) {
 								$name = htmlspecialchars( $label['tag'] );
 
@@ -9343,7 +9340,7 @@ global $wppa_hide_this;
 				case 'iptc': {
 					// IPTC tags and their labels as found in the uploaded photos
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 
 						$coldef = array( 	__('#', 'wp-photo-album-plus' ) => '24px;',
@@ -9355,11 +9352,11 @@ global $wppa_hide_this;
 						wppa_setting_box_header_new($tab, $coldef);
 
 						$labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_iptc
-																	   WHERE photo = '0'
+																	   WHERE photo = 0
 																	   ORDER BY tag" );
 
 						if ( is_array( $labels ) ) {
-							$i = '1';
+							$i = 1;
 							foreach ( $labels as $label ) {
 								$name = htmlspecialchars( $label['tag'] );
 								$desc = '';
@@ -9383,7 +9380,7 @@ global $wppa_hide_this;
 				case 'gpx': {
 					// GPX configuration
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -9395,7 +9392,7 @@ global $wppa_hide_this;
 						$vals = array( 'wppa-plus-embedded', 'external-plugin' );
 						$onch = "wppaSlaveSelected('wppa_gpx_implementation-wppa-plus-embedded','wppa_map_height');";
 						$html = wppa_select($slug, $opts, $vals, $onch);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Map height', 'wp-photo-album-plus' );
 						$desc = __('The height of the map display.', 'wp-photo-album-plus' );
@@ -9423,7 +9420,7 @@ global $wppa_hide_this;
 						$desc = __('The zoomlevel for GPX maps', 'wp-photo-album-plus' );
 						$help = __('This setting is for embedded implementation only.', 'wp-photo-album-plus' );
 						$slug = 'wppa_geo_zoom';
-						$opts = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25',);
+						$opts = array(1,'2','3','4','5','6','7','8','9',10,'11','12','13','14',15,'16','17','18','19','20','21','22','23','24','25',);
 						$vals = $opts;
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '5', $name, $desc, $html, $help, wppa_opt( 'gpx_implementation' ) == 'wppa-plus-embedded' );
@@ -9436,7 +9433,7 @@ global $wppa_hide_this;
 				case 'custom': {
 					// Album custom data fields configuration
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						if ( wppa_switch( 'album_custom_fields' ) ) {
 							$coldef = array( 	'#' => '24px;',
 												__('Name', 'wp-photo-album-plus' ) => 'auto;',
@@ -9451,7 +9448,7 @@ global $wppa_hide_this;
 							wppa_setting_tab_description($desc);
 							wppa_setting_box_header_new($tab, $coldef);
 
-							for ( $i = '0'; $i < '10'; $i++ ) {
+							for ( $i = 0; $i < 10; $i++ ) {
 								/* translators: integer sequesnce no */
 								$name = sprintf(__('Name, vis, edit %s', 'wp-photo-album-plus' ), $i);
 								/* translators: integer sequesnce no */
@@ -9542,19 +9539,19 @@ global $wppa_hide_this;
 							const CREATOR                         = '080';
 							const CITY                            = '090';
 							const PROVINCE_STATE                  = '095';
-							const COUNTRY_CODE                    = '100';
+							const COUNTRY_CODE                    = 100;
 							const COUNTRY                         = '101';
 							const ORIGINAL_TRANSMISSION_REFERENCE = '103';
 							const HEADLINE                        = '105';
 							const CREDIT                          = '110';
 							const SOURCE                          = '115';
 							const COPYRIGHT_STRING                = '116';
-							const CAPTION                         = '120';
+							const CAPTION                         = 120;
 							const LOCAL_CAPTION                   = '121';
 							const CAPTION_WRITER                  = '122';
 							*/
 
-							for ( $i = '0'; $i < '10'; $i++ ) {
+							for ( $i = 0; $i < 10; $i++ ) {
 								/* translators: integer sequesnce no */
 								$name = sprintf(__('Name, vis, edit %s dflt', 'wp-photo-album-plus' ), $i);
 								/* translators: integer sequesnce no */
@@ -9583,7 +9580,7 @@ global $wppa_hide_this;
 				case 'watermark': {
 					// Watermark related settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -9595,11 +9592,17 @@ global $wppa_hide_this;
 						$help .= '<br>'.sprintf(__('The watermark image will be overlaying the photo with %s%% transparency.', 'wp-photo-album-plus' ), (100-wppa_opt( 'watermark_opacity' )));
 						$help .= '<br>'.__('You may also select one of the textual watermark types at the bottom of the selection list.', 'wp-photo-album-plus' );
 						$slug = 'wppa_watermark_file';
-						$html = '<select style="float:left; font-size:11px; height:20px; margin:0 4px 0 0; padding:0; " id="wppa_watermark_file" onchange="wppaAjaxUpdateOptionValue(\'watermark_file\', this)" >' . wppa_watermark_file_select( 'system' ) . '</select>';
-						$html .= '<img id="img_watermark_file" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding-left:4px; float:left; height:16px; width:16px;" />';
-						$html .= '<span style="float:left; margin-left:12px">'.__('position:', 'wp-photo-album-plus' ).'</span><select style="float:left; font-size:11px; height:20px; margin:0 0 0 20px; padding:0; "  id="wppa_watermark_pos" onchange="wppaAjaxUpdateOptionValue(\'watermark_pos\', this)" >' . wppa_watermark_pos_select( 'system' ) . '</select>';
-						$html .= '<img id="img_watermark_pos" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus' ).'" style="padding-left:4px; float:left; height:16px; width:16px;" />';
-						wppa_setting_new(false, '1', $name, $desc, $html, $help);
+						$html =
+						wppa_html_tag( 'select', ['id' => "wppa_watermark_file", 'style' => "float:left;font-size:11px;height:20px;margin:0 4px 0 0;padding:0;",
+												  'onchange' => "wppaAjaxUpdateOptionValue('watermark_file', this)"], wppa_watermark_file_select( 'system' ) ) .
+						wppa_html_tag( 'img', ['id' => "img_watermark_file", 'src' => wppa_get_imgdir().'star.ico', 'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+											   'style' => "padding-left:4px;float:left;height:16px;width:16px;"] ) .
+						wppa_html_tag( 'span', ['style' => "float:left;margin-left:12px"], __('position:', 'wp-photo-album-plus' ) ) .
+						wppa_html_tag( 'select', ['id' =>"wppa_watermark_pos", 'style' => "float:left;font-size:11px;height:20px;margin:0 0 0 20px;padding:0;",
+												  'onchange' => "wppaAjaxUpdateOptionValue('watermark_pos', this)"], wppa_watermark_pos_select( 'system' ) ) .
+						wppa_html_tag( 'img', ['id' => "img_watermark_pos", 'src' => wppa_get_imgdir().'star.ico', 'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+											   'style' => "padding-left:4px;float:left;height:16px;width:16px;"] );
+						wppa_setting_new(false, 1, $name, $desc, $html, $help);
 
 						$name = __('Upload watermark', 'wp-photo-album-plus' );
 						$desc = __('Upload a new watermark file', 'wp-photo-album-plus' );
@@ -9625,7 +9628,7 @@ global $wppa_hide_this;
 						$font = wppa_opt( 'textual_watermark_font' );
 						$onch = "wppaPlanUpdateWatermarkPreview();";
 						$html = wppa_select($slug, $sopts, $svals, $onch);
-						$preview = '<img './*style="background-color:#777;"*/' id="wm-type-preview" src="" />';
+						$preview = wppa_html_tag( 'img', ['id' => "wm-type-preview", 'src' =>""] );
 						wppa_setting_new($slug, '4', $name, $desc, $html.' '.$preview, $help, $clas);
 
 						$name = __('Predefined watermark text', 'wp-photo-album-plus' );
@@ -9656,7 +9659,7 @@ global $wppa_hide_this;
 							}
 							$onch = "wppaPlanUpdateWatermarkPreview();";
 							$html = wppa_select($slug, $fopts, $fvals, $onch);
-							$preview = '<img id="wm-font-preview" src="" />';
+							$preview = wppa_html_tag( 'img', ['id' => "wm-font-preview", 'src' => ""] );
 							wppa_setting_new($slug, '6', $name, $desc, $html.' '.$preview, $help, $clas);
 
 							$name = __('Textual watermark font size', 'wp-photo-album-plus' );
@@ -9689,7 +9692,7 @@ global $wppa_hide_this;
 							$help = __('Upload truetype fonts (.ttf) only, and test if they work on your server platform.', 'wp-photo-album-plus' );
 							$slug = 'wppa_watermark_font_upload';
 							$html = wppa_upload_form( $slug, $wppa_cur_tab, '.ttf' );
-							wppa_setting_new(false, '10', $name, $desc, $html, $help);
+							wppa_setting_new(false, 10, $name, $desc, $html, $help);
 
 							$name = __('Watermark opacity text', 'wp-photo-album-plus' );
 							$desc = __('You can set the intensity of a text watermarks here.', 'wp-photo-album-plus' );
@@ -9703,14 +9706,12 @@ global $wppa_hide_this;
 							$help = __('To see the changes: refresh the page', 'wp-photo-album-plus' );
 							$slug = 'wppa_watermark_preview';
 							$tr = floor( 127 * ( 100 - wppa_opt( 'watermark_opacity_text' ) ) / 100 );
-							$args = array( 'id' => '0', 'url' => true, 'width' => '1000', 'height' => '400', 'transp' => $tr );
+							$args = array( 'id' => 0, 'url' => true, 'width' => '1000', 'height' => '400', 'transp' => $tr );
 							$html = '
 								<div
 									style="float:left; text-align:center; max-width:400px; overflow:hidden; background-image:url('.WPPA_UPLOAD_URL.'/fonts/turkije.jpg);"
-									>
-									<img id="wppa-watermark-preview"
-										src="'.wppa_create_textual_watermark_file( $args ).'?ver='.wp_rand(0, 4711).'"
-									/>
+									>' .
+									wppa_html_tag( 'img', ['id' => "wppa-watermark-preview", 'src' => wppa_create_textual_watermark_file( $args ).'?ver='.wp_rand(0, 4711)] ) . '
 								</div>
 								<div style="clear:both;"></div>';
 							wppa_setting_new($slug, '12', $name, $desc, $html, $help);
@@ -9730,7 +9731,7 @@ global $wppa_hide_this;
 						$help = __('Select a value, --- off --- means: use the watermark image as is', 'wp-photo-album-plus' );
 						$slug = 'wppa_watermark_size';
 						$opts = array( __('--- off ---', 'wp-photo-album-plus' ), '10%', '20%', '25%', '30%', '40%', '50%', '60%', '70%', '80%', '90%' );
-						$vals = array( '0', '10', '20', '25', '30', '40', '50', '60', '70', '80', '90' );
+						$vals = array( 0, 10, '20', '25', '30', '40', '50', '60', '70', '80', '90' );
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '14', $name, $desc, $html, $help);
 
@@ -9739,7 +9740,7 @@ global $wppa_hide_this;
 						$help = __('A value > 1 means pixels, a value < 1 means fraction. E.g enter 0.12 for 12%', 'wp-photo-album-plus' );
 						$slug = 'wppa_watermark_margin';
 						$html = wppa_input($slug, '40px;');
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help);
 
 						wppa_setting_box_footer_new();
 					}
@@ -9749,7 +9750,7 @@ global $wppa_hide_this;
 				case 'constants': {
 					// System constants (read only)
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 
 						$coldef = array( 	__('#', 'wp-photo-album-plus' ) => '24px;',
@@ -9764,22 +9765,18 @@ global $wppa_hide_this;
 						$name = 'WPPA_ALBUMS';
 						$desc = __('Albums db table name.', 'wp-photo-album-plus' );
 						$help = '';
-						$html1 = WPPA_ALBUMS . wppa_see_also( 'miscadv', '1', '13' );
-						$html2 = 	'<a onclick="wppaExportDbTable(\'' . WPPA_ALBUMS . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_ALBUMS . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_ALBUMS . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html1 = WPPA_ALBUMS . wppa_see_also( 'miscadv', 1, '13' );
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_ALBUMS . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_ALBUMS . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_ALBUMS . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
-						wppa_setting_new(false, '1', $name, $desc, $html, $help);
+						wppa_setting_new(false, 1, $name, $desc, $html, $help);
 
 						$name = 'WPPA_PHOTOS';
 						$desc = __('Photos db table name.', 'wp-photo-album-plus' );
 						$help = '';
 						$html1 = WPPA_PHOTOS;
-						$html2 =  	'<a onclick="wppaExportDbTable(\'' . WPPA_PHOTOS . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_PHOTOS . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_PHOTOS . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_PHOTOS . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_PHOTOS . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_PHOTOS . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '2', $name, $desc, $html, $help);
 
@@ -9787,10 +9784,8 @@ global $wppa_hide_this;
 						$desc = __('Rating db table name.', 'wp-photo-album-plus' );
 						$help = '';
 						$html1 = WPPA_RATING;
-						$html2 = 	'<a onclick="wppaExportDbTable(\'' . WPPA_RATING . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_RATING . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_RATING . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_RATING . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_RATING . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_RATING . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '3', $name, $desc, $html, $help);
 
@@ -9798,10 +9793,8 @@ global $wppa_hide_this;
 						$desc = __('Comments db table name.', 'wp-photo-album-plus' );
 						$help = '';
 						$html1 = WPPA_COMMENTS;
-						$html2 = 	'<a onclick="wppaExportDbTable(\'' . WPPA_COMMENTS . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_COMMENTS . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_COMMENTS . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_COMMENTS . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_COMMENTS . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_COMMENTS . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '4', $name, $desc, $html, $help);
 
@@ -9809,10 +9802,8 @@ global $wppa_hide_this;
 						$desc = __('IPTC db table name.', 'wp-photo-album-plus' );
 						$help = '';
 						$html1 = WPPA_IPTC;
-						$html2 = 	'<a onclick="wppaExportDbTable(\'' . WPPA_IPTC . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_IPTC . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_IPTC . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_IPTC . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_IPTC . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_IPTC . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '5', $name, $desc, $html, $help);
 
@@ -9820,10 +9811,8 @@ global $wppa_hide_this;
 						$desc = __('EXIF db table name.', 'wp-photo-album-plus' );
 						$help = '';
 						$html1 = WPPA_EXIF;
-						$html2 =  	'<a onclick="wppaExportDbTable(\'' . WPPA_EXIF . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_EXIF . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_EXIF . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_EXIF . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_EXIF . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_EXIF . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '6', $name, $desc, $html, $help);
 
@@ -9831,10 +9820,8 @@ global $wppa_hide_this;
 						$desc = __('Index db table name.', 'wp-photo-album-plus' );
 						$help = '';
 						$html1 = WPPA_INDEX;
-						$html2 = 	'<a onclick="wppaExportDbTable(\'' . WPPA_INDEX . '\')" >' .
-										__('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_INDEX . '.csv' .
-									'</a> ' .
-									'<img id="' . WPPA_INDEX . '-spin" src="' . wppa_get_imgdir( 'spinner.gif' ) . '" style="display:none;" />';
+						$html2 = wppa_html_tag( 'a', ['onclick' => "wppaExportDbTable('" . WPPA_INDEX . "')"], __('Download', 'wp-photo-album-plus' ) . ' ' . WPPA_INDEX . '.csv' ) .
+								 wppa_html_tag( 'img', ['id' => WPPA_INDEX . '-spin', 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;"] );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '7', $name, $desc, $html, $help);
 
@@ -9861,7 +9848,7 @@ global $wppa_hide_this;
 						$html1 = ABSPATH;
 						$html2 = '';
 						$html = array( $html1, $html2 );
-						wppa_setting_new(false, '10', $name, $desc, $html, $help);
+						wppa_setting_new(false, 10, $name, $desc, $html, $help);
 
 						$name = 'WPPA_ABSPATH';
 						$desc = __('ABSPATH windows proof', 'wp-photo-album-plus' );
@@ -9901,7 +9888,7 @@ global $wppa_hide_this;
 						$html1 = WPPA_UPLOAD;
 						$html2 = '';
 						$html = array( $html1, $html2 );
-						wppa_setting_new(false, '15', $name, $desc, $html, $help);
+						wppa_setting_new(false, 15, $name, $desc, $html, $help);
 
 						$name = 'WPPA_UPLOAD_PATH';
 						$desc = __('The upload directory path.', 'wp-photo-album-plus' );
@@ -9984,7 +9971,7 @@ global $wppa_hide_this;
 				case 'misc': {
 					// Miscellaneous settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -10001,8 +9988,8 @@ global $wppa_hide_this;
 										__('Name descending', 'wp-photo-album-plus' ),
 										__('Timestamp descending', 'wp-photo-album-plus' ),
 										);
-						$vals = array(	'0',
-										'1',
+						$vals = array(	0,
+										1,
 										'2',
 										'3',
 										'5',
@@ -10011,7 +9998,7 @@ global $wppa_hide_this;
 										'-5'
 										);
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Photo sequence default', 'wp-photo-album-plus' );
 						$desc = __('Photo sequence method.', 'wp-photo-album-plus' );
@@ -10032,8 +10019,8 @@ global $wppa_hide_this;
 										__('Timestamp descending', 'wp-photo-album-plus' ),
 										__('EXIF Date descending', 'wp-photo-album-plus' )
 										);
-						$vals = array(	'0',
-										'1',
+						$vals = array(	0,
+										1,
 										'2',
 										'3',
 										'4',
@@ -10116,6 +10103,13 @@ global $wppa_hide_this;
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '9', $name, $desc, $html, $help, wppa_switch('enable_video'));
 
+						$name = __('Empty tags selectable', 'wp-photo-album-plus');
+						$desc = __('In tagcloud and tag selection add "empty tags" as selectable item', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_empty_tags';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+
 						wppa_setting_box_footer_new();
 					}
 					// Panorama related settings
@@ -10139,7 +10133,7 @@ global $wppa_hide_this;
 											'none',
 											);
 							$html = wppa_select($slug, $opts, $vals);
-							wppa_setting_new( $slug, '1', $name, $desc, $html, $help );
+							wppa_setting_new( $slug, 1, $name, $desc, $html, $help );
 
 							$name = __( 'Manual movement', 'wp-photo-album-plus' );
 							$desc = __( 'Select if movement touch move is allowed', 'wp-photo-album-plus' );
@@ -10179,7 +10173,7 @@ global $wppa_hide_this;
 											__( 'fast', 'wp-photo-album-plus' ),
 											__( 'very fast', 'wp-photo-album-plus' ),
 											);
-							$vals = array( '1', '2', '3', '5', '8' );
+							$vals = array( 1, '2', '3', '5', '8' );
 							$html = wppa_select($slug, $opts, $vals);
 							wppa_setting_new( $slug, '4', $name, $desc, $html, $help );
 
@@ -10193,7 +10187,7 @@ global $wppa_hide_this;
 											__( 'high', 'wp-photo-album-plus' ),
 											__( 'very high', 'wp-photo-album-plus' ),
 											);
-							$vals = array( '1', '2', '3', '5', '8' );
+							$vals = array( 1, '2', '3', '5', '8' );
 							$html = wppa_select($slug, $opts, $vals);
 							wppa_setting_new( $slug, '5', $name, $desc, $html, $help );
 
@@ -10227,7 +10221,7 @@ global $wppa_hide_this;
 				case 'miscadv': {
 					// Advanced miscellaneous settings
 					{
-						$desc = $wppa_subtab_names[$tab]['1'];
+						$desc = $wppa_subtab_names[$tab][1];
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
@@ -10237,7 +10231,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('Possible values 20..100', 'wp-photo-album-plus' );
 						$slug = 'wppa_jpeg_quality';
 						$html = wppa_input($slug, '50px');
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Enable <b>in-line</b> settings', 'wp-photo-album-plus' );
 						$desc = __('Activates shortcode [wppa_set].', 'wp-photo-album-plus' );
@@ -10284,15 +10278,15 @@ global $wppa_hide_this;
 						$help = __('This setting has only effect when Encrypted links is mandatory', 'wp-photo-album-plus' );
 						$help .= '<br>' . __('Use with care, and only in special situations!', 'wp-photo-album-plus' );
 						$slug = 'wppa_direct_comment';
-						$html = wppa_checkbox($slug) . wppa_see_also( 'links', '1', '5.6' );
+						$html = wppa_checkbox($slug) . wppa_see_also( 'links', 1, '5.6' );
 						wppa_setting_new($slug, '8', $name, $desc, $html, $help);
 
 						$name = __('Extended resize count', 'wp-photo-album-plus' );
 						$desc = __('Number of extra resize handler actions', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_extended_resize_count';
-						$opts = array('0','1','2','3','4','5','6','10','15','20',__( 'infinite', 'wp-photo-album-plus' ) );
-						$vals = array('0','1','2','3','4','5','6','10','15','20','-1');
+						$opts = array(0,1,'2','3','4','5','6',10,15,'20',__( 'infinite', 'wp-photo-album-plus' ) );
+						$vals = array(0,1,'2','3','4','5','6',10,15,'20','-1');
 						$html = wppa_select($slug, $opts, $vals).' '.__('times', 'wp-photo-album-plus' );
 						wppa_setting_new($slug, '9', $name, $desc, $html, $help);
 
@@ -10300,10 +10294,10 @@ global $wppa_hide_this;
 						$desc = __('Delay time of extra resize handler actions', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_extended_resize_delay';
-						$opts = array('5','10','20','50','100','150','200','300','500','700','1000');
+						$opts = array('5',10,'20','50',100,'150','200','300','500','700','1000');
 						$vals = $opts;
 						$html = wppa_select($slug, $opts, $vals).' ms.';
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('Load nicescroller always', 'wp-photo-album-plus' );
 						$desc = __('Loads nicescroller js on all pages', 'wp-photo-album-plus' );
@@ -10335,15 +10329,15 @@ global $wppa_hide_this;
 						$desc = $wppa_subtab_names[$tab]['2'];
 						wppa_setting_tab_description($desc);
 
-						$coldef = array(
-										__( '#', 'wp-photo-album-plus' ) => '24px',
-										__( 'Name', 'wp-photo-album-plus' ) => 'auto',
-										__( 'Description', 'wp-photo-album-plus' ) => 'auto',
-										__( 'Enable', 'wp-photo-album-plus' ) => 'auto',
-										__( 'Stack', 'wp-photo-album-plus' ) => 'auto',
-										__( 'Url', 'wp-photo-album-plus' ) => 'auto',
-										__( 'Help', 'wp-photo-album-plus' ) => '24px',
-									);
+						$coldef = [
+									__( '#', 'wp-photo-album-plus' ) => '24px',
+									__( 'Name', 'wp-photo-album-plus' ) => 'auto',
+									__( 'Description', 'wp-photo-album-plus' ) => 'auto',
+									__( 'Enable', 'wp-photo-album-plus' ) => 'auto',
+									$dbg ? __( 'Stack', 'wp-photo-album-plus' ) : '&nbsp;' => 'auto',
+									$dbg ? __( 'Url', 'wp-photo-album-plus' ) : '&thinsp;' => 'auto',
+									__( 'Help', 'wp-photo-album-plus' ) => '24px',
+									];
 						wppa_setting_box_header_new($tab, $coldef);
 
 						$name = __('Enable extended logging', 'wp-photo-album-plus');
@@ -10352,7 +10346,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_enable_ext_logging';
 						$onch = "wppaSlaveChecked(this,'extlog')";
 						$html = array(wppa_checkbox($slug, $onch), '', '');
-						wppa_setting_new($slug, '0', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 0, $name, $desc, $html, $help);
 
 						$name = __('Log Errors', 'wp-photo-album-plus' );
 						$desc = __('Keep track of wppa internal errors.', 'wp-photo-album-plus' );
@@ -10361,10 +10355,10 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_errors_stack';
 						$slug3 = 'wppa_log_errors_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Log Warnings', 'wp-photo-album-plus' );
 						$desc = __('Keep track of wppa internal warnings.', 'wp-photo-album-plus' );
@@ -10373,9 +10367,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_warnings_stack';
 						$slug3 = 'wppa_log_warnings_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '2', $name, $desc, $html, $help);
 
 						$name = __('Log Cron', 'wp-photo-album-plus' );
@@ -10386,9 +10380,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_cron_stack';
 						$slug3 = 'wppa_log_cron_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '3', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Ajax', 'wp-photo-album-plus' );
@@ -10398,9 +10392,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_ajax_stack';
 						$slug3 = 'wppa_log_ajax_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '4', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Comments', 'wp-photo-album-plus' );
@@ -10410,9 +10404,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_comments_stack';
 						$slug3 = 'wppa_log_comments_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '5', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log File events', 'wp-photo-album-plus' );
@@ -10422,9 +10416,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_fso_stack';
 						$slug3 = 'wppa_log_fso_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Debug messages', 'wp-photo-album-plus' );
@@ -10434,9 +10428,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_debug_stack';
 						$slug3 = 'wppa_log_debug_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '7', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Database queries', 'wp-photo-album-plus' );
@@ -10446,9 +10440,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_database_stack';
 						$slug3 = 'wppa_log_database_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '8', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Emails sent', 'wp-photo-album-plus' );
@@ -10458,9 +10452,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_email_stack';
 						$slug3 = 'wppa_log_email_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '9', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Timings', 'wp-photo-album-plus' );
@@ -10470,10 +10464,10 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_tim_stack';
 						$slug3 = 'wppa_log_tim_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Index', 'wp-photo-album-plus' );
 						$desc = __('Keep track of index changes.', 'wp-photo-album-plus' );
@@ -10482,9 +10476,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_idx_stack';
 						$slug3 = 'wppa_log_idx_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '11', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Observations', 'wp-photo-album-plus' );
@@ -10494,9 +10488,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_obs_stack';
 						$slug3 = 'wppa_log_obs_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '12', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Client', 'wp-photo-album-plus' );
@@ -10506,9 +10500,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_cli_stack';
 						$slug3 = 'wppa_log_cli_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '12', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Uploads', 'wp-photo-album-plus' );
@@ -10518,9 +10512,9 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_upl_stack';
 						$slug3 = 'wppa_log_upl_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
 						wppa_setting_new($slug, '12', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('Log Miscalleneous', 'wp-photo-album-plus' );
@@ -10530,10 +10524,10 @@ global $wppa_hide_this;
 						$slug2 = 'wppa_log_misc_stack';
 						$slug3 = 'wppa_log_misc_url';
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_checkbox($slug2);
-						$html3 = wppa_checkbox($slug3);
-						$html = array($html1, $html2, $html3);
-						wppa_setting_new($slug, '15', $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
+						$html2 = $dbg ? wppa_checkbox($slug2) : '';
+						$html3 = $dbg ? wppa_checkbox($slug3) : '';
+						$html = [$html1, $html2, $html3];
+						wppa_setting_new($slug, 15, $name, $desc, $html, $help, wppa_switch('enable_ext_logging'), 'extlog');
 
 						$name = __('List WPPA Logfile', 'wp-photo-album-plus' );
 						$desc = __('Show the content of wppa+ (error) log.', 'wp-photo-album-plus' );
@@ -10546,7 +10540,7 @@ global $wppa_hide_this;
 						$desc = __('Deletes the logfile', 'wp-photo-album-plus' );
 						$help = __('The logfile will not grow forever, the max number of entries is 1000', 'wp-photo-album-plus' );
 						$slug = 'wppa_errorlog_purge';
-						$html = array( wppa_ajax_button(__('Do it!', 'wp-photo-album-plus' ), 'errorlog_purge', '0', true ), '', '');
+						$html = array( wppa_ajax_button(__('Do it!', 'wp-photo-album-plus' ), 'errorlog_purge', 0, true ), '', '');
 						wppa_setting_new($slug, '17', $name, $desc, $html, $help);
 
 						$name = __('WPPA Logfile on menu', 'wp-photo-album-plus' );
@@ -10571,7 +10565,7 @@ global $wppa_hide_this;
 								$desc = __('Deletes the debuglogfile', 'wp-photo-album-plus' );
 								$help = '';
 								$slug = 'wppa_debuglog_purge';
-								$html = array( wppa_ajax_button(__('Do it!', 'wp-photo-album-plus' ), 'debuglog_purge', '0', true ), '', '' );
+								$html = array( wppa_ajax_button(__('Do it!', 'wp-photo-album-plus' ), 'debuglog_purge', 0, true ), '', '' );
 								wppa_setting_new($slug, '20', $name, $desc, $html, $help);
 							}
 						}
@@ -10612,7 +10606,7 @@ global $wppa_hide_this;
 						$show = wppa_opt( 'cdn_service' ) == 'cloudinary';
 						$onch = "wppaSlaveSelected('wppa_cdn_service-cloudinary','".$clas."');";
 						$html = wppa_select($slug, $opts, $vals, $onch);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Cloud name', 'wp-photo-album-plus' );
 						$desc = '';
@@ -10655,11 +10649,11 @@ global $wppa_hide_this;
 						$slug = 'wppa_max_cloud_life';
 						$opts = array( 	__('Forever', 'wp-photo-album-plus' ),
 										/* translators: integer count */
-										sprintf( _n('%d day', '%d days', '1', 'wp-photo-album-plus' ), '1'),
+										sprintf( _n('%d day', '%d days', 1, 'wp-photo-album-plus' ), 1),
 										/* translators: integer count */
-										sprintf( _n('%d week', '%d weeks', '1', 'wp-photo-album-plus' ), '1'),
+										sprintf( _n('%d week', '%d weeks', 1, 'wp-photo-album-plus' ), 1),
 										/* translators: integer count */
-										sprintf( _n('%d month', '%d months', '1', 'wp-photo-album-plus' ), '1'),
+										sprintf( _n('%d month', '%d months', 1, 'wp-photo-album-plus' ), 1),
 										/* translators: integer count */
 										sprintf( _n('%d month', '%d months', '2', 'wp-photo-album-plus' ), '2'),
 										/* translators: integer count */
@@ -10669,7 +10663,7 @@ global $wppa_hide_this;
 										/* translators: integer count */
 										sprintf( _n('%d month', '%d months', '9', 'wp-photo-album-plus' ), '9'),
 										/* translators: integer count */
-										sprintf( _n('%d year', '%d years', '1', 'wp-photo-album-plus' ), '1'),
+										sprintf( _n('%d year', '%d years', 1, 'wp-photo-album-plus' ), 1),
 										/* translators: integer count */
 										sprintf( _n('%d month', '%d months', '18', 'wp-photo-album-plus' ), '18'),
 										/* translators: integer count */
@@ -10745,7 +10739,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('Do NOT remove the text w#fotomoto from the Custombox content.', 'wp-photo-album-plus' );
 						$slug = 'wppa_fotomoto_on';
 						$onch = "wppaSlaveChecked(this,'fmon');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'slide', '1', '25.26' );
+						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'slide', 1, '25.26' );
 						wppa_setting_new($slug, '9', $name, $desc, $html, $help);
 
 						$name = __('Hide when running', 'wp-photo-album-plus' );
@@ -10790,7 +10784,7 @@ global $wppa_hide_this;
 										'9:16 ' . __( 'portrait', 'wp-photo-album-plus' ),
 										'1:2 ' . __( 'portrait', 'wp-photo-album-plus' )
 									);
-						$vals = array('NaN', 'ratio', '1', '1.25', '1.33333', '1.5', '1.6', '1.77777', '2', '0.8', '0.75', '0.66667', '0.625', '0.5625', '0.5');
+						$vals = array('NaN', 'ratio', 1, '1.25', '1.33333', '1.5', '1.6', '1.77777', '2', '0.8', '0.75', '0.66667', '0.625', '0.5625', '0.5');
 
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '14', $name, $desc, $html, $help, wppa_opt( 'image_magick' ) != 'none', 'image_magick_ratio');
@@ -10808,7 +10802,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_allow_foreign_shortcodes_general';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '0', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 0, $name, $desc, $html, $help);
 
 						$name = __('Foreign shortcodes fullsize', 'wp-photo-album-plus' );
 						$desc = __('Enable the use of non-wppa+ shortcodes in fullsize photo descriptions.', 'wp-photo-album-plus' );
@@ -10816,7 +10810,7 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('The shortcodes will be expanded in the descriptions of fullsize images.', 'wp-photo-album-plus' );
 						$slug = 'wppa_allow_foreign_shortcodes';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '1', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 1, $name, $desc, $html, $help);
 
 						$name = __('Foreign shortcodes thumbnails', 'wp-photo-album-plus' );
 						$desc = __('Enable the use of non-wppa+ shortcodes in thumbnail photo descriptions.', 'wp-photo-album-plus' );
@@ -10871,7 +10865,7 @@ global $wppa_hide_this;
 						$desc = __('Use plugin CM Tooltip Glossary on photo and album descriptions.', 'wp-photo-album-plus' );
 						$help = __('You MUST set Defer javascript, also if you do not want this plugin to act on album and photo descriptions!', 'wp-photo-album-plus' );
 						$slug = 'wppa_use_CMTooltipGlossary';
-						$html = wppa_checkbox($slug) . wppa_see_also( 'system', '1', '11' );
+						$html = wppa_checkbox($slug) . wppa_see_also( 'system', 1, '11' );
 						wppa_setting_new($slug, '8', $name, $desc, $html, $help);
 
 						$name = __('Shortcode [photo nnn] on bbPress', 'wp-photo-album-plus' );
@@ -10886,7 +10880,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug = 'wppa_domain_link_buddypress';
 						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '10', $name, $desc, $html, $help);
+						wppa_setting_new($slug, 10, $name, $desc, $html, $help);
 
 						$name = __('This site uses plugin Page Load Ajax', 'wp-photo-album-plus' );
 						$desc = __('Tick this box if you use pla', 'wp-photo-album-plus' );
@@ -10926,7 +10920,7 @@ global $wppa_hide_this;
 		sprintf( __( 'Memory used on this page: %6.2f Mb', 'wp-photo-album-plus' ), memory_get_peak_usage( true ) / ( 1024 * 1024 ) ) . '<br>' .
 		/* translators: integers */
 		sprintf( __( 'There are %1$d settings and %2$d runtime parameters', 'wp-photo-album-plus' ), count( $wppa_opt ), count( $wppa ) ) . '<br>' .
-		__( 'Database revision:', 'wp-photo-album-plus' ) . ' ' . wppa_get_option( 'wppa_revision', '100' ) . '<br>' .
+		__( 'Database revision:', 'wp-photo-album-plus' ) . ' ' . wppa_get_option( 'wppa_revision', 100 ) . '<br>' .
 		__( 'WP Charset:', 'wp-photo-album-plus' ) . ' ' . get_bloginfo( 'charset' ) . '<br>' .
 		__( 'Current PHP version:', 'wp-photo-album-plus' ) . ' ' . phpversion() . '<br>' .
 		__( 'WPPA+ API Version:', 'wp-photo-album-plus' ) . ' ' . $wppa_version . '<br>' .

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version: 8.7.04.002
+* Version: 9.0.00.000
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -57,11 +57,11 @@ class AlbumNavigatorWidget extends WP_Widget {
 		}
 		else {
 			if ( $parent == 'all' ) {
-				$widget_content .= $this->do_album_navigator( '0', $page, $skip, '', false, $cache );
+				$widget_content .= $this->do_album_navigator( 0, $page, $skip, '', false, $cache );
 				$widget_content .= $this->do_album_navigator( '-1', $page, $skip, '', false, $cache );
 			}
 			elseif ( $parent == 'owner' ) {
-				$widget_content .= $this->do_album_navigator( '0', $page, $skip, '', true, $cache );
+				$widget_content .= $this->do_album_navigator( 0, $page, $skip, '', true, $cache );
 				$widget_content .= $this->do_album_navigator( '-1', $page, $skip, '', true, $cache );
 			}
 			else {
@@ -127,7 +127,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 								__( '--- owner/public ---', 'wp-photo-album-plus' ),
 								);
 			$values  = array(	'all',
-								'0',
+								0,
 								'-1',
 								'owner',
 								);
@@ -175,16 +175,16 @@ class AlbumNavigatorWidget extends WP_Widget {
 	static $ca;
 
 		if ( ! $level ) {
-			$level = '1';
+			$level = 1;
 			$ca = wppa_get( 'album' );
-			$ca = wppa_force_numeric_else( $ca, '0' );
+			$ca = wppa_force_numeric_else( $ca, 0 );
 			if ( $ca && ! wppa_album_exists( $ca ) ) {
-				$ca = '0';
+				$ca = 0;
 			}
 
 			// Ignore current album when caching, i.e. no raquo
 			if ( $cache ) {
-				$ca = '0';
+				$ca = 0;
 			}
 		}
 		else {
@@ -195,7 +195,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 
 		$w = $this->get_widget_id();
 		$p = $parent;
-		$o = wppa_get_album_order_a( max( '0', $parent ) );
+		$o = wppa_get_album_order_a( max( 0, $parent ) );
 		$result = '';
 
 		if ( $checkowner ) {
@@ -220,7 +220,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 					$result .= '
 						<li
 							class="anw-'.$w.'-'.$p.$propclass.' albnav albnav-li albnav-li-' . $level . '"
-							style="list-style:none;' . ( $level == '1' ? '' : 'display:none;' ) . '"
+							style="list-style:none;' . ( $level == 1 ? '' : 'display:none;' ) . '"
 							>';
 						if ( $has_children ) {
 							$result .= '
@@ -287,14 +287,14 @@ class AlbumNavigatorWidget extends WP_Widget {
 								foreach ( $thumbs as $thumb ) {
 									$title = wppa_get_lbtitle('alw', $thumb['id']);
 									if ( wppa_is_video( $thumb['id']  ) ) {
-										$siz['0'] = wppa_get_videox( $thumb['id'] );
-										$siz['1'] = wppa_get_videoy( $thumb['id'] );
+										$siz[0] = wppa_get_videox( $thumb['id'] );
+										$siz[1] = wppa_get_videoy( $thumb['id'] );
 									}
 									else {
-										$siz['0'] = wppa_get_photox( $thumb['id'] );
-										$siz['1'] = wppa_get_photoy( $thumb['id'] );
+										$siz[0] = wppa_get_photox( $thumb['id'] );
+										$siz[1] = wppa_get_photoy( $thumb['id'] );
 									}
-									$url 		= wppa_get_photo_url( $thumb['id'], true, '', $siz['0'], $siz['1'] );
+									$url 		= wppa_get_photo_url( $thumb['id'], true, '', $siz[0], $siz[1] );
 									$is_video 	= wppa_is_video( $thumb['id'] );
 									$has_audio 	= wppa_has_audio( $thumb['id'] );
 									$is_pdf 	= wppa_is_pdf( $thumb['id'] );
@@ -375,10 +375,10 @@ class AlbumNavigatorWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Album Navigator', 'wp-photo-album-plus' ),
-							'parent' 	=> '0',			// Parent album
+							'parent' 	=> 0,			// Parent album
 							'skip' 		=> 'no',		// Skip empty albums
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

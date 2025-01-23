@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '8.8.07.002';
+wppaJsUtilsVersion = '9.0.00.002';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -391,13 +391,11 @@ function wppaMakeLazyVisible(e) {
 	// Feature enabled?
 	if ( ! wppaLazyLoad ) return; // No, quit
 
-//	wppaConsoleLog( 'wppaMakeLazyVisible() requested from ' + e );
 	clearTimeout(wppaLazyTimer);
 	wppaLazyTimer = setTimeout(function(){_wppaMakeLazyVisible();}, wppaScrollEndDelay);
 }
 function _wppaMakeLazyVisible() {
 
-//	wppaConsoleLog( 'wppaMakeLazyVisible() started' );
 	var start = Date.now();
 	var count = 0;
 	var src;
@@ -413,14 +411,12 @@ function _wppaMakeLazyVisible() {
 
 		jQuery( potential ).each( function() {
 			src = jQuery(this).attr('data-src');
-			if ( wppaIsElementInViewport(this) ) {
-				jQuery(this).attr('src', src);
-				jQuery(this).removeAttr('data-src');
-				jQuery(this).parent().css({'min-height':0});
-				jQuery(this).parent().parent().css({'min-height':0});
-				count++;
-				wppaLazyDone = true;
-			}
+			jQuery(this).attr('src', src);
+			jQuery(this).removeAttr('data-src');
+			jQuery(this).parent().css({'min-height':0});
+			jQuery(this).parent().parent().css({'min-height':0});
+			count++;
+			wppaLazyDone = true;
 		});
 	}
 
@@ -432,12 +428,14 @@ function _wppaMakeLazyVisible() {
 
 		// Resize nicescroller
 		wppaResizeNice('wppaMakeLazyVisible');
+
+		wppaDoAllAutocols();
 	}
 
 	wppaLazyDone = false;
 
 	if (count) {
-//		console.log( 'wppaMakeLazyVisible processed ' + count + ' items in ' + ( Date.now() - start ) + ' milliseconds' );
+		console.log( 'wppaMakeLazyVisible processed ' + count + ' items in ' + ( Date.now() - start ) + ' milliseconds' );
 	}
 	else {
 //		console.log( 'wppaMakeLazyVisible() ended after ' + ( Date.now() - start ) + ' milliseconds' );

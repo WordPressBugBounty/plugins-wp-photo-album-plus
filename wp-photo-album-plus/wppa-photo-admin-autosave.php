@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 8.9.02.004
+* Version: 9.0.00.005
 *
 */
 
@@ -88,7 +88,7 @@ global $wpdb;
 
 	// Init
 	wppa_add_local_js( 'wppa_album_photos' );
-	$a 			= wppa_is_int( $album ) ? $album : '0';
+	$a 			= wppa_is_int( $album ) ? $album : 0;
 	$is_empty 	= false;
 
 	$slug 		= 'photo_admin';
@@ -103,7 +103,7 @@ global $wpdb;
 
 	if ( ! is_numeric( $page ) )
 		$page 	= 1;
-	$skip 		= ( $page - '1' ) * $pagesize;
+	$skip 		= ( $page - 1 ) * $pagesize;
 	$is_album 	= false;
 	$photos 	= array();
 
@@ -115,7 +115,7 @@ global $wpdb;
 			$count 	= wppa_get_edit_search_photos( '', '', 'count_only' );
 			$photos = wppa_get_edit_search_photos( $skip, $pagesize );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
 				return;
 			}
@@ -125,12 +125,12 @@ global $wpdb;
 
 		// Edit trashed photos
 		elseif ( $album == 'trash' ) {
-			$count 	= wppa_get_count( WPPA_PHOTOS, ['album' => '0'], ['<'] );
+			$count 	= wppa_get_count( WPPA_PHOTOS, ['album' => 0], ['<'] );
 			$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
-														   WHERE album < '0' ORDER BY modified DESC
+														   WHERE album < 0 ORDER BY modified DESC
 														   LIMIT %d, %d", $skip, $pagesize ) );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
 				return;
 			}
@@ -158,7 +158,7 @@ global $wpdb;
 			$query  = wppa_fix_query( $query );
 			$photos = wppa_get_results( $query );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
 				return;
 			}
@@ -169,7 +169,7 @@ global $wpdb;
 
 	// Edit a single photo
 	elseif ( $photo && ! $moderate ) {
-		$count 	= '1';
+		$count 	= 1;
 		$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
 													   WHERE id = %s", $photo ) );
 		$link 	= '';
@@ -182,7 +182,7 @@ global $wpdb;
 													   ORDER BY timestamp DESC
 													   LIMIT %d, %d", $owner, $skip, $pagesize ) );
 
-		if ( ! count( $photos ) && $parms['page'] > '1' ) {
+		if ( ! count( $photos ) && $parms['page'] > 1 ) {
 			wppa_album_photos( $album, $photo, $owner, $moderate, true );
 			return;
 		}
@@ -276,7 +276,7 @@ global $wpdb;
 														   ORDER BY timestamp DESC
 														   LIMIT %d, %d", $skip, $pagesize ) );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
 				return;
 			}
@@ -301,7 +301,7 @@ global $wpdb;
 	}
 
 	// If no photos and page != 1, retry om page 1
-	if ( empty( $photos ) && $parms['page'] > '1' ) {
+	if ( empty( $photos ) && $parms['page'] > 1 ) {
 		wppa_album_photos( $album, $photo, $owner, $moderate, true );
 		return;
 	}
@@ -345,7 +345,7 @@ global $wpdb;
 			$parms 		= wppa_get_paging_parms( 'moderate_photos', $page_1 );
 			$pagesize 	= $parms['pagesize'];
 			$page 		= $parms['page'];
-			$skip 		= ( $page - '1' ) * $pagesize;
+			$skip 		= ( $page - 1 ) * $pagesize;
 			$count 		= count( $photos );
 			$photos 	= array_slice( $photos, $skip, $pagesize );
 
@@ -372,7 +372,7 @@ global $wpdb;
 			// We may not use extract(), so we do something like it here manually, hence controlled.
 			$id 			= $photo['id'];
 			$crid 			= wppa_encrypt_photo( $id );
-			$timestamp 		= ( $photo['timestamp'] ? $photo['timestamp'] : '0' );
+			$timestamp 		= ( $photo['timestamp'] ? $photo['timestamp'] : 0 );
 			$modified 		= $photo['modified'];
 			$owner 			= $photo['owner'];
 			$crypt 			= $photo['crypt'];
@@ -459,19 +459,19 @@ global $wpdb;
 
 			// Various usefull vars
 			$owner_editable = wppa_switch( 'photo_owner_change' ) && wppa_user_is_admin();
-			if ( $album && $album > '0' ) {
+			if ( $album && $album > 0 ) {
 				$order_by = wppa_get_album_item( $album, 'p_order_by' );
 			}
 			else {
 				$order_by = wppa_opt( 'list_photos_by' );
 			}
 			switch ( $order_by ) {
-				case '0':
+				case 0:
 					$temp = wppa_opt( 'list_photos_by' );
-					$sortby_orderno = ( $temp == '-1' || $temp == '1' );
+					$sortby_orderno = ( $temp == '-1' || $temp == 1 );
 					break;
 				case '-1':
-				case '1':
+				case 1:
 					$sortby_orderno = true;
 					break;
 				default:
@@ -566,14 +566,8 @@ global $wpdb;
 								target="_blank"
 								title="' . esc_attr( __( 'Preview fullsize video' , 'wp-photo-album-plus' ) ) . '"
 								>' .
-								wppa_get_video_html( array( 	'id' 		=> $id,
-																'tagid' 	=> 'video-' . $id,
-																'width' 	=> '160',
-																'height' 	=> '160' * $videoy / $videox,
-																'controls' 	=> false,
-																'use_thumb' => true,
-																'cursor' 	=> 'pointer',
-															) ) . '
+									wppa_get_video_html( ['id' => $id, 'tagid' => 'video-'.$id, 'style' => 'width:160px;height:'.(160*$videoy/$videox).'px;cursor:pointer;',
+														  'controls' => false, 'use_thumb' => true] ) . '
 								</a>' );
 
 								// Duratiuon
@@ -617,13 +611,10 @@ global $wpdb;
 									title="' . esc_attr( __( 'Preview fullsize photo', 'wp-photo-album-plus' ) ) . '"
 									>' );
 							}
-							wppa_echo( '
-									<img
-										id="thumburl-' . $crid . '"' .
-										( wppa_lazy() && $count > '1' ? ' data-' : ' ' ) . 'src="' . esc_url( $src ) . '"
-										alt="' . esc_attr( $name ) . '"
-										style="max-width:160px;vertical-align:middle;'.($has_audio?'':'margin-bottom:6px;').'"
-									/>' );
+							wppa_echo(
+								wppa_html_tag( 'img', ['id' => 'thumburl-'.$crid, 'src' => $src, 'alt' => wppa_alt($id),
+													   'style' => 'max-width:160px;vertical-align:middle;'.($has_audio?'':'margin-bottom:6px;')] ) );
+
 							if ( $is_photo || $has_poster ) {
 								wppa_echo( '</a>' );
 							}
@@ -1087,7 +1078,7 @@ global $wpdb;
 											__( 'Location' , 'wp-photo-album-plus' ) . '
 										</label>
 										<div class="wppa-ldi">' .
-											esc_html( $geo['0'].' '.$geo['1'].'. ' ) . '
+											esc_html( $geo[0].' '.$geo[1].'. ' ) . '
 										</div>
 									</div>' );
 								}
@@ -1221,7 +1212,7 @@ global $wpdb;
 								<div class="left">
 									<label
 										for="lat-' . $id . '">' .
-										__( 'Location Lat' , 'wp-photo-album-plus' ) . esc_html( $geo['0'] ) . '
+										__( 'Location Lat' , 'wp-photo-album-plus' ) . esc_html( $geo[0] ) . '
 									</label><br>
 									<input
 										id="lat-' . $id . '"
@@ -1234,7 +1225,7 @@ global $wpdb;
 								<div class="left">
 									<label
 										for="lon-' . $id . '">' .
-										__( 'Location Lon' , 'wp-photo-album-plus' ) . esc_html( $geo['1'] ) . '
+										__( 'Location Lon' , 'wp-photo-album-plus' ) . esc_html( $geo[1] ) . '
 									</label><br>
 									<input
 										id="lon-' . $id . '"
@@ -1276,10 +1267,10 @@ global $wpdb;
 										id="stereo-' . $id . '"
 										onchange="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'stereo\', this.value, true)"
 										>
-										<option value="0"' . ( $stereo == '0' ? ' selected' : '' ) . '>' .
+										<option value="0"' . ( $stereo == 0 ? ' selected' : '' ) . '>' .
 											__( 'No stereo image', 'wp-photo-album-plus' ) . '
 										</option>
-										<option value="1"' . ( $stereo == '1' ? ' selected' : '' ) . '>' .
+										<option value="1"' . ( $stereo == 1 ? ' selected' : '' ) . '>' .
 											__( 'Left - right stereo image', 'wp-photo-album-plus' ) . '
 										</option>
 										<option value="-1"' . ( $stereo == '-1' ? ' selected' : '' ) . '>' .
@@ -1302,8 +1293,8 @@ global $wpdb;
 										<select
 											id="panorama-' . $id . '"
 											onchange="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'panorama\', this.value, true )">
-											<option value="0"' . ( $panorama == '0' ? ' selected' : '' ) . '>' . __( '- none -', 'wp-photo-album-plus' ) . '</option>
-											<option value="1"' . ( $panorama == '1' ? ' selected' : '' ) . '>' . __( '360&deg; Spheric', 'wp-photo-album-plus' ) . '</option>
+											<option value="0"' . ( $panorama == 0 ? ' selected' : '' ) . '>' . __( '- none -', 'wp-photo-album-plus' ) . '</option>
+											<option value="1"' . ( $panorama == 1 ? ' selected' : '' ) . '>' . __( '360&deg; Spheric', 'wp-photo-album-plus' ) . '</option>
 											<option value="2"' . ( $panorama == '2' ? ' selected' : '' ) . '>' . __( 'Non 360&deg; Flat', 'wp-photo-album-plus' ) . '</option>
 										</select>
 									</div>' );
@@ -1312,7 +1303,7 @@ global $wpdb;
 									if ( wppa_is_file( $source_file ) ) {
 										$source_file_sizes = wppa_getimagesize( $source_file );
 
-										if ( $panorama == '1' && $source_file_sizes[0] / $source_file_sizes[1] > 2.001 ) {
+										if ( $panorama == 1 && $source_file_sizes[0] / $source_file_sizes[1] > 2.001 ) {
 											$t = array( 120, 150, 180, 210, 240, 270, 300, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450 );
 											wppa_echo( '
 											<div class="left">
@@ -1346,8 +1337,8 @@ global $wpdb;
 								$wmpos 	= isset( $temp['pos'] ) && isset ( $wms[$temp['pos']] ) ? $wms[$temp['pos']] : '';
 
 								$user = wppa_get_user();
-								$has_source = wppa_is_file( wppa_get_source_path( $id ) ) ? '1' : '0';
-								$can_remove = ( wppa_opt( 'watermark_file' ) == '--- none ---' ) ? '1' : '0';
+								$has_source = wppa_is_file( wppa_get_source_path( $id ) ) ? 1 : 0;
+								$can_remove = ( wppa_opt( 'watermark_file' ) == '--- none ---' ) ? 1 : 0;
 								if ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) {
 									wppa_echo( '
 									<div class="left" style="max-width:250px;">
@@ -1383,13 +1374,8 @@ global $wpdb;
 											class="button wppa-admin-button"
 											value="' . esc_attr( __( 'Apply watermark', 'wp-photo-album-plus' ) ) . '"
 											onclick="wppaTryWatermark(\'' . $crid . '\', ' . $has_source . ', ' . $can_remove . ' )"
-										/>
-										<img
-											id="wppa-water-spin-' . $crid . '"
-											src="' . wppa_get_imgdir() . 'spinner.gif"
-											alt="Spin"
-											style="visibility:hidden"
-										/>
+										/>' .
+										wppa_html_tag( 'img', ['id' => 'wppa-water-spin-'.$crid, 'src' => wppa_get_imgdir('spinner.gif'), 'alt' => "Spin", 'style' => "visibility:hidden"] ) . '
 									</div>' );
 								}
 							}
@@ -1441,7 +1427,7 @@ global $wpdb;
 									$album_select[$album] = wppa_album_select_a( array( 	'checkaccess' 		=> true,
 																							'path' 				=> true,
 																							'void' 				=> $album,
-																							'selected' 			=> '0',
+																							'selected' 			=> 0,
 																							'addpleaseselect' 	=> true,
 																							'sort' 				=> true,
 																							'crypt' 			=> true,
@@ -1621,9 +1607,9 @@ global $wpdb;
 										id="page-method-' . $id . '"
 										onchange="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'misc\', this.value)"
 										>
-										<option value="0" ' . ( $cnvparms['pagtype'] == '0' ? 'selected' : '' ) . '>' . __( 'Page', 'wp-photo-album-plus' ) . ' 1</option>
-										<option value="1" ' . ( $cnvparms['pagtype'] == '1' ? 'selected' : '' ) . '>' . __( 'Page', 'wp-photo-album-plus' ) . ' 2</option>
-										<option value="10" ' . ( $cnvparms['pagtype'] == '10' ? 'selected' : '' ) . '>' . __( 'Cover - page 1', 'wp-photo-album-plus' ) . '</option>
+										<option value="0" ' . ( $cnvparms['pagtype'] == 0 ? 'selected' : '' ) . '>' . __( 'Page', 'wp-photo-album-plus' ) . ' 1</option>
+										<option value="1" ' . ( $cnvparms['pagtype'] == 1 ? 'selected' : '' ) . '>' . __( 'Page', 'wp-photo-album-plus' ) . ' 2</option>
+										<option value="10" ' . ( $cnvparms['pagtype'] == 10 ? 'selected' : '' ) . '>' . __( 'Cover - page 1', 'wp-photo-album-plus' ) . '</option>
 										<option value="11" ' . ( $cnvparms['pagtype'] == '11' ? 'selected' : '' ) . '>' . __( 'Page 2-3', 'wp-photo-album-plus' ) . '</option>
 										<option value="12" ' . ( $cnvparms['pagtype'] == '12' ? 'selected' : '' ) . '>' . __( 'Page 4-5', 'wp-photo-album-plus' ) . '</option>
 									</select>
@@ -1684,12 +1670,8 @@ global $wpdb;
 										class="button button-secundary"
 										value="' . esc_attr( __( 'Update Photo description', 'wp-photo-album-plus' ) ) . '"
 										onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'description\', wppaGetTinyMceContent(\'wppaphotodesc' . $alfaid . '\') )"
-									/>
-									<img
-										id="wppa-photo-spin-' . $id . '"
-										src="' . wppa_get_imgdir() . 'spinner.gif"
-										style="visibility:hidden"
-									/>' );
+									/>' .
+									wppa_html_tag( 'img', ['id' => 'wppa-photo-spin-'.$id, 'src' => wppa_get_imgdir('spinner.gif'), 'style' => "visibility:hidden"] ) );
 								}
 
 								// Textarea
@@ -2135,7 +2117,7 @@ global $wpdb;
 											$ima 		= getimagesize( $sp );
 
 											/* Translators: integer width (W:) and height (H:) */
-											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $ima['0'], $ima['1'] ) .
+											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $ima[0], $ima[1] ) .
 														  ' (' . wppa_get_filesize( $sp ) . ')';
 											$files[0] 	= ['name' => $s_name,
 														   'path' => str_replace( WPPA_UPLOAD_PATH, '.../wppa', $sp ),
@@ -2149,7 +2131,7 @@ global $wpdb;
 											$ima 		= getimagesize( $o1sp );
 
 											/* Translators: integer width (W:) and height (H:) */
-											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $ima['0'], $ima['1'] ) .
+											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $ima[0], $ima[1] ) .
 														  ' (' . wppa_get_filesize( $o1sp ) . ')';
 
 											$files[1] 	= ['name' => $o1_name,
@@ -2696,7 +2678,7 @@ global $wpdb;
 											>
 											<option value="NaN"' . 				( $dflt == 'NaN' ? 		' selected' : '' ) . '>' . 		__( 'free', 'wp-photo-album-plus' ) . '</option>
 											<option value="' . $ratio . '"' . 	( $dflt == 'ratio' ? 	' selected' : '' ) . '>' . 		__( 'original', 'wp-photo-album-plus' ) . '</option>
-											<option value="1"' . 				( $dflt == '1' ? 		' selected' : '' ) . '>' . 		__( 'square', 'wp-photo-album-plus' ) . '</option>
+											<option value="1"' . 				( $dflt == 1 ? 		' selected' : '' ) . '>' . 		__( 'square', 'wp-photo-album-plus' ) . '</option>
 											<option value="1.25"' . 			( $dflt == '1.25' ? 	' selected' : '' ) . '>4:5 ' . 	__( 'landscape', 'wp-photo-album-plus' ) . '</option>
 											<option value="1.33333"' . 			( $dflt == '1.33333' ? 	' selected' : '' ) . '>3:4 ' . 	__( 'landscape', 'wp-photo-album-plus' ) . '</option>
 											<option value="1.5"' . 				( $dflt == '1.5' ? 		' selected' : '' ) . '>2:3 ' . 	__( 'landscape', 'wp-photo-album-plus' ) . '</option>
@@ -2748,15 +2730,9 @@ global $wpdb;
 									// Cropper container
 									// Fake 'for social media' to use the local file here, not cloudinary. Files from cloudinary do not reload, even with ?ver=...
 									wppa( 'for_sm', true );
-									wppa_echo( '
-									<div
-										class="wppa-cropper-container-wrapper">
-										<img
-											id="fs-img-' . $crid . '"
-											src="' . esc_url( wppa_get_photo_url( $id ) ) . '"
-											style="float:left;max-width:100%"
-										/>
-									</div>' );
+									wppa_echo(
+										wppa_html_tag( 'div', ['class' => "wppa-cropper-container-wrapper"],
+											wppa_html_tag( 'img', ['id' => 'fs-img-'.$crid, 'src' => wppa_get_photo_url($id), 'style' => "float:left;max-width:100%"] ) ) );
 
 									// Reset switch
 									wppa( 'for_sm', false );
@@ -2827,17 +2803,9 @@ global $wpdb;
 									wppa_echo( '</div>' );
 
 										// The preview image
-										wppa_echo( '
-										<div style="clear: both; text-align: center">
-											<img
-												id="photourl-'.$crid.'"
-												src="'.wppa_get_photo_url($id).'"
-												style="max-width: 80%;"
-											>
-										</div>' );
-
-
-
+										wppa_echo(
+											wppa_html_tag( 'div', ['style' => "clear:both;text-align:center"],
+												wppa_html_tag( 'img', ['id' => 'photourl-'.$crid, 'src' => wppa_get_photo_url($id), 'style' => "max-width:80%;"] ) ) );
 								}
 
 							wppa_echo( '</fieldset>' );
@@ -2877,12 +2845,13 @@ global $wpdb;
 										<td style="padding:0 4px">' . $iptc['tag'] . '</td>
 										<td style="padding:0 4px">' . esc_html( wppa_iptc_tagname( $iptc['tag'] ) ) . ':</td>
 										<td style="padding:0 4px">
-											<input
-												type="text"
+											<textarea
+
 												style="width:500px"
-												value="' . esc_attr( $iptc['description'] ) . '"
-												onchange="wppaAjaxUpdateIptc(\'' . $id . '\', \'' . $iptc['id'] . '\', this.value, \'' . $iptc['tag'] . '\')"
-											/>
+
+												onchange="wppaAjaxUpdateIptc(\'' . $crid . '\', \'' . $iptc['id'] . '\', this.value, \'' . $iptc['tag'] . '\')"
+											>' . esc_html( $iptc['description'] ) . '
+											</textarea>
 										</td>
 									</tr>' );
 								}
@@ -3171,7 +3140,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 
 	// Init
 	wppa_add_local_js( 'wppa_album_photos_bulk' );
-	$count = '0';
+	$count = 0;
 	$abort = false;
 
 	if ( wppa_get( 'bulk-action' ) ) {
@@ -3327,7 +3296,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 	}
 
 	$slug = 'photo_bulk';
-	$a = wppa_is_int( $album ) ? $album : '0';
+	$a = wppa_is_int( $album ) ? $album : 0;
 	if ( ! $a ) {
 		$slug .= '_' . $album;
 	}
@@ -3335,10 +3304,10 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 
 	$pagesize 		= $parms['pagesize']; // wppa_opt( 'photo_admin_pagesize' ) ? wppa_opt( 'photo_admin_pagesize' ) : '20';
 
-	$next_after 	= wppa_get( 'next-after', '0' ) ? '1' : '0';
-	$p 				= $parms['page']; // wppa_get( 'paged', '1' );
+	$next_after 	= wppa_get( 'next-after', 0 ) ? 1 : 0;
+	$p 				= $parms['page']; // wppa_get( 'paged', 1 );
 	$page 			= $p + $next_after;
-	$skip 			= ( $page - '1' ) * $pagesize;
+	$skip 			= ( $page - 1 ) * $pagesize;
 
 	if ( $album ) {
 		if ( $album == 'moderate' ) {
@@ -3349,7 +3318,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 														   ORDER BY album DESC, timestamp DESC
 														   LIMIT %d, %d", $skip, $pagesize ) );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos_bulk( $album, true );
 				return;
 			}
@@ -3360,7 +3329,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 			$count 	= wppa_get_edit_search_photos( '', '', 'count_only' );
 			$photos = wppa_get_edit_search_photos( $skip, $pagesize );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos_bulk( $album, true );
 				return;
 			}
@@ -3369,13 +3338,13 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 			wppa_show_search_statistics();
 		}
 		elseif ( $album == 'trash' ) {
-			$count 	= wppa_get_count( WPPA_PHOTOS, ['album' => '0'], ['<'] );
+			$count 	= wppa_get_count( WPPA_PHOTOS, ['album' => 0], ['<'] );
 
 			$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
-														   WHERE album < '0' ORDER BY modified DESC
+														   WHERE album < 0 ORDER BY modified DESC
 														   LIMIT %d, %d", $skip, $pagesize ) );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos_bulk( $album, true );
 				return;
 			}
@@ -3394,7 +3363,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 			$query  = wppa_fix_query( $query );
 			$photos = wppa_get_results( $query );
 
-			if ( ! count( $photos ) && $parms['page'] > '1' ) {
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos_bulk( $album, true );
 				return;
 			}
@@ -3442,7 +3411,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 					wppa_album_select_a( array( 'checkaccess' 		=> true,
 												'path' 				=> true,
 												'void' 				=> $album,
-												'selected' 			=> '0',
+												'selected' 			=> 0,
 												'addpleaseselect' 	=> true,
 												'sort' 				=> true,
 												'tagopen' 			=> '<select' .
@@ -3518,8 +3487,8 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 					$nextafterselhtml = '
 					<select name="next-after">
 						<option value="-1"' . ( $next_after == '-1' ? ' selected' : '' ) . '>' . esc_html__( 'the previous page', 'wp-photo-album-plus' ) . '</option>
-						<option value="0"' . ( $next_after == '0' ? ' selected' : '' ) . '>' . esc_html__( 'the same page', 'wp-photo-album-plus' ) . '</option>
-						<option value="1"' . ( $next_after == '1' ? ' selected' : '' ) . '>' . esc_html__( 'the next page', 'wp-photo-album-plus' ) . '</option>
+						<option value="0"' . ( $next_after == 0 ? ' selected' : '' ) . '>' . esc_html__( 'the same page', 'wp-photo-album-plus' ) . '</option>
+						<option value="1"' . ( $next_after == 1 ? ' selected' : '' ) . '>' . esc_html__( 'the next page', 'wp-photo-album-plus' ) . '</option>
 					</select>';
 					/* translators: page indicator */
 					$result .= sprintf( __( 'Go to %s after Doit!.', 'wp-photo-album-plus' ), $nextafterselhtml );
@@ -3600,8 +3569,6 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 								}
 							}
 
-							$maxsize = wppa_get_minisize();
-
 							$result = '
 							<tr id="photoitem-' . $crid . '" class="photoitem">
 								<!-- Checkbox -->
@@ -3641,13 +3608,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 											>' ;
 									}
 
-									$result .= wppa_get_video_html( array(
-												'id'			=> $id,
-												'height' 		=> '160',
-												'controls' 		=> false,
-												'tagid' 		=> 'pa-id-' . $id,
-												'use_thumb' 	=> true,
-												) );
+									$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'pa-id-'.$id, 'style' => 'max-width:250px;max-height:250px;', 'use_thumb' => true, 'controls' => false] );
 									if ( $a ) {
 										$result .= '</a>';
 									}
@@ -3658,12 +3619,8 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 										href="' . esc_url( wppa_get_photo_url( $photo['id'] ) ) . '"
 										target="_blank"
 										title="' . esc_attr( __( 'Click to see fullsize', 'wp-photo-album-plus' ) ) . '"
-										>
-										<img
-											class="wppa-bulk-thumb"' .
-											( wppa_lazy() ? ' data-' : ' ' ) . 'src="' . esc_url( wppa_get_thumb_url( $id ) ) . '"
-											style="max-width:' . $maxsize . 'px;max-height:' . $maxsize . 'px"
-										/>
+										>' .
+										wppa_html_tag( 'img', ['class' => "wppa-bulk-thumb", 'src' => wppa_get_thumb_url($id), 'style' => 'max-width:250px;max-height:250px;'] ) . '
 									</a>';
 								}
 								$result .= '
@@ -3687,7 +3644,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 										if ( wppa_is_file( $sp ) ) {
 											$ima = getimagesize( $sp );
 											if ( is_array( $ima ) ) {
-												$result .= '<br>' . $ima['0'] . ' x ' . $ima['1'] . ' px.';
+												$result .= '<br>' . $ima[0] . ' x ' . $ima[1] . ' px.';
 											}
 										}
 									}
@@ -3701,7 +3658,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 											$album_select[$album] = wppa_album_select_a( array( 	'checkaccess' 		=> true,
 																									'path' 				=> true,
 																									'void' 				=> $album,
-																									'selected' 			=> '0',
+																									'selected' 			=> 0,
 																									'addpleaseselect' 	=> true,
 																									'sort' 				=> true,
 																									'crypt'  			=> true,
@@ -3793,7 +3750,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 			wppa_admin_pagination( $pagesize, $page, $count, $plink, 'bottom' );
 		}
 		else {
-			if ( $page == '1' ) {
+			if ( $page == 1 ) {
 				if ( wppa_get( 'searchstring' ) ) {
 					wppa_echo( '<h1>' . __( 'No photos matching your search criteria.', 'wp-photo-album-plus' ) . ' 2</h1>' );
 				}
@@ -3808,7 +3765,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 				}
 			}
 			else {
-				$page_1 = $page - '1';
+				$page_1 = $page - 1;
 				/* translators: pageno, link, pageno */
 				wppa_echo( sprintf( __( 'Page %1$d is empty, try <a href="%2$s">page %3$d</a>.', 'wp-photo-album-plus' ), $page, $link . '&paged=' . $page_1 . '#manage-photos', $page_1 ) );
 			}
@@ -3850,24 +3807,24 @@ global $wpdb;
 					$id 	= $photo['id'];
 					$crid 	= $photo['crypt'];
 					if ( wppa_is_video( $id ) ) {
-						$imgs['0'] = wppa_get_videox( $id, 'admin' );
-						$imgs['1'] = wppa_get_videoy( $id, 'admin' );
+						$imgs[0] = wppa_get_videox( $id, 'admin' );
+						$imgs[1] = wppa_get_videoy( $id, 'admin' );
 					}
 					else {
-						$imgs['0'] = wppa_get_thumbx( $id );
-						$imgs['1'] = wppa_get_thumby( $id );
+						$imgs[0] = wppa_get_thumbx( $id );
+						$imgs[1] = wppa_get_thumby( $id );
 					}
-					if ( ! $imgs['0'] ) {	// missing thuimbnail, prevent division by zero
-						$imgs['0'] = 200;
-						$imgs['1'] = 150;
+					if ( ! $imgs[0] ) {	// missing thuimbnail, prevent division by zero
+						$imgs[0] = 200;
+						$imgs[1] = 150;
 					}
 					$mw = $size - '20';
 					$mh = $mw * '3' / '4';
 					if ( $imgs[1]/$imgs[0] > $mh/$mw ) {	// more portrait than 200x150, y is limit
-						$mt = '15';
+						$mt = 15;
 					}
 					else {	// x is limit
-						$mt = ( $mh - ( $imgs[1]/$imgs[0] * $mw ) ) / '2' + '15';
+						$mt = ( $mh - ( $imgs[1]/$imgs[0] * $mw ) ) / '2' + 15;
 					}
 
 					$result .= '
@@ -3878,22 +3835,11 @@ global $wpdb;
 						>';
 						if ( wppa_is_video( $id ) ) {
 							$imgstyle = 'max-width:'.$mw.'px;max-height:'.$mh.'px;margin-top:'.$mt.'px;';
-							$result .= wppa_get_video_html( array(
-								'id'			=> $id,
-								'controls' 		=> false,
-								'tagid' 		=> 'pa-id-'.$id,
-								'class' 		=> 'wppa-bulk-thumb',
-								'style' 		=> $imgstyle,
-								'use_thumb' 	=> true
-								) );
+							$result .= wppa_get_video_html( ['id' => $id, 'controls' => false, 'tagid' => 'pa-id-'.$id, 'class' => 'wppa-bulk-thumb', 'style' => $imgstyle, 'use_thumb' => true] );
 						}
 						else {
-							$result .= '
-							<img
-								class="wppa-bulk-thumb"' .
-								( wppa_lazy() ? ' data-' : ' ' ) . 'src="' . esc_url( wppa_get_thumb_url( $id ) ) . '"
-								style="max-width:' . $mw . 'px;max-height:' . $mh . 'px;margin-top:' . $mt . 'px"
-							/>';
+							$result .=
+							wppa_html_tag( 'img', ['class' => "wppa-bulk-thumb", 'src' => wppa_get_thumb_url($id), 'style' => 'max-width:'.$mw.'px;max-height:'.$mh.'px;margin-top:'.$mt.'px'] );
 						}
 						$result .= '
 						<div
@@ -3940,7 +3886,7 @@ global $wpdb;
 	}
 }
 
-function wppa_get_edit_search_photos( $skip = '0', $pagesize = '1000', $count_only = false ) {
+function wppa_get_edit_search_photos( $skip = 0, $pagesize = '1000', $count_only = false ) {
 global $wpdb;
 global $wppa_search_stats;
 
@@ -4081,8 +4027,8 @@ global $wppa_search_stats;
 				</tr>
 			</thead>
 			<tbody>' );
-			$count = empty( $wppa_search_stats ) ? '0' : count( $wppa_search_stats );
-			$c = '0';
+			$count = empty( $wppa_search_stats ) ? 0 : count( $wppa_search_stats );
+			$c = 0;
 			$s = '';
 			foreach( $wppa_search_stats as $search_item ) {
 				$c++;
@@ -4180,12 +4126,8 @@ function wppa_fe_edit_photo( $photo ) {
 					background-color:#fff;
 					overflow:auto;"
 			class="wppa-edit-area wppa-modal">
-			<h1>
-				<img
-					style="height:50px"' .
-					' ' . ( wppa_lazy() ? 'data-' : '' ) . 'src="' . esc_url( wppa_get_thumb_url( $photo ) ) . '" ' .
-					wppa_get_imgalt( $photo ) . '
-				/>
+			<h1>' .
+				wppa_html_tag( 'img', ['style' => "height:50px", 'src' => wppa_get_thumb_url($photo), 'alt' => wppa_alt($photo)] ) . '
 				&nbsp;&nbsp;' .
 				wppa_opt( 'fe_edit_caption' ) . '
 			</h1>';

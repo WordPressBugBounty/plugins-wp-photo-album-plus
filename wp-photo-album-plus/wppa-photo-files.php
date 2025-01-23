@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 8.9.02.002
+* Version: 9.0.00.000
 *
 */
 
@@ -74,7 +74,7 @@ function wppa_get_o1_source_path( $id ) {
 function wppa_orientate_image( $id, $ori ) {
 
 	// If orientation right, do nothing
-	if ( ! $ori || $ori == '1' ) {
+	if ( ! $ori || $ori == 1 ) {
 		return;
 	}
 
@@ -253,7 +253,7 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 	}
 
 	// Max sizes
-	if ( wppa_opt( 'resize_to' ) == '0' ) {	// from fullsize
+	if ( wppa_opt( 'resize_to' ) == 0 ) {	// from fullsize
 		$max_width 	= wppa_opt( 'fullsize' );
 		$max_height = wppa_opt( 'maxheight' );
 		$do_resize = true;
@@ -504,7 +504,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 		$file = wppa_get_o1_source_path( $id );
 
 		// Try source path
-		if ( ! wppa_is_file( $file ) || wppa_get_photo_item( $id, 'panorama' ) == '1' ) {
+		if ( ! wppa_is_file( $file ) || wppa_get_photo_item( $id, 'panorama' ) == 1 ) {
 			$file = wppa_get_source_path( $id );
 		}
 
@@ -860,7 +860,7 @@ function wppa_image_magick( $command ) {
 
 	wppa_log( 'Fso', 'Exec ' . $logcom . ' return status: ' . $err );
 
-	if ( $err == '46' ) $err = '0';
+	if ( $err == '46' ) $err = 0;
 	return $err;
 }
 
@@ -1001,11 +1001,11 @@ global $wpdb;
 	// Create the album if it does not exist yet (from previous conversion)
 	if ( ! $alb ) {
 		$alb 	= $cnvparms['album'];
-		if ( $alb ) wppa_update_album( $alb, ['p_order_by' => '1'] );
+		if ( $alb ) wppa_update_album( $alb, ['p_order_by' => 1] );
 	}
 
 	if ( ! $alb ) {
-		$alb 	= wppa_create_album_entry( ['name' => $name, 'a_parent' => $parent, 'p_order_by' => '1'] );
+		$alb 	= wppa_create_album_entry( ['name' => $name, 'a_parent' => $parent, 'p_order_by' => 1] );
 		if ( ! $alb ) return "Could no create album";
 		wppa_update_pdf_conv_parms( $id, ['album' => $alb] );
 	}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * local js code for admin pages
-* Version 8.8.05.003
+* Version 9.0.00.000
 *
 */
 
@@ -300,7 +300,7 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 					wppaAjaxRequests++;
 					wppaConsoleLog("Pending ajax requests = "+wppaAjaxRequests);
 					jQuery("#wppa-sort-seqn-"+photo).val(seqno);	// set hidden value to new value to prevent duplicate action
-					var spinnerhtml = \'<img src="\'+wppaImageDirectory+\'spinner.gif" />\';
+					var spinnerhtml = \''.wppa_html_tag('img',['src' => wppa_get_imgdir('spinner.gif')]).'\';
 					jQuery("#wppa-seqno-"+photo).html(spinnerhtml);
 				}';
 			}
@@ -558,7 +558,7 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 					wppaAjaxInProgress++;
 
 					jQuery( "#wppa-sort-seqn-albums-" + album ).prop( "value", seqno );
-					var spinnerhtml = "<img src=\'" + wppaImageDirectory + "spinner.gif\' />";
+					var spinnerhtml = \''.wppa_html_tag('img',['src' => wppa_get_imgdir('spinner.gif')]).'\';
 					jQuery( "#wppa-album-seqno-" + album ).html( spinnerhtml );
 				}';
 			}
@@ -1225,8 +1225,8 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 					jQuery("#"+target).attr("src",iconurl);
 				}
 				function wppaPlanPotdUpdate() {
-					jQuery("#potdseqno").html("<img src=\'' . wppa_get_imgdir() . 'spinner.gif\'>");
-					jQuery("#potdpreview").html("<img src=\'' . wppa_get_imgdir() . 'spinner.gif\'>");
+					jQuery("#potdseqno").html(\''.wppa_html_tag('img',['src' => wppa_get_imgdir('spinner.gif')]).'\');
+					jQuery("#potdpreview").html(\''.wppa_html_tag('img',['src' => wppa_get_imgdir('spinner.gif')]).'\');
 					_wppaPlanPotdUpdate = true;
 				}
 				function wppaPlanUpdateWatermarkPreview() {

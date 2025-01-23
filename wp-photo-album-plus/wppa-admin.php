@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 8.8.08.002
+* Version: 9.0.00.000
 *
 */
 
@@ -49,7 +49,7 @@ function wppa_add_admin() {
 
 	// Compute total pending moderation
 	$tot_pending = '';
-	$tot_pending_count = '0';
+	$tot_pending_count = 0;
 	if ( current_user_can('wppa_comments') || current_user_can('wppa_moderate') ) $tot_pending_count += $com_pending_count;
 	if ( current_user_can('wppa_admin') || current_user_can('wppa_moderate') ) $tot_pending_count += $upl_pending_count;
 	if ( $tot_pending_count ) $tot_pending = '<span class="update-plugins"><span class="plugin-count"><b>' . $tot_pending_count . '</b></span></span>';
@@ -207,8 +207,8 @@ function wppa_add_admin() {
 	}
 
 	// Cache *
-	$hits = wppa_get_option( 'wppa_cache_hits', '0' );
-	$miss = wppa_get_option( 'wppa_cache_misses', '1' );
+	$hits = wppa_get_option( 'wppa_cache_hits', 0 );
+	$miss = wppa_get_option( 'wppa_cache_misses', 1 );
 	$perc = sprintf( '%5.2f', 100 * $hits / ( $hits + $miss ) );
 	add_submenu_page( 'wppa_admin_menu',
 							__( 'Cache', 'wp-photo-album-plus' ),
@@ -484,8 +484,7 @@ global $wppa_version;
 
 	if ( wppa( 'has_panorama' ) ) {
 		$three_url = WPPA_URL . '/vendor/three/three.min.js';
-		$ver = '122';
-		wppa_enqueue_script( 'wppa-three-min-js', $three_url, array(), $ver, true );
+		wppa_enqueue_script( 'wppa-three-min-js', $three_url, array(), $wppa_version, true );
 	}
 }
 

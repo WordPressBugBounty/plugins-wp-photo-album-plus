@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the multitag widget
-* Version 8.7.03.006
+* Version 9.0.00.000
 *
 */
 
@@ -82,7 +82,7 @@ class MultitagPhotos extends WP_Widget {
 
 		// Sanitize certain args
 		$instance['title'] 	= wp_strip_all_tags( $instance['title'] );
-		$instance['cols'] 	= min( max( '1', $instance['cols'] ), '6' );
+		$instance['cols'] 	= min( max( 1, $instance['cols'] ), '6' );
 
 		wppa_remove_widget_cache( $this->id );
 
@@ -104,7 +104,7 @@ class MultitagPhotos extends WP_Widget {
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
 		// Columns
-		wppa_widget_number( $this, 'cols', $instance['cols'], __( 'Number of columns', 'wp-photo-album-plus' ), '1', '6', '', 'true' );
+		wppa_widget_number( $this, 'cols', $instance['cols'], __( 'Number of columns', 'wp-photo-album-plus' ), 1, '6', '', 'true' );
 
 		// Tags selection
 		$tags = wppa_get_taglist();
@@ -116,7 +116,7 @@ class MultitagPhotos extends WP_Widget {
 		wppa_widget_selection_frame( $this, 'tags', $body, '<div style="clear:both"></div>' . __( 'Select multiple tags or --- all ---', 'wp-photo-album-plus' ), 'multi' );
 
 		// Currently selected
-		if ( isset( $instance['tags']['0'] ) && $instance['tags']['0'] ) $s = implode( ',', $instance['tags'] ); else $s = __( '--- all ---', 'wp-photo-album-plus' );
+		if ( isset( $instance['tags'][0] ) && $instance['tags'][0] ) $s = implode( ',', $instance['tags'] ); else $s = __( '--- all ---', 'wp-photo-album-plus' );
 		$result = '
 		<p style="word-break:break-all">' .
 			__( 'Currently selected tags', 'wp-photo-album-plus' ) . ':
@@ -142,7 +142,7 @@ class MultitagPhotos extends WP_Widget {
 							'cols' 		=> '2',
 							'tags' 		=> '',
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

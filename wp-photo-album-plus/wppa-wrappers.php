@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 8.9.01.001
+* Version 9.0.00.000
 *
 */
 
@@ -711,7 +711,7 @@ function wppa_unserialize( $xstring, $is_session = false ) {
 
 				// Boolean
 				case 'b:':
-					$data 	 = substr( $string, 0, 1 ) == '1';
+					$data 	 = substr( $string, 0, 1 ) == 1;
 					$string  = substr( $string, 2 );
 					break;
 
@@ -797,6 +797,7 @@ static $allowed_tags;
 			'class' => true,
 			'style' => true,
 			'onclick' => true,
+			'ondblclick' => true,
 			'onmouseover' => true,
 			'onmouseout' => true,
 			'onwheel' => true,
@@ -862,6 +863,7 @@ static $allowed_tags;
 				'srcset' => true,
 				'onload' => true,
 				'onerror' => ( $flags['needonerror'] ? true : false ),
+				'decoding' => true,
 				) ),
 			'input' => array_merge( $sa, array(
 				'type' => true,
@@ -1062,21 +1064,7 @@ static $js_accu;
 		$script = wppa_compress_js( $script );
 	}
 
-/*
-	// Last resort patch in case other plugins tamper js loading: $force_inline = true;
-	$force_inline = wppa_switch( 'force_local_js' );
-
-	if ( $force_inline ) {
-		$js_accu .= $script . ';';
-		if ( $wppa_jquery_loaded ) {
-			echo '<script>' . $js_accu . '</script>';
-			$js_accu = '';
-		}
-	}
-	else {
-*/
-		wp_add_inline_script( $where, $script );
-//	}
+	wp_add_inline_script( $where, $script );
 }
 
 // Wrapper for exif_read_data()

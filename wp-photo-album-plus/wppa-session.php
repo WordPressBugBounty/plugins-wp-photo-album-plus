@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 8.9.02.004
+* Version 9.0.00.000
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -63,7 +63,7 @@ global $wppa_session;
 			if ( in_array( WPPA_SESSION, $table ) ) $found = true;
 		}
 		if ( ! $found ) {
-			$wppa_session['id'] = '0';
+			$wppa_session['id'] = 0;
 			return false;
 		}
 	}
@@ -123,8 +123,8 @@ global $wppa_session;
 		}
 
 		$wppa_session = array();
-		$wppa_session['page'] 		= '0';
-		$wppa_session['ajax'] 		= '0';
+		$wppa_session['page'] 		= 0;
+		$wppa_session['ajax'] 		= 0;
 		$wppa_session['id']   		= $iret;
 		$wppa_session['user'] 		= wppa_get_user();
 		$wppa_session['wfcart'] 	= null;
@@ -138,7 +138,7 @@ global $wppa_session;
 		$wppa_session = wppa_unserialize( $data, true );
 
 		wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
-									   SET count = %d WHERE id = %d", $session['count'] + '1', $session['id'] ) );
+									   SET count = %d WHERE id = %d", $session['count'] + 1, $session['id'] ) );
 	}
 
 	// Get info for root and sub search
@@ -179,11 +179,11 @@ global $wppa_session;
 						'display_searchstring' 	=> '',
 						'supersearch' 			=> '',
 						'superview' 			=> 'thumbs',
-						'superalbum' 			=> '0',
-						'page'					=> '0',
-						'ajax'					=> '0',
+						'superalbum' 			=> 0,
+						'page'					=> 0,
+						'ajax'					=> 0,
 						'user' 					=> '',
-						'id' 					=> '0',
+						'id' 					=> 0,
 						'uris' 					=> array(),
 						'isrobot' 				=> false,
 						'wfcart' 				=> null,

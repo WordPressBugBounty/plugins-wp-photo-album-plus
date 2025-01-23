@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the actual import functions
-* Version: 8.9.01.001
+* Version: 9.0.00.000
 *
 */
 
@@ -180,9 +180,9 @@ function wppa_import_a_zip( $file ) {
 	// so there is no chance a depot/destroy.php or the like will get a chance to be created.
 	// so...
 
-	$err = '0';
+	$err = 0;
 	if ( ! class_exists( 'ZipArchive' ) ) {
-		wppa_import_quit( '10' );
+		wppa_import_quit( 10 );
 		wppa_log( 'err', 'Class ZipArchive does not exist! Check your php configuration' );
 		wppa_import_quit( '30' ); // not implemented
 	}
@@ -217,9 +217,9 @@ function wppa_import_a_zip( $file ) {
 
 			if ( wppa_get( 'del-after-z' ) ) {
 				wppa_unlink( $file );
-				wppa_import_quit( '0', true, false, true );
+				wppa_import_quit( 0, true, false, true );
 			}
-			wppa_import_quit( '0', false, false, true );
+			wppa_import_quit( 0, false, false, true );
 		}
 		else {
 			wppa_log( 'err', __( 'Failed to extract', 'wp-photo-album-plus' ) . ' ' . $path );
@@ -238,14 +238,14 @@ function wppa_import_a_album( $path ) {
 	// Validate file
 	$ext = strtolower( wppa_get_ext( $path ) );
 	if ( $ext != 'amf' ) {
-		wppa_import_quit( '1' );
+		wppa_import_quit( 1 );
 	}
 
 	$name 		= '';
 	$desc 		= '';
-	$aord 		= '0';
-	$parent 	= '0';
-	$porder 	= '0';
+	$aord 		= 0;
+	$parent 	= 0;
+	$porder 	= 0;
 	$owner 		= ( wppa_switch( 'backend_album_public' ) ? '--- public ---' : wppa_get_user() );
 	$dela 		= wppa_get( 'del-after-a' );
 	$delfa 		= wppa_get( 'del-after-fa' );
@@ -265,7 +265,7 @@ function wppa_import_a_album( $path ) {
 				if ( is_numeric( $data ) ) $aord = $data;
 				break;
 			case 'prnt=':
-				if ( $data == __( '--- none ---', 'wp-photo-album-plus' ) ) $parent = '0';
+				if ( $data == __( '--- none ---', 'wp-photo-album-plus' ) ) $parent = 0;
 				elseif ( $data == __( '--- separate ---', 'wp-photo-album-plus' ) ) $parent = '-1';
 				else {
 					$prnt = wppa_get_album_id( $data );
@@ -273,7 +273,7 @@ function wppa_import_a_album( $path ) {
 						$parent = $prnt;
 					}
 					else {
-						$parent = '0';
+						$parent = 0;
 						wppa_log( 'war', __( 'Unknown parent album:', 'wp-photo-album-plus' ).' '.htmlspecialchars($data).' '.__( '--- none --- used.', 'wp-photo-album-plus' ) );
 					}
 				}
@@ -325,7 +325,7 @@ function wppa_import_a_album( $path ) {
 		wppa_unlink( $path );
 		wppa_clear_cache( ['albums' => true] );
 		wppa_invalidate_treecounts( $id );
-		wppa_import_quit( '0', true );
+		wppa_import_quit( 0, true );
 	}
 
 	// Done
@@ -340,8 +340,8 @@ global $wppa_skip;
 	$ok = false;
 
 	// Update last used album
-	if ( wppa_get( 'photo-album', '0', 'acrypt' ) ) {
-		wppa_update_option( 'wppa-photo-album-import-' . wppa_get_user(), wppa_get( 'photo-album', '0', 'acrypt' ) );
+	if ( wppa_get( 'photo-album', 0, 'acrypt' ) ) {
+		wppa_update_option( 'wppa-photo-album-import-' . wppa_get_user(), wppa_get( 'photo-album', 0, 'acrypt' ) );
 	}
 
 	// Find album id if not supplied
@@ -365,7 +365,7 @@ global $wppa_skip;
 			}
 		}
 		else {
-			$album = wppa_get( 'photo-album', '0', 'acrypt' );
+			$album = wppa_get( 'photo-album', 0, 'acrypt' );
 		}
 	}
 
@@ -400,7 +400,7 @@ global $wppa_skip;
 		$alb = $album;	// default album
 		$name = basename( $file );		// default name
 		$desc = '';		// default description
-		$porder = '0';	// default p_order
+		$porder = 0;	// default p_order
 		$linkurl = '';
 		$linktitle = '';
 		$owner = wppa_get_user();
@@ -419,7 +419,7 @@ global $wppa_skip;
 	if ( $is_poster ) {
 
 		// Clear sizes on db
-		wppa_update_photo( $is_poster, ['thumbx' => '0', 'thumby' => '0', 'photox' => '0', 'photoy' => '0'] );
+		wppa_update_photo( $is_poster, ['thumbx' => 0, 'thumby' => 0, 'photox' => 0, 'photoy' => 0] );
 		if ( wppa_get_photo_item( $is_poster, 'ext' ) == 'pdf' ) {
 			wppa_update_photo( $is_poster, ['ext' => wppa_get_ext( basename( $file  ) )] );
 		}
@@ -465,7 +465,7 @@ global $wppa_skip;
 			$ok = true;
 			if ( wppa_get( 'del-after-p' ) ) {
 				wppa_unlink( $file );
-				wppa_import_quit( '0', true );
+				wppa_import_quit( 0, true );
 			}
 			wppa_import_quit();
 		}
@@ -489,7 +489,7 @@ global $wppa_skip;
 		}
 
 		// Do we have an album id?
-		if ( is_numeric( $alb ) && $alb != '0' ) {
+		if ( is_numeric( $alb ) && $alb != 0 ) {
 
 			// Is it a dup and no dups?
 			if ( ( wppa_switch( 'void_dups' ) || wppa_get( 'nodups' ) ) && wppa_is_file_duplicate_photo( $name, $alb ) ) {
@@ -500,14 +500,14 @@ global $wppa_skip;
 					if ( wppa_is_file( $path ) ) {
 						wppa_unlink( $path );
 					}
-					wppa_import_quit( '15' );
+					wppa_import_quit( 15 );
 				}
 				if ( wppa_get( 'del-after-fp' ) ) {
 					wppa_unlink( $file );
-					wppa_import_quit( '15', true );
+					wppa_import_quit( 15, true );
 				}
 				else {
-					wppa_import_quit( '15' );
+					wppa_import_quit( 15 );
 				}
 			}
 
@@ -551,7 +551,7 @@ global $wppa_skip;
 						if ( wppa_is_file( $meta ) ) {
 							wppa_unlink( $meta );
 						}
-						wppa_import_quit( '0', true );
+						wppa_import_quit( 0, true );
 					}
 					wppa_import_quit();
 
@@ -570,7 +570,7 @@ global $wppa_skip;
 		else {
 			$wppa_skip++;
 			wppa_log_skip( $file, 'unknown or not existing album' );
-			wppa_import_quit( '1' ); 	// Unknown album
+			wppa_import_quit( 1 ); 	// Unknown album
 		}
 	}
 	return $ok;
@@ -583,13 +583,13 @@ global $wppa_done;
 global $wppa_skip;
 
 	// Update last used album
-	if ( wppa_get( 'video-album', '0', 'acrypt' ) ) {
-		wppa_update_option( 'wppa-video-album-import-' . wppa_get_user(), wppa_get( 'video-album', '0', 'acrypt' ) );
+	if ( wppa_get( 'video-album', 0, 'acrypt' ) ) {
+		wppa_update_option( 'wppa-video-album-import-' . wppa_get_user(), wppa_get( 'video-album', 0, 'acrypt' ) );
 	}
 
 	$alb = $album ? $album : wppa_get( 'video-album', $album, 'acrypt' );
 	if ( ! $alb ) {
-		wppa_import_quit( '1' );
+		wppa_import_quit( 1 );
 	}
 
 	$name = basename( $file );
@@ -605,7 +605,7 @@ global $wppa_skip;
 				if ( wppa_is_file( $file ) ) {
 					wppa_unlink( $file );
 				}
-				wppa_import_quit( '0', true );
+				wppa_import_quit( 0, true );
 			}
 			wppa_import_quit();
 		}
@@ -630,13 +630,13 @@ global $wppa_done;
 global $wppa_skip;
 
 	// Update last used album
-	if ( wppa_get( 'audio-album', '0', 'acrypt' ) ) {
+	if ( wppa_get( 'audio-album', 0, 'acrypt' ) ) {
 		wppa_update_option( 'wppa-audio-album-import-' . wppa_get_user(), wppa_get( 'audio-album' ) );
 	}
 
 	$alb = $album ? $album : wppa_get( 'audio-album', $album, 'acrypt' );
 	if ( ! $alb ) {
-		wppa_import_quit( '1' );
+		wppa_import_quit( 1 );
 	}
 
 	$name = basename( $file );
@@ -653,7 +653,7 @@ global $wppa_skip;
 				if ( wppa_is_file( $file ) ) {
 					wppa_unlink( $file );
 				}
-				wppa_import_quit( '0', true );
+				wppa_import_quit( 0, true );
 			}
 			wppa_import_quit();
 		}
@@ -678,13 +678,13 @@ global $wppa_done;
 global $wppa_skip;
 
 	// Update last used album
-	if ( wppa_get( 'document-album', '0', 'acrypt' ) ) {
-		wppa_update_option( 'wppa-document-album-import-' . wppa_get_user(), wppa_get( 'document-album', '0', 'acrypt' ) );
+	if ( wppa_get( 'document-album', 0, 'acrypt' ) ) {
+		wppa_update_option( 'wppa-document-album-import-' . wppa_get_user(), wppa_get( 'document-album', 0, 'acrypt' ) );
 	}
 
 	$alb = $album ? $album : wppa_get( 'document-album', $album, 'acrypt' );
 	if ( ! $alb ) {
-		wppa_import_quit( '1' );
+		wppa_import_quit( 1 );
 	}
 
 	$name = basename( $file );
@@ -700,7 +700,7 @@ global $wppa_skip;
 			if ( wppa_get( 'del-after-d' ) ) {
 				if ( wppa_is_file( $file ) ) {
 					wppa_unlink( $file );
-					wppa_import_quit( '0', true );
+					wppa_import_quit( 0, true );
 				}
 			}
 			wppa_import_quit();
@@ -730,7 +730,7 @@ global $wpdb;
 
 	// Get the captions we already have
 	$cust_labels = array();
-	for ( $i = '0'; $i < '10'; $i++ ) {
+	for ( $i = 0; $i < 10; $i++ ) {
 		$cust_labels[$i] = wppa_opt( 'custom_caption_' . $i );
 	}
 
@@ -749,32 +749,32 @@ global $wpdb;
 		'owner', 		// text NOT NULL,
 		'timestamp', 	// tinytext NOT NULL,
 		'status', 		// tinytext NOT NULL,
-						// rating_count bigint(20) NOT NULL default '0',
+						// rating_count bigint(20) NOT NULL default 0,
 		'tags',			// text NOT NULL,
 		'alt',			// tinytext NOT NULL,
 						// filename tinytext NOT NULL,
 		'modified',		// tinytext NOT NULL,
 		'location',		// tinytext NOT NULL,
-		'views',		// bigint(20) NOT NULL default '0',
-		'clicks',		// bigint(20) NOT NULL default '0',
-						// page_id bigint(20) NOT NULL default '0',
+		'views',		// bigint(20) NOT NULL default 0,
+		'clicks',		// bigint(20) NOT NULL default 0,
+						// page_id bigint(20) NOT NULL default 0,
 		'exifdtm', 		// tinytext NOT NULL,
-						// videox smallint(5) NOT NULL default '0',
-						// videoy smallint(5) NOT NULL default '0',
-						// thumbx smallint(5) NOT NULL default '0',
-						// thumby smallint(5) NOT NULL default '0',
-						// photox smallint(5) NOT NULL default '0',
-						// photoy smallint(5) NOT NULL default '0',
+						// videox smallint(5) NOT NULL default 0,
+						// videoy smallint(5) NOT NULL default 0,
+						// thumbx smallint(5) NOT NULL default 0,
+						// thumby smallint(5) NOT NULL default 0,
+						// photox smallint(5) NOT NULL default 0,
+						// photoy smallint(5) NOT NULL default 0,
 						// scheduledtm tinytext NOT NULL,
 						// custom longtext NOT NULL,
-						// stereo smallint NOT NULL default '0',
+						// stereo smallint NOT NULL default 0,
 						// crypt tinytext NOT NULL,
 	);
 
 	// Process the file
 	$name 					= basename( $file );
-	$processed 		= '0';
-	$skipped 		= '0';
+	$processed 		= 0;
+	$skipped 		= 0;
 	$is_db_table 	= false;
 	$tables 		= array( WPPA_ALBUMS, WPPA_PHOTOS, WPPA_RATING, WPPA_COMMENTS, WPPA_IPTC, WPPA_EXIF, WPPA_INDEX, WPPA_SESSION );
 
@@ -869,7 +869,7 @@ global $wpdb;
 
 				reset( $data_arr );
 				$id = trim( current( $data_arr ) );
-				if ( wppa_is_int( $id ) && $id > '0' ) {
+				if ( wppa_is_int( $id ) && $id > 0 ) {
 
 					$existing_data = wppa_get_row( "SELECT * FROM " . $is_db_table . " WHERE id = $id" );
 
@@ -959,8 +959,8 @@ global $wpdb;
 		foreach ( array_keys( $captions ) as $captidx ) {
 
 			// First item must be 'name', 'photoname' or 'filename'
-			if ( $captidx == '0' ) {
-				if ( ! in_array( $captions['0'], ['name', 'photoname', 'filename'] ) ) {
+			if ( $captidx == 0 ) {
+				if ( ! in_array( $captions[0], ['name', 'photoname', 'filename'] ) ) {
 
 					// Wrap up, no need to delete
 					wppa_import_csv_wrapup( $handle, $write_handle, '25', $tempfile, $file );
@@ -969,7 +969,7 @@ global $wpdb;
 
 			// If a systemlabel, first caption must be filename
 			elseif ( in_array( $captions[$captidx], $syst_labels ) ) {
-				if ( $captions['0'] != 'filename' ) {
+				if ( $captions[0] != 'filename' ) {
 
 					// Wrap up, no need to delete
 					wppa_import_csv_wrapup( $handle, $write_handle, '26', $tempfile, $file );
@@ -985,7 +985,7 @@ global $wpdb;
 				}
 
 				// Add a new caption
-				$i = '0';
+				$i = 0;
 				while ( $cust_labels[$i] ) $i++;
 				$cust_labels[$i] = $captions[$captidx];
 				wppa_update_option( 'wppa_custom_caption_' . $i, $cust_labels[$i] );
@@ -996,9 +996,9 @@ global $wpdb;
 		// Find the correlation between caption index and custom data index.
 		// $custptrs is an array of custom data field numbers
 		$custptrs = array();
-		for ( $captidx = '1'; $captidx < count( $captions ); $captidx++ ) {
+		for ( $captidx = 1; $captidx < count( $captions ); $captidx++ ) {
 			if ( ! in_array( $captions[$captidx], $syst_labels ) ) {
-				for ( $custidx = '0'; $custidx < '10'; $custidx++ ) {
+				for ( $custidx = 0; $custidx < 10; $custidx++ ) {
 					if ( $captions[$captidx] == $cust_labels[$custidx] ) {
 						$custptrs[$custidx] = $captidx;
 					}
@@ -1009,7 +1009,7 @@ global $wpdb;
 		// Find the correlation betwwn caption index and system data field names.
 		// $systptrs is an array of system data field names. Key is data filed number, value is system field name
 		$systptrs = array();
-		for ( $captidx = '1'; $captidx < count( $captions ); $captidx++ ) {
+		for ( $captidx = 1; $captidx < count( $captions ); $captidx++ ) {
 			if ( in_array( $captions[$captidx], $syst_labels ) ) {
 				$systptrs[$captidx] = $captions[$captidx];
 			}
@@ -1101,7 +1101,7 @@ global $wpdb;
 
 	if ( 'del-after-c' ) {
 		wppa_unlink( $file );
-		wppa_import_quit( '0', true, false, false, $processed, $skipped );
+		wppa_import_quit( 0, true, false, false, $processed, $skipped );
 	}
 
 	wppa_import_quit();
@@ -1117,7 +1117,7 @@ global $wppa_skip;
 	$wppa_noquit = true;
 	$wppa_nodelete = wppa_switch( 'keep_import_files' );
 
-	$bret = wppa_import_dir_to_album( $file, '0' );
+	$bret = wppa_import_dir_to_album( $file, 0 );
 
 	$wppa_noquit = false;
 	$wppa_nodelete = false;
@@ -1135,7 +1135,7 @@ global $wppa_skip;
 	else {
 		$del = false;
 	}
-	wppa_import_quit( '0', $del, false, false, $wppa_done, $wppa_skip );
+	wppa_import_quit( 0, $del, false, false, $wppa_done, $wppa_skip );
 }
 
 // Import a dir to album
@@ -1162,7 +1162,7 @@ global $wppa_skip;
 
 			// If parent = 0 ( top-level album ) and album not found,
 			// try a 'separate' album ( i.e. parent = -1 ) with this name
-			if ( ! $alb && $parent == '0' ) {
+			if ( ! $alb && $parent == 0 ) {
 				$alb = wppa_get_album_id( $name, '-1' );
 			}
 		}
@@ -1189,7 +1189,7 @@ global $wppa_skip;
 				wppa_set_last_album( $alb );
 				wppa_invalidate_treecounts( $alb );
 				wppa_create_pl_htaccess();
-				if ( wppa_switch( 'newpag_create' ) && $parent <= '0' ) {
+				if ( wppa_switch( 'newpag_create' ) && $parent <= 0 ) {
 
 					// Create post object
 					$my_post = array(
@@ -1348,14 +1348,14 @@ global $wppa_skip;
 	}
 
 	// Not yet, create it
-	if ( $rm_parent > '0' ) {
+	if ( $rm_parent > 0 ) {
 		$parent = wppa_get_var( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = $rm_parent" );
 		if ( ! $parent ) {
 			wppa_import_quit( '29' ); // Missing parent album
 		}
 	}
 	else {
-		$parent = '0';
+		$parent = 0;
 	}
 
 	$iret = wppa_create_album_entry( ['name' 		=> $name,
@@ -1553,7 +1553,7 @@ global $wppa_skip;
 			else {
 				$wppa_skip++;
 				wppa_log_skip( $file, 'album not converted yet' );
-				wppa_import_quit( '1' );
+				wppa_import_quit( 1 );
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 8.7.04.004
+/* Version 9.0.00.000
 /*
 */
 
@@ -14,15 +14,15 @@ function wppa_create_wppa_dynamic_css() {
 
 	$the_css = '
 .wppa-box {	' .
-	( wppa_opt( 'bwidth' ) > '0' ? 'border-style: solid; border-width:' . wppa_opt( 'bwidth' ) . 'px;' : '' ) .
-	( wppa_opt( 'bradius' ) > '0' ? 'border-radius:' . wppa_opt( 'bradius' ) . 'px; -moz-border-radius:' . wppa_opt( 'bradius' ) . 'px;' : '' ) .
+	( wppa_opt( 'bwidth' ) > 0 ? 'border-style: solid; border-width:' . wppa_opt( 'bwidth' ) . 'px;' : '' ) .
+	( wppa_opt( 'bradius' ) > 0 ? 'border-radius:' . wppa_opt( 'bradius' ) . 'px; -moz-border-radius:' . wppa_opt( 'bradius' ) . 'px;' : '' ) .
 	( wppa_opt( 'box_spacing' ) ? 'margin-bottom:' . wppa_opt( 'box_spacing' ) . 'px;' : '' ) .
 	( wppa_opt( 'bgcolor' ) ? 'background-color:' . wppa_opt( 'bgcolor' ) . ';' : '' ) .
 	( wppa_opt( 'bcolor' ) ? 'border-color:' . wppa_opt( 'bcolor' ) . ';' : '' ) .
 ' }
 .wppa-mini-box { ' .
-	( wppa_opt( 'bwidth' ) > '0' ? 'border-style: solid; border-width:' . floor( ( wppa_opt( 'bwidth' ) + 2 ) / 3 ) . 'px;' : '' ) .
-	( wppa_opt( 'bradius' ) > '0' ? 'border-radius:' . floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px;' : '' ) .
+	( wppa_opt( 'bwidth' ) > 0 ? 'border-style: solid; border-width:' . floor( ( wppa_opt( 'bwidth' ) + 2 ) / 3 ) . 'px;' : '' ) .
+	( wppa_opt( 'bradius' ) > 0 ? 'border-radius:' . floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px;' : '' ) .
 	( wppa_opt( 'bcolor' ) ? 'border-color:' . wppa_opt( 'bcolor' ) . ';' : '' ) .
 ' }
 .wppa-cover-box { ' .
@@ -99,7 +99,7 @@ function wppa_get_fullimgstyle( $id ) {
 // get full img style - array output
 function wppa_get_fullimgstyle_a( $id ) {
 
-	if ( ! is_numeric( wppa( 'fullsize' ) ) || wppa( 'fullsize' ) <= '1' ) {
+	if ( ! is_numeric( wppa( 'fullsize' ) ) || wppa( 'fullsize' ) <= 1 ) {
 		wppa( 'fullsize', wppa_opt( 'fullsize' ) );
 	}
 
@@ -134,10 +134,10 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 
 	if (
 			! $image_attr ||
-			! isset( $image_attr['0'] ) ||
-			! $image_attr['0'] ||
-			! isset( $image_attr['1'] ) ||
-			! $image_attr['1'] ) {
+			! isset( $image_attr[0] ) ||
+			! $image_attr[0] ||
+			! isset( $image_attr[1] ) ||
+			! $image_attr[1] ) {
 
 		// File is corrupt
 		wppa_log( 'War', 'Please check file ' . $file . ' it is corrupted.' );
@@ -150,7 +150,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			case '':
 				$max_size = $xmax_size;
 				break;
-			case '0':
+			case 0:
 				$max_size = $xmax_size - '2';
 				break;
 			default:
@@ -257,10 +257,10 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			if ( $valign != 'default' ) {	// Center horizontally
 				$delta = floor( ( $max_size - $width ) / 2 );
 				if ( is_numeric( $valign ) ) $delta += $valign;
-				if ( $delta < '0' ) {
-					$delta = '0';
+				if ( $delta < 0 ) {
+					$delta = 0;
 				}
-				if ( $delta > '0' ) {
+				if ( $delta > 0 ) {
 					$result['style'] .= 'margin-left:' . $delta . 'px;margin-right:' . $delta . 'px;';
 				}
 			}
@@ -268,20 +268,20 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			switch ( $valign ) {
 				case 'top':
 					$delta = $max_size - $height;
-					if ( $delta < '0' ) $delta = '0';
+					if ( $delta < 0 ) $delta = 0;
 					$result['style'] .= 'margin-bottom: ' . $delta . 'px;';
 					$result['margin-bottom'] = $delta;
 					break;
 				case 'center':
 					$delta = round( ( $max_size - $height ) / 2 );
-					if ( $delta < '0' ) $delta = '0';
+					if ( $delta < 0 ) $delta = 0;
 					$result['style'] .= 'margin-top: ' . $delta . 'px;margin-bottom:' . $delta . 'px;';
 					$result['margin-top'] = $delta;
 					$result['margin-bottom'] = $delta;
 					break;
 				case 'bottom':
 					$delta = $max_size - $height;
-					if ( $delta < '0' ) $delta = '0';
+					if ( $delta < 0 ) $delta = 0;
 					$result['style'] .= 'margin-top: ' . $delta . 'px;';
 					$result['margin-top'] = $delta;
 					break;
@@ -358,7 +358,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 				$result['style'] .= 'height:' . $height . 'px;';
 			}
 
-			if ( wppa( 'is_slideonly' ) == '1' ) {
+			if ( wppa( 'is_slideonly' ) == 1 ) {
 				if ( wppa( 'ss_widget_valign' ) != '' ) $valign = wppa( 'ss_widget_valign' );
 				else $valign = 'fit';
 			}
@@ -371,40 +371,40 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 
 			// Margin
 			if ( $valign != 'default' ) {
-				$m_left 	= '0';
-				$m_right 	= '0';
-				$m_top 		= '0';
-				$m_bottom 	= '0';
+				$m_left 	= 0;
+				$m_right 	= 0;
+				$m_top 		= 0;
+				$m_bottom 	= 0;
 
 				// Center horizontally
 				$delta = round( ( $max_size - $width ) / 2 );
-				if ( $delta < '0' ) $delta = '0';
+				if ( $delta < 0 ) $delta = 0;
 				if ( wppa( 'auto_colwidth' ) ) {
 					$m_left 	= 'auto';
 					$m_right 	= 'auto';
 				}
 				else {
 					$m_left 	= $delta;
-					$m_right 	= '0';
+					$m_right 	= 0;
 				}
 
 				// Position vertically
-				if ( wppa_in_widget() == 'ss' && wppa( 'in_widget_frame_height' ) > '0' ) {
+				if ( wppa_in_widget() == 'ss' && wppa( 'in_widget_frame_height' ) > 0 ) {
 					$max_height = wppa( 'in_widget_frame_height' );
 				}
-				$delta = '0';
+				$delta = 0;
 				if ( ! wppa( 'auto_colwidth' ) && ! wppa_page( 'oneofone' ) ) {
 					switch ( $valign ) {
 						case 'center':
 							$delta = round( ( $max_height - $height ) / 2 );
-							if ( $delta < '0' ) $delta = '0';
+							if ( $delta < 0 ) $delta = 0;
 							break;
 						case 'bottom':
 							$delta = $max_height - $height;
-							if ( $delta < '0' ) $delta = '0';
+							if ( $delta < 0 ) $delta = 0;
 							break;
 						default: //	case 'top': case 'fit':
-							$delta = '0';
+							$delta = 0;
 							break;
 					}
 				}
@@ -417,7 +417,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			if ( ! wppa_in_widget() ) switch ( wppa_opt( 'fullimage_border_width' ) ) {
 				case '':
 					break;
-				case '0':
+				case 0:
 					$result['style'] .= 'border:1px solid ' . wppa_opt( 'bcolor_fullimg' ) . ';';
 					break;
 				default:
@@ -426,7 +426,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 					$result['style'] .= 'padding:' . wppa_opt( 'fullimage_border_width' ) . 'px;';
 
 					// If we do round corners...
-					if ( wppa_opt( 'bradius' ) > '0' ) {	// then also here
+					if ( wppa_opt( 'bradius' ) > 0 ) {	// then also here
 						$result['style'] .= 'border-radius:' .
 							wppa_opt( 'fullimage_border_width' ) . 'px;';
 					}
@@ -444,7 +444,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 }
 
 
-function wppa_get_text_medal_color_style( $type, $bw ='1' ) {
+function wppa_get_text_medal_color_style( $type, $bw =1 ) {
 
 	$darks = array(
 					'red' 		=> '#BB0000',

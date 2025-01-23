@@ -4,7 +4,7 @@
 *
 * This file contains all procedures related to the privacy policy.
 *
-* Version 8.8.08.001
+* Version 9.0.00.000
 */
 
 function wppa_comment_exporter( $email_address, $page = 1 ) {
@@ -268,7 +268,7 @@ global $wpdb;
 			if ( wppa_is_file( $poster_file ) ) {
 				$poster_ext = wppa_get_ext( $poster_file );
 				$file = wppa_strip_ext( $filename ) . '.' . $poster_ext;
-				$media_html .= 	'<img src="wppa-media/Poster_' . $file . '" style="height:150px;margin-left:12px;" />';
+				$media_html .= 	wppa_html_tag( 'img', ['src' => 'wppa-media/Poster_' . $file, 'style' => "height:150px;margin-left:12px;"] );
 			}
 		}
 
@@ -288,7 +288,7 @@ global $wpdb;
 			if ( wppa_is_file( $poster_file ) ) {
 				$poster_ext = wppa_get_ext( $poster_file );
 				$file = wppa_strip_ext( $filename ) . '.' . $poster_ext;
-				$media_html .= 	'<img src="wppa-media/Poster_' . $file . '" style="height:150px;margin-left:12px;" />';
+				$media_html .= 	wppa_html_tag( 'img', ['src' => 'wppa-media/Poster_' . $file, 'style' => "height:150px;margin-left:12px;"] );
 			}
 		}
 
@@ -297,7 +297,7 @@ global $wpdb;
 			$media_type = __( 'PDF Document', 'wp-photo-album-plus' );
 			$filename 	= wppa_get_photo_item( $id, 'filename' );
 			$media_html = 	'<a href="wppa-media/' . $filename . '" target="_blank" >' .
-								'<img src="wppa-media/' . wppa_strip_ext( $filename ) . '.jpg" style="height:150px;" />' .
+								wppa_html_tag( 'img', ['src' => 'wppa-media/' . wppa_strip_ext( $filename ) . '.jpg', 'style' => "height:150px;"] ) .
 							'</a>';
 		}
 
@@ -305,7 +305,7 @@ global $wpdb;
 		else {
 			$media_type = __( 'Photo', 'wp-photo-album-plus' );
 			$filename 	= wppa_get_photo_item( $id, 'filename' );
-			$media_html = '<img src="wppa-media/' . $filename . '" style="height:150px;" />';
+			$media_html = wppa_html_tag( 'img', ['src' => 'wppa-media/' . $filename, 'style' => "height:150px;"] );
 		}
 
 		// Store Image html

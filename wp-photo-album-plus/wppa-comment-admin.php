@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 8.8.08.001
+* Version: 9.0.00.005
 *
 */
 
@@ -92,24 +92,14 @@ class WPPA_Comment_table extends WPPA_List_Table {
 		$title 	= esc_attr( wppa_get_photo_name( $photo ) ) . ' (' . wppa_get_album_name( wppa_get_photo_item( $photo, 'album' ) ) . ')';
 		if ( wppa_is_video( $photo ) && ! wppa_is_file( wppa_get_thumb_path( $photo ) ) ) {
 			$result =
-			wppa_get_video_html( array (
-				'id'			=> $photo,
-				'tagid' 		=> 'video-' . $item['id'],
-				'controls' 		=> false,
-				'title' 		=> $title,
-				'style' 		=> 'width:170px;',
-			) ) .
+			wppa_get_video_html( ['id' => $photo, 'tagid' => 'video-'.$item['id'], 'controls' => false, 'title' => $title, 'style' => 'width:170px;'] ) .
 			'<br>' .
 			$item['id'] . ' ' .
 			__( 'Video', 'wp-photo-album-plus' ) . ': ' . $item['photo'];
 		}
 		else {
-		$result = '
-			<img
-				src="' . $src . '"
-				style="width:170px;"
-				title="' . $title . '"
-			>
+			$result = wppa_html_tag( 'img', ['src' => $src, 'style' => 'width:170px;', 'title' => $title] );
+			$result .= '
 			<br>' .
 			$item['id'] . ' ' .
 			__( 'Photo', 'wp-photo-album-plus' ) . ': ' . $item['photo'];
@@ -159,7 +149,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 
 		$backlink =  wppa_get('backlink', '', 'text');
 		if ( ! $backlink ) $backlink = 'nixyz';
-		$p1 = '<a href="?page=wppa_manage_comments&commentids=' . $item['id'] . '&paged=' . wppa_get( 'paged', '1', 'int' ) . '&backlink=' . urlencode($backlink);
+		$p1 = '<a href="?page=wppa_manage_comments&commentids=' . $item['id'] . '&paged=' . wppa_get( 'paged', 1, 'int' ) . '&backlink=' . urlencode($backlink);
 		$actions = array(
 			'approvesingle' 	=> $p1 . '&action=approvesingle" >' . __( 'Approve', 'wp-photo-album-plus' ) . '</a>',
 			'pendingsingle' 	=> $p1 . '&action=pendingsingle" >' . __( 'Pending', 'wp-photo-album-plus' ) . '</a>',
@@ -363,17 +353,17 @@ global $wpdb;
 		else {
 
 			// Statistics
-			$t_to_txt = array( 	'none' 		=> false,
+			$t_to_txt = array( 	'none' 	=> false,
 								/* translators: integer */
-								'600' 		=> sprintf( _n('%d minute', '%d minutes', '10', 'wp-photo-album-plus' ), '10'),
+								600 	=> sprintf( _n('%d minute', '%d minutes', 10, 'wp-photo-album-plus' ), 10),
 								/* translators: integer */
-								'1800' 		=> sprintf( _n('%d minute', '%d minutes', '30', 'wp-photo-album-plus' ), '30'),
+								1800 	=> sprintf( _n('%d minute', '%d minutes', 30, 'wp-photo-album-plus' ), 30),
 								/* translators: integer */
-								'3600' 		=> sprintf( _n('%d hour', '%d hours', '1', 'wp-photo-album-plus' ), '1'),
+								3600 	=> sprintf( _n('%d hour', '%d hours', 1, 'wp-photo-album-plus' ), 1),
 								/* translators: integer */
-								'86400' 	=> sprintf( _n('%d day', '%d days', '1', 'wp-photo-album-plus' ), '1'),
+								86400 	=> sprintf( _n('%d day', '%d days', 1, 'wp-photo-album-plus' ), 1),
 								/* translators: integer */
-								'604800' 	=> sprintf( _n('%d week', '%d weeks', '1', 'wp-photo-album-plus' ), '1'),
+								604800 	=> sprintf( _n('%d week', '%d weeks', 1, 'wp-photo-album-plus' ), 1),
 							);
 			$spamtime = $t_to_txt[wppa_opt( 'spam_maxage' )];
 
@@ -404,7 +394,7 @@ global $wpdb;
 						wppa_echo( '
 						<tr>
 							<td style="margin:0;font-weight:bold;color:red">' . __( 'Auto deleted spam:', 'wp-photo-album-plus' ) . '</td>
-							<td style="margin:0;font-weight:bold">' . wppa_get_option( 'wppa_spam_auto_delcount', '0' ) . '</td>' .
+							<td style="margin:0;font-weight:bold">' . wppa_get_option( 'wppa_spam_auto_delcount', 0 ) . '</td>' .
 							/* translators: time interval */
 							'<td>' . sprintf( __( 'Comments marked as spam will be deleted when they are entered longer than %s ago.', 'wp-photo-album-plus' ), $spamtime ) . '</td>
 						</tr>' );

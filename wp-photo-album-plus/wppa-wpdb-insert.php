@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 8.8.08.005
+* Version 9.0.00.010
 *
 */
 
@@ -21,7 +21,7 @@ global $wpdb;
 					'ip'				=> wppa_get_user_ip(),
 					'status' 			=> 'valid',
 					'data'				=> false,
-					'count' 			=> '1',
+					'count' 			=> 1,
 	);
 
 	$bret = wppa_insert( $table, $data );
@@ -66,7 +66,7 @@ static $last;
 
 	$table 	= $wpdb->wppa_exif;
 	$data 	= wp_parse_args( (array) $args, array (
-					'photo' 			=> '0',
+					'photo' 			=> 0,
 					'tag' 				=> '',
 					'description' 		=> '',
 					'f_description' 	=> '',
@@ -115,7 +115,7 @@ static $last;
 
 	$table 	= $wpdb->wppa_iptc;
 	$data 	= wp_parse_args( (array) $args, array (
-					'photo' 			=> '0',
+					'photo' 			=> 0,
 					'tag' 				=> '',
 					'description' 		=> '',
 					'status' 			=> ''
@@ -124,11 +124,10 @@ static $last;
 	$data['description'] = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $data['description'] );
 
 	// Skip unwanted garbage
-	if ( strlen( $data['description'] ) > 255 ) return true; 					// is array or nonsense anyway
 	if ( ! $data['description'] ) return true; 									// is empty
 	if ( strpos( $data['description'], 'UndefinedTag:' ) === 0 ) return true; 	// skip undefined tags
 
-	// Skip if duplecate of last done. $wpdb->insert() bug due to delayed actual writing to db???
+	// Skip if duplicate of last done. $wpdb->insert() bug due to delayed actual writing to db???
 	if ( $last['photo'] === $data['photo'] && $last['tag'] == $data['tag'] ) {
 		return true;
 	}
@@ -162,7 +161,7 @@ global $wpdb;
 	$data 	= wp_parse_args( (array) $args, array (
 					'id' 				=>  $id,
 					'timestamp' 		=> time(),
-					'photo' 			=> '0',
+					'photo' 			=> 0,
 					'user' 				=> wppa_get_user(),
 					'userid' 			=> wppa_get_user_id(),
 					'ip'				=> wppa_get_user_ip(),
@@ -195,8 +194,8 @@ global $wpdb;
 	$data 	= wp_parse_args( (array) $args, array (
 					'id' 				=> $id,
 					'timestamp' 		=> time(),
-					'photo' 			=> '0',
-					'value' 			=> '0',
+					'photo' 			=> 0,
+					'value' 			=> 0,
 					'user' 				=> wppa_get_user(),
 					'userid' 			=> wppa_get_user_id(),
 					'ip' 				=> wppa_get_user_ip(),
@@ -223,11 +222,11 @@ global $wpdb;
 	$id 	= wppa_nextkey( $table, $hope );
 	$data 	= wp_parse_args( (array) $args, array (
 					'id'				=>  $id,
-					'album' 			=> '0',
+					'album' 			=> 0,
 					'ext' 				=> 'jpg',
 					'name'				=> '',
 					'description' 		=> ( wppa_switch( 'apply_newphoto_desc' ) ? wppa_opt( 'newphoto_description' ) : '' ),
-					'p_order' 			=> '0',
+					'p_order' 			=> 0,
 					'mean_rating'		=> '',
 					'linkurl' 			=> '',
 					'linktitle' 		=> '',
@@ -235,34 +234,34 @@ global $wpdb;
 					'owner'				=> ( wppa_opt( 'newphoto_owner' ) ? wppa_opt( 'newphoto_owner' ) : wppa_get_user() ),
 					'timestamp'			=> time(),
 					'status'			=> wppa_opt( 'status_new' ),
-					'rating_count'		=> '0',
+					'rating_count'		=> 0,
 					'tags' 				=> '',
 					'alt' 				=> '',
 					'filename' 			=> '',
 					'modified' 			=> time(),
 					'location' 			=> '',
-					'views' 			=> '0',
-					'clicks' 			=> '0',
-					'page_id' 			=> '0',
+					'views' 			=> 0,
+					'clicks' 			=> 0,
+					'page_id' 			=> 0,
 					'exifdtm' 			=> '',
-					'videox' 			=> '0',
-					'videoy' 			=> '0',
-					'thumbx' 			=> '0',
-					'thumby' 			=> '0',
-					'photox' 			=> '0',
-					'photoy' 			=> '0',
+					'videox' 			=> 0,
+					'videoy' 			=> 0,
+					'thumbx' 			=> 0,
+					'thumby' 			=> 0,
+					'photox' 			=> 0,
+					'photoy' 			=> 0,
 					'scheduledtm' 		=> '',
 					'scheduledel' 		=> '',
 					'custom'			=> '',
-					'stereo' 			=> '0',
+					'stereo' 			=> 0,
 					'crypt' 			=> wppa_get_unique_crypt(),
 					'magickstack' 		=> '',
 					'indexdtm' 			=> '',
-					'panorama' 			=> '0',
-					'angle' 			=> '0',
+					'panorama' 			=> 0,
+					'angle' 			=> 0,
 					'sname' 			=> '',
-					'dlcount' 			=> '0',
-					'thumblock' 		=> '0',
+					'dlcount' 			=> 0,
+					'thumblock' 		=> 0,
 					'duration' 			=> '',
 					'rml_id' 			=> '',
 					'usedby' 			=> '',
@@ -274,6 +273,7 @@ global $wpdb;
 	$data['name'] 			= trim( $data['name'] );
 	$data['description'] 	= trim( $data['description'] );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
+	$data['tags'] 			= str_replace( '-none-,', '', $data['tags'] );
 	$sdtm = wppa_get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %s", $data['album'] ) );
 	if ( $sdtm ) {
 		$data['scheduledtm'] = $sdtm;
@@ -303,7 +303,6 @@ global $wpdb;
 	}
 
 	wppa_log( 'err', 'Could not insert into db table wppa_photos' );
-//	wppa_log( 'err', var_export( $data, true ) );
 	return false;
 }
 
@@ -318,22 +317,22 @@ global $wpdb;
 					'id' 				=> $id,
 					'name' 				=> __( 'New Album', 'wp-photo-album-plus' ),
 					'description' 		=> '',
-					'a_order' 			=> '0',
-					'main_photo' 		=> '0',
+					'a_order' 			=> 0,
+					'main_photo' 		=> 0,
 					'a_parent' 			=> wppa_opt( 'default_parent' ),
-					'p_order_by' 		=> '0',
+					'p_order_by' 		=> 0,
 					'cover_linktype' 	=> wppa_opt( 'default_album_linktype' ),
-					'cover_linkpage' 	=> '0',
+					'cover_linkpage' 	=> 0,
 					'cover_link' 		=> '',
 					'owner' 			=> wppa_get_user(),
 					'timestamp' 		=> time(),
 					'modified' 			=> time(),
 					'upload_limit' 		=> wppa_opt( 'upload_limit_count' ).'/'.wppa_opt( 'upload_limit_time' ),
-					'alt_thumbsize' 	=> '0',
+					'alt_thumbsize' 	=> 0,
 					'default_tags' 		=> '',
 					'cover_type' 		=> '',
 					'suba_order_by' 	=> '',
-					'views' 			=> '0',
+					'views' 			=> 0,
 					'cats'				=> '',
 					'scheduledtm' 		=> '',
 					'custom' 			=> '',
@@ -345,10 +344,10 @@ global $wpdb;
 					'sname' 			=> '',
 					'zoomable' 			=> '',
 					'displayopts' 		=> '0,0,0,0',
-					'upload_limit_tree' => '0',
+					'upload_limit_tree' => 0,
 					'scheduledel' 		=> '',
 					'status' 			=> 'publish',
-					'max_children' 		=> '0',
+					'max_children' 		=> 0,
 					'rml_id' 			=> '',
 					'usedby' 			=> '',
 					) );
@@ -356,6 +355,7 @@ global $wpdb;
 	$data['name'] 			= trim( $data['name'] );
 	$data['description'] 	= trim( $data['description'] );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
+	$data['cats'] 			= str_replace( '-none-,', '', $data['cats'] );
 
 	$bret = wppa_insert( $table, $data );
 
@@ -390,7 +390,7 @@ global $wpdb;
 				'albums' 	=> '',
 				'photos' 	=> '',
 				'other' 	=> '',
-				'page' 		=> '0',
+				'page' 		=> 0,
 				));
 
 	$data['filename'] 	= sanitize_text_field( $data['filename'] );
@@ -416,7 +416,7 @@ global $wpdb;
 // This happens when a time-out occurs during an insert query.
 // This is not theoretical, i have seen it happen two times on different installations.
 // This routine will find a free positive keyvalue larger than any key used, ignoring the fact that the MAXINT key may be used.
-function wppa_nextkey( $table, $hope = '0' ) {
+function wppa_nextkey( $table, $hope = 0 ) {
 global $wpdb;
 
 	if ( $hope && wppa_is_id_free( $table, $hope ) ) {
@@ -430,13 +430,13 @@ global $wpdb;
 		$query = $wpdb->prepare( "SELECT id FROM %s WHERE id < `9223372036854775806` ORDER BY id DESC LIMIT 1", $table );
 		$query = wppa_fix_query( $query );
 		$lastkey = wppa_get_var( $query );
-		if ( ! is_numeric( $lastkey ) || $lastkey <= '0' ) {
-			$lastkey = '0';
+		if ( ! is_numeric( $lastkey ) || $lastkey <= 0 ) {
+			$lastkey = 0;
 		}
 		wppa_update_option( $name, $lastkey );
 	}
 
-	$result = $lastkey + '1';
+	$result = $lastkey + 1;
 	while ( ! wppa_is_id_free( $table, $result ) ) {
 		$result++;
 	}
@@ -450,7 +450,7 @@ global $wpdb;
 
 	if ( ! is_numeric( $id ) ) return false;
 	if ( ! wppa_is_int( $id ) ) return false;
-	if ( $id <= '0' ) return false;
+	if ( $id <= 0 ) return false;
 
 	$query = $wpdb->prepare( "SELECT * FROM %s WHERE id = %s", $table, $id );
 	$query = wppa_fix_query( $query );

@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 8.9.02.003
+* Version 9.0.00.004
 */
 
 // Place all wppa related js declarations in the header, both admin and frontend
@@ -96,7 +96,7 @@ global $wpdb;
 	wppaTextFrameDelta = '.wppa_get_textframe_delta() . ',
 	wppaBoxDelta = '.wppa_get_box_delta() . ',
 	wppaFilmShowGlue = '.( wppa_switch( 'film_show_glue' ) ? 'true' : 'false' ) . ',
-	wppaMiniTreshold = '.( wppa_opt( 'mini_treshold' ) ? wppa_opt( 'mini_treshold' ) : '0' ) . ',
+	wppaMiniTreshold = '.( wppa_opt( 'mini_treshold' ) ? wppa_opt( 'mini_treshold' ) : 0 ) . ',
 	wppaRatingOnce = '.( wppa_switch( 'rating_change' ) || wppa_switch( 'rating_multi' ) ? 'false' : 'true' ) . ',
 	wppaHideWhenEmpty = '.( wppa_switch( 'hide_when_empty' ) ? 'true' : 'false' ) . ',
 	wppaBGcolorNumbar = "'.wppa_opt( 'bgcolor_numbar' ) . '",
@@ -113,7 +113,7 @@ global $wpdb;
 	wppaFontWeightNumbarActive = "'.wppa_opt( 'fontweight_numbar_active' ) . '",
 	wppaNumbarMax = "'.wppa_opt( 'numbar_max' ) . '",
 	wppaNextOnCallback = '.( wppa_switch( 'next_on_callback' ) ? 'true' : 'false' ) . ',
-	wppaStarOpacity = '.str_replace(',', '.',( wppa_opt( 'star_opacity' )/'100' )) . ',
+	wppaStarOpacity = '.str_replace(',', '.',( wppa_opt( 'star_opacity' )/100 )) . ',
 	wppaEmailRequired = "'.wppa_opt( 'comment_email_required' ) . '",
 	wppaSlideBorderWidth = '.wppa_fbw().',
 	wppaAllowAjax = '.$can_ajax.',
@@ -177,7 +177,7 @@ global $wpdb;
 	wppaStartStopNew = ' . ( wppa_switch( 'startstop_new' ) ? 'true' : 'false' ) . ';';
 
 	/* Lightbox vars */
-	$fontsize_lightbox = wppa_opt( 'fontsize_lightbox' ) ? wppa_opt( 'fontsize_lightbox' ) : '10';
+	$fontsize_lightbox = wppa_opt( 'fontsize_lightbox' ) ? wppa_opt( 'fontsize_lightbox' ) : 10;
 	$d = wppa_switch( 'ovl_show_counter') ? 1 : 0;
 	$ovlh = wppa_opt( 'ovl_txt_lines' ) == 'auto' ? 'auto' : ((wppa_opt( 'ovl_txt_lines' ) + $d) * ($fontsize_lightbox + 2));
 	$lb_global = '';
@@ -196,7 +196,7 @@ global $wpdb;
 	wppaOvlOnclickType = "'.wppa_opt( 'ovl_onclick' ).'",
 	wppaOvlTheme = "'.wppa_opt( 'ovl_theme' ).'",
 	wppaOvlAnimSpeed = '.wppa_opt( 'ovl_anim' ).',
-	wppaOvlSlideSpeed = '.wppa_opt( 'ovl_slide' ).',
+	wppaOvlSlideSpeedDefault = '.wppa_opt( 'ovl_slide' ).',
 	wppaVer4WindowWidth = 800,
 	wppaVer4WindowHeight = 600,
 	wppaOvlShowCounter = '.( wppa_switch( 'ovl_show_counter') ? 'true' : 'false' ).',
@@ -207,7 +207,7 @@ global $wpdb;
 	wppaOvlLineHeight = "'.wppa_opt( 'fontsize_lightbox' ).'",
 	wppaOvlVideoStart = '.( wppa_switch( 'ovl_video_start' ) ? 'true' : 'false' ).',
 	wppaOvlAudioStart = '.( wppa_switch( 'ovl_audio_start' ) ? 'true' : 'false' ).',
-	wppaOvlSlideStart = '.( wppa_switch( 'ovl_slide_start' ) ? 'true' : 'false' ).',
+	wppaOvlSlideStartDefault = '.( wppa_switch( 'ovl_slide_start' ) ? 'true' : 'false' ).',
 	wppaOvlShowStartStop = '.( wppa_switch( 'ovl_show_startstop' ) ? 'true' : 'false' ).',
 	wppaIsMobile = '.( wppa_is_mobile() ? 'true' : 'false' ).',
 	wppaIsIpad = '.( wppa_is_ipad() ? 'true' : 'false' ).',
@@ -275,7 +275,7 @@ function wppa_thumb_asp() {
 		$t = explode( ':', wppa_opt( 'thumb_aspect' ) );
 		$aspect = $t[0] / $t[1];
 	}
-	elseif ( wppa_opt( 'resize_to' ) != '-1' && wppa_opt( 'resize_to' ) != '0' ) {
+	elseif ( wppa_opt( 'resize_to' ) != '-1' && wppa_opt( 'resize_to' ) != 0 ) {
 		$t = explode( 'x', wppa_opt( 'resize_to' ) );
 		$aspect = $t[1] / $t[0];
 	}
@@ -288,10 +288,10 @@ function wppa_thumb_asp() {
 function wppa_fbw() {
 
 	if ( is_numeric( wppa_opt( 'fullimage_border_width' ) ) ) {
-		$fbw = wppa_opt( 'fullimage_border_width' ) + '1';
+		$fbw = wppa_opt( 'fullimage_border_width' ) + 1;
 	}
 	else {
-		$fbw = '0';
+		$fbw = 0;
 	}
 	return $fbw;
 }
@@ -444,7 +444,7 @@ global $wppa_opt;
 	jQuery("body").append(\'
 	<div
 		id="wppa-overlay-bg"
-		style="text-align:center;display:none;position:fixed;top:0;left:0;width:100%;height:10000px;background-color:black"
+		style="text-align:center;display:none;position:fixed;top:0;left:0;width:100%;height:10000px;background-color:black;opacity:'.(wppa_opt('ovl_opacity')/100).';"
 		onclick="wppaOvlOnclick(event)"
 		onwheel="return false;"
 		onscroll="return false;">

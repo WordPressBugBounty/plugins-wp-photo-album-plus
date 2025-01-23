@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
- Version: 8.8.08.001
+ Version: 9.0.00.000
 *
 */
 
@@ -100,7 +100,7 @@ function wppa_is_maintenance_proc_running( $slug ) {
 	$timedelta = 10;
 
 	// If there is a last timestamp less than some tme ago...
-	$lasttime = wppa_get_option( $slug . '_lasttimestamp', '0' );
+	$lasttime = wppa_get_option( $slug . '_lasttimestamp', 0 );
 
 	// Than it runs
 	return ( $lasttime > ( time() - $timedelta ) );
@@ -114,7 +114,7 @@ function wppa_is_maintenance_cron_job_crashed( $slug ) {
 	$timedelta = 10;
 
 	// If there is a last timestamp longer than some time ago...
-	$lasttime = wppa_get_option( $slug.'_lasttimestamp', '0' );
+	$lasttime = wppa_get_option( $slug.'_lasttimestamp', 0 );
 	if ( $lasttime && $lasttime < ( time() - $timedelta ) ) {
 
 		// And proc is not scheduled
@@ -162,7 +162,7 @@ global $wppa_endtime;
 	wppa_log( 'Cron', '{b}wppa_cleanup{/b} started.' );
 
 	// Fix invalid ratings
-	$iret = wppa_del_row( WPPA_RATING, 'value', '0' );
+	$iret = wppa_del_row( WPPA_RATING, 'value', 0 );
 	if ( $iret ) {
 		wppa_schedule_maintenance_proc('wppa_rerate');
 	}
@@ -178,7 +178,7 @@ global $wppa_endtime;
 	// Start renew crypt processes if configured
 	if ( wppa_opt( 'crypt_albums_every' ) ) {
 		wppa_log( 'Cron', '{b}wppa_cleanup{/b} renew albumcrypt.' );
-		$last = wppa_get_option( 'wppa_crypt_albums_lasttimestamp', '0' );
+		$last = wppa_get_option( 'wppa_crypt_albums_lasttimestamp', 0 );
 		if ( $last + wppa_opt( 'crypt_albums_every' ) * 3600 < time() ) {
 			wppa_schedule_maintenance_proc( 'wppa_crypt_albums' );
 			wppa_update_option( 'wppa_crypt_albums_lasttimestamp', time() );
@@ -187,7 +187,7 @@ global $wppa_endtime;
 
 	if ( wppa_opt( 'crypt_photos_every' ) ) {
 		wppa_log( 'Cron', '{b}wppa_cleanup{/b} renew photocrypt.' );
-		$last = wppa_get_option( 'wppa_crypt_photos_lasttimestamp', '0' );
+		$last = wppa_get_option( 'wppa_crypt_photos_lasttimestamp', 0 );
 		if ( $last + wppa_opt( 'crypt_photos_every' ) * 3600 < time() ) {
 			wppa_schedule_maintenance_proc( 'wppa_crypt_photos' );
 			wppa_update_option( 'wppa_crypt_photos_lasttimestamp', time() );
@@ -210,7 +210,7 @@ global $wppa_endtime;
 		$time = time();
 		$obsolete = $time - $spammaxage;
 		$iret = wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_comments WHERE status = 'spam' AND timestamp < %s", $obsolete ) );
-		if ( $iret ) wppa_update_option( 'wppa_spam_auto_delcount', wppa_get_option( 'wppa_spam_auto_delcount', '0' ) + $iret );
+		if ( $iret ) wppa_update_option( 'wppa_spam_auto_delcount', wppa_get_option( 'wppa_spam_auto_delcount', 0 ) + $iret );
 	}
 
 	// Re-animate crashed cronjobs
@@ -246,7 +246,7 @@ global $wppa_endtime;
 					wppa_log( 'Eml', 'Retried mail to ' . $mail['to'] . ' succeeded.' );
 
 					// Set counter to 0
-					$failed_mails[$key]['retry'] = '0';
+					$failed_mails[$key]['retry'] = 0;
 				}
 				else {
 
@@ -255,7 +255,7 @@ global $wppa_endtime;
 					wppa_log( 'Eml', 'Retried mail to ' . $mail['to'] . ' failed. Tries to go = ' . $failed_mails[$key]['retry'] );
 
 					// If no tries left, add to permanently failed
-					if ( $failed_mails[$key]['retry'] < '1' ) {
+					if ( $failed_mails[$key]['retry'] < 1 ) {
 						$perm_fail = wppa_get_option( 'wppa_perm_failed_mails', array() );
 						$perm_fail[] = $failed_mails[$key];
 						wppa_update_option( 'wppa_perm_failed_mails', $perm_fail );
@@ -265,7 +265,7 @@ global $wppa_endtime;
 
 			// Cleanup
 			foreach( array_keys( $failed_mails ) as $key ) {
-				if ( $failed_mails[$key]['retry'] < '1' ) {
+				if ( $failed_mails[$key]['retry'] < 1 ) {
 					unset( $failed_mails[$key] );
 				}
 			}
@@ -372,7 +372,7 @@ global $wpdb;
 
 	$start = time();
 
-	$albs = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent < '1' ORDER BY id" );
+	$albs = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent < 1 ORDER BY id" );
 
 	foreach( $albs as $alb ) {
 		$treecounts = wppa_get_treecounts_a( $alb );

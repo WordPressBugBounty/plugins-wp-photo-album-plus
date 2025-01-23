@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains import utility functions
-* Version 8.8.01.005
+* Version 9.0.00.000
 *
 */
 
@@ -25,7 +25,7 @@ global $wppa_session;
 		$files 			= wppa_glob( $source_path . '/*' );
 	}
 	else { // remote
-		$max_tries 		= wppa_get_option( 'wppa_import_remote_max_'.$user, '10' );
+		$max_tries 		= wppa_get_option( 'wppa_import_remote_max_'.$user, 10 );
 		$setting 		= wppa_get_option( 'wppa_import_source_url_'.$user, 'http://' );
 		$pattern		= '/src=".*?"/';
 
@@ -430,7 +430,7 @@ function wppa_import_csv_wrapup( $handle, $write_handle, $code, $tempfile, $file
 }
 
 // Output appropriate message and exit
-function wppa_import_quit( $code = '0', $deleted = false, $continue = false, $reload = false, $done = 0, $skip = 0 ) {
+function wppa_import_quit( $code = 0, $deleted = false, $continue = false, $reload = false, $done = 0, $skip = 0 ) {
 global $wppa_noquit;
 
 	if ( $wppa_noquit && $code != '23' ) {
@@ -438,16 +438,16 @@ global $wppa_noquit;
 	}
 
 	$data = [ 'code' => $code,
-			  'deleted' => ( $deleted ? '1' : '0' ),
-			  'continue' => ( $continue ? '1' : '0' ),
-			  'reload' => ( $reload ? '1' : '0' ),
+			  'deleted' => ( $deleted ? 1 : 0 ),
+			  'continue' => ( $continue ? 1 : 0 ),
+			  'reload' => ( $reload ? 1 : 0 ),
 			  'done' => $done,
 			  'skip' => $skip,
 			];
 
 	$result = wp_json_encode( $data );
 	wppa_echo( $result );
-	if ( $code == '0' ) {
+	if ( $code == 0 ) {
 		wppa_clear_cache( ['force' => true] );
 	}
 

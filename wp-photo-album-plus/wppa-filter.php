@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 8.8.06.006
+* Version: 9.0.00.000
 *
 */
 
@@ -177,7 +177,7 @@ global $wppa_runtime_settings;
 
 	// Find occur
 	if ( wppa_get_the_ID() != $wppa_postid && ! $wppa['in_widget'] ) {		// New post
-		$wppa['mocc'] = '0';						// Init this occurance
+		$wppa['mocc'] = 0;						// Init this occurance
 		$wppa['fullsize'] = '';						// Reset at each post
 		$wppa_postid = wppa_get_the_ID();			// Remember the post id
 	}
@@ -269,7 +269,7 @@ global $wppa_runtime_settings;
 	}
 
 	// If querystring present, delay will cause looping
-	if ( wppa_get( 'occur', '0' ) ) {
+	if ( wppa_get( 'occur', 0 ) ) {
 		$atts['delay'] = false;
 	}
 
@@ -340,13 +340,13 @@ global $wppa_runtime_settings;
 			return $wppa_revno;
 			break;
 		case 'landing':
-			$wppa['is_landing'] = '1';
+			$wppa['is_landing'] = 1;
 			break;
 		case 'generic':
 			break;
 		case 'cover':
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_cover'] = '1';
+			$wppa['is_cover'] = 1;
 			$wppa['albums_only'] = true;
 			break;
 		case 'album':
@@ -363,7 +363,7 @@ global $wppa_runtime_settings;
 			break;
 		case 'slide':
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_slide'] = '1';
+			$wppa['is_slide'] = 1;
 			$wppa['start_photo'] = $atts['photo'];
 			if ( $atts['button'] ) {
 				$wppa['is_button'] = esc_attr( wppa_translate( $atts['button'] ) );
@@ -374,7 +374,7 @@ global $wppa_runtime_settings;
 			break;
 		case 'slideonly':
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_slideonly'] = '1';
+			$wppa['is_slideonly'] = 1;
 			$wppa['start_photo'] = $atts['photo'];
 			if ( $atts['timeout'] ) {
 				$wppa['timeout'] = strval( intval ( $atts['timeout'] ) );
@@ -382,9 +382,9 @@ global $wppa_runtime_settings;
 			break;
 		case 'slideonlyf':
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_slideonly'] = '1';
-			$wppa['is_slideonlyf'] = '1';
-			$wppa['film_on'] = '1';
+			$wppa['is_slideonly'] = 1;
+			$wppa['is_slideonlyf'] = 1;
+			$wppa['film_on'] = 1;
 			$wppa['start_photo'] = $atts['photo'];
 			if ( $atts['timeout'] ) {
 				$wppa['timeout'] = strval( intval ( $atts['timeout'] ) );
@@ -392,10 +392,10 @@ global $wppa_runtime_settings;
 			break;
 		case 'slidef':
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_slide'] = '1';
-			$wppa['film_on'] = '1';
-			$wppa['is_slideonly'] = '1';
-			$wppa['is_filmonly'] = '1';
+			$wppa['is_slide'] = 1;
+			$wppa['film_on'] = 1;
+			$wppa['is_slideonly'] = 1;
+			$wppa['is_filmonly'] = 1;
 			$wppa['start_photo'] = $atts['photo'];
 			if ( $atts['timeout'] ) {
 				$wppa['timeout'] = strval( intval ( $atts['timeout'] ) );
@@ -403,9 +403,9 @@ global $wppa_runtime_settings;
 			break;
 		case 'filmonly':
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_slideonly'] = '1';
-			$wppa['is_filmonly'] = '1';
-			$wppa['film_on'] = '1';
+			$wppa['is_slideonly'] = 1;
+			$wppa['is_filmonly'] = 1;
+			$wppa['film_on'] = 1;
 			$wppa['start_photo'] = $atts['photo'];
 			if ( $atts['timeout'] ) {
 				$wppa['timeout'] = strval( intval ( $atts['timeout'] ) );
@@ -421,29 +421,29 @@ global $wppa_runtime_settings;
 			$wppa['single_photo'] = $atts['photo'];
 			$wppa['start_photo'] = $atts['photo'];
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_mphoto'] = '1';
+			$wppa['is_mphoto'] = 1;
 			break;
 		case 'xphoto':
 			$wppa['single_photo'] = $atts['photo'];
 			$wppa['start_photo'] = $atts['photo'];
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_xphoto'] = '1';
+			$wppa['is_xphoto'] = 1;
 			break;
 		case 'slphoto':
-			$wppa['is_slide'] = '1';
+			$wppa['is_slide'] = 1;
 			$wppa['single_photo'] = $atts['photo'];
 			$wppa['start_photo'] = $atts['photo'];
 			$wppa['start_album'] = $atts['album'];
-			$wppa['is_single'] = '1';
+			$wppa['is_single'] = 1;
 			break;
 		case 'audio':
-			$wppa['is_audioonly'] = '1';
+			$wppa['is_audioonly'] = 1;
 			$wppa['audio_item'] = $atts['audio'];
 			$wppa['audio_album'] = $atts['album'];
 			$wppa['audio_poster'] = $atts['poster'];
 			break;
 		case 'autopage':
-			$wppa['is_autopage'] = '1';
+			$wppa['is_autopage'] = 1;
 			break;
 		case 'upload':
 			if ( $atts['parent'] ) {
@@ -453,7 +453,7 @@ global $wppa_runtime_settings;
 				$wppa['start_album'] = $atts['album'];
 			}
 			if ( ! $wppa['start_album'] ) {
-				$wppa['start_album'] = '0';
+				$wppa['start_album'] = 0;
 			}
 			$wppa['is_upload'] = true;
 			break;
@@ -466,7 +466,7 @@ global $wppa_runtime_settings;
 				if ( isset( $cols[1] ) && wppa_is_mobile() ) {
 					$col = $cols[1];
 				}
-				if ( ! wppa_is_int( $col ) || $col < '1' ) $col = '2'; // On error use default
+				if ( ! wppa_is_int( $col ) || $col < 1 ) $col = '2'; // On error use default
 				$wppa['tagcols'] = $col;
 			}
 			break;
@@ -534,7 +534,7 @@ global $wppa_runtime_settings;
 		case 'acount':
 		case 'pcount':
 			$alb = $atts['album'];
-			if ( ! $alb || $alb < '1' ) {
+			if ( ! $alb || $alb < 1 ) {
 				$err = '
 				<span style="color:red">
 				Error in shortcode spec for type="' . $atts['type'] . '":
@@ -594,7 +594,7 @@ global $wppa_runtime_settings;
 			return $result;
 			break;
 		case 'lastupdate':
-			$album = $atts['album'] ? $atts['album'] : '0';
+			$album = $atts['album'] ? $atts['album'] : 0;
 			if ( $album ) {
 				$timestamp = wppa_get_var( $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE album = %d ORDER BY timestamp DESC LIMIT 1", $album ) );
 			}
@@ -610,7 +610,7 @@ global $wppa_runtime_settings;
 			}
 			break;
 		case 'contest':
-			$album = $atts['album'] ? $atts['album'] : '0';
+			$album = $atts['album'] ? $atts['album'] : 0;
 			if ( strpos( $album, '..' ) !== false ) {
 				$album = wppa_expand_enum( $album );
 			}
@@ -640,7 +640,7 @@ global $wppa_runtime_settings;
 				if ( isset( $cols[1] ) && wppa_is_mobile() ) {
 					$col = $cols[1];
 				}
-				if ( ! wppa_is_int( $col ) || $col < '1' ) $col = '2'; // On error use default
+				if ( ! wppa_is_int( $col ) || $col < 1 ) $col = '2'; // On error use default
 				$wppa['gridcols'] = $col;
 			}
 			break;
@@ -702,13 +702,23 @@ global $wppa_runtime_settings;
 		$other_deps  = '';
 	}
 
+	// Lightbox timeout if not default
+	if ( $atts['lbtimeout'] && wppa_is_posint( $atts['lbtimeout'] ) ) {
+		$wppa['lbtimeout'] = $atts['lbtimeout'] * 1000;
+	}
+
+	// Lightbox start if not default
+	if ( $atts['lbstart'] && ( $atts['lbstart'] == 'yes' || $atts['lbstart'] == 'no' ) ) {
+		$wppa['lbstart'] = $atts['lbstart'];
+	}
+
 	// Ready to render
 	$result =  wppa_albums();						// Get the HTML
 
 	// Calendar needs an extra container
 	if ( $is_calendar ) {
 		wppa_reset_occurrance();
-		wppa_bump_mocc(); //$wppa['mocc'] += '1';
+		wppa_bump_mocc(); //$wppa['mocc'] += 1;
 		wppa_container( 'open' );
 		wppa_container( 'close' );
 		$result .= $wppa['out'];
@@ -760,7 +770,8 @@ global $wpdb;
 		'portrait' 	=> '',
 		'audio' 	=> '',
 		'poster' 	=> '',
-		'timeout' 	=> '',
+		'lbtimeout' => '',
+		'lbstart' 	=> '',
 		'mocc' 		=> '',
 		'set' 		=> '',
 		'anon' 		=> '',
@@ -769,12 +780,12 @@ global $wpdb;
 	];
 
 	// Shortcode attributes that do not need a value. Convert them to 'attr => 1'
-	$no_s = ['0', 'no', 'off'];
-	if ( in_array( 'landscape', $xatts ) 	|| ( isset( $xatts['landscape'] ) 	&& ! in_array( $xatts['landscape'], $no_s ) ) )	$xatts['landscape'] = '1'; 	else $xatts['landscape'] = '0';
-	if ( in_array( 'portrait', $xatts ) 	|| ( isset( $xatts['portrait'] ) 	&& ! in_array( $xatts['portrait'], $no_s ) ) )	$xatts['portrait'] = '1'; 	else $xatts['portrait'] = '0';
-	if ( in_array( 'cache', $xatts ) 		|| ( isset( $xatts['cache'] ) 		&& ! in_array( $xatts['cache'], $no_s ) ) )		$xatts['cache'] = '1'; 		else $xatts['cache'] = '0';
-	if ( in_array( 'anon', $xatts ) 		|| ( isset( $xatts['anon'] ) 		&& ! in_array( $xatts['anon'], $no_s ) ) ) 		$xatts['anon'] = '1'; 		else $xatts['anon'] = '0';
-	if ( in_array( 'meonly', $xatts ) 		|| ( isset( $xatts['meonly'] ) 		&& ! in_array( $xatts['meonly'], $no_s ) ) ) 	$xatts['meonly'] = '1'; 	else $xatts['meonly'] = '0';
+	$no_s = [0, 'no', 'off'];
+	if ( in_array( 'landscape', $xatts ) 	|| ( isset( $xatts['landscape'] ) 	&& ! in_array( $xatts['landscape'], $no_s ) ) )	$xatts['landscape'] = 1; 	else $xatts['landscape'] = 0;
+	if ( in_array( 'portrait', $xatts ) 	|| ( isset( $xatts['portrait'] ) 	&& ! in_array( $xatts['portrait'], $no_s ) ) )	$xatts['portrait'] = 1; 	else $xatts['portrait'] = 0;
+	if ( in_array( 'cache', $xatts ) 		|| ( isset( $xatts['cache'] ) 		&& ! in_array( $xatts['cache'], $no_s ) ) )		$xatts['cache'] = 1; 		else $xatts['cache'] = 0;
+	if ( in_array( 'anon', $xatts ) 		|| ( isset( $xatts['anon'] ) 		&& ! in_array( $xatts['anon'], $no_s ) ) ) 		$xatts['anon'] = 1; 		else $xatts['anon'] = 0;
+	if ( in_array( 'meonly', $xatts ) 		|| ( isset( $xatts['meonly'] ) 		&& ! in_array( $xatts['meonly'], $no_s ) ) ) 	$xatts['meonly'] = 1; 	else $xatts['meonly'] = 0;
 	if ( in_array( 'delay', $xatts ) ) $xatts['delay'] = 'yes';
 
 	// Login requested?
@@ -800,7 +811,7 @@ global $wpdb;
 		$xatts[$key] = wp_strip_all_tags( $xatts[$key] ); // NOT htmlspecialchars because of album="$cat,René" has allowed funny chars
 		$xatts[$key] = str_replace( ['%23', 'QUOTE', 'APOS'], ['#', '', "'"], $xatts[$key] ); // Fix for Gutenberg previews
 	}
-	if ( isset( $xatts['size'] ) && $xatts['size'] == '1' ) {
+	if ( isset( $xatts['size'] ) && $xatts['size'] == 1 ) {
 		$xatts['size'] = 'auto';
 	}
 	if ( isset( $xatts['class'] ) && $xatts['class'] != '' ) {
@@ -813,7 +824,7 @@ global $wpdb;
 			if ( $p ) {
 				$xatts[$key] = str_replace( '#me', wppa_get_user(), $xatts[$key] );
 				$voidcache = true;
-				$xatts['meonly'] = '1';
+				$xatts['meonly'] = 1;
 			}
 		}
 	}
@@ -827,10 +838,10 @@ global $wpdb;
 	// Caching?
 	switch( wppa_opt( 'cache_overrule' ) ) {
 		case 'always':
-			$xatts['cache'] = '1';
+			$xatts['cache'] = 1;
 			break;
 		case 'never':
-			$xatts['cache'] = '0';
+			$xatts['cache'] = 0;
 			break;
 		default:
 	}
@@ -851,17 +862,17 @@ global $wpdb;
 
 	// Void caching virtual albums / photos
 	if ( isset( $xatts['album'] ) ) {
-		if ( strpos( $xatts['album'], '#me' ) !== false ) $xatts['cache'] = '0';
-		if ( strpos( $xatts['album'], '#owner' ) !== false ) $xatts['cache'] = '0';
-		if ( strpos( $xatts['album'], '#upldr' ) !== false ) $xatts['cache'] = '0';
+		if ( strpos( $xatts['album'], '#me' ) !== false ) $xatts['cache'] = 0;
+		if ( strpos( $xatts['album'], '#owner' ) !== false ) $xatts['cache'] = 0;
+		if ( strpos( $xatts['album'], '#upldr' ) !== false ) $xatts['cache'] = 0;
 	}
 	if ( isset( $xatts['photo'] ) ) {
-		if ( strpos( $xatts['photo'], '#potd' ) !== false ) $xatts['cache'] = '0';
+		if ( strpos( $xatts['photo'], '#potd' ) !== false ) $xatts['cache'] = 0;
 	}
 
 	// Void caching #me shortcodes
 	if ( $voidcache ) {
-		$xatts['cache'] = '0';
+		$xatts['cache'] = 0;
 	}
 
 	// Make globally known 'we are building a cache file'
@@ -1051,7 +1062,7 @@ global $photos_used;
 
 	// Find occur
 	if ( wppa_get_the_ID() != $wppa_postid && ! $wppa['in_widget'] ) {		// New post
-		$wppa['mocc'] = '0';					// Init this occurance
+		$wppa['mocc'] = 0;					// Init this occurance
 		$wppa['fullsize'] = '';					// Reset at each post
 		$wppa_postid = wppa_get_the_ID();			// Remember the post id
 	}
@@ -1114,18 +1125,18 @@ global $photos_used;
 		case 'mphoto':
 			$wppa['single_photo'] 	= $photo;
 			$wppa['start_photo'] 	= $photo;
-			$wppa['is_mphoto'] 		= '1';
+			$wppa['is_mphoto'] 		= 1;
 			break;
 		case 'xphoto':
 			$wppa['single_photo'] 	= $photo;
 			$wppa['start_photo'] 	= $photo;
-			$wppa['is_xphoto'] 		= '1';
+			$wppa['is_xphoto'] 		= 1;
 			break;
 		case 'slphoto':
-			$wppa['is_slide'] 		= '1';
+			$wppa['is_slide'] 		= 1;
 			$wppa['single_photo'] 	= $photo;
 			$wppa['start_photo'] 	= $photo;
-			$wppa['is_single'] 		= '1';
+			$wppa['is_single'] 		= 1;
 			break;
 		default:
 			wppa_log( 'err', "Unimplemented photo_shortcode_type: $type in wppa_photo_shortcodes()" );
@@ -1153,7 +1164,7 @@ global $photos_used;
 	// Cache?
 	if ( isset( $xatts['cache'] ) ) {
 		$photos_used = $photo;
-		$wppa['cache'] = ! in_array( $xatts['cache'], array( '', '0', 'off', 'no' ) );
+		$wppa['cache'] = ! in_array( $xatts['cache'], array( '', 0, 'off', 'no' ) );
 	}
 
 	// Delay

@@ -2,7 +2,7 @@
 /* wppa-edit-tags.php
 * Package: wp-photo-album-plus
 *
-* Version 8.3.01.009
+* Version 9.0.00.000
 *
 */
 
@@ -72,13 +72,11 @@ function _wppa_edit_tags() {
 							style="float:left;width:75%;height:20px;font-size:11px;margin:0;"
 							value="' . esc_attr( trim( wppa_get_option( 'wppa_new_tag_value' ), ',' ) ) . '"
 							onchange="wppaAjaxUpdateOptionValue(\'new_tag_value\',this);"
-						/>
-						<img
-							id="img_new_tag_value"
-							src="' . esc_url( wppa_get_imgdir() . 'star.ico' ) . '"
-							title="' . esc_attr( __( 'Setting unmodified', 'wp-photo-album-plus' ) ) . '"
-							style="padding:0 4px;float:left;height:16px;width:16px;"
-						/>
+						/>' .
+						wppa_html_tag( 'img', ['id' => "img_new_tag_value",
+											   'src' => wppa_get_imgdir() . 'star.ico',
+											   'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ),
+											   'style' => "padding:0 4px;float:left;height:16px;width:16px;"] ) . '
 					</td>
 					<td>
 						<input
@@ -146,12 +144,8 @@ function wppa_tag_select( $options, $values ) {
 	}
 
 	$result .= '
-	</select>
-	<img
-		id="img_tag_to_edit"
-		src="' . wppa_get_imgdir() . 'star.ico"
-		style="padding:0 4px; float:left; height:16px; width:16px;"
-		/>';
+	</select>' .
+	wppa_html_tag( 'img', ['id' => "img_tag_to_edit", 'src' => wppa_get_imgdir() . 'star.ico', 'style' => "padding:0 4px;float:left;height:16px;width:16px;"] );
 
 	return $result;
 }

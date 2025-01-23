@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * ask the album / display you want
-* Version: 8.7.03.006
+* Version: 9.0.00.000
 */
 
 
@@ -116,10 +116,10 @@ class WppaSuperView extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Super View' , 'wp-photo-album-plus' ),
-							'root' 		=> '0',
+							'root' 		=> 0,
 							'sort'		=> true,
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}

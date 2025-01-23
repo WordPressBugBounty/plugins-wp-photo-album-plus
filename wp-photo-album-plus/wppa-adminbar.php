@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* Version 8.8.08.002
+* Version 9.0.00.000
 *
 */
 
@@ -30,7 +30,7 @@ function wppa_admin_bar_menu() {
 	else $upl_pending = '';
 
 	// Tot
-	$tot_pend = '0';
+	$tot_pend = 0;
 	if ( current_user_can('administrator') ) $tot_pend += $com_pend;
 	if ( current_user_can('wppa_admin') ) $tot_pend += $upl_pend;
 	if ( $tot_pend ) $tot_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$tot_pend.'</span>';
@@ -148,8 +148,8 @@ function wppa_admin_bar_menu() {
 	}
 
 	if ( current_user_can( 'administrator' ) ) {
-		$hits = wppa_get_option( 'wppa_cache_hits', '0' );
-		$miss = wppa_get_option( 'wppa_cache_misses', '1' );
+		$hits = wppa_get_option( 'wppa_cache_hits', 0 );
+		$miss = wppa_get_option( 'wppa_cache_misses', 1 );
 		$perc = sprintf( '%5.2f', 100 * $hits / ( $hits + $miss ) );
 		$menu_items['cache'] = array(
 			'parent' => $wppaplus,

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the photo of the day widget
-* Version 8.7.03.007
+* Version 9.0.00.005
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -51,7 +51,7 @@ class PhotoOfTheDay extends WP_Widget {
 
 			$id 		= $image['id'];
 			$ratio 		= ( wppa_get_photox( $id ) ? wppa_get_photoy( $id ) / wppa_get_photox( $id ) : 1 );
-			$usethumb	= wppa_use_thumb_file( $id, '300', '0' );
+			$usethumb	= wppa_use_thumb_file( $id, '300', 0 );
 			$imgurl 	= $usethumb ? wppa_get_thumb_url( $id, true ) : wppa_get_photo_url( $id, true );
 			$name 		= wppa_get_photo_name( $id );
 			$page 		= ( in_array( wppa_opt( 'potd_linktype' ), wppa( 'links_no_page' ) ) && ! wppa_switch( 'potd_counter' ) ) ? '' : wppa_get_the_landing_page( 'potd_linkpage', __('Photo of the day', 'wp-photo-album-plus' ) );
@@ -109,20 +109,10 @@ class PhotoOfTheDay extends WP_Widget {
 
 				// The image
 				if ( wppa_is_video( $id ) ) {
-					$widget_content .= "\n\t\t".wppa_get_video_html( array ( 	'id' 		=> $id,
-																				'title' 	=> $title,
-																				'controls' 	=> ( wppa_opt( 'potd_linktype' ) == 'none' ),
-																				'cursor' 	=> $cursor,
-																				'widthp' 	=> '100'
-																	));
+					$widget_content .= wppa_get_video_html( ['id' => $id, 'title' => $title, 'controls' => (wppa_opt('potd_linktype')=='none'), 'style' => 'cursor:'.$cursor,';width:100%;'] );
 				}
 				else {
-					$widget_content .= 	'<img' .
-											' src="'.$imgurl.'"' .
-											' style="width: 100%;'.$cursor.'"' .
-											' ' . wppa_get_imgalt( $id ) .
-											( $title ? 'title="' . $title . '"' : '' ) .
-											' />';
+					$widget_content .= wppa_html_tag( 'img', ['src' => $imgurl, 'style' => 'width:100%;'.$cursor, 'alt' => wppa_alt($id), 'title' => $title] );
 				}
 
 			// Close the link
@@ -141,13 +131,13 @@ class PhotoOfTheDay extends WP_Widget {
 						$lnk = wppa_get_album_url( array( 'album' => $alb,
 														  'page' => $page,
 														  'type' => 'thumbs',
-														  'mocc' => '1' ) );
+														  'mocc' => 1 ) );
 					}
 					elseif ( wppa_opt( 'potd_counter_link' ) == 'slide' ) {
 						$lnk = wppa_get_slideshow_url( array( 'album' => $alb,
 															  'page' => $page,
 															  'photo' => $id,
-															  'mocc' => '1' ) );
+															  'mocc' => 1 ) );
 					}
 					elseif ( wppa_opt( 'potd_counter_link' ) == 'single' ) {
 						$lnk = wppa_encrypt_url( get_permalink( $page ) . '?occur=1&photo=' . $id );

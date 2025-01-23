@@ -2,7 +2,7 @@
 /* wppa-tinymce-shortcodes.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 8.7.04.004
+* Version 9.0.00.000
 */
 
 if ( ! defined( 'ABSPATH' ) )
@@ -460,7 +460,7 @@ global $wpdb;
 
 								$id = $photo['id'];
 								$name = wppa_get_photo_item( $id, 'name' );
-								if ( strlen( $name ) > '50' ) $name = substr( $name, '0', '50' ) . '...';
+								if ( strlen( $name ) > '50' ) $name = substr( $name, 0, '50' ) . '...';
 
 								if ( wppa_get_option( 'wppa_file_system' ) == 'flat' ) {
 									$val = $id . '.' . $photo['ext'];

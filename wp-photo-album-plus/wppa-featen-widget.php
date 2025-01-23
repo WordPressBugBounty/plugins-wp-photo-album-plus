@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 8.7.04.002
+* Version 9.0.00.005
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -60,7 +60,7 @@ class FeaTenWidget extends WP_Widget {
 											 WHERE status = 'featured'
 											 ORDER BY RAND(" . wppa_get_randseed() . ") DESC" );
 				if ( $temp ) {
-					$c = '0';
+					$c = 0;
 					$thumbs = array();
 					while ( $c < $max && $c < count( $temp ) ) {
 						$alb = wppa_get_photo_item( $temp[$c]['id'], 'album' );
@@ -82,7 +82,7 @@ class FeaTenWidget extends WP_Widget {
 											 WHERE status = 'featured'
 											 ORDER BY RAND(" . wppa_get_randseed() . ") DESC" );
 				if ( $temp ) {
-					$c = '0';
+					$c = 0;
 					$thumbs = array();
 					while ( $c < $max && $c < count( $temp ) ) {
 						$alb = wppa_get_photo_item( $temp[$c]['id'], 'album' );
@@ -98,7 +98,7 @@ class FeaTenWidget extends WP_Widget {
 				break;
 
 			// All
-			case '0':
+			case 0:
 				$thumbs = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
 											   WHERE status = 'featured'
 											   ORDER BY RAND(" . wppa_get_randseed() . ") DESC LIMIT " . $max );
@@ -119,7 +119,7 @@ class FeaTenWidget extends WP_Widget {
 		$maxh 			= $maxw;
 		$lineheight 	= wppa_opt( 'fontsize_widget_thumb' ) * 1.5;
 		$maxh 			+= $lineheight;
-		$count 			= '0';
+		$count 			= 0;
 
 		if ( $thumbs ) foreach ( $thumbs as $image ) {
 
@@ -152,7 +152,8 @@ class FeaTenWidget extends WP_Widget {
 				$height     = $imgstyle_a['height'];
 				$cursor		= $imgstyle_a['cursor'];
 				$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $width, $height );
-				$imgevents 	= wppa_get_imgevents( 'thumb', $image['id'], true );
+				$onmouseover  = wppa_mouseover( 'thumb', $image['id'], true );
+				$onmouseout   = wppa_mouseout( 'thumb' );
 
 				if ( $link ) {
 					$title 	= esc_attr( stripslashes( $link['title'] ) );
@@ -163,7 +164,7 @@ class FeaTenWidget extends WP_Widget {
 
 				$display 	= 'thumbs';
 
-				$widget_content .= wppa_get_the_widget_thumb( 'featen', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents );
+				$widget_content .= wppa_get_the_widget_thumb( 'featen', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $onmouseover, $onmouseout );
 
 			}
 
@@ -258,9 +259,9 @@ class FeaTenWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Featured Photos', 'wp-photo-album-plus' ),
-							'album' 	=> '0',
+							'album' 	=> 0,
 							'logonly' 	=> 'no',
-							'cache' 	=> '0',
+							'cache' 	=> 0,
 							);
 		return $defaults;
 	}
