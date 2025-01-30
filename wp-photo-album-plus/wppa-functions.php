@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.0.00.009
+* Version: 9.0.01.003
 *
 */
 
@@ -229,8 +229,8 @@ global $other_deps;
 
 			$delay = wppa( 'delay' );
 			$delay_arr = explode( ',', $delay );
-// wppa_out(var_export($delay_arr,true));
-			// Maybo to different mocc
+
+			// Maybe to different mocc
 			$tomocc = wppa( 'mocc' );
 
 			if ( $delay_arr[0] == 'button' || $delay_arr[0] == 'text' ) {
@@ -958,7 +958,6 @@ global $albums_used;
 	}
 
 	wppa( 'album_count', ( $the_result_a ? count( $the_result_a ) : 0 ) );
-
 	return $the_result_a;
 }
 

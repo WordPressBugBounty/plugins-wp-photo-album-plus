@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.0.00.005
+* Version 9.0.01.003
 *
 */
 
@@ -484,7 +484,7 @@ global $wppa_revno;
 			$query 			= $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE a_parent = %d", $id );
 			$has_children  	= wppa_get_var( $query );
 			$indexdtm 		= $albuminfo['indexdtm'];
-			$usedby 		= $albuminfo['usedby'] ? explode( ".", trim( $albuminfo['usedby'], '. ' ) ) : array();
+			$usedby 		= ( $albuminfo['usedby'] && $albuminfo['usedby'] != '..' ) ? explode( ".", trim( $albuminfo['usedby'], '. ' ) ) : array();
 
 			// Get number of allowed uploads, -1 is unlimited
 			$a = wppa_allow_uploads( $id );
@@ -2073,8 +2073,8 @@ global $wppa_revno;
 						wppa_echo( '
 						<div
 							id="albumusedby-' . $id . '"
-							class="wppa-table-wrap wppa-tabcontent-'.$id.'"
-							style="position:relative;padding-bottom:12px;padding-left:12px;display:none"
+							class="wppa-table-wrap wppa-tabcontent"
+							style="position:relative;padding-bottom:12px;padding-left:12px;display:none;min-height:20px;"
 							>' );
 
 							wppa_echo( '

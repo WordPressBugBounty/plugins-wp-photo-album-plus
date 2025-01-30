@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.0.00.000
+* Version: 9.0.01.003
 *
 */
 
@@ -763,30 +763,34 @@ global $wpdb;
 		'delay' 	=> '',
 		'year' 		=> '',
 		'month' 	=> '',
-		'cache' 	=> '',
+		'cache' 	=> false,
 		'login' 	=> '',
 		'widget' 	=> '',
-		'landscape' => '',
-		'portrait' 	=> '',
+		'landscape' => false,
+		'portrait' 	=> false,
 		'audio' 	=> '',
 		'poster' 	=> '',
 		'lbtimeout' => '',
 		'lbstart' 	=> '',
 		'mocc' 		=> '',
 		'set' 		=> '',
-		'anon' 		=> '',
-		'meonly' 	=> '',
+		'anon' 		=> false,
+		'meonly' 	=> false,
 		'class' 	=> '',
 	];
 
 	// Shortcode attributes that do not need a value. Convert them to 'attr => 1'
-	$no_s = [0, 'no', 'off'];
-	if ( in_array( 'landscape', $xatts ) 	|| ( isset( $xatts['landscape'] ) 	&& ! in_array( $xatts['landscape'], $no_s ) ) )	$xatts['landscape'] = 1; 	else $xatts['landscape'] = 0;
-	if ( in_array( 'portrait', $xatts ) 	|| ( isset( $xatts['portrait'] ) 	&& ! in_array( $xatts['portrait'], $no_s ) ) )	$xatts['portrait'] = 1; 	else $xatts['portrait'] = 0;
-	if ( in_array( 'cache', $xatts ) 		|| ( isset( $xatts['cache'] ) 		&& ! in_array( $xatts['cache'], $no_s ) ) )		$xatts['cache'] = 1; 		else $xatts['cache'] = 0;
-	if ( in_array( 'anon', $xatts ) 		|| ( isset( $xatts['anon'] ) 		&& ! in_array( $xatts['anon'], $no_s ) ) ) 		$xatts['anon'] = 1; 		else $xatts['anon'] = 0;
-	if ( in_array( 'meonly', $xatts ) 		|| ( isset( $xatts['meonly'] ) 		&& ! in_array( $xatts['meonly'], $no_s ) ) ) 	$xatts['meonly'] = 1; 	else $xatts['meonly'] = 0;
-	if ( in_array( 'delay', $xatts ) ) $xatts['delay'] = 'yes';
+	$no_s = ['no', 'off'];
+	if ( in_array( 'landscape', $xatts ) )	$xatts['landscape'] = true;
+	elseif ( isset( $xatts['landscape'] ) && in_array( $xatts['landscape'], $no_s ) ) $xatts['landscape'] = false;
+	if ( in_array( 'portrait', $xatts ) )	$xatts['portrait'] = true;
+	elseif ( isset( $xatts['portrait'] ) && in_array( $xatts['portrait'], $no_s ) ) $xatts['portrait'] = false;
+	if ( in_array( 'cache', $xatts ) )		$xatts['cache'] = true;
+	elseif ( isset( $xatts['cache'] ) && in_array( $xatts['cache'], $no_s ) ) $xatts['cache'] = false;
+	if ( in_array( 'anon', $xatts ) )		$xatts['anon'] = true;
+	elseif ( isset( $xatts['anon'] ) && in_array( $xatts['anon'], $no_s ) ) $xatts['anon'] = false;
+	if ( in_array( 'meonly', $xatts ) ) 	$xatts['meonly'] = true;
+	elseif ( isset( $xatts['meonly'] ) && in_array( $xatts['meonly'], $no_s ) ) $xatts['meonly'] = false;
 
 	// Login requested?
 	if ( in_array( 'login', (array) $xatts ) ) {

@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 9.0.00.000
+* Version 9.0.01.003
 *
 */
 
@@ -47,7 +47,6 @@ function wppa_schedule_mailinglist( $type, $alb = 0, $pho = 0, $com = 0, $url = 
 		$owner = wppa_get_photo_item( $pho, 'owner' );
 
 		$pending = get_transient( 'last_feuploadnotify_scheduled-' . $owner . '-' . $alb );
-//		wppa_log( 'eml', 'Reading transient ' . 'last_feuploadnotify_scheduled-' . $owner . '-' . $alb . ' Value = ' . var_export( $pending, true ) );
 
 		if ( ! $pending ) {
 

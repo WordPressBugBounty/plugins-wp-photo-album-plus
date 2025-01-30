@@ -1,5 +1,12 @@
 WP Photo Album Plus Changelog
 
+= 9.0.01 =
+
+* Video did not use posters when available. Fixed.
+* The path shown after settings backup was wrong. Fixed.
+* Fixed an issue casued by incorrect comparision mechanism in a.o. PHP version 7.4.33
+* Usedby block did not close when selecting a different tab in album admin.
+
 = 9.0.00 =
 
 * New shortcode attribute: lbtimeout="t" where t is integer number of seconds.

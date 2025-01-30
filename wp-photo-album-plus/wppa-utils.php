@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.00.010
+* Version: 9.0.01.003
 *
 */
 
@@ -494,8 +494,8 @@ global $wppa_opt;
 	}
 
 	if ( isset( $wppa_opt[$key] ) ) {
-		if ( $wppa_opt[$key] == 'yes' ) return true;
-		elseif ( $wppa_opt[$key] == 'no' ) return false;
+		if ( $wppa_opt[$key] === 'yes' ) return true;
+		elseif ( $wppa_opt[$key] === 'no' ) return false;
 		else wppa_log( 'dbg', '$wppa_opt['.$key.'] is not a yes/no setting' );
 		return $wppa_opt[$key]; // Return the right value afterall
 	}
@@ -523,7 +523,7 @@ global $wppa_opt;
 	}
 
 	if ( isset( $wppa_opt[$key] ) ) {
-		if ( $wppa_opt[$key] == 'yes' || $wppa_opt[$key] == 'no' ) {
+		if ( $wppa_opt[$key] === 'yes' || $wppa_opt[$key] === 'no' ) {
 			wppa_log( 'dbg', '$wppa_opt['.$key.'] is a yes/no setting, not a value' );
 			return ( $wppa_opt[$key] == 'yes' ); // Return the right value afterall
 		}
@@ -5784,8 +5784,12 @@ function wppa_is_anon() {
 
 function wppa_is_meonly() {
 
-	if ( wppa( 'meonly' ) ) return true;
-	if ( wppa_get( 'occur' ) == wppa( 'mocc' ) && wppa_get( 'meonly', 0, 'int' ) ) return true;
+	if ( wppa( 'meonly' ) ) {
+		return true;
+	}
+	if ( wppa_get( 'occur' ) == wppa( 'mocc' ) && wppa_get( 'meonly', 0, 'int' ) ) {
+		return true;
+	}
 	return false;
 }
 
@@ -6138,7 +6142,7 @@ function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
 
 	$result = '<' . $tag;
 
-	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'data-title', 'data-day', 'data-from', 'type', 'preload',
+	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'data-title', 'data-day', 'data-from', 'type', 'preload', 'poster',
 					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'disabled', 'selected'];
 	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
 
@@ -6157,6 +6161,7 @@ function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
 					}
 					break;
 				case 'href':
+				case 'poster':
 					$result .= ' ' . $attr . '="' . esc_url( $attribs[$attr] ) . '"';
 					break;
 				default:

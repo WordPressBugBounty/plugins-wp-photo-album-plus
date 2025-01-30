@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all video routines
-* Version 9.0.00.007
+* Version 9.0.01.001
 *
 */
 
@@ -77,8 +77,8 @@ function wppa_get_video_html( $args ) {
 	// See if there is a poster image
 	$poster_photo_path = wppa_get_photo_path( $id );
 	$poster_thumb_path = wppa_get_thumb_path( $id );
-	$poster_photo = wppa_is_file ( $poster_photo_path ) ? ' poster="' . wppa_get_photo_url( $id ) . '"' : '';
-	$poster_thumb = wppa_is_file ( $poster_thumb_path ) ? ' poster="' . wppa_get_thumb_url( $id ) . '"' : '';
+	$poster_photo = wppa_is_file ( $poster_photo_path ) ? wppa_get_photo_url( $id ) : '';
+	$poster_thumb = wppa_is_file ( $poster_thumb_path ) ? wppa_get_thumb_url( $id ) : '';
 	$poster = '';	// Init to none
 
 	// Thumbnail?
@@ -94,7 +94,7 @@ function wppa_get_video_html( $args ) {
 	if ( $mp4 || $ogv || $webm ) {
 
 		// Assume the browser supports html5
-		$attribs = ['id' => $tagid, 'title' => $title, 'class' => $class, 'style' => $style, 'preload' => 'metadata',
+		$attribs = ['id' => $tagid, 'title' => $title, 'class' => $class, 'style' => $style, 'preload' => $poster ? 'none' : 'metadata',  'poster' => $poster,
 					'onload' => $onload, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout, 'onclick' => $onclick, 'ondblclick' => $ondblclick];
 		if ( $controls ) $attribs['controls'] = 'controls';
 		if ( $autoplay ) $attribs['autoplay'] = 'autoplay';

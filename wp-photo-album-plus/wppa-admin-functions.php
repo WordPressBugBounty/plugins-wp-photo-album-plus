@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.0.00.000
+* Version: 9.0.01.003
 *
 */
 
@@ -35,7 +35,7 @@ global $wppa_opt;
 	wppa_initialize_runtime();
 
 	// Save to file
-	wppa_ok_message( __( 'Backing up to', 'wp-photo-album-plus' ) . ': ' . str_replace( WPPA_ABSPATH, '.../', WPPA_UPLOAD ) . '/backup/' . $filename );
+	wppa_ok_message( __( 'Backing up to', 'wp-photo-album-plus' ) . ': ' . str_replace( WPPA_ABSPATH, '.../', WPPA_UPLOAD_PATH ) . '/backup/' . $filename );
 	$bret = wppa_put_contents( WPPA_UPLOAD_PATH . '/backup/' . $filename, $contents );
 
 	// Report
@@ -536,8 +536,8 @@ function _wppa_sanitze_files( $root, $from = '' ) {
 			// Check extension and mimetype
 			$file_is_ok = wppa_check_filetype_and_ext( $file, basename( $file ), wppa_get_mime_types( 'import' ) );
 			if ( ! $file_is_ok['ext'] || ! $file_is_ok['type'] ) {
-				if ( ! $file_is_ok['ext'] ) wppa_error_message( 'Illegal ext '.wppa_get_ext($file) ); // .' '.var_export(wppa_get_mime_types( 'import' ),true));
-				if ( ! $file_is_ok['type'] ) wppa_error_message( 'Illegal type '.wppa_get_ext($file) ); // .' '.var_export(wppa_get_mime_types( 'import' ),true));
+				if ( ! $file_is_ok['ext'] ) wppa_error_message( 'Illegal ext '.wppa_get_ext($file) );
+				if ( ! $file_is_ok['type'] ) wppa_error_message( 'Illegal type '.wppa_get_ext($file) );
 
 				wppa_unlink( $file );
 				/* translators: filename */
