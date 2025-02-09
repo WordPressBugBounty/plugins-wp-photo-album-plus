@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.00.002';
+wppaWppaVer = '9.0.02.001';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -586,6 +586,11 @@ function _wppaDoAutocol( mocc, i ) {
 
 	// Real calendar
 	wppaSetRealCalendarHeights( mocc );
+
+	// Selection boxes max width
+	jQuery( ".wppa-box" ).find("select").each(function(){
+		jQuery(this).css({maxWidth:jQuery(this).parent().width()});
+	});
 
 	return true;
 }

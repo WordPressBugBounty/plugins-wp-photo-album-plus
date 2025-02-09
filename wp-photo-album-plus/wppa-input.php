@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.0.00.009
+* Version: 9.0.02.001
 *
 */
 
@@ -326,7 +326,7 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 		case 'tag':
 		case 'tags':
 		case 'cat':
-			if ( $filter == 'tag' && isset( $_REQUEST[$key] ) && strpos( $_REQUEST[$key], '-none-' ) !== false ) return '-none-';
+			if ( $filter == 'tag' && isset( $_REQUEST[$key] ) && strpos( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), '-none-' ) !== false ) return '-none-';
 			return isset( $_REQUEST[$key] ) ? trim( wppa_sanitize_tags( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), ',;' ) ) : $default;
 			break;
 

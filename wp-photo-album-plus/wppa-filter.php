@@ -882,7 +882,7 @@ global $wpdb;
 	// Make globally known 'we are building a cache file'
 	if ( strpos( wppa_request_uri(), 'wp-admin/widgets.php' ) !== false ) $xatts['cache'] = '';
 	if ( strpos( wppa_request_uri(), 'wp-json/wp/v2/widget-types' ) !== false ) $xatts['cache'] = '';
-	$wppa_is_caching = $xatts['cache'];
+	$wppa_is_caching = isset( $xatts['cache'] ) ? $xatts['cache'] : false;
 
 	// Update usedby fields
 	$page = get_the_ID();
