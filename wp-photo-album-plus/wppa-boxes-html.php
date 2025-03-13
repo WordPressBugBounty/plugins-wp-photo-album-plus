@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.0.00.010
+* Version 9.0.03.003
 *
 */
 
@@ -2499,7 +2499,7 @@ function wppa_user_destroy_html( $alb, $width, $where, $rsp ) {
 			>
 			<a
 				style="float:left; cursor:pointer"
-				onclick="
+				onclick="wppaStopProp(event);
 					jQuery(this).html(\'' . __( 'Working...', 'wp-photo-album-plus' ) . '\');
 					wppaAjaxDestroyAlbum(\'' . wppa_encrypt_album( $alb ) . '\',\'' . wp_create_nonce( 'wppa-nonce_' . $alb ) . '\');
 					jQuery(this).html(\'' . __( 'Delete Album', 'wp-photo-album-plus' ) . '\');
@@ -2607,6 +2607,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 	$result .= '
 		<div style="clear:both"></div>
 		<a id="wppa-cr-' . $a . '-' . $mocc . '" class="wppa-create-' . $where . ' wppa-album-cover-link" onclick="
+				wppaStopProp(event);
 				jQuery( \'#wppa-create-'.$t.$a.'-'.$mocc.'\' ).css( \'display\',\'block\' );
 				jQuery( \'#wppa-cr-'.$a.'-'.$mocc.'\' ).css( \'display\',\'none\' );
 				jQuery( \'#wppa-up-'.$a.'-'.$mocc.'\' ).css( \'display\',\'none\' );
@@ -2618,6 +2619,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 			( $alb ? __( 'Create sub album', 'wp-photo-album-plus' ) : __( 'Create album', 'wp-photo-album-plus' ) ) . '
 		</a>
 		<a id="_wppa-cr-' . $a . '-' . $mocc . '" class="wppa-create-' . $where . ' wppa-album-cover-link" onclick="
+				wppaStopProp(event);
 				jQuery( \'#wppa-create-'.$t.$a.'-'.$mocc.'\' ).css( \'display\',\'none\' );
 				jQuery( \'#wppa-cr-'.$a.'-'.$mocc.'\' ).css( \'display\',\'block\' );
 				jQuery( \'#wppa-up-'.$a.'-'.$mocc.'\' ).css( \'display\',\'block\' );
@@ -2634,6 +2636,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 		<div
 			id="wppa-create-'.$t.$a.'-'.$mocc.'"
 			style="width:100%;text-align:center;display:none;"
+			onclick="wppaStopProp(event);"
 			>
 			<form
 				id="wppa-creform-'.$a.'-'.$mocc.'"
@@ -2960,6 +2963,7 @@ static $albums_granted;
 
 	$result .= '
 		<a id="wppa-up-' . $a . '-' . $mocc . '" class="wppa-upload-'.$where.' wppa-album-cover-link" onclick="
+				wppaStopProp(event);
 				jQuery( \'#wppa-file-'.$t.$a.'-'.$mocc.'\' ).css( \'display\',\'block\' );
 				jQuery( \'#wppa-up-'.$a.'-'.$mocc.'\' ).css( \'display\',\'none\' );
 				jQuery( \'#wppa-cr-'.$a.'-'.$mocc.'\' ).css( \'display\',\'none\' );
@@ -2972,6 +2976,7 @@ static $albums_granted;
 			__( 'Upload photo', 'wp-photo-album-plus' ) . '
 		</a>
 		<a id="_wppa-up-' . $a . '-' . $mocc . '" class="wppa-upload-'.$where.' wppa-album-cover-link" onclick="
+				wppaStopProp(event);
 				jQuery( \'#wppa-file-'.$t.$a.'-'.$mocc.'\' ).css( \'display\',\'none\' );
 				jQuery( \'#wppa-cr-'.$a.'-'.$mocc.'\' ).css( \'display\',\'block\' );
 				jQuery( \'#wppa-up-'.$a.'-'.$mocc.'\' ).css( \'display\',\'block\' );
@@ -2982,7 +2987,7 @@ static $albums_granted;
 				" style="float:right; cursor:pointer;display:none;padding-right:6px">' .
 			wppa_translate( wppa_opt( 'close_text' ), 'wp-photo-album-plus' ) . '
 		</a>
-		<div id="wppa-file-' . $t . $a . '-' . $mocc . '" style="width:100%;text-align:center;display:none; clear:both" >
+		<div id="wppa-file-' . $t . $a . '-' . $mocc . '" style="width:100%;text-align:center;display:none; clear:both" onclick="wppaStopProp(event);">
 			<form id="wppa-uplform-' . $cralb . '-' . $mocc . '" action="' . $returnurl . '" method="post" enctype="multipart/form-data" >' .
 				wppa_nonce_field( 'wppa-check', 'wppa-nonce', false, $yalb );
 
@@ -3645,7 +3650,7 @@ static $albums_granted;
 
 		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
 		$ajax_url_after_upload = str_replace( '&amp;', '&', wppa_get_ajaxlink() ) . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
-		$on_complete = 'wppaDoAjaxRender( ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' )';
+		$on_complete = 'wppaDoAjaxRender(event, ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' )';
 	}
 	else {
 		$url_after_ajax_upload = '';
@@ -3716,7 +3721,8 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 
 	$result = '
 	<div style="clear:both;"></div>
-	<a id="wppa-ea-'.$a.'-'.wppa( 'mocc' ).'" class="wppa-aedit-'.$where.' wppa-album-'.$where.'-link" onclick="'.
+	<a id="wppa-ea-'.$a.'-'.wppa( 'mocc' ).'" class="wppa-aedit-'.$where.' wppa-album-'.$where.'-link" onclick="
+									wppaStopProp(event);'.
 									'jQuery( \'#wppa-fe-div-'.$a.'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'block\' );'.		// Open the Edit form
 									'jQuery( \'#wppa-ea-'.$a.'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'none\' );'.			// Hide the Edit link
 									'jQuery( \'#wppa-cr-'.$a.'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'none\' );'.			// Hide the Create libk
@@ -3727,7 +3733,8 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 									'" style="float:left; cursor:pointer">
 		'.__( 'Edit album info', 'wp-photo-album-plus' ).'
 	</a>
-	<a id="_wppa-ea-'.$a.'-'.wppa( 'mocc' ).'" class="wppa-aedit-'.$where.' wppa-album-'.$where.'-link" onclick="'.
+	<a id="_wppa-ea-'.$a.'-'.wppa( 'mocc' ).'" class="wppa-aedit-'.$where.' wppa-album-'.$where.'-link" onclick="
+									wppaStopProp(event);'.
 									'jQuery( \'#wppa-fe-div-'.$a.'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'none\' );'.		// Hide the Edit form
 									'jQuery( \'#wppa-cr-'.$a.'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'block\' );'.			// Show the Create link
 									'jQuery( \'#wppa-up-'.$a.'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'block\' );'.			// Show the Upload link
@@ -3759,7 +3766,7 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 	$desc = esc_textarea( $desc );
 
 	$result .=
-	'<div id="wppa-fe-div-'.$a.'-'.wppa( 'mocc' ).'" style="display:none">' .
+	'<div id="wppa-fe-div-'.$a.'-'.wppa( 'mocc' ).'" style="display:none" onclick="wppaStopProp(event);">' .
 		'<form action="#" method="post" >' .
 			'<input' .
 				' type="hidden"' .
@@ -4912,7 +4919,7 @@ global $other_deps;
 	$photos_used = '*';
 	$other_deps = 'R';
 
-	// Copletify args
+	// Completify args
 	$args = wp_parse_args( ( array ) $args, array( 	'page' 			=> 0,
 													'count' 		=> 1,
 													'sortby' 		=> 'maxratingcount',
@@ -4927,6 +4934,7 @@ global $other_deps;
 													'lineheight' 	=> wppa_opt( 'fontsize_widget_thumb' ) * 1.5,
 													'height' 		=> '200',
 													'totvalue' 		=> '',
+													'timestamp' 	=> 'yes',
 											 ) );
 
 	// Make args into seperate vars
@@ -4939,6 +4947,12 @@ global $other_deps;
 	$result = '';
 
 	$data = wppa_get_the_bestof( $count, $period, $sortby, $display );
+
+	if ( wppa('rating_start') && is_array( $data ) ) {
+		/* Translators: start date and end date */
+		$text = sprintf( __('Ratings from %1$s to %2$s', 'wp-photo-album-plus'), wppa_local_date( wppa_get_option('date_format'), wppa('rating_start')), wppa_local_date( wppa_get_option('date_format'), wppa('rating_end')));
+		$result .= wppa_html_tag('div', ['id' => 'bestof-period-'.wppa('mocc'), 'class' => 'bestof-period'], $text);
+	}
 
 	if ( $display == 'photo' ) {
 
@@ -4968,6 +4982,7 @@ global $other_deps;
 					if ( $meanrat == 'yes' ) 	$totalh += $lineheight;
 					if ( $ratcount == 'yes' ) 	$totalh += $lineheight;
 					if ( $totvalue == 'yes' ) 	$totalh += $lineheight;
+					if ( $timestamp == 'yes' ) 	$totalh += $lineheight;
 
 					if ( $widget ) $clear = 'clear:both; '; else $clear = '';
 					$result .= "\n" .
@@ -5076,9 +5091,13 @@ global $other_deps;
 						$result .= wppa_get_medal_html_a( array( 'id' => $id, 'size' => 'M', 'where' => 'bot' ) );
 
 						// The subtitles
-						$result .= "\n\t".'<div style="font-size:'.$fontsize.'px; line-height:'.$lineheight.'px; position:absolute; width:'.$maxw.'px">';
+						$result .= "\n\t".'<div style="font-size:'.$fontsize.'px; line-height:'.$lineheight.'px; width:'.$maxw.'px">';
 							/* translators: username */
 							$result .= sprintf( __( 'Photo by: %s', 'wp-photo-album-plus' ), $data[$id]['user'] ).'<br>';
+							if ( $timestamp 	== 'yes' ) {
+								/* translators: formatted date/time */
+								$result .= sprintf( __( 'Uploaded: %s', 'wp-photo-album-plus' ), wppa_local_date( wppa_get_option( 'date_format' ), wppa_get_photo_item( $id, 'timestamp' ) ) ) . '<br>';
+							}
 							if ( $maxratings 	== 'yes' ) {
 								$n = $data[$id]['maxratingcount'];
 								/* translators: integer count */
@@ -5370,7 +5389,7 @@ global $photos_used;
 
 					$onclick = 'jQuery(\'.wppa-minicover-' . $mocc . '\').removeClass(\'wppa-minicover-current\');
 								jQuery(this).addClass(\'wppa-minicover-current\');
-								wppaDoAjaxRender(' . $mocc1 . ', \'' . $ajaxurl . '\', \'\');';
+								wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'\');';
 
 					$result .= '
 					<a
@@ -5410,7 +5429,7 @@ global $photos_used;
 
 				$onclick = 'jQuery( \'.wppa-minicover-' . $mocc . '\' ).removeClass( \'wppa-minicover-current\' );
 							jQuery(this).addClass(\'wppa-minicover-current\');
-							wppaDoAjaxRender(' . $mocc1 . ', \'' . $ajaxurl . '\', \'\');';
+							wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'\');';
 
 				$result .= 	'
 				<a
@@ -5596,7 +5615,7 @@ global $photos_used;
 					else {
 					$result .= '
 						<td class="wppa-real-calendar-small wppa-real-calendar-head-td-'.$mocc.'"
-							onclick="wppaDoAjaxRender(' . $mocc . ', \'' . wppa_get_real_calendar_link( $year-1, $month ) . '\');"
+							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $year-1, $month ) . '\');"
 							>' .
 							( $year - 1 ) . '
 						</td>';
@@ -5617,7 +5636,7 @@ global $photos_used;
 						else {
 							$result .= '
 							<td class="wppa-real-calendar-small wppa-real-calendar-head-td-'.$mocc.'"
-							onclick="wppaDoAjaxRender(' . $mocc . ', \'' . wppa_get_real_calendar_link( $year, $m ) . '\');"
+							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $year, $m ) . '\');"
 							>' .
 							$month_lbls[$m - 1] . '
 							</td>';
@@ -5636,7 +5655,7 @@ global $photos_used;
 					else {
 						$result .= '
 						<td class="wppa-real-calendar-small wppa-real-calendar-head-td-'.$mocc.'"
-							onclick="wppaDoAjaxRender(' . $mocc . ', \'' . wppa_get_real_calendar_link( $year+1, $month ) . '\');"
+							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $year+1, $month ) . '\');"
 							>' .
 							( $year + 1 ) . '
 						</td>';
@@ -5663,7 +5682,7 @@ global $photos_used;
 						<td colspan="1"
 							class="wppa-real-calendar-navi wppa-real-calendar-head-td-'.$mocc.'"
 							title="' . ucfirst( $month_labels[$pm-1] ) . ' ' . $py . '"
-							onclick="wppaDoAjaxRender(' . $mocc . ', \'' . wppa_get_real_calendar_link( $py, $pm ) . '\');"
+							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $py, $pm ) . '\');"
 							>' .
 							ucfirst( $month_lbls[$pm-1] ) . '
 						</td>';
@@ -5694,7 +5713,7 @@ global $photos_used;
 						<td colspan="2"
 							class="wppa-real-calendar-today wppa-real-calendar-navi wppa-real-calendar-head-td-'.$mocc.'"
 							title="' . ucfirst( $month_labels[wppa_local_date( 'm', time() )-1] ) . ' - ' . wppa_local_date( 'Y', time() ) . '"
-							onclick="wppaDoAjaxRender(' . $mocc . ', \'' . wppa_get_real_calendar_link( 0, 0 ) . '\');"
+							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( 0, 0 ) . '\');"
 							>' .
 							__( "Now", 'wp-photo-album-plus' ) . '
 						</td>';
@@ -5714,7 +5733,7 @@ global $photos_used;
 						<td colspan="1"
 							class="wppa-real-calendar-navi wppa-real-calendar-head-td-'.$mocc.'"
 							title="' . ucfirst( $month_labels[$nm-1] ) . ' ' . $ny . '"
-							onclick="wppaDoAjaxRender(' . $mocc . ', \'' . wppa_get_real_calendar_link( $ny, $nm ) . '\');"
+							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $ny, $nm ) . '\');"
 							>' .
 							ucfirst( $month_lbls[$nm-1] ) . '
 						</td>';
@@ -5857,7 +5876,7 @@ global $photos_used;
 										<a
 											data-id="' . wppa_encrypt_photo( $id ) . '"
 											style="color:white;cursor:pointer"
-											onclick="wppaDoAjaxRender(' . ( $mocc + 1 ) . ', \'' . $ajaxurl . '\' );"
+											onclick="wppaDoAjaxRender(event,' . ( $mocc + 1 ) . ', \'' . $ajaxurl . '\' );"
 											>';
 
 										// The cell content
@@ -6340,7 +6359,7 @@ global $wppa_lang;
 			' id="wppa-button-initial-' . $mocc . '"' .
 			' type="button"' .
 			' value="' . wppa( 'is_button' ) . '"' .
-			' onclick="wppaDoAjaxRender( ' . $mocc . ', \'' . $al . '\' )"' .
+			' onclick="wppaDoAjaxRender(event, ' . $mocc . ', \'' . $al . '\' )"' .
 		' />';
 
 	// Output
@@ -6551,7 +6570,7 @@ function wppa_get_grid_image_html( $id ) {
 
 			// The a img
 			if ( $link['ajax_url'] ) {
-				$result .= '<a style="position:static;" onclick="wppaDoAjaxRender('.$mocc.', \''.$link['ajax_url'].'\', \''.$link['url'].'\');" class="grid-img" id="x-'.$xid.'-'.$mocc.'" >';
+				$result .= '<a style="position:static;" onclick="wppaDoAjaxRender(event,'.wppa('targetmocc').', \''.$link['ajax_url'].'\', \''.$link['url'].'\');" class="grid-img" id="x-'.$xid.'-'.$mocc.'" >';
 			}
 			else {
 				$result .= '<a style="position:static;" href="'.$link['url'].'" target="'.$link['target'].'" class="grid-img" id="x-'.$xid.'-'.$mocc.'" >';

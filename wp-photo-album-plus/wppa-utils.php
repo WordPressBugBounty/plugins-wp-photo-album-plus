@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.01.003
+* Version: 9.0.03.003
 *
 */
 
@@ -2515,34 +2515,51 @@ global $wpdb;
 
 	// Phase 1, find the period we are talking about
 	// find $start and $end
-	switch ( $period ) {
-		case 'lastweek':
-			$start 	= wppa_get_timestamp( 'lastweekstart' );
-			$end   	= wppa_get_timestamp( 'lastweekend' );
-			break;
-		case 'thisweek':
-			$start 	= wppa_get_timestamp( 'thisweekstart' );
-			$end   	= wppa_get_timestamp( 'thisweekend' );
-			break;
-		case 'lastmonth':
-			$start 	= wppa_get_timestamp( 'lastmonthstart' );
-			$end 	= wppa_get_timestamp( 'lastmonthend' );
-			break;
-		case 'thismonth':
-			$start 	= wppa_get_timestamp( 'thismonthstart' );
-			$end 	= wppa_get_timestamp( 'thismonthend' );
-			break;
-		case 'lastyear':
-			$start 	= wppa_get_timestamp( 'lastyearstart' );
-			$end 	= wppa_get_timestamp( 'lastyearend' );
-			break;
-		case 'thisyear':
-			$start 	= wppa_get_timestamp( 'thisyearstart' );
-			$end 	= wppa_get_timestamp( 'thisyearend' );
-			break;
-		default:
-			return 'Unimplemented period: '.$period;
+	if ( wppa_is_posint( $period ) ) {
+		$start 	= wppa_get_timestamp( $period );
+		$end 	= wppa_get_timestamp( $period + 1);
 	}
+	else {
+		switch ( $period ) {
+			case 'lastweek':
+				$start 	= wppa_get_timestamp( 'lastweekstart' );
+				$end   	= wppa_get_timestamp( 'lastweekend' );
+				break;
+			case 'thisweek':
+				$start 	= wppa_get_timestamp( 'thisweekstart' );
+				$end   	= wppa_get_timestamp( 'thisweekend' );
+				break;
+			case 'lastmonth':
+				$start 	= wppa_get_timestamp( 'lastmonthstart' );
+				$end 	= wppa_get_timestamp( 'lastmonthend' );
+				break;
+			case 'thismonth':
+				$start 	= wppa_get_timestamp( 'thismonthstart' );
+				$end 	= wppa_get_timestamp( 'thismonthend' );
+				break;
+			case 'lastyear':
+				$start 	= wppa_get_timestamp( 'lastyearstart' );
+				$end 	= wppa_get_timestamp( 'lastyearend' );
+				break;
+			case 'thisyear':
+				$start 	= wppa_get_timestamp( 'thisyearstart' );
+				$end 	= wppa_get_timestamp( 'thisyearend' );
+				break;
+			case 'forever':
+				$start 	= '0';
+				$end 	= time();
+				break;
+			default:
+				return 'Unimplemented period: '.$period;
+		}
+	}
+
+	$end--;
+
+	wppa('rating_start', $start);
+	wppa('rating_end', $end);
+
+	wppa_log('dbg', 'Period='.$period.', start='.wppa_local_date( 'F j, Y, H:i s', $start ).' end='.wppa_local_date( 'F j, Y, H:i s', $end ));
 
 	// Phase 2, get the ratings of the period
 	// find $ratings, ordered by photo id
@@ -2639,13 +2656,9 @@ global $wpdb;
 		return $data;
 	}
 	else {
-		return 	__('There are no ratings between', 'wp-photo-album-plus' ) .
-				'<br>' .
-				wppa_local_date( 'F j, Y, H:i s', $start ) .
-				' ' . __('and', 'wp-photo-album-plus' ) .
-				'<br>' .
-				wppa_local_date( 'F j, Y, H:i s', $end ) .
-				'.';
+		/* Translators: start date and end date */
+		$text = sprintf( __('There are no ratings between %1$s and %2$s.', 'wp-photo-album-plus' ), wppa_local_date( wppa_get_option('date_format'), $start ), wppa_local_date( wppa_get_option('date_format'), $end ) );
+		return 	wppa_html_tag( 'div', ['id' => 'bestof-period-no-'.wppa('mocc'), 'class' => 'bestof-period'], $text );
 	}
 }
 
@@ -6195,3 +6208,18 @@ function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
 	return $result;
 }
 
+// Ge the rating html to be used in slides and lightbox
+function wppa_get_rating_html( $id ) {
+
+	if ( ! wppa_is_item_displayable( wppa_get_photo_item( $id, 'album' ), 'rating', 'rating_on' ) ) return '';
+
+	if ( wppa_opt( 'rating_max' ) == 1 ) {
+		return wppa_get_slide_rating_vote_only( '', $id, wppa( 'mocc' ) == 0 );
+	}
+
+	else {
+		return wppa_get_rating_range_html( $id, wppa( 'mocc' ) == 0, '' );
+	}
+
+
+}

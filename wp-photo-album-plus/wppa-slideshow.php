@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.0.00.000
+* Version 9.0.03.002
 *
 */
 
@@ -322,7 +322,7 @@ function wppa_start_stop_icons( $opt = '' ) {
 				class="wppa-nav-text renew"
 				style="float:right;cursor:pointer"
 				title="' . esc_attr( __('Renew', 'wp-photo-album-plus' ) ) . '"
-				onclick="_wppaStop(' . $mocc . ');wppaDoAjaxRender(' . $mocc . ', \'' . $ajax_url .
+				onclick="_wppaStop(' . $mocc . ');wppaDoAjaxRender(event,' . $mocc . ', \'' . $ajax_url .
 							'wppa-slideonly=1&amp;wppa-filmonly=1&amp;wppa-album=' . wppa( 'start_album' ) . '&amp;wppa-occur=' . $mocc . '\', \'\' )"
 				>' .
 				wppa_get_svghtml( 'Redo', $iconsize ) . '
@@ -403,7 +403,7 @@ function wppa_start_stop_text( $opt = '' ) {
 				id="renew-' . $mocc . '"
 				class="wppa-nav-text renew"
 				style="float:right;cursor:pointer"
-				onclick="_wppaStop(' . $mocc . ');wppaDoAjaxRender(' . $mocc . ', \'' . $ajax_url .
+				onclick="_wppaStop(' . $mocc . ');wppaDoAjaxRender(event,' . $mocc . ', \'' . $ajax_url .
 							'wppa-slideonly=1&amp;wppa-filmonly=1&amp;wppa-album=' . wppa( 'start_album' ) . '&amp;wppa-occur=' . $mocc . '\', \'\' )"
 				>' .
 				__( 'Renew', 'wp-photo-album-plus' ) . '
@@ -1103,7 +1103,7 @@ static $cache;
 					$mylast = wppa_get_my_last_vote( $id );
 
 					if ( $mylast == '-1' ) {
-						wppa_js( 'jQuery(\'#wppa-dislike-'.wppa( 'mocc' ).'\').css(\'display\'. \'none\');' );
+						wppa_js( 'jQuery(\'#wppa-dislike-'.wppa( 'mocc' ).'\').css(\'display\', \'none\');' );
 					}
 				}
 

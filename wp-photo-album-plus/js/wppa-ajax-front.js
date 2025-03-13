@@ -3,10 +3,12 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.0.00.000';
+var wppaJsAjaxVersion = '9.0.03.002';
 
 // The new AJAX rendering routine Async
-function wppaDoAjaxRender( mocc, ajaxurl, newurl, addHilite ) {
+function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
+
+	event.stopPropagation();
 
 	// Fix the url
 	if ( wppaLang != '' ) ajaxurl += '&lang='+wppaLang;
@@ -1154,13 +1156,14 @@ function _wppaOvlRateIt( id, value, mocc, reloadAfter ) {
 								},
 					success: 	function( xresult, status, xhr ) {
 									var result;
-									if ( wppaAjaxMethod == 'rest' ) {
+									if ( xresult.txt ) {
 										result = xresult.txt;
 									}
 									else {
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
 									}
+
 									var ArrValues = result.split( "||" );
 
 									// Error from rating algorithm?
@@ -1252,9 +1255,7 @@ function wppaAjaxDownloadAlbum( mocc, id ) {
 									jQuery( '#dwnspin-'+mocc+'-'+id ).css( 'display', '' );
 								},
 					success: 	function( xresult, status, xhr ) {
-
 									var result;
-
 									if ( xresult.txt ) {
 										result = xresult.txt;
 									}
@@ -1332,7 +1333,7 @@ function wppaAjaxComment( mocc, id ) {
 								},
 					success: 	function( xresult, status, xhr ) {
 									var result;
-									if ( wppaAjaxMethod == 'rest' ) {
+									if ( xresult.txt ) {
 										result = xresult.txt;
 									}
 									else {
@@ -1420,7 +1421,7 @@ function wppaUpdatePhotoNew(id,mocc) {
 								},
 					success: 	function( xresult, status, xhr ) {
 									var result;
-									if ( wppaAjaxMethod == 'rest' ) {
+									if ( typeof( xresult ) == 'object' ) {
 										result = xresult;
 									}
 									else {

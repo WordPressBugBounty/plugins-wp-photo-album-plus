@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '9.0.00.002';
+wppaJsUtilsVersion = '9.0.03.002';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -726,4 +726,9 @@ function wppaGetTinyMceContent( longId ) {
 	}
 
 	return result;
+}
+
+// Stop propagation
+function wppaStopProp(event) {
+	event.stopPropagation();
 }

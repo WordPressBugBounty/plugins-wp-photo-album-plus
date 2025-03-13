@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.0.01.003
+* Version: 9.0.03.002
 *
 */
 
@@ -163,6 +163,7 @@ global $wppa_runtime_settings;
 	$wppa['anon'] 		= $atts['anon'];
 	$wppa['meonly'] 	= $atts['meonly'];
 	$wppa['container-wrapper-class'] = $atts['class'];
+	$wppa['targetmocc'] = $atts['targetmocc'];
 
 	// Interprete wppa_set settable runtime settings
 	if ( is_array( $wppa_runtime_settings ) ) {
@@ -777,6 +778,7 @@ global $wpdb;
 		'anon' 		=> false,
 		'meonly' 	=> false,
 		'class' 	=> '',
+		'targetmocc'	=> '',
 	];
 
 	// Shortcode attributes that do not need a value. Convert them to 'attr => 1'
@@ -915,6 +917,11 @@ global $wpdb;
 	else {
 		$xatts['mocc'] = '';
 		$wppa_forced_mocc = 0;
+	}
+
+	// Look for targetmocc
+	if ( ! isset( $xatts['targetmocc'] ) || ! wppa_is_posint( $xatts['targetmocc'] ) ) {
+		$xatts['targetmocc'] = false;
 	}
 
 	// Reset possible sets in previous sc

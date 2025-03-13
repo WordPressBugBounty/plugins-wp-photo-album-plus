@@ -1,5 +1,14 @@
 WP Photo Album Plus Changelog
 
+= 9.0.03 =
+
+* Fixed a possible warning in photo admin related to custom data.
+* New shortcode attribute: targetmocc="n" where n is a positive integer. Indicates the occurrance where to place the results of an ajax call.
+To be used in combination with mocc="n" indicating the forced occurrance number of a wppa box. n must be > 100 and < 200.
+* Clicking the album cover background now acts identical to clicking the album name.
+* Bestof periods extended with 'forever' and any integer year number >= 1970.
+* Some extual corrections in the bestof display, and fixed local time offset issue.
+
 = 9.0.02 =
 
 * Fixed a warning about caching.

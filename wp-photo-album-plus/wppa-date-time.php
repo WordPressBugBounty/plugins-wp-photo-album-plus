@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * date and time related functions
-* Version 9.0.00.000
+* Version 9.0.03.003
 *
 */
 
@@ -17,6 +17,12 @@ function wppa_get_timestamp( $key = false ) {
 
 	$data = explode( ':', $local_date_time );
 	$data[4] = ltrim( 0, $data[4] );
+
+	// If a year is given, return timestamp for 1 jan 00.00
+	if ( wppa_is_posint( $key ) && $key >= 1970 ) {
+		$result = wppa_local_strtotime( $key . '-01-01' );
+		return $result;
+	}
 
 	$today_start = $timnow - $data[8] - 60 * $data[7] - 3600 * $data[6];
 	if ( $key == 'todaystart' ) return $today_start;
@@ -280,7 +286,7 @@ function wppa_local_strtotime( $str ) {
 	$tzstring = wppa_get_option( 'timezone_string' );
 
 	// Correct $time according to gmt_offset
-	$current_offset = intval( wppa_get_option( 'gmt_offset', 0 ) ) * 3600;
+	$current_offset = intval( wp_timezone_override_offset() * 3600 );
 	$result -= $current_offset;
 
 	return $result;

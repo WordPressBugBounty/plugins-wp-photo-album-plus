@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.0.01.003
+* Version: 9.0.03.002
 *
 */
 
@@ -49,6 +49,11 @@ global $other_deps;
 	// Widgets compile their own mocc
 	elseif ( ! wppa( 'in_widget' ) ) {
 		wppa_bump_mocc();
+	}
+
+	// See if an ajax target mocc is defined
+	if ( ! $wppa['targetmocc'] ) {
+		$wppa['targetmocc'] = $wppa['mocc'];
 	}
 
 	// Set wppa( 'src' ) = true and wppa( 'searchstring' ) if this occurrance processes a search request.
@@ -231,7 +236,7 @@ global $other_deps;
 			$delay_arr = explode( ',', $delay );
 
 			// Maybe to different mocc
-			$tomocc = wppa( 'mocc' );
+			$tomocc = wppa( 'targetmocc' );
 
 			if ( $delay_arr[0] == 'button' || $delay_arr[0] == 'text' ) {
 				if ( isset( $delay_arr[2] ) && wppa_is_posint( $delay_arr[2] ) ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.0.00.005
+* Version: 9.0.03.001
 *
 */
 
@@ -1763,11 +1763,8 @@ global $wpdb;
 
 						// Custom
 						if ( wppa_switch( 'custom_fields' ) ) {
-							$custom = wppa_get_photo_item( $photo['id'], 'custom' );
-							if ( $custom ) {
-								$custom_data = wppa_unserialize( $custom );
-							}
-							else {
+							$custom_data = wppa_unserialize( wppa_get_photo_item( $photo['id'], 'custom' ) );
+							if ( ! is_array( $custom_data ) ) {
 								$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
 							}
 

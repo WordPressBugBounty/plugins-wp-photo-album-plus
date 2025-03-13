@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version: 9.0.00.000
+* Version: 9.0.03.003
 *
 */
 
@@ -59,6 +59,7 @@ class BestOfWidget extends WP_Widget {
 		$size 			= wppa_opt( 'widget_width' );
 		$lineheight 	= wppa_opt( 'fontsize_widget_thumb' ) * 1.5;
 		$total 			= $instance['totvalue'] ? 'yes' : '';
+		$timestamp 		= $instance['timestamp'] ? 'yes' : '';
 
 		$widget_content = "\n".'<!-- WPPA+ BestOf Widget start -->';
 
@@ -75,6 +76,7 @@ class BestOfWidget extends WP_Widget {
 														'lineheight' 	=> $lineheight,
 														'totvalue' 		=> $total,
 														'cache' 		=> 'no',
+														'timestamp' 	=> $timestamp,
 														) );
 
 		$widget_content .= '<div style="clear:both" data-wppa="yes"></div>';
@@ -114,6 +116,7 @@ class BestOfWidget extends WP_Widget {
 
     /** @see WP_Widget::form */
     function form( $instance ) {
+		global $wpdb;
 
 		// Defaults
 		$instance = wppa_parse_args( (array) $instance, $this->get_defaults() );
@@ -141,6 +144,7 @@ class BestOfWidget extends WP_Widget {
 								__( 'This month', 'wp-photo-album-plus' ),
 								__( 'Last year', 'wp-photo-album-plus' ),
 								__( 'This year', 'wp-photo-album-plus' ),
+								__( 'For ever', 'wp-photo-album-plus' ),
 								);
 		$values 	= array( 	'lastweek',
 								'thisweek',
@@ -148,7 +152,17 @@ class BestOfWidget extends WP_Widget {
 								'thismonth',
 								'lastyear',
 								'thisyear',
+								'forever',
 								);
+		$first_year = wppa_local_date( 'Y', wppa_get_var( "SELECT timestamp FROM $wpdb->wppa_comments ORDER BY timestamp LIMIT 1" ) );
+		$last_year  = wppa_local_date( 'Y' );
+
+		$y = $first_year;
+		while ( $y <= $last_year ) {
+			$options[] = $y;
+			$values[]  = $y;
+			$y++;
+		}
 
 		wppa_widget_selection( $this, 'period', $instance['period'], __( 'Limit to ratings given during', 'wp-photo-album-plus' ), $options, $values, array(), '' );
 
@@ -177,6 +191,9 @@ class BestOfWidget extends WP_Widget {
 
 		// Total value
 		wppa_widget_checkbox( $this, 'totvalue', $instance['totvalue'], __( 'Show the sum of all ratings', 'wp-photo-album-plus' ) );
+
+		// timestamp
+		wppa_widget_checkbox( $this, 'timestamp', $instance['timestamp'], __( 'Show date/time upload', 'wp-photo-album-plus' ) );
 
 		// Link to
 		$options 	= array( 	__( '--- none ---', 'wp-photo-album-plus' ),
@@ -221,6 +238,7 @@ class BestOfWidget extends WP_Widget {
 							'totvalue' 	=> '',
 							'logonly' 	=> 'no',
 							'cache' 	=> 0,
+							'timestamp' => 'no',
 							);
 		return $defaults;
 	}

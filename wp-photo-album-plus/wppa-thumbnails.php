@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.0.00.008
+* Version: 9.0.03.002
 *
 */
 
@@ -27,6 +27,7 @@ global $wpdb;
 	// Initialize
 	$result = '';
 	$mocc 	= wppa( 'mocc' );
+	$tmocc 	= wppa('targetmocc');
 
 	// Encrypted photo id
 	$xid 	= wppa_encrypt_photo( $id );
@@ -198,7 +199,7 @@ global $wpdb;
 																'photo' => $p ) );
 				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ),
 														   'photo' => $p ) );
-				$onclick = "wppaDoAjaxRender( $mocc, '$ajax_url', '$href_url' );return false;";
+				$onclick = "wppaDoAjaxRender(event, $tmocc, '$ajax_url', '$href_url' );return false;";
 
 				$result .= '
 				<a
@@ -1062,7 +1063,7 @@ function wppa_get_thumb_masonry( $id ) {
 				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ),
 														   'photo' => $p ) );
 
-				$onclick = 'wppaDoAjaxRender( ' . $mocc . ', \'' . $ajax_url . '\', \'' . $href_url . '\' ); return false;';
+				$onclick = 'wppaDoAjaxRender(event, ' . $tmocc . ', \'' . $ajax_url . '\', \'' . $href_url . '\' ); return false;';
 
 				$result .= '
 				<a

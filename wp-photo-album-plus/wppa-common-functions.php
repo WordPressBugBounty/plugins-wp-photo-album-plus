@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.0.00.000
+* Version: 9.0.03.003
 *
 */
 
@@ -265,6 +265,9 @@ global $wppa_current_shortcode_atts;
 		'container-wrapper-class' 	=> '',
 		'lbtimeout' 				=> '',
 		'lbstart'					=> '',
+		'targetmocc' 				=> false,
+		'rating_start' 				=> 0,
+		'rating_end'				=> 0,
 	);
 
 	if ( false && is_array( $wppa_runtime_settings ) ) {

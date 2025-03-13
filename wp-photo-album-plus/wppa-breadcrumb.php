@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.0.00.009
+* Version 9.0.03.002
 *
 */
 
@@ -601,14 +601,14 @@ static $post_type_value;
 					$href_url = wppa_get_album_url( array( 'album' => wppa( 'start_album' ),
 														   'type' => 'thumbs' ) );
 					$href_url = str_replace( 'cache=1', 'cache=0', $href_url );
-				//	$onclick = "wppaDoAjaxRender( " . wppa( 'mocc' ) . ", '" . $ajax_url . $s . "+wppaPageArg, '" . $href_url . $s . $pg . "', true )";
+				//	$onclick = "wppaDoAjaxRender(event, " . wppa( 'mocc' ) . ", '" . $ajax_url . $s . "+wppaPageArg, '" . $href_url . $s . $pg . "', true )";
 					$mocc = wppa( 'mocc' );
 
 					wppa_out( 	'<span' .
 									' title="' . __( 'Thumbnail view', 'wp-photo-album-plus' ) . '"' .
 									' class="wppa-nav-text"' .
 									' style="float:right; cursor:pointer"' .
-									' onclick="wppaDoAjaxRender('.wppa('mocc').', \''.$ajax_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.$href_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true)"' .
+									' onclick="wppaDoAjaxRender(event,'.wppa('mocc').', \''.$ajax_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.$href_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true)"' .
 									' >' .
 									wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, 10, 10, 10, 10 ) .
 								'</span>' );
@@ -674,7 +674,7 @@ global $wppa_lang;
 	if ( $href ) {
 		wppa_out( 	'<a' .
 						( $ajax ?
-						' onclick="wppaDoAjaxRender(' . wppa( 'mocc' ) . ', \'' . $ajax . '\', \'' . $href . '\' );"' :
+						' onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax . '\', \'' . $href . '\' );"' :
 						' href="' . $href . '"' ) .
 						' class="wppa-nav-text ' . $class . '"' .
 						' style="cursor:pointer"' .
