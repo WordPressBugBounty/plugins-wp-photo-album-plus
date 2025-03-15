@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version: 9.0.03.003
+* Version: 9.0.03.004
 *
 */
 
@@ -154,8 +154,10 @@ class BestOfWidget extends WP_Widget {
 								'thisyear',
 								'forever',
 								);
-		$first_year = wppa_local_date( 'Y', wppa_get_var( "SELECT timestamp FROM $wpdb->wppa_comments ORDER BY timestamp LIMIT 1" ) );
-		$last_year  = wppa_local_date( 'Y' );
+								
+		$first_rating 	= wppa_get_var( "SELECT timestamp FROM $wpdb->wppa_rating ORDER BY timestamp ASC LIMIT 1" );
+		$first_year 	= wppa_local_date( 'Y', $first_rating );
+		$last_year  	= wppa_local_date( 'Y' );
 
 		$y = $first_year;
 		while ( $y <= $last_year ) {

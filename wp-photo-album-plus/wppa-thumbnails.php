@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.0.03.002
+* Version: 9.0.03.004
 *
 */
 
@@ -897,10 +897,11 @@ function wppa_get_thumb_masonry( $id ) {
 		return;
 	}
 	$result = '';
-	$mocc = wppa( 'mocc' );
-	$plus = ( wppa_opt( 'thumbtype' ) == 'masonry-plus' );
-	$hor  = ( wppa_opt( 'thumbtype' ) == 'masonry-h' );
-	$vert = ( wppa_opt( 'thumbtype' ) == 'masonry-v' );
+	$mocc 	= wppa( 'mocc' );
+	$plus 	= ( wppa_opt( 'thumbtype' ) == 'masonry-plus' );
+	$hor  	= ( wppa_opt( 'thumbtype' ) == 'masonry-h' );
+	$vert 	= ( wppa_opt( 'thumbtype' ) == 'masonry-v' );
+	$tmocc 	= wppa('targetmocc');
 
 	// Encrypted photo id
 	$xid = wppa_encrypt_photo( $id );
@@ -1063,7 +1064,7 @@ function wppa_get_thumb_masonry( $id ) {
 				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ),
 														   'photo' => $p ) );
 
-				$onclick = 'wppaDoAjaxRender(event, ' . $tmocc . ', \'' . $ajax_url . '\', \'' . $href_url . '\' ); return false;';
+				$onclick = "wppaDoAjaxRender(event,$tmocc,'$ajax_url','$href_url'); return false;";
 
 				$result .= '
 				<a
