@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.03.003
+* Version: 9.0.04.007
 *
 */
 
@@ -1666,12 +1666,28 @@ function wppa_get_og_desc( $id, $short = false ) {
 // is_numeric('3.7') returns true
 // intval('3..7') == '3..7' returns true
 // is_int('3') returns false
+// strval(intval(975a599984b28471)) == strval(975a599984b28471) returns true in php 7 because it is hex
 // so we make it ourselves
 function wppa_is_int( $var ) {
 	if ( is_array( $var ) ) {
 		return false;
 	}
-	return ( strval(intval($var)) == strval($var) );
+	$num = ['0','1','2','3','4','5','6','7','8','9'];
+	$str = strval( $var );
+	if ( substr( $str, 0, 1 ) == '-' ) {
+		$str = substr( $str, 1 );
+	}
+	$len = strlen( $str );
+	if ( $len == 0 ) {
+		return false;
+	}
+	$i = 0;
+	while ( $i < $len ) {
+		$c = substr( $str, $i, 1 );
+		if ( ! in_array( $c, $num ) ) return false;
+		$i++;
+	}
+	return true;
 }
 
 function wppa_is_posint( $var ) {
@@ -1684,7 +1700,7 @@ function wppa_is_notnegint( $var ) {
 
 // return true if $var only contains digits and points
 function wppa_is_enum( $var ) {
-	return '' === str_replace( array( 0,1,'2','3','4','5','6','7','8','9','.' ), '', $var );
+	return '' === str_replace( array( '0','1','2','3','4','5','6','7','8','9','.' ), '', $var );
 }
 
 // Log a wppa message.
@@ -6126,28 +6142,77 @@ global $wpdb;
 }
 
 // Retaurn a vaild escaped complete html tag
-function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
+function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
-	$no_lazy = false;
-	if ( $tag == 'source' ) {
-		$no_lazy = true;
-	}
-	if ( isset( $attribs['alt'] ) ) {
-		$alt = $attribs['alt'];
-		if ( $alt == 'spin' ||
-			 $alt == __('Gold medal', 'wp-photo-album-plus') ||
-			 $alt == __('Silver medal', 'wp-photo-album-plus') ||
-			 $alt == __('Bronze medal', 'wp-photo-album-plus') ) {
-			$no_lazy = true;
+	// Init allowed attibutes
+	$defaults = ['id' 			=> '',
+				 'name' 		=> '',
+				 'title' 		=> '',
+				 'style'		=> '',
+				 'src' 	 		=> '',
+				 'href' 	 	=> '',
+				 'alt' 	 		=> '',
+				 'target' 	 	=> '',
+				 'class' 	 	=> '',
+				 'data-title' 	=> '',
+				 'data-day' 	=> '',
+				 'data-from' 	=> '',
+				 'type' 	 	=> '',
+				 'preload' 	 	=> '',
+				 'poster' 	 	=> '',
+				 'onload' 	 	=> '',
+				 'onerror' 	 	=> '',
+				 'onchange' 	=> '',
+				 'onclick' 	 	=> '',
+				 'ondblclick' 	=> '',
+				 'onmouseover' 	=> '',
+				 'onmouseout' 	=> '',
+				 'decoding' 	=> '',
+				 ];
+
+	// Completize attributes
+	$attribs = wp_parse_args( $xattribs, $defaults );
+
+	// Find if lazy when tag is img
+	if ( $tag == 'img' && wppa_lazy() ) {
+
+		// Assume true
+		$lazy = true;
+
+		// Check for exceptions
+		if ( $tag == 'source' ) {
+			$lazy = false;
+		}
+		if ( $attribs['alt'] ) {
+			$alt = $attribs['alt'];
+			if ( $alt == 'spin' ||
+				 $alt == __('Gold medal', 'wp-photo-album-plus') ||
+				 $alt == __('Silver medal', 'wp-photo-album-plus') ||
+				 $alt == __('Bronze medal', 'wp-photo-album-plus') ) {
+				$lazy = false;
+			}
+		}
+		if ( defined( 'DOING_CRON' ) ) { 									// Not on emails etc
+			$lazy = false;
 		}
 	}
-	if ( defined( 'DOING_CRON' ) ) { 									// Not on emails etc
-		$no_lazy = true;
+	else {
+		$lazy = false;
 	}
 
-	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio'] );
+	// If lazy, modify src into data-src, and add/completize onload event
+	if ( $lazy && $attribs['src'] ) {
+		$attribs['data-src'] 	= $attribs['src'];
+		$attribs['src'] 		= '';
+		$attribs['onload'] 		= 'wppaLazyLoading--;wppaMakeLazyVisible();' . $attribs['onload'];
+		$attribs['decoding'] 	= 'async';
+	}
 
+	// Find vaild tags
+	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio', 'form'] );
+
+	// Report invalid tag
 	if ( ! in_array( $tag, $allowed_tags ) ) {
 		wppa_log( 'err', "Unsupported tag {b}$tag{/b} in wppa_html_tag()" );
 		return '';
@@ -6155,8 +6220,8 @@ function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
 
 	$result = '<' . $tag;
 
-	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'data-title', 'data-day', 'data-from', 'type', 'preload', 'poster',
-					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'disabled', 'selected'];
+	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'data-title', 'data-day', 'data-from', 'data-src', 'type', 'preload', 'poster',
+					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'decoding', 'disabled', 'selected', 'autoplay', 'controls'];
 	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
 
 	foreach( array_keys( $attribs ) as $attr ) {
@@ -6165,28 +6230,38 @@ function wppa_html_tag( $tag, $attribs = [], $content = '' ) {
 		}
 		else {
 			switch ( $attr ) {
+
+				// Urls
 				case 'src':
-					if ( wppa_lazy() && ! $no_lazy ) {
-						$result .= ' data-src="' . esc_url( $attribs[$attr] ) . '" decoding="async"';
-					}
-					else {
-						$result .= ' src="' . esc_url( $attribs[$attr] ) . '"';
-					}
-					break;
+				case 'data-src':
 				case 'href':
 				case 'poster':
-					$result .= ' ' . $attr . '="' . esc_url( $attribs[$attr] ) . '"';
-					break;
-				default:
-					if ( ! $attribs[$attr] ) {
-						if ( in_array( $attr, $may_empty_attrs ) ) {
-							$result .= ' ' . $attr;
-						}
+					if ( $attribs[$attr] ) {
+						$result .= ' ' . $attr . '="' . esc_url( $attribs[$attr] ) . '"';
 					}
-					else {
+					break;
+
+				// May empty with value
+				case 'disabled':
+				case 'selected':
+				case 'autoplay':
+				case 'controls':
+					$result .= ' ' . $attr;
+					break;
+
+				// Normal attributes
+				default:
+					if ( $attribs[$attr] ) {
 						$result .= ' ' . $attr . '="' . esc_attr( $attribs[$attr] ) . '"';
 					}
 			}
+		}
+	}
+
+	// May empty without value
+	foreach( $may_empty_attrs as $attr ) {
+		if ( in_array( $attr, $xattribs ) ) {
+			$result .= ' ' . $attr;
 		}
 	}
 

@@ -4,7 +4,7 @@
 *
 * Contains dashboard widgets code
 *
-* Version 9.0.00.005
+* Version 9.0.04.003
 *
 */
 
@@ -207,26 +207,28 @@ function wppa_show_potd_log() {
 	if ( ! empty( $his ) ) {
 		wppa_echo( '<table>' );
 		foreach( $his as $item ) {
+			$id = $item['id'];
 			if ( wppa_photo_exists( $item['id'] ) ) {
-				$photo = wppa_cache_photo( $item['id'] );
+				$photo = wppa_cache_photo( $id );
 				$time  = $item['tm'];
 				if ( wppa_user_is_admin() ) {
 					$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . $photo['crypt'] . '&nonce=' . wp_create_nonce( 'wppa-nonce' );
 				}
 				else {
-					$href = wppa_get_photo_url( $photo['id'] );
+					$href = wppa_get_photo_url( $id );
 				}
 				wppa_echo( '
 				<tr style="border-bottom:1px solid #444">
 					<td>' .
 						wppa_html_tag( 'a', ['href' => $href, 'target' => "_blank"],
-							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "max-width:100px;"] ) ) . '
+							wppa_is_video( $id ) ? wppa_get_video_html( ['id' => $id, 'tagid' => 'video-'.$id, 'use_thumb' => true, 'controls' => false, 'style' => "max-width:100px;"] ) :
+							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ), 'style' => "max-width:100px;"] ) ) . '
 					</td>
 					<td>' .
 						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $time ) . '<br>' .
-						__( 'Name', 'wp-photo-album-plus' ) . ': ' . wppa_get_photo_name( $photo['id'] ) . '<br>' .
+						__( 'Name', 'wp-photo-album-plus' ) . ': ' . wppa_get_photo_name( $id ) . '<br>' .
 						__( 'Description', 'wp-photo-album-plus' ) . ':<br>' .
-						htmlspecialchars( wp_strip_all_tags( wppa_get_photo_desc( $photo['id'] ) ) ) . '
+						htmlspecialchars( wp_strip_all_tags( wppa_get_photo_desc( $id ) ) ) . '
 					</td>
 				</tr>' );
 			}
@@ -235,7 +237,7 @@ function wppa_show_potd_log() {
 				<tr style="border-bottom:1px solid #444">
 					<td>' .
 						/* translators: integer id */
-						sprintf( __( 'Photo %d has been removed', 'wp-photo-album-plus' ), $item['id'] ) . '
+						sprintf( __( 'Photo %d has been removed', 'wp-photo-album-plus' ), $id ) . '
 					</td>
 					<td>' .
 						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $item['tm'] ) . '<br>

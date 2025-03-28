@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '9.0.03.002';
+wppaJsUtilsVersion = '9.0.04.002';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -383,33 +383,47 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 	return result;
 }
 
-var wppaLazyDone = false;
-var wppaLazyTimer = 0;
 // Make lazy load images visible
-function wppaMakeLazyVisible(e) {
+var wppaLazyDone = false;
+var wppaLazyLoadMax = 5;
+var wppaLazyLoading = 0;
+var wppaLazyPotentialCount = 0
+var wppaLazyStartTime = 0;
+
+function wppaMakeLazyVisible(from) {
+
+//	if ( from ) wppaConsoleLog('Lazy called from '+from);
+
+	if ( wppaLazyStartTime == 0 ) wppaLazyStartTime = Date.now();
 
 	// Feature enabled?
 	if ( ! wppaLazyLoad ) return; // No, quit
 
-	clearTimeout(wppaLazyTimer);
-	wppaLazyTimer = setTimeout(function(){_wppaMakeLazyVisible();}, wppaScrollEndDelay);
-}
-function _wppaMakeLazyVisible() {
+	// Should we not? Moe than 5 togo and still busy? Quit
+	if ( wppaLazyPotentialCount > 5 && wppaLazyLoading > 0 ) {
+		return;
+	}
 
+	// Init
 	var start = Date.now();
 	var count = 0;
 	var src;
+
 
 	// Init masonryplus
 	wppaInitMasonryPlus();
 
 	// Find potential imgs
 	var potential = jQuery( "*[data-src]" );
+	wppaLazyPotentialCount = potential.length;
 
 	// Process them
 	if ( potential.length > 0 ) {
 
 		jQuery( potential ).each( function() {
+			if ( wppaLazyLoadMax && wppaLazyLoading >= wppaLazyLoadMax ) {
+				return;
+			}
 			src = jQuery(this).attr('data-src');
 			jQuery(this).attr('src', src);
 			jQuery(this).removeAttr('data-src');
@@ -417,11 +431,24 @@ function _wppaMakeLazyVisible() {
 			jQuery(this).parent().parent().css({'min-height':0});
 			count++;
 			wppaLazyDone = true;
+			if ( wppaLazyLoadMax ) {
+				wppaLazyLoading++;
+			}
 		});
+	}
+	else {
+		if ( wppaLazyStartTime > 0 ) {
+			wppaConsoleLog( 'Total lazy load elapsed time = ' + ( Date.now() - wppaLazyStartTime ) + ' msec inclusive loading images' );
+			wppaLazyStartTime = -1;
+		}
 	}
 
 	// If anything done...
 	if ( wppaLazyDone ) {
+
+		if ( count ) {
+//			console.log( 'wppaMakeLazyVisible processed ' + count + ' items in ' + ( Date.now() - start ) + ' milliseconds' );
+		}
 
 		// Init masonryplus
 		wppaInitMasonryPlus();
@@ -429,16 +456,11 @@ function _wppaMakeLazyVisible() {
 		// Resize nicescroller
 		wppaResizeNice('wppaMakeLazyVisible');
 
+		// Do autocols
 		wppaDoAllAutocols();
-	}
 
-	wppaLazyDone = false;
-
-	if (count) {
-		console.log( 'wppaMakeLazyVisible processed ' + count + ' items in ' + ( Date.now() - start ) + ' milliseconds' );
-	}
-	else {
-//		console.log( 'wppaMakeLazyVisible() ended after ' + ( Date.now() - start ) + ' milliseconds' );
+		// Reset
+		wppaLazyDone = false;
 	}
 }
 
@@ -732,3 +754,4 @@ function wppaGetTinyMceContent( longId ) {
 function wppaStopProp(event) {
 	event.stopPropagation();
 }
+

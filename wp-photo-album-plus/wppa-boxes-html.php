@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.0.03.003
+* Version 9.0.04.002
 *
 */
 
@@ -34,10 +34,8 @@ function wppa_thumb_area( $action ) {
 			<div
 				id="wppa-thumb-area-' . $mocc . '"
 				class="wppa-box wppa-thumb-area wppa-thumb-area-' . $mocc . ( $modal ? ' wppa-modal' : '' ) . ( $nice ? ' wppa-nicescroll' : '' ) .'"
-				style="' . ( $maxh > 1 ? 'max-height:' . $maxh . 'px;' : '' ) . '
-						overflow:' . $overflow . ';"
-				onscroll="wppaMakeLazyVisible(\'scroll thumbarea\');"
-				>';
+				style="' . ( $maxh > 1 ? 'max-height:' . $maxh . 'px;' : '' ) . ' overflow:' . $overflow . ';"
+			>';
 
 			if ( wppa_is_int( wppa( 'start_album' ) ) ) {
 				wppa_bump_viewcount( 'album', wppa( 'start_album') );

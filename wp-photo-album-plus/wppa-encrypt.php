@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 9.0.00.000
+* Version 9.0.04.007
 *
 */
 
@@ -85,6 +85,10 @@ static $hits;
 	// Single item
 	else {
 
+		if ( wppa_is_int( $photo ) ) {
+			return $photo; // Already encrypted
+		}
+
 		// Init cache
 		if ( ! $cache ) {
 			$cache = array();
@@ -133,30 +137,32 @@ function wppa_encrypt_album( $album ) {
 			$id= '999999';
 		}
 
-		switch ( $id ) {
-			case '-3':
-				$crypt = wppa_get_option( 'wppa_album_crypt_3', false );
-				break;
-			case '-2':
-				$crypt = wppa_get_option( 'wppa_album_crypt_2', false );
-				break;
-			case '-1':
-				$crypt = wppa_get_option( 'wppa_album_crypt_1', false );
-				break;
-			case '':
-			case 0:
-				$crypt = wppa_get_option( 'wppa_album_crypt_0', false );
-				break;
-			case '999999':
-				$crypt = wppa_get_option( 'wppa_album_crypt_9', false );
-				break;
-			default:
-				if ( wppa_is_posint( $id ) ) {
+		// Check for already encrypted
+		if ( strlen( $id ) == 16 ) {
+			$crypt = $id;
+		}
+		else {
+			switch ( $id ) {
+				case '-3':
+					$crypt = wppa_get_option( 'wppa_album_crypt_3', false );
+					break;
+				case '-2':
+					$crypt = wppa_get_option( 'wppa_album_crypt_2', false );
+					break;
+				case '-1':
+					$crypt = wppa_get_option( 'wppa_album_crypt_1', false );
+					break;
+				case '':
+				case 0:
+					$crypt = wppa_get_option( 'wppa_album_crypt_0', false );
+					break;
+				case '999999':
+					$crypt = wppa_get_option( 'wppa_album_crypt_9', false );
+					break;
+				default:
 					$crypt = wppa_get_album_item( $id, 'crypt' );
-				}
-				else {
-					$crypt = $id; 	// Already encrypted
-				}
+					break;
+			}
 		}
 		$album_crypts[$i] = $crypt;
 		$i++;
@@ -372,7 +378,6 @@ global $wppa_opt;
 			$key = substr( $t, 0, strpos( $t, '=' ) );
 			$val = substr( $t, strpos( $t, '=' ) + 1 );
 			$wppa_opt[$key] = $val;
-//			wppa_log( 'misc', 'wppa_set item = ' . $key . ', value = ' . $val );
 		}
 	}
 }

@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.0.00.010
+* Version: 9.0.04.007
 *
 */
 
@@ -169,18 +169,27 @@ global $wppa_session;
 	// Feature enabled?
 	if ( ! wppa_switch( 'track_viewcounts') ) return;
 
-//	wppa_log( 'dbg', "Trying to bump viewcount type for $type number $id" );
-
 	// Validate args
-	if ( ! wppa_is_int( $id ) ) {
-		wppa_log( 'err', 'Non numeric id: ' . $id . ' of type ' . $type . ' found in wppa_bump_viewcount()' );
-		return;
-	}
 	if ( ! in_array( $type, array( 'album', 'photo' ) ) ) {
 		wppa_log( 'err', 'Unimplemented type: ' . $type . ' with id ' . $id . ' found in wppa_bump_viewcount()' );
 		return;
 	}
-	if ( $id == 0 ) return; // Vieuwcount of all albums is meaningless
+
+	// Is id encrypted?
+	if ( ! wppa_is_int( $id ) ) {
+		if ( $type == 'album' ) {
+			$id = wppa_decrypt_album( $id );
+		}
+		else {
+			$id = wppa_decrypt_photo( $id );
+		}
+	}
+
+	// Valid number?
+	if ( ! wppa_is_posint( $id ) ) {
+		wppa_log( 'err', 'Non numeric id: ' . $id . ' of type ' . $type . ' found in wppa_bump_viewcount()' );
+		return;
+	}
 
 	// Init session for this if not yet done
 	if ( ! isset( $wppa_session[$type] ) ) {

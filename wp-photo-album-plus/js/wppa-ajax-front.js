@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.0.03.002';
+var wppaJsAjaxVersion = '9.0.04.002';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -39,8 +39,8 @@ function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
 
 
 										if ( typeof( xresult ) == 'string' && xresult.substr( 0, 1 ) != '{' ) {
-							//				wppaConsoleLog( 'Ajax render result starts with ' + xresult.substr(0,500), 'force');
-											if ( xresult.substr( 0, 8 ) == '<!DOCTYPE' || xresult.substr( 0, 5 ) == '<html' ) {
+							//				console.log( 'Ajax render result starts with ' + xresult.substr(0,9) );
+											if ( xresult.substr( 0, 9 ) == '<!DOCTYPE' || xresult.substr( 0, 5 ) == '<html' ) {
 												if ( newurl.length > 0 ) {
 													document.location.href = newurl;
 												}
@@ -211,6 +211,9 @@ function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
 
 										// Hide rightclick optionally
 										wppaProtect();
+
+										// Init Lazy
+										wppaLazyStartTime = 0;
 									}
 					} );
 	}

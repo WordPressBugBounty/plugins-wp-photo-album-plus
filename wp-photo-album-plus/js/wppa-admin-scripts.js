@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 8.8.05.003
+/* Version 9.0.04.002
 /* Various js routines used in admin pages
 */
 
@@ -2025,7 +2025,10 @@ function wppaAjaxReplaceLog() {
 									result = wppaEntityDecode(result);
 									jQuery( "#wppa-logbody" ).html( result.substr( 1 ));
 									jQuery( "#wppa-spinner" ).hide();
-								}
+								},
+					error:		function( xhr, status, error ) {
+									wppaConsoleLog( 'wppaAjaxReplaceLog failed. Error = ' + error + ', status = ' + status );
+								},
 	});
 }
 

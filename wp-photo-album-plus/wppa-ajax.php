@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.00.000
+* Version: 9.0.04.000
 *
 */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 function wppa_ajax_include() {
 global $wp_query;
 
-	if ( $wp_query->get( 'wppa_ajax' ) === 1 ) {
+	if ( $wp_query->get( 'wppa_ajax' ) === '1' ) {
 		include_once ABSPATH . '/wp-admin/admin-ajax.php';
 		exit;
 	}

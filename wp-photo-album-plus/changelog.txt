@@ -1,5 +1,13 @@
 WP Photo Album Plus Changelog
 
+= 9.0.04 =
+
+* Ajax method 'by redirection' did not work since version 9.0.00.004. Fixed.
+* Improved lazy load handling.
+* Fixed the pagelinks when the display is invoked with a different mocc as the initiator.
+* Dashboard widget 'photo of the day hsitory' now also displays videos correctly.
+* Fixed a spurious error where an album cryptic code was accidently equal to a hexadecimal number.
+
 = 9.0.03 =
 
 * Fixed a possible warning in photo admin related to custom data.

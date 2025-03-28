@@ -1712,12 +1712,9 @@ function wppa_get_album_title_attr_a( $albumid, $linktype, $linkpage, $has_conte
 			case 'content':
 			case 'thumbs':
 			case 'albums':
-				$href_title = wppa_get_album_url( array( 'album' => $albumid,
-														 'page' => $linkpage,
-														 'type' => $linktype ) );
-				$ajax_title = wppa_get_album_url_ajax( array( 'album' => $albumid,
-															  'page' => $linkpage,
-															  'type' => $linktype ) );
+				$args = array( 'album' => $albumid, 'page' => $linkpage, 'type' => $linktype );
+				$href_title = wppa_get_album_url( $args );
+				$ajax_title = wppa_get_album_url_ajax( $args );
 
 				$onclick_title = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_title . "', '" . $href_title . "' )";
 				$href_title = "#";

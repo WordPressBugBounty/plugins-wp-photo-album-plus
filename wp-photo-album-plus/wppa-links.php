@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.0.03.002
+* Version: 9.0.04.007
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -164,7 +164,7 @@ global $wppa_url_set_extension;
 		$occ =  wppa( 'targetmocc' );
 	}
 	else {
-		$occ = wppa_get( 'occur' ) + $deltamoccur;
+		$occ = wppa( 'targetmocc' ) + $deltamoccur;
 	}
 	if ( wppa( 'ajax' ) ) {
 		if ( wppa_get( 'size' ) ) $al .= '&amp;wppa-size=' . wppa_get( 'size' );
@@ -271,7 +271,7 @@ function wppa_get_image_url_ajax_by_id( $id ) {
 
 	$thumb = wppa_cache_photo( $id );
 
-	$result = wppa_get_ajaxlink().'wppa-album='.$thumb['album'].'&amp;wppa-photo='.$thumb['id'].'&amp;wppa-cover=0&amp;wppa-occur='.wppa('mocc');
+	$result = wppa_get_ajaxlink().'wppa-album='.$thumb['album'].'&amp;wppa-photo='.$thumb['id'].'&amp;wppa-cover=0&amp;wppa-occur='.wppa('targetmocc');
 
 	return wppa_encrypt_url( $result );
 }
@@ -282,12 +282,12 @@ function wppa_get_album_url( $args ) { //$id, $pag = '', $type = 'content', $occ
 	$defaults = array( 'album' => '',
 					   'page' => '',
 					   'type' => 'content',
-					   'mocc' => wppa( 'mocc' ),
+					   'mocc' => wppa( 'targetmocc' ),
 					   );
 	$args = wppa_parse_args( $args, $defaults );
 
 	if ( $args['album'] ) {
-		$link = wppa_get_permalink( $args['page'] ) . 'wppa-album=' . $args['album'] . '&amp;wppa-cover=0&amp;wppa-occur=' . $args['mocc'];
+		$link = wppa_get_permalink( $args['page'] ) . 'wppa-album=' . $args['album'] . '&amp;wppa-cover=0&amp;wppa-occur=' . $args['mocc'] . '&amp;data-alb=' . $args['album'];
 		if ( $args['type'] == 'thumbs' ) {
 			$link .= '&amp;wppa-photos-only=1';
 		}
@@ -305,12 +305,12 @@ function wppa_get_album_url_ajax( $args ) { //$id, $pag = '', $type = 'content' 
 	$defaults = array( 'album' => '',
 					   'page' => '',
 					   'type' => 'content',
-					   'mocc' => wppa( 'mocc' ),
+					   'mocc' => wppa( 'targetmocc' ),
 					   );
 	$args = wppa_parse_args( $args, $defaults );
 
 	if ( $args['album'] ) {
-		$link = wppa_get_ajaxlink( $args['page'] ) . 'wppa-album=' . $args['album'] . '&amp;wppa-cover=0&amp;wppa-occur=' . $args['mocc'];
+		$link = wppa_get_ajaxlink( $args['page'] ) . 'wppa-album=' . $args['album'] . '&amp;wppa-cover=0&amp;wppa-occur=' . $args['mocc'] . '&amp;data-alb=' . $args['album'];
 		if ( $args['type'] == 'thumbs' ) {
 			$link .= '&amp;wppa-photos-only=1';
 		}
@@ -329,7 +329,7 @@ function wppa_get_slideshow_url( $args ) {
 		'album' => '',
 		'page' => '',
 		'photo' => '',
-		'mocc' => wppa( 'mocc' ),
+		'mocc' => wppa( 'targetmocc' ),
 	);
 	$args = wppa_parse_args( $args, $defaults );
 
@@ -356,7 +356,7 @@ function wppa_get_slideshow_url_ajax( $args ) {
 	$defaults = array( 'album' => '',
 					   'page' => '',
 					   'photo' => '',
-					   'mocc' => wppa( 'mocc' ),
+					   'mocc' => wppa( 'targetmocc' ),
 	);
 	$args = wppa_parse_args( $args, $defaults );
 
@@ -969,7 +969,7 @@ global $previous_page_last_id;
 
 	// occur
 	$occur = wppa_get('occur');
-	$ref_occur = wppa( 'mocc' );
+	$ref_occur = wppa( 'targetmocc' );
 
 	// album
 	if ( ( $occur == $ref_occur || wppa( 'ajax' ) ) && wppa_get('album') ) {
@@ -998,7 +998,7 @@ global $previous_page_last_id;
 
 	// occur
 	if ( ! wppa( 'ajax' ) ) {
-		$occur = wppa( 'mocc' );
+		$occur = wppa( 'targetmocc' );
 		$extra_url .= '&amp;wppa-occur=' . $occur;
 	}
 	else {
@@ -1098,7 +1098,7 @@ global $previous_page_last_id;
 				<a' .
 					' style="cursor:pointer"' .
 					' title="' . esc_attr( __( 'Previous page', 'wp-photo-album-plus' ) ) . '"' .
-					' onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage - 1 ) . '\', \'' . wppa_convert_to_pretty ( $link_url . '&amp;wppa-paged=' . ( $curpage - 1 ) ) . '\' )"' .
+					' onclick="wppaDoAjaxRender(event, ' . wppa( 'targetmocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage - 1 ) . '\', \'' . wppa_convert_to_pretty ( $link_url . '&amp;wppa-paged=' . ( $curpage - 1 ) ) . '\' )"' .
 					' >' .
 					wppa_get_svghtml( 'Prev-Button', $iconsize ) .
 				'</a>
@@ -1113,7 +1113,7 @@ global $previous_page_last_id;
 					' id="wppa-next-pagelink-' . $mocc . '"' .
 					' style="cursor:pointer"' .
 					' title="' . esc_attr( __( 'Next page', 'wp-photo-album-plus' ) ) . '"' .
-					' onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage + 1 ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage + 1 ) ) . '\')"' .
+					' onclick="wppaDoAjaxRender(event, ' . wppa( 'targetmocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage + 1 ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage + 1 ) ) . '\')"' .
 					' >' .
 					wppa_get_svghtml( 'Next-Button', $iconsize ) .
 				'</a>
