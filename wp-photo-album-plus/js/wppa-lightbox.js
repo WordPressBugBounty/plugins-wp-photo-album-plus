@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '9.0.00.004';
+var wppaJsLightboxVersion = '9.0.05.004';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -86,10 +86,12 @@ function wppaOvlKeyboardHandler( e ) {
 // 'this' for a single image or for the first of a set
 function wppaOvlShow( arg ) {
 
-	// To avoid conflicts with slideshows, pause them all
+	// To avoid conflicts with slideshows, pause them all and stop media execution
 	var i;
 	for ( i=0; i<wppaSlidePause.length; i++ ) {
 		wppaSlidePause[i]=true;
+		wppaStopVideo(i);
+		wppaStopAudio(i);
 	}
 	var panData;
 	var dotPos;
@@ -370,7 +372,7 @@ function _wppaOvlShow( idx ) {
 					' ontouchmove="wppaTouchMove( event );"' +
 					' ontouchcancel="wppaTouchCancel( event );"' +
 					' onclick="wppaOvlImgClick( event );"' +
-					' onpause="wppaOvlVideoPlaying = false;"' +
+					' onpause="wppaOvlVideoPlaying = false;'+( wppaOvlVideoPauseStop ? 'wppaOvlStop();' : '' )+'"' +
 					' onplay="wppaOvlVideoPlaying = true;"' +
 					' style="border:none; width:'+screen.width+'px; box-shadow:none; position:absolute;"' +
 					' alt="'+wppaOvlAlts[idx]+'"' +
@@ -527,7 +529,7 @@ function _wppaOvlShow( idx ) {
 							' onmouseout="jQuery(\'.wppa-ovl-nav-btn\').stop().fadeTo(200,0);"' +
 							' preload="metadata"' +
 							( wppaOvlVideoStart ? ' autoplay' : '' ) +
-							' onpause="wppaOvlVideoPlaying = false;"' +
+							' onpause="wppaOvlVideoPlaying = false;'+( wppaOvlVideoPauseStop ? 'wppaOvlStop();' : '' )+'"' +
 							' onplay="wppaOvlVideoPlaying = true;"' +
 							' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
 							' ontouchend="wppaTouchEnd( event );"' +
@@ -893,6 +895,12 @@ function wppaOvlFormatFull() {
 	var img;
 	var natWidth;
 	var natHeight;
+	var screenheight = screen.height;
+
+	// If video, fake a smaller screen height to allow for video control bar above lb control bar
+	if ( wppaOvlIsVideo ) {
+		screenheight -= wppaOvlNavIconSize;
+	}
 
 	// Find the natural image sizes
 	if ( wppaOvlIsVideo ) {
@@ -903,7 +911,7 @@ function wppaOvlFormatFull() {
 	else if ( wppaOvlIsPdf  ) {
 		img 		= document.getElementById( 'wppa-overlay-img' );
 		natWidth 	= screen.width;
-		natHeight 	= screen.height;
+		natHeight 	= screenheight;
 	}
 	else {
 		img 		= document.getElementById( 'wppa-overlay-img' );
@@ -917,7 +925,7 @@ function wppaOvlFormatFull() {
 	 	natHeight 	= img.naturalHeight;
 	}
 
-	var screenRatio = screen.width / screen.height;
+	var screenRatio = screen.width / screenheight;
 	var imageRatio 	= natWidth / natHeight;
 	var margLeft 	= 0;
 	var margTop 	= 0;
@@ -928,14 +936,14 @@ function wppaOvlFormatFull() {
 	var Overflow 	= 'hidden';
 
 	if ( screenRatio > imageRatio ) {	// Picture is more portrait
-		margLeft 	= ( screen.width - screen.height * imageRatio ) / 2;
+		margLeft 	= ( screen.width - screenheight * imageRatio ) / 2;
 		margTop 	= 0;
-		imgHeight 	= screen.height;
-		imgWidth 	= screen.height * imageRatio;
+		imgHeight 	= screenheight;
+		imgWidth 	= screenheight * imageRatio;
 	}
 	else {
 		margLeft 	= 0;
-		margTop 	= ( screen.height - screen.width / imageRatio ) / 2;
+		margTop 	= ( screenheight - screen.width / imageRatio ) / 2;
 		imgHeight 	= screen.width / imageRatio;
 		imgWidth 	= screen.width;
 	}
@@ -1016,6 +1024,13 @@ function wppaOvlStartStop() {
 			jQuery( '#wppa-ovl-stop-btn' ).show();
 			jQuery( '#wppa-ovl-start-btn' ).hide();
 		}
+	}
+}
+
+// Sop show
+function wppaOvlStop() {
+	if ( wppaOvlRunning ) {
+		wppaOvlStartStop();
 	}
 }
 

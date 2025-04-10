@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '9.0.04.002';
+wppaJsUtilsVersion = '9.0.05.002';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -385,70 +385,107 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 
 // Make lazy load images visible
 var wppaLazyDone = false;
-var wppaLazyLoadMax = 5;
-var wppaLazyLoading = 0;
-var wppaLazyPotentialCount = 0
+var wppaLazyLoaded = 0;
+var wppaLazyRequested = 0;
 var wppaLazyStartTime = 0;
+var wppaLazyTimer;
+var wppaLazyBusy = false;
+var wppaLazyProcTime = 0;
 
 function wppaMakeLazyVisible(from) {
 
-//	if ( from ) wppaConsoleLog('Lazy called from '+from);
+	wppaLazyProcTime -= Date.now();
 
-	if ( wppaLazyStartTime == 0 ) wppaLazyStartTime = Date.now();
+//	wppaConsoleLog('wppaMakeLazyVisible() called from '+from);
 
 	// Feature enabled?
-	if ( ! wppaLazyLoad ) return; // No, quit
+	if ( ! wppaLazyLoad ) {
+		wppaLazyProcTime += Date.now();
+		return; // No, quit
+	}
 
-	// Should we not? Moe than 5 togo and still busy? Quit
-	if ( wppaLazyPotentialCount > 5 && wppaLazyLoading > 0 ) {
+	if ( from == 'scroll' ) {
+		clearTimeout(wppaLazyTimer);
+		wppaLazyTimer = setTimeout( wppaMakeLazyVisible, wppaScrollEndDelay, 'delayed' );
+		wppaLazyBusy = true;
+		wppaLazyProcTime += Date.now();
 		return;
 	}
 
+	if ( from == 'resize' ) {
+		clearTimeout(wppaLazyTimer);
+		wppaLazyTimer = setTimeout( wppaMakeLazyVisible, wppaResizeEndDelay, 'delayed' );
+		wppaLazyBusy = true;
+		wppaLazyProcTime += Date.now();
+		return;
+	}
+
+	if ( from == 'DOM' ) {
+		clearTimeout(wppaLazyTimer);
+		wppaLazyTimer = setTimeout( wppaMakeLazyVisible, 100, 'delayed' );
+		wppaLazyBusy = true;
+		wppaLazyProcTime += Date.now();
+		return;
+	}
+
+	// wait for zero connections
+	if ( wppaLazyRequested != wppaLazyLoaded ) {
+		wppaLazyProcTime += Date.now();
+		return;
+	}
+
+	if ( from == 'delayed' ) wppaLazyBusy = false;
+
+	if ( wppaLazyBusy ) {
+		wppaLazyProcTime += Date.now();
+		return;
+	}
+	wppaLazyBusy = true;
+
+	if ( wppaLazyStartTime == 0 ) wppaLazyStartTime = Date.now();
+
 	// Init
 	var start = Date.now();
-	var count = 0;
 	var src;
-
 
 	// Init masonryplus
 	wppaInitMasonryPlus();
 
 	// Find potential imgs
 	var potential = jQuery( "*[data-src]" );
-	wppaLazyPotentialCount = potential.length;
+	var todo = [];
+	var i = 0;
+	while (i<potential.length) {
+		if (wppaIsElementInViewport(potential[i])) {
+			todo[i] = potential[i];
+		}
+		i++;
+	}
+
+//	wppaConsoleLog('lazy potential: '+potential.length+', todo: '+todo.length);
 
 	// Process them
-	if ( potential.length > 0 ) {
-
-		jQuery( potential ).each( function() {
-			if ( wppaLazyLoadMax && wppaLazyLoading >= wppaLazyLoadMax ) {
-				return;
-			}
-			src = jQuery(this).attr('data-src');
-			jQuery(this).attr('src', src);
-			jQuery(this).removeAttr('data-src');
-			jQuery(this).parent().css({'min-height':0});
-			jQuery(this).parent().parent().css({'min-height':0});
-			count++;
-			wppaLazyDone = true;
-			if ( wppaLazyLoadMax ) {
-				wppaLazyLoading++;
+	if ( todo.length > 0 ) {
+		jQuery( todo ).each( function() {
+			if ( wppaLazyRequested < 5+wppaLazyLoaded ) {
+				src = jQuery(this).attr('data-src');
+				if (src) {
+					jQuery(this).attr('src', src);
+					jQuery(this).removeAttr('data-src');
+					jQuery(this).parent().css({'min-height':0});
+					jQuery(this).parent().parent().css({'min-height':0});
+					wppaLazyRequested++;
+					wppaLazyDone = true;
+				}
 			}
 		});
 	}
 	else {
-		if ( wppaLazyStartTime > 0 ) {
-			wppaConsoleLog( 'Total lazy load elapsed time = ' + ( Date.now() - wppaLazyStartTime ) + ' msec inclusive loading images' );
-			wppaLazyStartTime = -1;
-		}
+//		wppaLazyStartTime = 0;
 	}
 
 	// If anything done...
 	if ( wppaLazyDone ) {
-
-		if ( count ) {
-//			console.log( 'wppaMakeLazyVisible processed ' + count + ' items in ' + ( Date.now() - start ) + ' milliseconds' );
-		}
 
 		// Init masonryplus
 		wppaInitMasonryPlus();
@@ -459,8 +496,16 @@ function wppaMakeLazyVisible(from) {
 		// Do autocols
 		wppaDoAllAutocols();
 
-		// Reset
-		wppaLazyDone = false;
+	}
+	// Reset
+	wppaLazyDone = false;
+	wppaLazyBusy = false;
+	wppaLazyProcTime += Date.now();
+
+	if ( potential.length == 0 && wppaLazyStartTime > 0 ) {
+		wppaConsoleLog('Lazy total proc time: '+ wppaLazyProcTime +' msec');
+//		wppaConsoleLog('Lazy total elapsed time: '+ (Date.now() - wppaLazyStartTime));
+		wppaLazyStartTime = -1;
 	}
 }
 
@@ -478,7 +523,7 @@ function wppaIsElementInViewport( elm ) {
 	while ( e[0] && e[0].nodeName != "BODY" ) {
 
 		if ( jQuery( e[0] ).css("display") == "none" ) {
-			return false;
+			return false; // may be filmstrip image for canvas
 		}
 		var vis = jQuery( e[0] ).css("visibility");
 		if ( vis == "hidden" || vis == "collapse" ) {
@@ -542,6 +587,9 @@ function wppaSizeArea() {
 
 	// Nice scroller
 	wppaResizeNice('wppaSizeArea');
+
+	// Lazy loader
+	wppaMakeLazyVisible('sizearea');
 
 }
 

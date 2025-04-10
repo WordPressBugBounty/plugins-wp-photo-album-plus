@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.0.00.009
+* Version: 9.0.05.004
 *
 */
 
@@ -3317,6 +3317,13 @@ global $wppa_hide_this;
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '14', $name, $desc, $html, $help);
 
+						$name = __('Stop running on video pause', 'wp-photo-album-plus');
+						$desc = __('Stop a running show when the video is paused', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_video_pause_stop_ss';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '15', $name, $desc, $html, $help, wppa_switch('enable_video'));
+
 						wppa_setting_box_footer_new();
 					}
 					// Filmstrip setings
@@ -3712,6 +3719,12 @@ global $wppa_hide_this;
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '30', $name, $desc, $html, $help, wppa_switch( 'ovl_big_browse' ));
 
+						$name = __('Stop running on video pause', 'wp-photo-album-plus');
+						$desc = __('Stop a running show when the video is paused', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_video_pause_stop_lb';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '31', $name, $desc, $html, $help, wppa_switch('enable_video'));
 
 						wppa_setting_box_footer_new();
 					}

@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.0.04.007
+* Version: 9.0.05.005
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -1801,6 +1801,7 @@ global $wpdb;
 					}
 					break;
 			}
+			$result['url'] .= '&amp;slide=1';
 			if ( wppa( 'is_potdhis' ) ) {
 				$result['url'] .= '&wppa-potdhis=1';
 			}

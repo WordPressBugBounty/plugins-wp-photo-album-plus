@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '9.0.04.002';
+var wppaJsSlideshowVersion = '9.0.05.004';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -130,7 +130,7 @@ function wppaStoreSlideInfo(
 	// Fill _wppaSlides[mocc][id]
 	if ( _wppaIsVideo[mocc][id] ) {
 		_wppaSlides[mocc][id] = ' alt="' + imagealt + '" class="theimg theimg-'+mocc+' big" ';
-		if ( wppaSlideVideoStart && wppaLightBox[mocc] == '' ) {
+		if ( wppaSlideVideoStart ) { // && wppaLightBox[mocc] == '' ) {
 			_wppaSlides[mocc][id] += ' autoplay ';
 		}
 		if ( posterurl.length > 0 ) {
@@ -139,7 +139,7 @@ function wppaStoreSlideInfo(
 	}
 	else if ( _wppaIsAudio[mocc][id] ) {
 		_wppaSlides[mocc][id] = ' alt="' + imagealt + '" class="theimg theimg-'+mocc+' big" ';
-		if ( wppaSlideAudioStart && wppaLightBox[mocc] == '' ) {
+		if ( wppaSlideAudioStart ) { // && wppaLightBox[mocc] == '' ) {
 			_wppaSlides[mocc][id] += ' autoplay ';
 		}
 		_wppaSlides[mocc][id] = ' src="' + url + '" alt="' + imagealt + '" class="theimg theimg-'+mocc+' big stereo" ';
@@ -161,7 +161,7 @@ function wppaStoreSlideInfo(
 	if ( _wppaIsVideo[mocc][id] ) {
 		var controls;
 		controls = 'wppa' == wppaLightBox[mocc] ? '' : 'controls';
-		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none;" '+controls+' preload="metadata">'+videohtml+'</video>';
+		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none;" '+controls+' >'+videohtml+'</video>';
 	}
 	else {
 		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none; vertical-align:middle;">';
@@ -404,9 +404,9 @@ function _wppaNextSlide( mocc, mode ) {
 
 	var isFilmOnly = ! document.getElementById( 'slide_frame-'+mocc );
 
-	// If not in viewport, try again later
+	// If not in viewport or media running try again later
 //	/*
-	if ( wppaLazyLoad && ! isFilmOnly && ! wppaIsSlidshowVisible( mocc ) ) {
+	if ( wppaLazyLoad && ! isFilmOnly && ! wppaIsSlidshowVisible( mocc ) || wppaVideoPlaying[mocc] || wppaAudioPlaying[mocc] ) {
 
 		// Fake not inited to cause jump to loc the first time
 		wppaFilmInit[mocc] = false;
@@ -645,7 +645,7 @@ function _wppaNextSlide( mocc, mode ) {
 		wppaMakeTheSlideHtml( mocc, bg, _wppaNxtIdx[mocc] );
     }
 
-	_wppaFirst[mocc] = false;
+//	_wppaFirst[mocc] = false;
 
 	// Give free for a while to enable rendering of what we have done so far
 	setTimeout( '_wppaNextSlide_2( ' + mocc + ' )', 10 );	// to be continued after 10 ms
@@ -666,8 +666,24 @@ function _wppaNextSlide_2( mocc ) {
 					return;
 				}
 			}
+			else if ( 'VIDEO' == elm.nodeName ) {
+
+				if ( elm.readyState < 4 ) {
+					setTimeout( '_wppaNextSlide_2( ' + mocc + ' )', 200 );	// Try again after 200 ms
+					return;
+				}
+				else {
+					if ( _wppaFirst[mocc] ) {
+						jQuery( elm ).css({display:''});
+						if ( wppaSlideVideoStart ) {
+							elm.play();
+						}
+					}
+				}
+			}
 		}
 	}
+	_wppaFirst[mocc] = false;
 
 	// Update lightbox
 	wppaUpdateLightboxes();
@@ -1238,13 +1254,15 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 	var url;
 	var theTitle = 'title';
 	if ( wppaLightBox[mocc] == 'wppa') theTitle = 'data-lbtitle';
-	var mmEvents = wppaLightBox[mocc] == '' ? ' onpause="wppaVideoPlaying['+mocc+'] = false;" onplay="wppaVideoPlaying['+mocc+'] = true;"' : '';
+	var mmEvents = ' onpause="wppaVideoPlaying['+mocc+'] = false;'+
+		( wppaSlideVideoPauseStop ? '_wppaStop('+mocc+');': '' ) +
+		'" onplay="wppaVideoPlaying['+mocc+'] = true;"';
 	var hrUrl;
 	var isPdf;
 	var isPanorama = ( _wppaPanoramaHtml[mocc][idx].length > 0 );
 	wppaHasControlbar = isPanorama;
 
-	// Stop possible zooom/pano image
+//	Stop possible zooom/pano image
 	jQuery("body").trigger("quitimage",[mocc]);
 
 	// No links on panos, so quickly done
@@ -1529,7 +1547,7 @@ function _wppaAdjustFilmstrip( mocc, easing ) {
 	}
 
 	// Make lazy filmthumbs visible
-//	wppaMakeLazyVisible('adjust filmstrip');
+	wppaMakeLazyVisible('filmstrip');
 
 	// Fix titles
 	if ( ! isFilmOnly && _wppaCurIdx[mocc] != -1 ) {
@@ -2436,6 +2454,6 @@ function wppaFilmThumbToCanvas(imgId) {
 		ctx.drawImage( imgElm, 0, fromY, sourceWidth, fromHeight, 0, 0, canvasWidth, canvasHeight );
 	}
 
-	if ( imgElm.pause ) imgElm.pause();
+//	if ( imgElm.pause ) imgElm.pause();
 	return;
 }

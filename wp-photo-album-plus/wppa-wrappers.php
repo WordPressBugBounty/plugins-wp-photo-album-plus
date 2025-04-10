@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.0.00.000
+* Version 9.0.05.005
 *
 */
 
@@ -784,7 +784,7 @@ function wppa_echo( $html, $flags = array() ) {
 	}
 }
 
-function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => false, 'needjs' => false, 'needonerror' => false] ) {
+function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => false, 'needjs' => false] ) { //, 'needonerror' => false] ) {
 static $allowed_tags;
 
 	if ( ! is_array( $allowed_tags ) ) {
@@ -862,7 +862,7 @@ static $allowed_tags;
 				'placeholder' => true,
 				'srcset' => true,
 				'onload' => true,
-				'onerror' => ( $flags['needonerror'] ? true : false ),
+				'onerror' => true,
 				'decoding' => true,
 				) ),
 			'input' => array_merge( $sa, array(

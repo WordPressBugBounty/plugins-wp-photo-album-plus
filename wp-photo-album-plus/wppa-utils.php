@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.04.007
+* Version: 9.0.05.005
 *
 */
 
@@ -6188,7 +6188,16 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 			if ( $alt == 'spin' ||
 				 $alt == __('Gold medal', 'wp-photo-album-plus') ||
 				 $alt == __('Silver medal', 'wp-photo-album-plus') ||
-				 $alt == __('Bronze medal', 'wp-photo-album-plus') ) {
+				 $alt == __('Bronze medal', 'wp-photo-album-plus') ||
+				 $alt == 'film' ) {
+				$lazy = false;
+			}
+		}
+		if ( $attribs['src'] ) {
+			if ( substr( $attribs['src'], -8 ) == 'star.ico' ) {
+				$lazy = false;
+			}
+			if ( $attribs['src'] == 'dummy' ) {
 				$lazy = false;
 			}
 		}
@@ -6204,7 +6213,8 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 	if ( $lazy && $attribs['src'] ) {
 		$attribs['data-src'] 	= $attribs['src'];
 		$attribs['src'] 		= '';
-		$attribs['onload'] 		= 'wppaLazyLoading--;wppaMakeLazyVisible();' . $attribs['onload'];
+		$attribs['onload'] 		= 'wppaLazyLoaded++;wppaMakeLazyVisible(\'onload\');' . $attribs['onload'];
+		$attribs['onerror'] 	= 'wppaLazyLoaded++;' . $attribs['onerror'];
 		$attribs['decoding'] 	= 'async';
 	}
 

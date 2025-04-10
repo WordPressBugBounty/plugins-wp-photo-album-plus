@@ -782,6 +782,21 @@ global $wpdb;
 	];
 
 	// Shortcode attributes that do not need a value. Convert them to 'attr => 1'
+	// To workaround a php bug this is complexer that it should need to be
+	$xatts_copy = $xatts;
+	$singles = ['landscape', 'portrait', 'cache', 'anon', 'meonly'];
+	$no_s = ['no', 'off'];
+	foreach ( $singles as $at ) {
+		$xatts_temp = $xatts_copy;
+		if ( in_array( $at, $xatts_temp ) ) {
+			$xatts[$at] = '1';
+		}
+		elseif ( isset( $xatts_temp[$at] ) && ! in_array( $xatts_temp[$at], $no_s ) ) {
+			$xatts[$at] = false;
+		}
+	}
+	
+	/*
 	$no_s = ['no', 'off'];
 	if ( in_array( 'landscape', $xatts ) )	$xatts['landscape'] = true;
 	elseif ( isset( $xatts['landscape'] ) && in_array( $xatts['landscape'], $no_s ) ) $xatts['landscape'] = false;
@@ -793,7 +808,8 @@ global $wpdb;
 	elseif ( isset( $xatts['anon'] ) && in_array( $xatts['anon'], $no_s ) ) $xatts['anon'] = false;
 	if ( in_array( 'meonly', $xatts ) ) 	$xatts['meonly'] = true;
 	elseif ( isset( $xatts['meonly'] ) && in_array( $xatts['meonly'], $no_s ) ) $xatts['meonly'] = false;
-
+	*/ 
+	
 	// Login requested?
 	if ( in_array( 'login', (array) $xatts ) ) {
 		if ( ! is_user_logged_in() ) {

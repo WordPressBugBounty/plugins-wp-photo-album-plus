@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 9.0.00.009
+* Version: 9.0.05.004
 *
 */
 
@@ -263,6 +263,7 @@ horizrailenabled:false,";
 						'wppa_easing_slide' 				=> 'swing',
 						'wppa_easing_lightbox' 				=> 'swing',
 						'wppa_easing_popup' 				=> 'swing',
+						'wppa_video_pause_stop_ss' 			=> 'no',
 
 						// Filmstrip
 						'wppa_film_type' 					=> 'normal', // 'normal' or 'canvas'
@@ -635,6 +636,7 @@ horizrailenabled:false,";
 						'wppa_ovl_slide_start' 			=> 'yes',
 						'wppa_ovl_big_browse' 			=> 'no',
 						'wppa_ovl_small_browse' 		=> 'no',
+						'wppa_video_pause_stop_lb' 		=> 'no',
 
 						// H Panorama
 						'wppa_panorama_control' 			=> 'all',

@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.0.03.004
+* Version: 9.0.05.001
 *
 */
 
@@ -1587,7 +1587,7 @@ static $seqno;
 					data-title="' . ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ) . '"
 					>
 				</canvas>' .
-				wppa_html_tag( 'img', ['id' => $tagid, 'src' => $url, 'style' => 'position:fixed;width:'.$thumbx.'px;height:'.$thumby.'px;display:none;', 'onload' => $the_js] );
+				wppa_html_tag( 'img', ['id' => $tagid, 'src' => $url, 'alt' => 'film', 'style' => 'position:fixed;width:'.$thumbx.'px;height:'.$thumby.'px;display:none;', 'onload' => $the_js] );
 			}
 		}
 

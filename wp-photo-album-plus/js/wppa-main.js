@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.04.002';
+wppaWppaVer = '9.0.05.001';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -87,8 +87,11 @@ jQuery(document).ready(function(){
 	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange',wppaSizeArea);
 
 	// Make Lazy load images visible
-	jQuery(window).on('DOMContentLoaded load wpparesizeend wppascrollend orientationchange', function(){wppaMakeLazyVisible('DOM loaded 2')});
-	jQuery('.wppa-divnicewrap').on('DOMContentLoaded load wpparesizeend wppascrollend wheel orientationchange', function(){wppaMakeLazyVisible('scroll div nicewrap')});
+	jQuery(window).on('DOMContentLoaded load resize scroll orientationchange', function(){wppaMakeLazyVisible('DOM')});
+	jQuery('.wppa-divnicewrap').on('DOMContentLoaded load resize orientationchange', function(){wppaMakeLazyVisible('resize')});
+	jQuery('.wppa-divnicewrap').on('scroll wheel', function(){wppaMakeLazyVisible('scroll')});
+	jQuery('.wppa-box').on('scroll', function(){wppaMakeLazyVisible('scroll')});
+	jQuery('.wppa-box').on('resize', function(){wppaMakeLazyVisible('resize')});
 
 	// Init masonryplus
 	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange', wppaInitMasonryPlus);
@@ -148,7 +151,7 @@ jQuery(document).ready(function(){
 	}
 
 	// Lazy on mobile extra:
-	jQuery("div").on("touchmove", function(){wppaMakeLazyVisible('div touchmove');});
+	jQuery("div").on("touchmove", function(){wppaMakeLazyVisible('scroll');});
 
 	// Align ajax spinner
 	jQuery(".wppa-ajax-spin").css({top:wppaWindowHeight()/2,left:wppaWindowWidth()/2});
@@ -202,11 +205,11 @@ jQuery(document).ready(function(){
 	});
 });
 
-/*
+
 jQuery(document).ready(function(){
-	jQuery(window).on( 'scroll wheel touchmove', function(){wppaMakeLazyVisible('scroll window');});
+	jQuery(window).on( 'scroll wheel touchmove', function(){wppaMakeLazyVisible('scroll');});
 });
-*/
+
 // Install auto div sizer
 jQuery(document).ready(function(){
 	jQuery(window).on("DOMContentLoaded load resize scroll wheel orientationchange", wppaSizeAutoDiv);
@@ -1528,4 +1531,19 @@ function wppaHideAudioDesc(seqno,mocc,force) {
 	if ( force || wppaAudioOnlyRuns[mocc] != seqno ) {
 		jQuery("#"+tagid).hide();
 	}
+};
+
+var wppaAlbLbBusy = false;
+function wppaAlbLb(event,albumid) {
+	event.stopPropagation();
+	
+	if (wppaAlbLbBusy) {
+		wppaAlbLbBusy = false;
+		return;
+	}
+	wppaAlbLbBusy = true;
+	
+	jQuery('#wppa-ovl-spin').show();
+	jQuery('.first-'+albumid).trigger('click');
+	return false;
 };

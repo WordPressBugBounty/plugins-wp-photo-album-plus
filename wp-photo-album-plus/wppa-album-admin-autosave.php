@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.0.01.003
+* Version 9.0.05.001
 *
 */
 
@@ -1796,6 +1796,7 @@ global $wppa_revno;
 									<option value="page"' . ( $lt == 'page' ? $sel : '' ) . ' >' . __( 'the link page with a clean url', 'wp-photo-album-plus' ) . '</option>
 									<option value="none"' . ( $lt == 'none' ? $sel : '' ) . ' >' . __( 'no link at all', 'wp-photo-album-plus' ) . '</option>
 									<option value="manual"' . ( $lt == 'manual' ? $sel : '' ) . ' >' . __( 'manually entered', 'wp-photo-album-plus' ) . '</option>
+									<option value="lightbox"' . ( $lt == 'lightbox' ? $sel : '' ) . ' >' . __( 'lightbox (for titleonly covertype only)', 'wp-photo-album-plus' ) . '</optiom>
 								</select>
 								<br>
 								<span class="description">';

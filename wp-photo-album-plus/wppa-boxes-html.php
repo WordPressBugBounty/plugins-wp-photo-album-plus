@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.0.04.002
+* Version 9.0.05.001
 *
 */
 
@@ -117,7 +117,7 @@ function wppa_contest_box() {
 			class="wppa-box wppa-contest wppa-thumb-area wppa-thumb-area-' . $mocc . ( $nice ? ' wppa-nicescroll' : '' ) . '"
 			style="' . ( $maxh > 1 ? 'max-height:' . $maxh . 'px;' : '' ) . '
 					overflow:' . $overflow . ';"
-			onscroll="wppaMakeLazyVisible(\'scroll content box\');"
+			onscroll="wppaMakeLazyVisible(\'scroll\');"
 			>';
 	}
 
@@ -4369,7 +4369,7 @@ global $wpdb;
 								value="' . esc_attr( $btn ) . '"
 								style="margin:0 4px 0 0;"
 							/>' .
-							wppa_html_tag( 'img', ['id' => 'wppa-comment-spin-'.$mocc, 'src' => wppa_get_imgdir('spinner.gif'), 'style' => "display:none;"] );
+							wppa_html_tag( 'img', ['id' => 'wppa-comment-spin-'.$mocc, 'src' => wppa_get_imgdir('spinner.gif'), 'alt' => 'spin', 'style' => "display:none;"] );
 
 							$need_captcha = ( is_user_logged_in() && wppa_opt( 'comment_captcha' ) == 'all' ) ||
 											( ! is_user_logged_in() && wppa_opt( 'comment_captcha' ) != 'none' );
@@ -6423,7 +6423,7 @@ function wppa_grid_box() {
 			class="wppa-box wppa-contest wppa-thumb-area wppa-thumb-area-' . $mocc . ( $nice ? ' wppa-nicescroll' : '' ) . '"
 			style="' . ( $maxh > 1 ? 'max-height:' . $maxh . 'px;' : '' ) . '
 					overflow:' . $overflow . ';padding-left:0;"
-			onscroll="wppaMakeLazyVisible(\'scroll gridbox\');"
+			onscroll="wppaMakeLazyVisible(\'scroll\');"
 			>';
 	}
 

@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.0.04.002
+/* Version 9.0.05.001
 /* Various js routines used in admin pages
 */
 
@@ -9,7 +9,7 @@
 jQuery(document).ready(function() {
 
 	// Make Lazy load images visible
-	jQuery(window).on('DOMContentLoaded load resize scroll', function(){wppaMakeLazyVisible('DOM loaded')});
+	jQuery(window).on('DOMContentLoaded load resize scroll', function(){wppaMakeLazyVisible('DOM')});
 });
 
 function wppaReUpload( event, photo, expectedName, reload ) {

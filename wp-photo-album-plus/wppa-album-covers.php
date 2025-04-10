@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.0.03.002
+* Version: 9.0.05.001
 *
 */
 
@@ -896,6 +896,10 @@ global $cover_count_key;
 	$onclick_title 	= $title_attr['onclick'];
 	$title 			= $title_attr['title'];
 
+	if ( $linktype == 'lightbox' ) {
+		$onclick_title = 'wppaAlbLb(event,'.$albumid.');return false;';
+	}
+
 	// Find the slideshow link and onclick
 	$href_slideshow = wppa_get_slideshow_url( array( 'album' => $albumid,
 													 'page' => $linkpage ) );
@@ -923,9 +927,9 @@ global $cover_count_key;
 	else {
 		$style .= 'clear:both;';
 	}
-	if ( $href_title ) {
+//	if ( $href_title ) {
 		$style .= 'cursor:pointer;';
-	}
+//	}
 
 	// keep track of position
 	wppa_step_covercount( 'cover' );
@@ -939,6 +943,10 @@ global $cover_count_key;
 		onclick="' . $onclick_title . '"
 		title="'.$title.'"
 		>' );
+
+if ( $linktype == 'lightbox' ) {
+	wppa_out( wppa_get_full_album_lightbox_html( $albumid, '', '' ) );
+}
 
 	// Open the Cover text frame
 	$textframestyle = ''; //wppa_get_text_frame_style( $photo_pos, 'cover' );
@@ -1072,70 +1080,9 @@ global $wpdb;
 
 				// If lightbox, we need all the album photos to set up a lightbox set
 				if ( $photolink['is_lightbox'] ) {
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %s", $albumid, wppa_get_poc( $albumid ) );
-					$query = wppa_fix_query( $query );
-					$thumbs = wppa_get_results( $query );
 
-					wppa_cache_photo( 'add', $thumbs );				// Save rsult in 2nd level cache
+					wppa_out( wppa_get_full_album_lightbox_html( $albumid, $id, $src, $imgattr, $onmouseover , $onmouseout ) );
 
-					if ( $thumbs ) foreach ( $thumbs as $thumb ) {
-						$tid = $thumb['id'];
-						$title = wppa_get_lbtitle( 'cover', $tid );
-						if ( wppa_is_video( $tid ) ) {
-							$siz[0] = wppa_get_videox( $tid );
-							$siz[1] = wppa_get_videoy( $tid );
-						}
-						else {
-							$siz[0] = wppa_get_photox( $tid );
-							$siz[1] = wppa_get_photoy( $tid );
-						}
-						$link 		= wppa_switch('lb_hres') ? wppa_get_hires_url($tid) : wppa_get_photo_url($tid, true, '', $siz[0], $siz[1]);
-						$is_video 	= wppa_is_video( $tid );
-						$has_audio 	= wppa_has_audio( $tid );
-						$is_pdf 	= wppa_is_pdf( $tid );
-
-						// Open the anchor tag for lightbox
-						wppa_out( '
-						<a
-							data-id="' . wppa_encrypt_photo( $tid ) . '"
-							href="' . $link . '"
-							class="pietje"
-							style="border:0;color:transparent;"' .
-							( $is_video ? ' data-videohtml="' . esc_attr( wppa_get_video_body( $tid ) ) . '"
-											data-videonatwidth="' . wppa_get_videox( $tid ) . '"
-											data-videonatheight="' . wppa_get_videoy( $tid ) . '"' : '' ) .
-							( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $tid ) ) . '"' : '' ) .
-							( $is_pdf ? ' data-pdfhtml="' . esc_attr( wppa_get_pdf_html( $tid ) ) . '"' : '' ) . '
-							data-rel="wppa[alw-' . wppa( 'mocc' ) . '-' . $albumid . ']"
-							data-lbtitle' . '="' . $title . '" ' .
-							wppa_get_lb_panorama_full_html( $tid ) . '
-							data-alt="' . esc_attr( wppa_get_imgalt( $tid, true ) ) . '"
-							style="cursor:' . wppa_wait() . ';"
-							onclick="return false;">' );
-
-						// the cover image
-						if ( $tid == $id ) {
-							if ( wppa_is_video( $tid ) && ! wppa_has_poster( $tid ) ) {
-								wppa_out( '
-								<video
-									preload="metadata"
-									class="image wppa-img" id="i-' . $tid . '-' . wppa( 'mocc' ) . '"
-									title="' . wppa_zoom_in( $tid ) . '"
-									style="' . $imgattr . '"
-									onmouseover="' . $onmouseover . '"
-									onmouseout="' . $onmouseout . '">' .
-									wppa_get_video_body( $tid ) . '
-								</video>' );
-							}
-							else {
-								wppa_out( wppa_html_tag( 'img', ['id' => 'i-'.$tid.'-'.wppa('mocc'), 'class' => 'image wppa-img', 'title' => wppa_zoom_in($tid),
-																 'src' => $src, 'style' => $imgattr, 'alt' => wppa_alt($tid), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] ) );
-							}
-						}
-
-						// Close the lightbox anchor tag
-						wppa_out( '</a>' );
-					}
 				}
 
 				// Link is NOT lightbox
@@ -2371,4 +2318,82 @@ function wppa_the_album_cats( $alb ) {
 				_n( 'Category:', 'Categories:', $ncats, 'wp-photo-album-plus' ) . '&nbsp;<b>' . $cats . '</b>' . '
 		</div>' );
 	}
+}
+
+// The html for full album lightbox
+// Arg 1: album id
+// Arg 2: coverimage id
+function wppa_get_full_album_lightbox_html( $albumid, $id, $src, $imgattr = '', $onmouseover = '', $onmouseout = '' ) {
+global $wpdb;
+global $wppa_no_lightbox;
+
+	if ( $wppa_no_lightbox ) return '';
+
+	$query 	= $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %s", $albumid, wppa_get_poc( $albumid ) );
+	$query 	= wppa_fix_query( $query );
+	$thumbs = wppa_get_results( $query );
+	$result = '';
+	$first 	= true;
+
+	if ( $thumbs ) foreach ( $thumbs as $thumb ) {
+		$tid = $thumb['id'];
+		$title = wppa_get_lbtitle( 'cover', $tid );
+		if ( wppa_is_video( $tid ) ) {
+			$siz[0] = wppa_get_videox( $tid );
+			$siz[1] = wppa_get_videoy( $tid );
+		}
+		else {
+			$siz[0] = wppa_get_photox( $tid );
+			$siz[1] = wppa_get_photoy( $tid );
+		}
+		$link 		= wppa_switch('lb_hres') ? wppa_get_hires_url($tid) : wppa_get_photo_url($tid, true, '', $siz[0], $siz[1]);
+		$is_video 	= wppa_is_video( $tid );
+		$has_audio 	= wppa_has_audio( $tid );
+		$is_pdf 	= wppa_is_pdf( $tid );
+
+		// Open the anchor tag for lightbox
+		$result .= '
+		<a
+			data-id="' . wppa_encrypt_photo( $tid ) . '"
+			href="' . $link . '"
+			class="'.($first?'first-'.$albumid:'').'"
+			style="border:0;color:transparent;"' .
+			( $is_video ? ' data-videohtml="' . esc_attr( wppa_get_video_body( $tid ) ) . '"
+							data-videonatwidth="' . wppa_get_videox( $tid ) . '"
+							data-videonatheight="' . wppa_get_videoy( $tid ) . '"' : '' ) .
+			( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $tid ) ) . '"' : '' ) .
+			( $is_pdf ? ' data-pdfhtml="' . esc_attr( wppa_get_pdf_html( $tid ) ) . '"' : '' ) . '
+			data-rel="wppa[alw-' . wppa( 'mocc' ) . '-' . $albumid . ']"
+			data-lbtitle' . '="' . $title . '" ' .
+			wppa_get_lb_panorama_full_html( $tid ) . '
+			data-alt="' . esc_attr( wppa_get_imgalt( $tid, true ) ) . '"
+			style="cursor:' . wppa_wait() . ';"
+			onclick="return false;">';
+
+		// the cover image
+		if ( $tid == $id ) {
+			if ( wppa_is_video( $tid ) && ! wppa_has_poster( $tid ) ) {
+				$result .= '
+				<video
+					preload="metadata"
+					class="image wppa-img" id="i-' . $tid . '-' . wppa( 'mocc' ) . '"
+					title="' . wppa_zoom_in( $tid ) . '"
+					style="' . $imgattr . '"
+					onmouseover="' . $onmouseover . '"
+					onmouseout="' . $onmouseout . '">' .
+					wppa_get_video_body( $tid ) . '
+				</video>';
+			}
+			else {
+				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$tid.'-'.wppa('mocc'), 'class' => 'image wppa-img', 'title' => wppa_zoom_in($tid),
+												 'src' => $src, 'style' => $imgattr, 'alt' => wppa_alt($tid), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+			}
+		}
+
+		// Close the lightbox anchor tag
+		$result .= '</a>';
+		$first = false;
+	}
+
+	return $result;
 }

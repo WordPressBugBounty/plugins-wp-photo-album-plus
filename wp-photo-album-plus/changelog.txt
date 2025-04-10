@@ -1,5 +1,18 @@
 WP Photo Album Plus Changelog
 
+= 9.0.05 =
+
+* Provided a workaround for a bug in a.o. PHP 8.3.19 for shortcode attributes without a value.
+* Improved lazy load handling, including viewport checking and limited simultaneous hhtp connections.
+* When the album covertype is set to titleonly, the link from the album can be lightbox; 
+this works like the lightbox link on cover images on other cover types.
+* There was an issue with the first item in a slideshow that is a video regarded loading and autoplay. 
+* under some conditions, lazy load did not work for masonry plus thumbnails. Fixed.
+* Ajax links with encryped albums with (old style) crypt codes of 12 char crypt codes resulted in unexpected output. Fixed.
+* Fullsize lightbox display of videos is less high to make the video controlbar be right above the lightbox control bar so now the video bar works.
+* Added 2 settings in Lightbox (Lightbox -> I -> Item 31) and slideshow (Slideshow -> IV -> Item 15) settings. When ticked, as soon as you pause the video, the running show will stop.
+* Fixed link form thumbnail to slide for album ="#upldr',...".
+
 = 9.0.04 =
 
 * Ajax method 'by redirection' did not work since version 9.0.00.004. Fixed.

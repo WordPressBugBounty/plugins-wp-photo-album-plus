@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.0.00.010
+* Version: 9.0.05.001
 *
 */
 
@@ -91,7 +91,7 @@ global $wpdb;
 	// Cover linktype
 	if ( isset( $args['cover_linktype'] ) ) {
 		$lt = $args['cover_linktype'];
-		if ( in_array( $lt, array( 'content', 'albums', 'thumbs', 'slide', 'page', 'manual', 'none' ) ) ) {
+		if ( in_array( $lt, array( 'content', 'albums', 'thumbs', 'slide', 'page', 'manual', 'none', 'lightbox' ) ) ) {
 			$fields['cover_linktype'] = $lt;
 		}
 	}

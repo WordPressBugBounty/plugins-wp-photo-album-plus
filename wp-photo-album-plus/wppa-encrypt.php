@@ -86,7 +86,7 @@ static $hits;
 	else {
 
 		if ( wppa_is_int( $photo ) ) {
-			return $photo; // Already encrypted
+			return $photo; // Already decrypted
 		}
 
 		// Init cache
@@ -138,7 +138,7 @@ function wppa_encrypt_album( $album ) {
 		}
 
 		// Check for already encrypted
-		if ( strlen( $id ) == 16 ) {
+		if ( ! wppa_is_int( $id ) ) {
 			$crypt = $id;
 		}
 		else {

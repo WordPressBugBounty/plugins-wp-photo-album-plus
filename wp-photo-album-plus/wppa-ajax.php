@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.04.000
+* Version: 9.0.05.001
 *
 */
 
@@ -1172,6 +1172,9 @@ wppa_log('misc', 'leeg');
 
 			// Prepare environment for rendering
 			wppa_load_theme();
+
+			global $wppa_no_lightbox;
+			$wppa_no_lightbox = true;
 
 			// Render the shortcode
 			$result = do_shortcode( $shortcode );

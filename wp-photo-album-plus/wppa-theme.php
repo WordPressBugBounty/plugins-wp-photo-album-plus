@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the albums/photos/slideshow in a page or post
-* Version 9.0.00.003
+* Version 9.0.05.004
 */
 function wppa_theme() {
 
@@ -292,7 +292,8 @@ global $wppa_empty_content;
 					<div
 						id="grid-' . $mocc . '"
 						class="grid-' . $mocc . ' grid-masonryplus"
-						style="padding-top:6px;padding-bottom:6px;padding-right:6px;margin:0 auto;line-height:0;"
+						style="padding-top:6px;padding-bottom:6px;padding-right:6px;margin:0 auto;line-height:0;" ' .
+						( wppa_lazy() ? 'onscroll="wppaMakeLazyVisible(\'scroll\')" onwheel="wppaMakeLazyVisible(\'scroll\')" ' : '' ) . '
 						>';
 
 					// Add css
