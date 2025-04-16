@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '9.0.05.004';
+var wppaJsLightboxVersion = '9.0.06.003';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -23,7 +23,7 @@ jQuery(document).ready(function(e) {
 jQuery( window ).on('orientationchange',function() {
 
 	if ( wppaOvlOpen ) {
-		setTimeout( function(){ wppaOvlShow( wppaOvlIdx )}, 200 );
+		setTimeout( function(){ wppaOvlShowSame()}, 200 );
 	}
 });
 
@@ -365,14 +365,14 @@ function _wppaOvlShow( idx ) {
 
 			html =
 			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
-				'<video id="wppa-overlay-img" controls preload="metadata"' +
+				'<video id="wppa-overlay-img" controls controlsList="nodownload nofullscreen noremoteplayback" preload="metadata"' +
 					( wppaOvlVideoStart ? ' autoplay' : '' ) +
 					' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
 					' ontouchend="wppaTouchEnd( event );"' +
 					' ontouchmove="wppaTouchMove( event );"' +
 					' ontouchcancel="wppaTouchCancel( event );"' +
 					' onclick="wppaOvlImgClick( event );"' +
-					' onpause="wppaOvlVideoPlaying = false;'+( wppaOvlVideoPauseStop ? 'wppaOvlStop();' : '' )+'"' +
+					' onpause="wppaOvlVideoOnPause(this);"' +
 					' onplay="wppaOvlVideoPlaying = true;"' +
 					' style="border:none; width:'+screen.width+'px; box-shadow:none; position:absolute;"' +
 					' alt="'+wppaOvlAlts[idx]+'"' +
@@ -529,14 +529,14 @@ function _wppaOvlShow( idx ) {
 							' onmouseout="jQuery(\'.wppa-ovl-nav-btn\').stop().fadeTo(200,0);"' +
 							' preload="metadata"' +
 							( wppaOvlVideoStart ? ' autoplay' : '' ) +
-							' onpause="wppaOvlVideoPlaying = false;'+( wppaOvlVideoPauseStop ? 'wppaOvlStop();' : '' )+'"' +
+							' onpause="wppaOvlVideoOnPause(this)"' +
 							' onplay="wppaOvlVideoPlaying = true;"' +
 							' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
 							' ontouchend="wppaTouchEnd( event );"' +
 							' ontouchmove="wppaTouchMove( event );"' +
 							' ontouchcancel="wppaTouchCancel( event );" ' +
 							' onclick="wppaOvlImgClick( event );"' +
-							' controls' +
+							' controls controlsList="nodownload nofullscreen noremoteplayback"' +
 							' style="' +
 								'border-width:' + wppaOvlBorderWidth + 'px ' + wppaOvlBorderWidth + 'px 0;' +
 								'border-style:solid;' +
@@ -753,6 +753,7 @@ function _wppaOvlShow( idx ) {
 		jQuery( '#wppa-ovl-stop-btn' ).show();
 		jQuery( '#wppa-ovl-start-btn' ).hide();
 
+		clearTimeout( wppaOvlTimer );
 		wppaOvlTimer = setTimeout( wppaOvlRun, wppaOvlSlideSpeed );
 	}
 
@@ -760,6 +761,26 @@ function _wppaOvlShow( idx ) {
 	wppaOvlFirst = false;
 
 //	console.log('done first');
+}
+
+// What to do when a video is paused
+function wppaOvlVideoOnPause(elm) {
+
+	// Pause event at the end ?
+	if ( elm.ended ) {
+
+		// Indicate that the video no longer playes
+		wppaOvlVideoPlaying = false;
+	}
+
+	// If we want to stop the running show when manually paused
+	else if ( wppaOvlVideoPauseStop && 		// we want to stop the running show on pause
+		 elm.readyState == 4 &&				// must be loaded to a playable state
+		 elm.played.length > 0 && 			// must have run
+		 elm.played.end(0) > 0 ) { 			// must have run for some time
+			wppaOvlStop(); 					// stop the show
+			wppaOvlVideoPlaying = false; 	// Indicate that the video no longer playes
+	}
 }
 
 // Adjust display sizes
@@ -1027,7 +1048,7 @@ function wppaOvlStartStop() {
 	}
 }
 
-// Sop show
+// Stop show
 function wppaOvlStop() {
 	if ( wppaOvlRunning ) {
 		wppaOvlStartStop();
@@ -1059,6 +1080,7 @@ function wppaOvlRun() {
 
 	wppaOvlShowNext();
 
+	clearTimeout( wppaOvlTimer );
 	wppaOvlTimer = setTimeout( wppaOvlRun, wppaOvlSlideSpeed );
 }
 
@@ -1119,13 +1141,23 @@ function wppaOvlShowNext() {
 }
 
 // Show the same after orientatiochange or fullscreenchange
-function wppaOvlShowSame() {
+function wppaOvlShowSame(from) {
+
+//	wppaConsoleLog('wppaOvlShowSame() from '+from);
 
 	// Are we in?
 	if ( ! wppaOvlOpen ) return;
 
 	// Find current index
 	var now = wppaOvlCurIdx;
+
+//	if ( from == 'fschange' ) {
+//		now--;
+//		if ( now < 0 ) {
+//			now = wppaOvlUrls.length-1;
+//		}
+//		console.log('now='+now)
+//	}
 
 	// Are we running?
 	var wasRunning = wppaOvlRunning;
@@ -1140,7 +1172,8 @@ function wppaOvlShowSame() {
 	setTimeout( function(){
 		wppaOvlShow(now);
 		if ( wasRunning ) {
-			setTimeout( wppaOvlStartStop(), wppaOvlSlideSpeed );
+//			clearTimeout( wppaOvlTimer );
+//			wppaOvlTimer = setTimeout( wppaOvlStartStop(), wppaOvlSlideSpeed );
 		}
 	}, 1000 );
 

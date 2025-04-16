@@ -1,5 +1,9 @@
 WP Photo Album Plus Changelog
 
+= 9.0.06 =
+
+* Various changes to lightbox to make it more userfriendly, especially when displaying videos.
+
 = 9.0.05 =
 
 * Provided a workaround for a bug in a.o. PHP 8.3.19 for shortcode attributes without a value.

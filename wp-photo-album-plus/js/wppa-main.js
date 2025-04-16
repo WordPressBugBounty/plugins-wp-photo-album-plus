@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.05.001';
+wppaWppaVer = '9.0.06.003';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -1356,7 +1356,7 @@ function wppaFsChange() {
 	wppaFsShow();
 
 	// Re-display lightbox
-	wppaOvlShowSame();
+	wppaOvlShowSame('fschange');
 }
 
 // Create global fullsize buttons
@@ -1536,13 +1536,13 @@ function wppaHideAudioDesc(seqno,mocc,force) {
 var wppaAlbLbBusy = false;
 function wppaAlbLb(event,albumid) {
 	event.stopPropagation();
-	
+
 	if (wppaAlbLbBusy) {
 		wppaAlbLbBusy = false;
 		return;
 	}
 	wppaAlbLbBusy = true;
-	
+
 	jQuery('#wppa-ovl-spin').show();
 	jQuery('.first-'+albumid).trigger('click');
 	return false;

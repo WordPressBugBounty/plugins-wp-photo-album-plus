@@ -186,8 +186,11 @@ global $wppa_session;
 	}
 
 	// Valid number?
-	if ( ! wppa_is_posint( $id ) ) {
+	if ( ! wppa_is_int( $id ) ) {
 		wppa_log( 'err', 'Non numeric id: ' . $id . ' of type ' . $type . ' found in wppa_bump_viewcount()' );
+		return;
+	}
+	if ( 0 == $id ) {
 		return;
 	}
 
@@ -630,7 +633,7 @@ static $login;
 		return true;
 	}
 
-	// Dispaych on status
+	// Dispatch on status
 	switch( $status ) {
 		case 'hidden':
 			return false;

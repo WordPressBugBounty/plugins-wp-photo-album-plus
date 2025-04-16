@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '9.0.05.004';
+var wppaJsSlideshowVersion = '9.0.06.002';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -1247,6 +1247,25 @@ function wppaMakeNameHtml( mocc ) {
 	return wppaRepairBrTags( _wppaFullNames[mocc][_wppaCurIdx[mocc]] );
 }
 
+function wppaVideoSlideOnPause(elm,mocc) {
+
+	// Pause event at the end ?
+	if ( elm.ended ) {
+
+		// Indicate that the video no longer playes
+		wppaVideoPlaying[mocc] = false;
+	}
+
+	// If we want to stop the running show when manually paused
+	else if ( wppaSlideVideoPauseStop && 		// we want to stop the running show on pause
+		 elm.readyState == 4 &&				// must be loaded to a playable state
+		 elm.played.length > 0 && 			// must have run
+		 elm.played.end(0) > 0 ) { 			// must have run for some time
+			_wppaStop(mocc); 				// stop the show
+			wppaVideoPlaying[mocc] = false;	// Indicate that the video no longer playes
+	}
+}
+
 function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 
 	var imgVideo = ( _wppaIsVideo[mocc][idx] ) ? 'video' : 'img';
@@ -1254,9 +1273,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 	var url;
 	var theTitle = 'title';
 	if ( wppaLightBox[mocc] == 'wppa') theTitle = 'data-lbtitle';
-	var mmEvents = ' onpause="wppaVideoPlaying['+mocc+'] = false;'+
-		( wppaSlideVideoPauseStop ? '_wppaStop('+mocc+');': '' ) +
-		'" onplay="wppaVideoPlaying['+mocc+'] = true;"';
+	var mmEvents = ' onpause="wppaVideoSlideOnPause(this,'+mocc+');" onplay="wppaVideoPlaying['+mocc+'] = true;"';
 	var hrUrl;
 	var isPdf;
 	var isPanorama = ( _wppaPanoramaHtml[mocc][idx].length > 0 );
