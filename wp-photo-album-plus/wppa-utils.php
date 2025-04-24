@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.05.005
+* Version: 9.0.07.002
 *
 */
 
@@ -6180,24 +6180,8 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 		$lazy = true;
 
 		// Check for exceptions
-		if ( $tag == 'source' ) {
-			$lazy = false;
-		}
-		if ( $attribs['alt'] ) {
-			$alt = $attribs['alt'];
-			if ( $alt == 'spin' ||
-				 $alt == __('Gold medal', 'wp-photo-album-plus') ||
-				 $alt == __('Silver medal', 'wp-photo-album-plus') ||
-				 $alt == __('Bronze medal', 'wp-photo-album-plus') ||
-				 $alt == 'film' ) {
-				$lazy = false;
-			}
-		}
-		if ( $attribs['src'] ) {
-			if ( substr( $attribs['src'], -8 ) == 'star.ico' ) {
-				$lazy = false;
-			}
-			if ( $attribs['src'] == 'dummy' ) {
+		if ( $attribs['class'] ) {
+			if ( strpos( 'nolazy', $attribs['class'] ) !== false ) {
 				$lazy = false;
 			}
 		}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 9.0.00.000
+* Version: 9.0.07.002
 *
 */
 
@@ -207,7 +207,7 @@ global $wpdb;
 											( in_array( $user -> ID, $userarray[$type] ) ? ' checked' : '' ) . '
 										>' .
 										wppa_html_tag( 'img', ['id' => 'img_'.$type.'-'.$user->ID, 'src' => wppa_get_imgdir('star.ico'),
-															   'style' => "padding-left:4px;float:left;height:16px;width:16px"] ) .
+															   'class' => 'nolazy', 'style' => "padding-left:4px;float:left;height:16px;width:16px"] ) .
 									'</td>' );
 								}
 								else {

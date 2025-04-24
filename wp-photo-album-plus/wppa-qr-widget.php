@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display qr code
-* Version: 9.0.00.000
+* Version: 9.0.07.001
 *
 */
 
@@ -41,7 +41,7 @@ class wppaQRWidget extends WP_Widget {
 			style="text-align:center;"
 			data-wppa="yes"
 			>' .
-			wppa_html_tag( 'img', [ 'id' => "wppa-qr-img", 'src' => $qrsrc, 'title' => wppa_convert_to_pretty( wppa_script_uri() ), 'alt' => __( 'QR code', 'wp-photo-album-plus' )] ) . '
+			wppa_html_tag( 'img', [ 'id' => "wppa-qr-img", 'src' => $qrsrc, 'class' => 'nolazy', 'title' => wppa_convert_to_pretty( wppa_script_uri() ), 'alt' => __( 'QR code', 'wp-photo-album-plus' )] ) . '
 		</div>
 		<div style="clear:both" ></div>';
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.0.05.001
+* Version 9.0.07.002
 *
 */
 
@@ -1979,7 +1979,7 @@ global $wppa_fb_init_done;
 	if ( wppa_switch( 'share_qr' ) && $key != 'thumb' ) {
 		$src = wppa_create_qrcode_cache( $share_url, '80' );
 		$qr  = wppa_html_tag( 'div', ['style' => "float:left;padding:2px"],
-					wppa_html_tag( 'img', ['src' => $src, 'title' => $share_url, 'alt' => __( 'QR code', 'wp-photo-album-plus' )] ) );
+					wppa_html_tag( 'img', ['src' => $src, 'class' => 'nolazy', 'title' => $share_url, 'alt' => __( 'QR code', 'wp-photo-album-plus' )] ) );
 	}
 	else {
 		$qr = '';
@@ -4369,7 +4369,7 @@ global $wpdb;
 								value="' . esc_attr( $btn ) . '"
 								style="margin:0 4px 0 0;"
 							/>' .
-							wppa_html_tag( 'img', ['id' => 'wppa-comment-spin-'.$mocc, 'src' => wppa_get_imgdir('spinner.gif'), 'alt' => 'spin', 'style' => "display:none;"] );
+							wppa_html_tag( 'img', ['id' => 'wppa-comment-spin-'.$mocc, 'src' => wppa_get_imgdir('spinner.gif'), 'class' => 'nolazy', 'style' => "display:none;"] );
 
 							$need_captcha = ( is_user_logged_in() && wppa_opt( 'comment_captcha' ) == 'all' ) ||
 											( ! is_user_logged_in() && wppa_opt( 'comment_captcha' ) != 'none' );

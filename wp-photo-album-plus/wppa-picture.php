@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.0.00.005
+* Version 9.0.07.002
 *
 */
 
@@ -714,7 +714,7 @@ function wppa_get_spheric_pan_html( $args ) {
 		});';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'alt' => 'spin'] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
 
 	if ( $haslink ) {
 		$result .= '<a>';
@@ -1026,7 +1026,7 @@ function wppa_get_flat_pan_html( $args ) {
 	});';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'alt' => 'spin'] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
 
 	// wppa-ovl-flatpan-container
 	if ( $lightbox ) {
@@ -1342,7 +1342,7 @@ function wppa_get_zoom_pan_html( $args ) {
 		});';
 
 		$result .=
-		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'alt' => 'spin'] );
+		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
 
 	// wppa-ovl-zoom-container
 	if ( $lightbox ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 9.0.00.005
+* Version 9.0.07.002
 *
 */
 
@@ -505,7 +505,8 @@ function wppa_ajax_button( $label, $slug, $elmid = 0, $no_confirm = false ) {
 		$result .= 'wppaAjaxUpdateOptionValue(\''.$slug.'\', 0)" />';
 	}
 
-	$result .= wppa_html_tag( 'img', ['id' => 'img_'.$slug, 'src' => wppa_get_imgdir('star.ico'), 'title' => __('Not done yet', 'wp-photo-album-plus' ), 'style' => "padding:0 4px;float:left;height:16px;width:16px"] );
+	$result .= wppa_html_tag( 'img', ['id' => 'img_'.$slug, 'src' => wppa_get_imgdir('star.ico'), 'title' => __('Not done yet', 'wp-photo-album-plus' ),
+									  'class' => 'nolazy', 'style' => "padding:0 4px;float:left;height:16px;width:16px"] );
 
 	return $result;
 }
@@ -1207,6 +1208,9 @@ function wppa_get_potd_pool_html() {
 
 function wppa_star_html( $slug ) {
 
-		return	wppa_html_tag( 'img', ['id' => 'img_'.str_replace('#','H',$slug), 'src' => wppa_get_imgdir('star.ico'),
-									   'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ), 'style' => "padding:0 4px;float:left;height:16px;width:16px;"] );
+		return	wppa_html_tag( 'img', ['id' => 'img_'.str_replace('#','H',$slug),
+									   'src' => wppa_get_imgdir('star.ico'),
+									   'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ),
+									   'class' => 'nolazy',
+									   'style' => "padding:0 4px;float:left;height:16px;width:16px;"] );
 }

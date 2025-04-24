@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version: 9.0.00.000
+* Version: 9.0.07.002
 *
 */
 
@@ -287,15 +287,15 @@ function wppa_the_medal_html( $id ) {
 	switch( $status ) {
 		case 'gold':
 			return wppa_html_tag( 'img', ['src' => wppa_get_imgdir('medal_gold_'.$color.'.png'), 'title' => __('Gold medal', 'wp-photo-album-plus'),
-										  'alt' => __('Gold medal', 'wp-photo-album-plus'), 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
+										  'class' => 'nolazy', 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
 			break;
 		case 'silver':
 			return wppa_html_tag( 'img', ['src' => wppa_get_imgdir('medal_silver_'.$color.'.png'), 'title' => __('Silver medal', 'wp-photo-album-plus'),
-										  'alt' => __('Silver medal', 'wp-photo-album-plus'), 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
+										  'class' => 'nolazy', 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
 			break;
 		case 'bronze':
 			return wppa_html_tag( 'img', ['src' => wppa_get_imgdir('medal_bronze_'.$color.'.png'), 'title' => __('Bronze medal', 'wp-photo-album-plus'),
-										  'alt' => __('Bronze medal', 'wp-photo-album-plus'), 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
+										  'class' => 'nolazy', 'style' => "border:none;margin:0;padding:0;box-shadow:none;height:32px;"] );
 			break;
 		default:
 			return '';

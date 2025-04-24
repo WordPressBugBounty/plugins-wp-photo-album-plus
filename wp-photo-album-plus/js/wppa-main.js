@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.06.003';
+wppaWppaVer = '9.0.07.001';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -51,7 +51,6 @@ window.onpopstate = function( event ) {
 // General initialisation
 function wppaDoInit() {
 
-jQuery(document).ready(function(){
 	// Misc. init
 	_wppaTextDelay = wppaAnimationSpeed;
 	if ( wppaFadeInAfterFadeOut ) {
@@ -90,8 +89,9 @@ jQuery(document).ready(function(){
 	jQuery(window).on('DOMContentLoaded load resize scroll orientationchange', function(){wppaMakeLazyVisible('DOM')});
 	jQuery('.wppa-divnicewrap').on('DOMContentLoaded load resize orientationchange', function(){wppaMakeLazyVisible('resize')});
 	jQuery('.wppa-divnicewrap').on('scroll wheel', function(){wppaMakeLazyVisible('scroll')});
-	jQuery('.wppa-box').on('scroll', function(){wppaMakeLazyVisible('scroll')});
-	jQuery('.wppa-box').on('resize', function(){wppaMakeLazyVisible('resize')});
+	jQuery('.wppa-box').on('scroll wheel resize', function(){wppaMakeLazyVisible('scroll')});
+	jQuery('.albumlist').on('scroll wheel resize', function(){wppaMakeLazyVisible('scroll')});
+	jQuery('.grid-masonryplus').on('scroll wheel resize', function(){wppaMakeLazyVisible('scroll')});
 
 	// Init masonryplus
 	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange', wppaInitMasonryPlus);
@@ -155,7 +155,6 @@ jQuery(document).ready(function(){
 
 	// Align ajax spinner
 	jQuery(".wppa-ajax-spin").css({top:wppaWindowHeight()/2,left:wppaWindowWidth()/2});
-});
 }
 
 // Resize all nicescrollers

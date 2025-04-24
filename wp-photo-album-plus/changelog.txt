@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.0.07 =
+
+* Lazy load on ajax results did not work properly. Fixed.
+* QR code widget and share spoiled lazy load. Fixed.
+* Problems with encryption of virtual album ''. Fixed.
+
 = 9.0.06 =
 
 * Various changes to lightbox to make it more userfriendly, especially when displaying videos.

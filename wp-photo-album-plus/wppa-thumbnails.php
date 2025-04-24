@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.0.05.001
+* Version: 9.0.07.002
 *
 */
 
@@ -1587,7 +1587,7 @@ static $seqno;
 					data-title="' . ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ) . '"
 					>
 				</canvas>' .
-				wppa_html_tag( 'img', ['id' => $tagid, 'src' => $url, 'alt' => 'film', 'style' => 'position:fixed;width:'.$thumbx.'px;height:'.$thumby.'px;display:none;', 'onload' => $the_js] );
+				wppa_html_tag( 'img', ['id' => $tagid, 'src' => $url, 'class' => 'nolazy', 'style' => 'position:fixed;width:'.$thumbx.'px;height:'.$thumby.'px;display:none;', 'onload' => $the_js] );
 			}
 		}
 
@@ -1729,7 +1729,7 @@ function wppa_get_medal_html_a( $args ) {
 			default: $url = ''; 	// Should never get here
 		}
 		$style = $mstyle . 'top:4px;position:absolute;border:none;margin:0 '.($left?'2':'-2').'px;padding:0;box-shadow:none;height:'.$size.'px;width:'.$size.'px;top:'.$top.'px;background-color:white';
-		$result .= wppa_html_tag( 'img', ['src' => $url, 'title' => $titles[$mmitem], 'alt' => $titles[$mmitem], 'style' => $style] );
+		$result .= wppa_html_tag( 'img', ['src' => $url, 'title' => $titles[$mmitem], 'class' => 'nolazy', 'style' => $style] );
 	}
 
 	// The medal bronze-silver-gold

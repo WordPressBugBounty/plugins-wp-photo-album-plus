@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.0.05.005
+* Version: 9.0.07.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -1296,7 +1296,7 @@ function wppa_album_download_link( $albumid ) {
 		>' .
 		__( 'Download album', 'wp-photo-album-plus' ) . '
 	</a>' .
-	wppa_html_tag( 'img', ['id' => 'dwnspin-'.$mocc.'-'.wppa_encrypt_album($albumid), 'src' => wppa_get_imgdir('spinner.gif'), 'style' => "margin-left:6px;display:none;", 'alt' => 'spin'] );
+	wppa_html_tag( 'img', ['id' => 'dwnspin-'.$mocc.'-'.wppa_encrypt_album($albumid), 'src' => wppa_get_imgdir('spinner.gif'), 'style' => "margin-left:6px;display:none;", 'class' => 'nolazy'] );
 
 	wppa_out( $result );
 }

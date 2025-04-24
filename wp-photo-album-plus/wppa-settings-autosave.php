@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.0.05.004
+* Version: 9.0.07.002
 *
 */
 
@@ -2122,7 +2122,10 @@ global $wppa_hide_this;
 																'sort' 			=> true,
 													) ) . '
 							</select>' .
-							wppa_html_tag( 'img', ['id' => 'img_potd_album', 'src' => wppa_get_imgdir()  . 'star.ico', 'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ),
+							wppa_html_tag( 'img', ['id' => 'img_potd_album',
+												   'src' => wppa_get_imgdir()  . 'star.ico',
+												   'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ),
+												   'class' => 'nolazy',
 												   'style' => 'padding:0 4px; float:left; height:16px; width:16px;'] );
 						}
 						$is_phys = wppa_opt( 'potd_album_type' ) == 'physical';
@@ -9040,6 +9043,7 @@ global $wppa_hide_this;
 									'</select>' .
 									wppa_html_tag( 'img', ['id' => "img_move_all_photos_from", 'src' => wppa_get_imgdir().'star.ico',
 														   'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+														   'class' => 'nolazy',
 														   'style' => "padding-left:4px; float:left; height:16px; width:16px;"] );
 							$html = array($html, '', '', '');
 							wppa_setting_new(false, '28', $name, $desc, $html, $help);
@@ -9061,6 +9065,7 @@ global $wppa_hide_this;
 									'</select>' .
 									wppa_html_tag( 'img', ['id' => "img_move_all_photos_to", 'src' => wppa_get_imgdir().'star.ico',
 														   'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+														   'class' => 'nolazy',
 														   'style' => "padding-left:4px; float:left; height:16px; width:16px;"] );
 							$html = array($html, '', '', '');
 							wppa_setting_new(false, '29', $name, $desc, $html, $help);
@@ -9609,11 +9614,13 @@ global $wppa_hide_this;
 						wppa_html_tag( 'select', ['id' => "wppa_watermark_file", 'style' => "float:left;font-size:11px;height:20px;margin:0 4px 0 0;padding:0;",
 												  'onchange' => "wppaAjaxUpdateOptionValue('watermark_file', this)"], wppa_watermark_file_select( 'system' ) ) .
 						wppa_html_tag( 'img', ['id' => "img_watermark_file", 'src' => wppa_get_imgdir().'star.ico', 'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+											   'class' => 'nolazy',
 											   'style' => "padding-left:4px;float:left;height:16px;width:16px;"] ) .
 						wppa_html_tag( 'span', ['style' => "float:left;margin-left:12px"], __('position:', 'wp-photo-album-plus' ) ) .
 						wppa_html_tag( 'select', ['id' =>"wppa_watermark_pos", 'style' => "float:left;font-size:11px;height:20px;margin:0 0 0 20px;padding:0;",
 												  'onchange' => "wppaAjaxUpdateOptionValue('watermark_pos', this)"], wppa_watermark_pos_select( 'system' ) ) .
 						wppa_html_tag( 'img', ['id' => "img_watermark_pos", 'src' => wppa_get_imgdir().'star.ico', 'title' => __('Setting unmodified', 'wp-photo-album-plus' ),
+											   'class' => 'nolazy',
 											   'style' => "padding-left:4px;float:left;height:16px;width:16px;"] );
 						wppa_setting_new(false, 1, $name, $desc, $html, $help);
 

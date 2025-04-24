@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version: 9.0.00.000
+* Version: 9.0.07.002
 *
 */
 
@@ -253,7 +253,7 @@ global $wppa_opt;
 						clearInterval(wppaExpTmr);
 						jQuery(".wppaexpdelta").css("display","none")';
 					wppa_echo(
-						wppa_html_tag( 'img', ['class' => "wppaexpdelta", 'src' => $url, 'onload' => $js1, 'alt' => 'spin'] ) . '
+						wppa_html_tag( 'img', ['class' => "wppaexpdelta nolazy", 'src' => $url, 'onload' => $js1] ) . '
 						<span class="wppaexpdelta">' .
 							/* translators: number if seconds */
 							sprintf( __( 'Trying to continue in %s seconds', 'wp-photo-album-plus' ), '<span id="extimer">10</span>' ) . '

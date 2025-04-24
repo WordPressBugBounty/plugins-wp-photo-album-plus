@@ -2,7 +2,7 @@
 /* wppa-edit-tags.php
 * Package: wp-photo-album-plus
 *
-* Version 9.0.00.000
+* Version 9.0.07.002
 *
 */
 
@@ -75,6 +75,7 @@ function _wppa_edit_tags() {
 						/>' .
 						wppa_html_tag( 'img', ['id' => "img_new_tag_value",
 											   'src' => wppa_get_imgdir() . 'star.ico',
+											   'class' => 'nolazy',
 											   'title' => __( 'Setting unmodified', 'wp-photo-album-plus' ),
 											   'style' => "padding:0 4px;float:left;height:16px;width:16px;"] ) . '
 					</td>
@@ -145,7 +146,7 @@ function wppa_tag_select( $options, $values ) {
 
 	$result .= '
 	</select>' .
-	wppa_html_tag( 'img', ['id' => "img_tag_to_edit", 'src' => wppa_get_imgdir() . 'star.ico', 'style' => "padding:0 4px;float:left;height:16px;width:16px;"] );
+	wppa_html_tag( 'img', ['id' => "img_tag_to_edit", 'src' => wppa_get_imgdir() . 'star.ico', 'class' => 'nolazy', 'style' => "padding:0 4px;float:left;height:16px;width:16px;"] );
 
 	return $result;
 }

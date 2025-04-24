@@ -503,7 +503,7 @@ function wppaMakeLazyVisible(from) {
 	wppaLazyProcTime += Date.now();
 
 	if ( potential.length == 0 && wppaLazyStartTime > 0 ) {
-		wppaConsoleLog('Lazy total proc time: '+ wppaLazyProcTime +' msec');
+//		wppaConsoleLog('Lazy total proc time: '+ wppaLazyProcTime +' msec');
 //		wppaConsoleLog('Lazy total elapsed time: '+ (Date.now() - wppaLazyStartTime));
 		wppaLazyStartTime = -1;
 	}

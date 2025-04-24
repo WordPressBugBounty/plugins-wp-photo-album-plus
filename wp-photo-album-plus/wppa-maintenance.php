@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 9.0.04.002
+* Version: 9.0.07.002
 *
 */
 
@@ -2015,7 +2015,7 @@ function wppa_log_page() {
 
 		&nbsp;' .
 			wppa_html_tag( 'img', ['id' => "wppa-spinner", 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;",
-								   'alt' => 'spin', 'onload' => "setInterval(function(){wppaAjaxReplaceLog();}, 10000)"] ) . '
+								   'class' => 'nolazy', 'onload' => "setInterval(function(){wppaAjaxReplaceLog();}, 10000)"] ) . '
 		<div id="wppa-logbody" >' .
 
 			ltrim( wppa_do_maintenance_popup( 'wppa_list_errorlog' ), '| ' ) .
