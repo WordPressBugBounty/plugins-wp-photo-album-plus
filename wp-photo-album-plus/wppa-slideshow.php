@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.0.03.002
+* Version 9.0.08.004
 *
 */
 
@@ -1275,6 +1275,7 @@ function wppa_slide_filmstrip( $thumbs ) {
 		if ( ! wppa( 'is_slideonly' ) ) $do_it = true;		// always except slideonly
 		if ( wppa( 'film_on' ) ) $do_it = true;				// explicitly turned on
 	}
+	if ( wppa( 'is_slideonlyf' ) ) $do_it = true;			// Fix in 9.0.08
 
 	if ( ! $do_it ) return;									// Don't do it
 	if ( ! $thumbs || count( $thumbs ) < 1 ) return; 		// No items

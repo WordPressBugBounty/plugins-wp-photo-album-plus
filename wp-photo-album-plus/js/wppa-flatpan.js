@@ -2,7 +2,7 @@
 //
 // contains wppa functions for flat panorama images
 //
-var wppaJsFlatPanVersion = '8.5.03.007';
+var wppaJsFlatPanVersion = '9.0.08.002';
 
 	// The main proccedure
 	function wppaDoFlatPanorama(mocc, xdata) {
@@ -190,12 +190,18 @@ var wppaJsFlatPanVersion = '8.5.03.007';
 		// Draw the image
 		var ctx = data.canvas.getContext("2d");
 		ctx.drawImage(data.image, data.fromX, data.fromY, data.fromWidth, data.fromHeight, 0, 0, data.canvas.width, data.canvas.height);
+		
+		// Display the image
+		jQuery( data.canvas ).css({display:'inline'});
 
 		// Draw the preview image
 		if ( data.prevCanvas ) {
 			var prevctx = data.prevCanvas.getContext("2d");
 			prevctx.clearRect(0, 0, data.prevCanvas.width, data.prevCanvas.height);
 			prevctx.drawImage(data.image, 0, 0, data.image.width, data.image.height, 0, 0, data.prevCanvas.width, data.prevCanvas.height);
+			
+			// Display the preview image
+			jQuery( data.prevCanvas ).css({display:'inline'});
 
 			// Draw viewport rect on preview image
 			var factor = data.prevCanvas.width / data.image.width;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.0.05.001
+* Version 9.0.08.004
 *
 */
 
@@ -2639,7 +2639,7 @@ global $wpdb;
 						$pendcount 	= $counts['pendselfphotos'];
 						$url 		= wppa_ea_url( $crid );
 						$delurl 	= wppa_ea_url( $crid, 'del' );
-						$creurl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=new&amp;parent_id=' . $crid . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+						$creurl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=new&amp;parent_id=' . $id . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 						$creonc 	= 'if (confirm(\''.esc_js(__( 'Are you sure you want to create a sub album?', 'wp-photo-album-plus' )).'\')) document.location=\''.$creurl.'\';';
 
 						$result .= '

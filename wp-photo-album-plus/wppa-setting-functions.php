@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 9.0.07.002
+* Version 9.0.08.003
 *
 */
 
@@ -349,6 +349,7 @@ global $no_default;
 	switch ($dflt) {
 		case 'yes': 	$dft = __('Checked', 'wp-photo-album-plus' ); break;
 		case 'no': 		$dft = __('Unchecked', 'wp-photo-album-plus' ); break;
+		case 'rest': 	$dft = __('Using REST API', 'wp-photo-album-plus' ); break;
 /*		case 'none': 	$dft .= ': '.__('no link at all.', 'wp-photo-album-plus' ); break;
 		case 'file': 	$dft .= ': '.__('the plain photo (file).', 'wp-photo-album-plus' ); break;
 		case 'photo': 	$dft .= ': '.__('the full size photo in a slideshow.', 'wp-photo-album-plus' ); break;

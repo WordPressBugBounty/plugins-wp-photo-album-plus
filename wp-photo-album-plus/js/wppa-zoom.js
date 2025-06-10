@@ -2,7 +2,7 @@
 //
 // contains wppa functions for simple zoomable photos
 //
-var wppaJsZoomVersion = '8.5.03.009';
+var wppaJsZoomVersion = '9.0.08.002';
 
 // The main proccedure
 function wppaDoZoomPan(mocc, xdata) {
@@ -205,6 +205,9 @@ function wppaDoZoomPan(mocc, xdata) {
 
 		// Draw the image
 		data.ctx = data.canvas.getContext("2d");
+		
+		// Display the image
+		jQuery( data.canvas ).css({display:'inline'});
 
 		if ( screenRatio > data.imageRatio && newHeight > data.image.height && wppaIsFs() ) {
 			data.enableManual = false;

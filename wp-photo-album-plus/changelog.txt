@@ -1,5 +1,23 @@
 WP Photo Album Plus Changelog
 
+= 9.0.08 =
+
+* Cosmetic changes for certain site configurations by adding css styles that look redundant but can be required though.
+* Fixed possible glance of white rectangle in lightbox zoomable during image load.
+* Added .htaccess files in the img subdir where the navigation and cursor icons are
+and in the wppa-source dir to enable the use of source image files when the site configuration denied http access in those dirs.
+* Thumbnail popups did not work when there is a single quote in the name or description. Fixed.
+* New link option: To the entire album on lightbox from the subalbums on the cover. See Settings -> Links -> V -> Item 12
+* Fixed helptext for Advanced settings -> System -> Item 5: Frontend ajax method.
+* Fixed links and titles on album covers.
+* When filmstrips are generally off in the slideshow settings and the shortcode type is slideonlyf the filmstrip did not show up. 
+This is not logical when it is specifically requested and has been fixed.
+* Improved algorithm to find keywords of featured items in the page header <meta> tag.
+* Creating subalbums on the Albums page did not work properly. Fixed.
+* New setting: Void meta keywords, to add custom words to be excluded from meta keywords. Advanced settings -> Share -> II -> Item 3, originbal items 3 and 4 are renummbered to 4 and 5
+* Setting tab Share now also appears when no share buttons used on slideshow or lightbox.
+* Source file urls now also have a version number, to make sure the browser does not use cached old versions of source files.
+
 = 9.0.07 =
 
 * Lazy load on ajax results did not work properly. Fixed.
@@ -14,9 +32,9 @@ WP Photo Album Plus Changelog
 
 * Provided a workaround for a bug in a.o. PHP 8.3.19 for shortcode attributes without a value.
 * Improved lazy load handling, including viewport checking and limited simultaneous hhtp connections.
-* When the album covertype is set to titleonly, the link from the album can be lightbox; 
+* When the album covertype is set to titleonly, the link from the album can be lightbox;
 this works like the lightbox link on cover images on other cover types.
-* There was an issue with the first item in a slideshow that is a video regarded loading and autoplay. 
+* There was an issue with the first item in a slideshow that is a video regarded loading and autoplay.
 * under some conditions, lazy load did not work for masonry plus thumbnails. Fixed.
 * Ajax links with encryped albums with (old style) crypt codes of 12 char crypt codes resulted in unexpected output. Fixed.
 * Fullsize lightbox display of videos is less high to make the video controlbar be right above the lightbox control bar so now the video bar works.

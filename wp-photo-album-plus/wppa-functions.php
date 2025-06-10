@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.0.04.002
+* Version: 9.0.08.004
 *
 */
 
@@ -3348,9 +3348,9 @@ global $wpdb;
 					', this, ' .
 					'\''.wppa_encrypt_photo($id) .'\''.
 					', \'' .
-					( wppa_is_item_displayable( $alb, 'name', 'popup_text_name' ) ? $name : '' ) .
+					( wppa_is_item_displayable( $alb, 'name', 'popup_text_name' ) ? esc_js($name) : '' ) .
 					'\', \'' .
-					( wppa_is_item_displayable( $alb, 'description', 'popup_text_desc' ) ? $desc : '' ) .
+					( wppa_is_item_displayable( $alb, 'description', 'popup_text_desc' ) ? esc_js($desc) : '' ) .
 					'\', \'' .
 					( wppa_is_item_displayable( $alb, 'name', 'popup_text_rating' ) ? $rating : '' ) .
 					'\', \'' .
@@ -4373,10 +4373,10 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 			$width -= wppa_opt( 'smallsize' );
 
 			if ( $photo_left ) {
-				$result = 'style="width:'.$width.'px; float:right;"';
+				$result = 'width:'.$width.'px;float:right;';
 			}
 			else {
-				$result = 'style="width:'.$width.'px; float:left"';
+				$result = 'width:'.$width.'px;float:left';
 			}
 		}
 		elseif ( $type == 'cover' ) {
@@ -4389,10 +4389,10 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 				}
 				switch ( $photo_pos ) {
 					case 'left':
-						$result = 'style="width:'.$width.'%;float:right;"';
+						$result = 'width:'.$width.'%;float:right;';
 						break;
 					case 'right':
-						$result = 'style="width:'.$width.'%;float:left"';
+						$result = 'width:'.$width.'%;float:left';
 						break;
 					case 'top':
 					case 'bottom':
@@ -4405,11 +4405,11 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 				switch ( $photo_pos ) {
 					case 'left':
 						$width -= wppa_get_textframe_delta();
-						$result = 'style="width:'.$width.'px; float:right;"';
+						$result = 'width:'.$width.'px; float:right;';
 						break;
 					case 'right':
 						$width -= wppa_get_textframe_delta();
-						$result = 'style="width:'.$width.'px; float:left"';
+						$result = 'width:'.$width.'px; float:left';
 						break;
 					case 'top':
 					case 'bottom':

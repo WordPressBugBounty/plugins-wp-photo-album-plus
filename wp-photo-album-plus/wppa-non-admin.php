@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version: 8.8.05.003
+* Version: 9.0.08.007
 *
 */
 
@@ -159,50 +159,123 @@ wppa_echo( '
 		}
 	}
 
-	// To make sure we are on a page that contains at least [wppa] we check for Get var 'wppa-album'.
-	// This also narrows the selection of featured photos to those that exist in the current album.
-	$done = array();
-	$album = wppa_get( 'album' );
+	// If we want page specific metatags, make them
+	if ( wppa_switch( 'meta_page' ) || wppa_switch( 'meta_all' ) ) {
 
-	if ( $album ) {
-		if ( wppa_switch( 'meta_page' ) ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %s AND status = 'featured'", $album );
-			$photos = wppa_get_results( $query );
-			wppa_cache_photo( 'add', $photos );
-			if ( $photos ) {
-				wppa_echo( "\n<!-- WPPA+ BEGIN Featured photos on this page -->" );
-				foreach ( $photos as $photo ) {
-					$id 		= $photo['id'];
-					$content 	= esc_attr( sanitize_text_field( wppa_get_keywords( $id ) ) );
-					if ( $content && ! in_array( $content, $done ) ) {
-						wppa_echo( '
-<meta name="keywords" content="' . $content . '">' );
-						$done[] = $content;
-					}
-				}
-				wppa_echo( "\n<!-- WPPA+ END Featured photos on this page -->\n" );
-			}
+		// Try to find albums on the current page where featured items may be
+		$the_album = '';
+		$the_photo = '';
+		$the_ids = array();
+
+		// Case 1: Query arg contains album spec
+		$album = wppa_get( 'album' );
+		if ( wppa_is_posint( $album ) ) {
+			$the_album = $album;
 		}
-	}
 
-	// No photo and no album, give the plain photo links of all featured photos
-	elseif ( wppa_switch( 'meta_all' ) ) {
-		$query = "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured'";
-		$photos = wppa_get_results( $query );
-		wppa_cache_photo( 'add', $photos );
-		if ( $photos ) {
-			wppa_echo( "\n<!-- WPPA+ BEGIN Featured photos on this site -->" );
-			foreach ( $photos as $photo ) {
-				$thumb 		= $photo;	// Set to global to reduce queries when getting the name
-				$id 		= $photo['id'];
-				$content 	= esc_attr( sanitize_text_field( wppa_get_keywords( $id ) ) );
-				if ( $content && ! in_array( $content, $done ) ) {
-					wppa_echo( '
-<meta name="keywords" content="' . $content . '">' );
-					$done[] = $content;
+		// Case 2: [wppa] shortcode
+		if ( ! $the_album ) {
+			$the_page = get_post();
+			$the_content = $the_page->post_content;
+
+			$shortcodes = wppa_find_shortcodes( $the_content );
+			foreach ( $shortcodes as $shortcode ) {
+
+				$albums_used = '';
+				$photo_used = '';
+
+				// Album specified
+				if ( isset( $shortcode['attributs']['album'] ) ) {
+					$a = $shortcode['attributs']['album'];
+					if ( substr( $a, 0, 1 ) == '$' ) {
+						$a = wppa_get_album_id_by_name( substr( $a, 1 ) );
+					}
+					$albums_used = wppa_expand_enum( $a );
+				}
+
+				// Photo specified
+				if ( isset( $shortcode['attributs']['photo'] ) ) {
+					$photo_used = wppa_expand_enum( $shortcode['attributs']['photo'] );
+				}
+				if ( $shortcode['shortcode'] == 'photo' ) {
+					$photo_used = wppa_expand_enum( $shortcode['attributs'][0] );
+				}
+
+				// wppa but no album and no photo = generic including subalbums
+				if ( $shortcode['shortcode'] == 'wppa' && !isset( $shortcode['attributs']['album'] ) && !isset( $shortcode['attributs']['photo'] ) ) {
+					$albums_used =  wppa_alb_to_enum_children( '0' );
+				}
+
+				// Cover(s) or comtent implies subalbums are reacheable
+				if ( wppa_is_int( $albums_used ) && isset( $shortcode['type'] ) && in_array( $shortcode['type'], ['content', 'cover', 'covers'] ) ) {
+					$albums_used = wppa_alb_to_enum_children( $albums_used );
+				}
+
+				if ( $albums_used ) $the_album .= '.'.$albums_used;
+				if ( $photo_used ) $the_photo .= '.'.$photo_used;
+			}
+
+			$the_albums = explode( '.', $the_album );
+			foreach( array_keys( $the_albums ) as $k ) {
+				if ( ! wppa_is_int( $the_albums[$k] ) ) {
+					if ( substr( $the_albums[$k], 0, 1 ) == '$' ) {
+						$id = wppa_get_album_id_by_name( substr( $the_albums[$k], 1 ) );
+						if ( wppa_is_posint( $id ) ) {
+							$the_albums[$k] = $id;
+						}
+						else unset( $the_albums[$k] );
+					}
+					else unset( $the_albums[$k] );
 				}
 			}
-			wppa_echo( "\n<!-- WPPA+ END Featured photos on this site -->\n" );
+
+			$the_album = implode( '.', $the_albums );
+			$the_photos = explode( '.', $the_photo );
+
+			foreach( array_keys( $the_photos ) as $k ) {
+				if ( ! wppa_is_posint( $the_photos[$k] ) ) {
+					unset( $the_photos[$k] );
+				}
+			}
+			$the_photo = implode( '.', $the_photos );
+		}
+
+		// Case 3: All always
+		if ( wppa_switch( 'meta_all' ) ) {
+			$the_album = 'all';
+		}
+
+		// Now interprete the_album and find item ids
+		$where = 'page';
+		if ( $the_album ) {
+			if ( wppa_is_posint( $the_album ) ) {
+				$query 	 = "SELECT id FROM $wpdb->wppa_photos WHERE album = $the_album AND status = 'featured'";
+			}
+			elseif ( wppa_is_enum( $the_album ) ) {
+				$the_album = str_replace( '.', ',', wppa_expand_enum( $the_album ) );
+				$query 	= "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($the_album) AND status = 'featured'";
+			}
+			elseif ( 'all' == $the_album ) {
+				$where = 'site';
+				$query 	= "SELECT id FROM $wpdb->wppa_photos WHERE status = 'featured'";
+			}
+			else {
+				$query 	= "SELECT id FROM $wpdb->wppa_photos WHERE album = 0 AND status = 'featured'";
+			}
+
+			$the_ids = wppa_get_col( $query );
+		}
+
+		// Photos used need not to be featured
+		if ( $the_photo ) {
+			$the_ids = array_merge( $the_ids, explode( '.', $the_photo ) );
+		}
+
+		$keywords = wppa_get_keywords( $the_ids );
+		if ( $keywords ) {
+			wppa_echo( "\n<!-- WPPA+ BEGIN Featured photos on this $where -->" );
+			wppa_echo( "\n".'<meta name="keywords" content="' . esc_attr( $keywords ) . '">', ['keeplinebreaks' => true] );
+			wppa_echo( "\n<!-- WPPA+ END Featured photos on this $where -->\n" );
 		}
 	}
 

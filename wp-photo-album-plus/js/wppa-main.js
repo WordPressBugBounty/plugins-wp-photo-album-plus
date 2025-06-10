@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.07.001';
+wppaWppaVer = '9.0.08.004';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -498,7 +498,7 @@ function _wppaDoAutocol( mocc, i ) {
 	if ( isGrid > 0 ) {
 
 		// Set container linheight to 0
-		jQuery('#wppa-container-'+mocc).css( 'line-height', '0' );
+//		jQuery('#wppa-container-'+mocc).css( 'line-height', '0' );
 
 		// Calculate width
 		var nItems = parseInt( ( w / wppaMaxCoverWidth ) + 0.9999 );

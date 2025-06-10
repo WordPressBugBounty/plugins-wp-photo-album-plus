@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '9.0.06.003';
+var wppaJsLightboxVersion = '9.0.08.003';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -1256,6 +1256,8 @@ function wppaOvlHide(keepState) {
 			}
 		},500);
 	}
+
+	wppaAlbLbBusy = false;
 }
 
 // Perform onclick action

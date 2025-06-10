@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.05.001
+* Version: 9.0.08.007
 *
 */
 
@@ -4148,6 +4148,9 @@ wppa_log('misc', 'leeg');
 						$value = '';
 						$alert = __('Not a valid url', 'wp-photo-album-plus');
 					}
+					break;
+				case 'wppa_meta_void_custom':
+					$value = strtolower( sanitize_text_field( $value ) );
 					break;
 
 				default:

@@ -3,7 +3,7 @@
 /* It is strongly recommended not to modify this file because it will be overwritten by an update
 /* Any modifications to styles that are not configurable on the settings page should be made in the standard wp customizer css tab
 /*
-/* This is version 8.8.01.005
+/* This is version 9.0.08.002
 */
 
 .wppa-container, .wppa-cover-box, .wppa-thumb-area {
@@ -730,4 +730,9 @@ display:none;
 	padding-left: 30px !important;
 	background-position: 4px center !important;
 	background-repeat: no-repeat !important;
+}
+
+/* For badly configured sites */
+#wppa-ovl-zoom-container, #wppa-overlay-ic div iframe {
+	box-sizing: content-box;
 }

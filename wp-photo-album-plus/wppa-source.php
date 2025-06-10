@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains photo source file management routines
-* Version 8.8.01.005
+* Version 9.0.08.008
 *
 */
 
@@ -41,6 +41,10 @@ function wppa_save_source( $file, $name, $alb, $always = false ) {
 				wppa_unlink( $o1 );
 			}
 
+			// If re-upload, bump rev
+			if ( wppa_is_file( $dest ) ) {
+				wppa_update_option( 'wppa_source_version', wppa_get_option( 'wppa_source_version', 1 ) + 1 );
+			}
 			wppa_copy( $file, $dest );
 
 		}

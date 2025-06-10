@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.0.07.002
+* Version 9.0.08.004
 *
 */
 
@@ -357,6 +357,33 @@ function wppa_get_picture_html( $args ) {
 	return $result;
 }
 
+// Get pan html and Type
+function wppa_get_pan_a( $id ) {
+
+	$pan['html'] = wppa_get_lb_panorama_html( $id );
+	$pan['type'] = '';
+
+	if ( $pan['html'] ) {
+		switch ( wppa_get_photo_item( $id, 'panorama' ) ) {
+			case '0': // none
+				if ( wppa_is_zoomable( $id ) ) {
+					$pan['type'] = 'zoom';
+				}
+				break;
+			case '1': // spheric
+				$pan['type'] = 'spheric';
+				break;
+			case '2': // flat
+				$pan['type'] = 'flat';
+				break;
+			default:
+				break;
+		}
+	}
+	return $pan;
+}
+
+
 // Get full html for a lightbox pan image, e.g. ' data-panorama="'..."' for use in lightbox anchor link
 function wppa_get_lb_panorama_full_html( $id ) {
 
@@ -698,7 +725,7 @@ function wppa_get_spheric_pan_html( $args ) {
 				dY 					:0,
 				fov 				:' . wppa_opt( 'panorama_fov' ) . ',
 				zoomsensitivity		:' . $zoomsensitivity . ',
-				borderWidth			:' . wppa_opt( 'ovl_border_width' ) . ',
+				borderWidth			:0,
 				controls			:' . ( $controls ? 'true' : 'false' ) . ',
 				initialized			:false,
 				icsize				:' . ( $lightbox ? wppa_nav_icon_size( 'lightbox' ) : wppa_nav_icon_size( 'panorama' ) ) . ',
@@ -800,7 +827,7 @@ function wppa_get_flat_pan_html( $args ) {
 		// The actual drawing area
 		'<canvas
 			id="wppa-pan-canvas-' . $mocc . '"
-			style="background-color:transparent;' . ( $manual ? 'cursor:grab;' : '' ) . '"
+			style="' . ( $manual ? 'cursor:grab;' : '' ) . ';background-color:transparent; ' . ( $lightbox ? 'display:none;' : '' ) . '"
 			width="' . $width . '"
 			height="' . ( $width / 2 ) . '"' .
 			( $lightbox ? '
@@ -816,7 +843,7 @@ function wppa_get_flat_pan_html( $args ) {
 		if ( ! $slide ) $result .=
 		'<canvas
 			id="wppa-pan-prev-canvas-' . $mocc . '"
-			style="margin-top:4px;background-color:transparent;"
+			style="margin-top:4px;background-color:transparent; ' . ( $lightbox ? 'display:none;' : '' ) . '"
 			width="' . $width . '"
 			height="' . $height . '"
 			>
@@ -1007,7 +1034,7 @@ function wppa_get_flat_pan_html( $args ) {
 			url 				:\'' . $url . '\',
 			abort 				:false,
 			zoomsensitivity		:' . $zoomsensitivity . ',
-			borderWidth			:' . wppa_opt( 'ovl_border_width' ) . ',
+			borderWidth			:0,
 			controls			:' . ( $controls ? 'true' : 'false' ) . ',
 			height				:' . $height . ',
 			width				:' . $width . ',
@@ -1123,8 +1150,8 @@ function wppa_get_zoom_pan_html( $args ) {
 			$result .=
 			'<canvas
 				id="wppa-pan-canvas-' . $itemid . '"
-				style="' . ( $manual ? 'cursor:grab;' : '' ) . ';background-color:transparent ' . '" ' .//( $lightbox ? '' : 'width:' . $width . 'px;' ) . '"
-'			/>
+				style="' . ( $manual ? 'cursor:grab;' : '' ) . ';background-color:transparent; ' . ( $lightbox ? 'display:none;' : '' ) . '"
+			/>
 
 		</div>';
 
@@ -1325,7 +1352,7 @@ function wppa_get_zoom_pan_html( $args ) {
 				url 				:\'' . $url . '\',
 				abort 				:false,
 				zoomsensitivity		:' . $zoomsensitivity . ',
-				borderWidth			:' . wppa_opt( 'ovl_border_width' ) . ',
+				borderWidth			:0,
 				controls			:' . ( $controls ? 'true' : 'false' ) . ',
 				height				:wppaGetContainerWidth(' . $mocc . ') * '.$height.' / '.$width.',
 				width				:wppaGetContainerWidth(' . $mocc . '),

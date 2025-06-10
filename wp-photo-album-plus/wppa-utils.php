@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.07.002
+* Version: 9.0.08.008
 *
 */
 
@@ -2243,7 +2243,7 @@ global $wppa_supported_photo_extensions;
 
 // Get url of photo with highest available resolution.
 // Not for display ( need not to download fast ) but for external services like Fotomoto
-function wppa_get_hires_url( $id ) {
+function wppa_get_hires_url( $id, $add_version = false ) {
 
 /*
 	// video or audio? return the poster url
@@ -2267,13 +2267,15 @@ function wppa_get_hires_url( $id ) {
 		if ( $url ) return $url;
 	}
 */
+	$ver = ( wppa( 'no_ver' ) ? '' : '?ver=' . wppa_get_option( 'wppa_source_version', 1 ) );
+
 	// Try the orientation corrected source url
 	$source_path = wppa_get_o1_source_path( $id );
 	if ( wppa_is_file( $source_path ) ) {
 
 		// The source file is only http reacheable when it is down from wp-content
 		if ( strpos( $source_path, WPPA_CONTENT_PATH ) !== false ) {
-			return str_replace( WPPA_CONTENT_PATH, WPPA_CONTENT_URL, $source_path );
+			return str_replace( WPPA_CONTENT_PATH, WPPA_CONTENT_URL, $source_path ) . $ver;
 		}
 	}
 
@@ -2283,7 +2285,7 @@ function wppa_get_hires_url( $id ) {
 
 		// The source file is only http reacheable when it is down from ABSPATH
 		if ( strpos( $source_path, WPPA_CONTENT_PATH ) !== false ) {
-			return str_replace( WPPA_CONTENT_PATH, WPPA_CONTENT_URL, $source_path );
+			return str_replace( WPPA_CONTENT_PATH, WPPA_CONTENT_URL, $source_path ) . $ver;
 		}
 	}
 
@@ -2987,10 +2989,10 @@ function wppa_sanitize_photo_name( $file ) {
 }
 
 // Get meta keywords of a photo
-function wppa_get_keywords( $id ) {
+function wppa_get_keywords( $ids, $return_voids = false ) {
 static $wppa_void_keywords;
 
-	if ( ! $id ) return '';
+	if ( empty( $ids ) && ! $return_voids ) return '';
 
 	if ( empty ( $wppa_void_keywords ) ) {
 		$wppa_void_keywords	= array( 	__('Not Defined', 'wp-photo-album-plus' ),
@@ -3038,7 +3040,7 @@ static $wppa_void_keywords;
 										__('Auto, Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus' ),
 										__('Auto, Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus' ),
 										'album', 'albums', 'content', 'http',
-										'source', 'wp', 'uploads', 'thumbs',
+										'source', 'wp', 'uploads', 'upload', 'uploaded', 'thumbs',
 										'wp-content', 'wppa-source',
 										'border', 'important', 'label', 'padding',
 										'segment', 'shutter', 'style', 'table',
@@ -3050,6 +3052,9 @@ static $wppa_void_keywords;
 
 		// make a string
 		$temp = implode( ',', $wppa_void_keywords );
+
+		// Add custom voids
+		$temp .= ','.wppa_opt( 'meta_void_custom' );
 
 		// Downcase
 		$temp = strtolower( $temp );
@@ -3077,18 +3082,33 @@ static $wppa_void_keywords;
 			}
 		}
 	}
-
-	$text 	= wppa_get_photo_name( $id )  .' ' . wppa_get_photo_desc( $id );
-	$text 	= str_replace( array( '/', '-' ), ' ', $text );
-	$words 	= wppa_index_raw_to_words( $text );
-	foreach ( array_keys( $words ) as $key ) {
-		if ( 	wppa_is_int( $words[$key] ) ||
-				in_array( $words[$key], $wppa_void_keywords ) ||
-				strlen( $words[$key] ) < 5 ) {
-			unset ( $words[$key] );
-		}
+	if ( $return_voids ) {
+		return implode( ', ', $wppa_void_keywords );
 	}
-	$result = implode( ', ', $words );
+
+	$accu = array();
+
+	foreach( $ids as $id ) {
+
+		$text 	= wppa_get_photo_name( $id )  .' ' . wppa_get_photo_desc( $id );
+		$text 	= str_replace( array( '/', '-' ), ' ', $text );
+		$words 	= wppa_index_raw_to_words( $text );
+		foreach ( array_keys( $words ) as $key ) {
+			if ( is_numeric( substr( $words[$key], 0, 1 ) ) || in_array( $words[$key], $wppa_void_keywords ) || strlen( $words[$key] ) < 5 ) {
+				unset ( $words[$key] );
+			}
+			else {
+				$words[$key] = wppa_strip_ext( $words[$key] );
+			}
+		}
+		$accu = array_merge( $accu, $words );
+	}
+	if ( count( $accu ) ) {
+		sort( $accu );
+		$accu = array_unique( $accu );
+	}
+
+	$result = implode( ', ', $accu );
 	return $result;
 }
 
@@ -6141,6 +6161,27 @@ global $wpdb;
 	return;
 }
 
+// Queue in output buffer a vaild escaped complete html tag
+function wppa_html_out( $tag, $xattribs = [], $content = '' ) {
+
+	wppa_out( wppa_html_tag( $tag, $xattribs, $content ) );
+}
+
+function wppa_close_tag( $tag, $clear = false, $return = false ) {
+
+	$result = '';
+	if ( $clear ) {
+		$result .= '<div style="clear:both;"></div>';
+	}
+	$result .= '</' . $tag . '>';
+	if ( $return ) {
+		return $result;
+	}
+	else {
+		wppa_out( $result );
+	}
+}
+
 // Retaurn a vaild escaped complete html tag
 function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
@@ -6154,11 +6195,9 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'alt' 	 		=> '',
 				 'target' 	 	=> '',
 				 'class' 	 	=> '',
-				 'data-title' 	=> '',
-				 'data-day' 	=> '',
-				 'data-from' 	=> '',
 				 'type' 	 	=> '',
-				 'preload' 	 	=> '',
+				 'value' 		=> '',
+				 'preload' 	 	=> ( $tag == 'video' ? 'metadata' : '' ),
 				 'poster' 	 	=> '',
 				 'onload' 	 	=> '',
 				 'onerror' 	 	=> '',
@@ -6167,7 +6206,24 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'ondblclick' 	=> '',
 				 'onmouseover' 	=> '',
 				 'onmouseout' 	=> '',
+				 'onscroll' 	=> '',
+				 'onwheel' 		=> '',
 				 'decoding' 	=> '',
+				 'data-id' 		=> '',
+				 'data-title' 	=> '',
+				 'data-day' 	=> '',
+				 'data-from' 	=> '',
+				 'data-src' 	=> '',
+				 'data-videohtml' 	=> '',
+				 'data-videonatwidth' 	=> '',
+				 'data-videonatheight' 	=> '',
+				 'data-audiohtml' 	=> '',
+				 'data-pdfhtml' 	=> '',
+				 'data-rel' 		=> '',
+				 'data-lbtitle' 	=> '',
+				 'data-alt'			=> '',
+				 'data-pantype' 	=> '',
+				 'data-panorama' 	=> '',
 				 ];
 
 	// Completize attributes
@@ -6204,7 +6260,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	// Find vaild tags
 	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio', 'form'] );
+	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio', 'form', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] );
 
 	// Report invalid tag
 	if ( ! in_array( $tag, $allowed_tags ) ) {
@@ -6214,8 +6270,12 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	$result = '<' . $tag;
 
-	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'data-title', 'data-day', 'data-from', 'data-src', 'type', 'preload', 'poster',
-					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'decoding', 'disabled', 'selected', 'autoplay', 'controls'];
+	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'type', 'value', 'preload', 'poster',
+					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding',
+					  'disabled', 'selected', 'autoplay', 'controls',
+					  'data-id', 'data-title', 'data-day', 'data-from', 'data-src', 'data-videohtml', 'data-videonatwidth', 'data-videonatheight', 'data-audiohtml',
+					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama',
+					  ];
 	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
 
 	foreach( array_keys( $attribs ) as $attr ) {
@@ -6270,6 +6330,9 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 	if ( in_array( $tag, $self_closing ) ) {
 		$result .= '/>';
 	}
+	elseif ( $content === false ) {
+		$result .= '>';
+	}
 	else {
 		$result .= '>' . $content . '</' . $tag . '>';
 	}
@@ -6277,7 +6340,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 	return $result;
 }
 
-// Ge the rating html to be used in slides and lightbox
+// Get the rating html to be used in slides and lightbox
 function wppa_get_rating_html( $id ) {
 
 	if ( ! wppa_is_item_displayable( wppa_get_photo_item( $id, 'album' ), 'rating', 'rating_on' ) ) return '';
@@ -6291,4 +6354,24 @@ function wppa_get_rating_html( $id ) {
 	}
 
 
+}
+
+// Get the wppa shortcodes in a text
+function wppa_find_shortcodes( $content ) {
+
+    preg_match_all('/\[(\w+)([^\]]*)\]/', $content, $matches, PREG_SET_ORDER);
+
+    $result = [];
+    foreach ( $matches as $match ) {
+
+        if ( $match[1] == 'wppa' || $match[1] == 'photo'){
+            $attributs = shortcode_parse_atts( $match[2] ); // Attributs du shortcode
+            $result[] = [
+            'shortcode' => $match[1],
+            'attributs' => $attributs,
+            ];
+        }
+    }
+
+    return $result;
 }
