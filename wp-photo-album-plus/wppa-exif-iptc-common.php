@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* Version: 9.0.00.000
+* Version: 9.0.09.002
 *
 *
 */
@@ -3137,20 +3137,20 @@ function wppa_get_exif_item( $file, $item ) {
 
 	// File exists?
 	if ( ! wppa_is_file( $file ) ) {
-		wppa_log('dbg', 'No file');
+//		wppa_log('dbg', 'No file');
 		return false;
 	}
 
 	// Exif functions present?
 	if ( ! function_exists( 'exif_imagetype' ) ) {
-		wppa_log('dbg', 'No exif_imagetype');
+//		wppa_log('dbg', 'No exif_imagetype');
 		return false;
 	}
 
 	// Check filetype
 	$image_type = @ exif_imagetype( $file );
 	if ( $image_type != IMAGETYPE_JPEG ) {
-		wppa_log('dbg', 'Image type != IMAGE_JPEG');
+//		wppa_log('dbg', 'Image type != IMAGE_JPEG');
 		return false;
 	}
 
@@ -3163,7 +3163,7 @@ function wppa_get_exif_item( $file, $item ) {
 	}
 
 	// Nothing found
-	wppa_log('dbg', 'No EXIF found');
+//	wppa_log('dbg', 'No EXIF found');
 	return false;
 }
 

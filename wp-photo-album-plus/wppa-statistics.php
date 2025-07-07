@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.0.04.007
+* Version: 9.0.09.002
 *
 */
 
@@ -300,7 +300,7 @@ function wppa_invalidate_treecounts( $alb = '' ) {
 	else {
 		$iret = wppa_clear_col( WPPA_ALBUMS, 'treecounts' );
 		if ( ! $iret ) {
-			wppa_log( 'dbg', 'Unable to clear all treecounts' );
+//			wppa_log( 'dbg', 'Unable to clear all treecounts' );
 		}
 	}
 }

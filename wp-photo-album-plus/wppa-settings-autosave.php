@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.0.08.007
+* Version: 9.0.09.002
 *
 */
 
@@ -216,8 +216,7 @@ global $wppa_hide_this;
 							/* translators: filename */
 							wppa_alert_text( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus' ), basename( sanitize_file_name( $file['name'] ) ) ) );
 
-							wppa_bump_photo_rev();
-							wppa_bump_thumb_rev();
+							wppa_bump_version( ['photo', 'thumb'] );
 						}
 					}
 				}
@@ -255,8 +254,7 @@ global $wppa_hide_this;
 							/* translators: filename */
 							wppa_alert_text( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus' ), basename( sanitize_file_name( $file['name'] ) ) ) );
 
-							wppa_bump_photo_rev();
-							wppa_bump_thumb_rev();
+							wppa_bump_version( ['photo', 'thumb'] );
 						}
 					}
 				}
@@ -330,8 +328,8 @@ global $wppa_hide_this;
 	wppa_fix_source_path();
 
 	// Make sure there is a .htaccess
-	if ( ! wppa_is_file( wppa_opt( 'wppa_source_dir' ) . '/.htaccess' ) ) {
-		wppa_copy( WPPA_PATH . '/img/.htaccess', wppa_opt( 'wppa_source_dir' ) . '/.htaccess' );
+	if ( ! wppa_is_file( wppa_opt( 'source_dir' ) . '/.htaccess' ) ) {
+		wppa_copy( WPPA_PATH . '/img/.htaccess', wppa_opt( 'source_dir' ) . '/.htaccess' );
 	}
 
 	// Spinner image

@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.0.05.001
+/* Version 9.0.09.001
 /* Various js routines used in admin pages
 */
 
@@ -12,11 +12,11 @@ jQuery(document).ready(function() {
 	jQuery(window).on('DOMContentLoaded load resize scroll', function(){wppaMakeLazyVisible('DOM')});
 });
 
-function wppaReUpload( event, photo, expectedName, reload ) {
+function wppaReUpload( event, photo, expectedName, reload, type, i ) {
 
-	var form = document.getElementById('wppa-re-up-form-'+photo);
-	var fileSelect = document.getElementById('wppa-re-up-file-'+photo);
-	var button = document.getElementById('wppa-re-up-butn-'+photo);
+	var form = document.getElementById('wppa-re-up-form-'+photo+'-'+i);
+	var fileSelect = document.getElementById('wppa-re-up-file-'+photo+'-'+i);
+	var button = document.getElementById('wppa-re-up-butn-'+photo+'-'+i);
 
 	// Remove default action
 	event.preventDefault();
@@ -25,16 +25,19 @@ function wppaReUpload( event, photo, expectedName, reload ) {
 	var file = fileSelect.files[0];
 
 	// Check the file type.
-	if ( !file.type.match( 'image.*' ) ) {
-		alert( 'File is not an image file!' );
+	if ( !file.type.match( type+'.*' ) ) {
+		alert( 'You can only re-upload a file of type '+type+' this way!' );
+		alert( 'File type = '+file.type );
 		return;
 	}
 
 	// Check the file name
+	var saniFilename = file.name.replaceAll( ' ', '-' );
 	if ( expectedName.length == 0 ) {
 		alert( 'Filename will be set to '+file.name );
 	}
-	else if ( file.name != expectedName ) {
+	else if ( saniFilename != expectedName ) {
+console.log( saniFilename + ' ' + expectedName );
 		if ( ! confirm( 'Filename is different.\nIf you continue, the filename will not be updated!.\n\nContinue?' ) ) {
 			jQuery( '#re-up-'+photo ).css( 'display', 'none' );
 			return;
@@ -136,6 +139,7 @@ function wppaReUpload( event, photo, expectedName, reload ) {
 									break;
 							}
 						}
+						if ( reload ) setTimeout( document.location.reload(true), 2500 );
 
 						button.value = 'Upload';
 						jQuery( '#re-up-'+photo ).css( 'display', 'none' );

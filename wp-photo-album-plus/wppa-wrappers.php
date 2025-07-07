@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.0.05.005
+* Version 9.0.09.001
 *
 */
 
@@ -212,16 +212,18 @@ global $wp_filesystem;
 }
 
 // Wrapper for rename
-function wppa_rename( $from, $to ) {
+function wppa_rename( $from, $to, $from_upload = false ) {
 global $wp_filesystem;
 
-	if ( ! wppa_is_path_safe( $from ) ) {
-		wppa_log( 'Err', 'Unsafe from path detected in wppa_rename(): ' . wppa_shortpath( $from ) );
-		return false;
-	}
-	if ( ! wppa_is_path_safe( $to ) ) {
-		wppa_log( 'Err', 'Unsafe to path detected in wppa_rename(): ' . wppa_shortpath( $to ) );
-		return false;
+	if ( ! $from_upload ) {
+		if ( ! wppa_is_path_safe( $from ) ) {
+			wppa_log( 'Err', 'Unsafe from path detected in wppa_rename(): ' . wppa_shortpath( $from ) );
+			return false;
+		}
+		if ( ! wppa_is_path_safe( $to ) ) {
+			wppa_log( 'Err', 'Unsafe to path detected in wppa_rename(): ' . wppa_shortpath( $to ) );
+			return false;
+		}
 	}
 
 	$bret = false;

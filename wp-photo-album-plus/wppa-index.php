@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version: 9.0.00.000
+* Version: 9.0.09.002
 *
 *
 */
@@ -117,38 +117,40 @@ global $pcount;
 		$words_added = '';
 		foreach ( $words as $word ) {
 
-			// Get the row of the index table where the word is registered.
-			$indexline = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug = %s", $word ) );
+			if ( strlen( $word ) <= 20 ) { // Max sluglength is 20 char
 
-			// If this line does not exist yet, create it with only one album number as data
-			if ( ! $indexline ) {
-				wppa_create_index_entry( array( 'slug' => $word, 'photos' => $id ) );
-				wppa_log( 'idx', 'Adding index slug {b}{span style="color:darkred"}' . $word . '{/span}{/b} for photo {b}' . $id . '{/b}' );
-				$words_added .= $word . ' ';
-			}
+				// Get the row of the index table where the word is registered.
+				$indexline = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug = %s", $word ) );
 
-			// Index line already exitst, process this photo id for this word
-			else {
-
-				// Convert existing album ids to an array
-				$oldphotos = wppa_index_string_to_array( $indexline['photos'] );
-
-				// If not in yet...
-				if ( ! in_array( $id, $oldphotos ) ) {
-
-					// Add it
-					$oldphotos[] = $id;
-
-					// Covert to string again
-					$newphotos = wppa_index_array_to_string( $oldphotos );
-
-					// Update db
-					wppa_update_index( $indexline['id'], ['photos' => $newphotos] );
-
+				// If this line does not exist yet, create it with only one album number as data
+				if ( ! $indexline ) {
+					wppa_create_index_entry( array( 'slug' => $word, 'photos' => $id ) );
+					wppa_log( 'idx', 'Adding index slug {b}{span style="color:darkred"}' . $word . '{/span}{/b} for photo {b}' . $id . '{/b}' );
 					$words_added .= $word . ' ';
 				}
-			}
 
+				// Index line already exitst, process this photo id for this word
+				else {
+
+					// Convert existing album ids to an array
+					$oldphotos = wppa_index_string_to_array( $indexline['photos'] );
+
+					// If not in yet...
+					if ( ! in_array( $id, $oldphotos ) ) {
+
+						// Add it
+						$oldphotos[] = $id;
+
+						// Covert to string again
+						$newphotos = wppa_index_array_to_string( $oldphotos );
+
+						// Update db
+						wppa_update_index( $indexline['id'], ['photos' => $newphotos] );
+
+						$words_added .= $word . ' ';
+					}
+				}
+			}
 		}
 		wppa_update_photo( $id, ['indexdtm' => time()] );
 		$pcount++;
@@ -292,9 +294,16 @@ function wppa_index_raw_to_words( $xtext, $no_skips = false, $minlen = '3', $no_
 
 // Expand compressed string
 function wppa_index_string_to_array( $string ) {
+static $cache;
+
+	if ( ! $cache ) $cache = array();
 
 	// Anything?
 	if ( ! $string ) return array();
+	if ( strpos( $string, ',' ) === false && strpos( $string, '.' ) === false ) return array( $string );
+
+	// In Cache?
+	if ( isset( $cache[$string] ) ) return $cache[$string];
 
 	// Any ranges?
 	if ( strstr( $string, '..' ) ) {
@@ -337,6 +346,9 @@ function wppa_index_string_to_array( $string ) {
 
 	// Remove dups
 	$result = array_unique( $result );
+
+	// Save in cache
+	$cache[$string] = $result;
 
 	return $result;
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.0.03.002
+* Version: 9.0.09.002
 *
 */
 
@@ -303,7 +303,7 @@ global $wppa_runtime_settings;
 				$atts['album'] = implode( '.', $albs );
 			}
 			else {
-				switch( wppa_opt( 'wppa_posttitle_owner' ) ) {
+				switch( wppa_opt( 'posttitle_owner' ) ) {
 					case '--- postauthor ---':
 						$usr = get_user_by( 'ID', $owner_id );
 						$owner = $usr->user_login;
@@ -313,8 +313,8 @@ global $wppa_runtime_settings;
 						break;
 					default:
 						// Should never get here
-						wppa_log( 'err', 'Unimplemented #posttitle album owner: '.wppa_opt( 'wppa_posttitle_owner' ));
-						return "Error. Unimplemented album owner indicator: ".wppa_opt( 'wppa_posttitle_owner' );
+						wppa_log( 'err', 'Unimplemented #posttitle album owner: '.wppa_opt( 'posttitle_owner' ));
+						return "Error. Unimplemented album owner indicator: ".wppa_opt( 'posttitle_owner' );
 				}
 
 				$alb = wppa_create_album_entry( ['name' 		=> $the_name,
@@ -795,7 +795,7 @@ global $wpdb;
 			$xatts[$at] = false;
 		}
 	}
-	
+
 	/*
 	$no_s = ['no', 'off'];
 	if ( in_array( 'landscape', $xatts ) )	$xatts['landscape'] = true;
@@ -808,8 +808,8 @@ global $wpdb;
 	elseif ( isset( $xatts['anon'] ) && in_array( $xatts['anon'], $no_s ) ) $xatts['anon'] = false;
 	if ( in_array( 'meonly', $xatts ) ) 	$xatts['meonly'] = true;
 	elseif ( isset( $xatts['meonly'] ) && in_array( $xatts['meonly'], $no_s ) ) $xatts['meonly'] = false;
-	*/ 
-	
+	*/
+
 	// Login requested?
 	if ( in_array( 'login', (array) $xatts ) ) {
 		if ( ! is_user_logged_in() ) {
@@ -1215,7 +1215,7 @@ function wppa_you_can_not( $xaction, $xtype, $useless = true ) {
 	/* translators: Example: You can not delay a single image shortcode display */
 	$result = sprintf( __( 'You can not %1$s a %2$s shortcode display.', 'wp-photo-album-plus' ), $action, $type ) .
 			  ( $useless ? ' ' . __( 'It is useless anyway.', 'wp-photo-album-plus' ) : '' );
-	wppa_log( 'dbg', $result );
+//	wppa_log( 'dbg', $result );
 	return $result;
 }
 

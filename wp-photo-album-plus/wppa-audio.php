@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all audio routines
-* Version 9.0.00.007
+* Version 9.0.09.002
 *
 */
 
@@ -130,10 +130,11 @@ function wppa_get_audio_body( $id ) {
 
 	// Find video url with no version and no extension
 	$source = wppa_strip_ext( wppa_get_photo_url( $id, false ) );
+	$aver 	= wppa_get_version( 'audio' );
 
 	$result = '';
 	foreach ( $is_audio as $ext ) {
-		$result .= wppa_html_tag( 'source', ['src' => $source.'.'.$ext, 'type' => 'audio/'.$ext] );
+		$result .= wppa_html_tag( 'source', ['src' => $source.'.'.$ext.'?ver='.$aver, 'type' => 'audio/'.$ext] );
 	}
 	$result .= esc_js( __( 'There is no filetype available for your browser, or your browser does not support html5 audio', 'wp-photo-album-plus' ) );
 

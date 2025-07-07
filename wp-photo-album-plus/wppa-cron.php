@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
- Version: 9.0.00.000
+ Version: 9.0.09.003
 *
 */
 
@@ -337,6 +337,9 @@ global $wppa_endtime;
 	if ( $p_need_index ) {
 		wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 	}
+
+	// Check for recursive paremtships
+	wppa_fix_recursion();
 
 	wppa_log( 'Cron', '{b}wppa_cleanup{/b} completed.' );
 

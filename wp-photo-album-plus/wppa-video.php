@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all video routines
-* Version 9.0.01.001
+* Version 9.0.09.002
 *
 */
 
@@ -116,10 +116,11 @@ function wppa_get_video_body( $id ) {
 
 	// Find video url with no version and no extension
 	$source = wppa_strip_ext( wppa_get_photo_url( $id, false ) );
+	$vver 	= wppa_get_version( 'video' );
 
 	$result = '';
 	foreach ( $is_video as $ext ) {
-		$result .= wppa_html_tag( 'source', ['src' => $source.'.'.$ext, 'type' => str_replace( 'ogv', 'ogg', 'video/'.$ext )] );
+		$result .= wppa_html_tag( 'source', ['src' => $source.'.'.$ext.'?ver='.$vver, 'type' => str_replace( 'ogv', 'ogg', 'video/'.$ext )] );
 	}
 	$result .= esc_js( __( 'There is no filetype available for your browser, or your browser does not support html5 video', 'wp-photo-album-plus' ) );
 

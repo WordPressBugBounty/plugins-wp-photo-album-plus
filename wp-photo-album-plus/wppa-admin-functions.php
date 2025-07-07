@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.0.01.003
+* Version: 9.0.09.002
 *
 */
 
@@ -199,6 +199,7 @@ global $wpdb;
 			return false;
 		}
 	}
+	wppa_bump_version( ['photo', 'thumb'] );
 	return true;
 }
 
@@ -659,6 +660,7 @@ global $allphotos;
 			// Update modified flag
 			wppa_update_photo( $id );
 		}
+		wppa_bump_version( ['source', 'photo', 'thumb'] );
 		return count( $photos );
 	}
 	return false;
@@ -1093,9 +1095,7 @@ function wppa_make_360( $id, $degs ) {
 
 	// Housekeeping
 	imagedestroy( $canvas );
-	wppa_bump_photo_rev();
-	wppa_bump_thumb_rev();
-
+	wppa_bump_version( ['photo', 'thumb'] );
 	// All done
 	return true;
 }

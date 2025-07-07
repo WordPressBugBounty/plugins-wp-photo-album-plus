@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.0.00.000
+* Version 9.0.09.002
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -264,7 +264,7 @@ static $last_query;
 		// No luck, maybe attempt to save a session that never started.
 		// Mostly robots that modify their own ip.
 		// Just ignore is the best way
-		wppa_log( 'Dbg', 'Could not save session '.$wppa_session['id']);
+//		wppa_log( 'Dbg', 'Could not save session '.$wppa_session['id']);
 		return false;
 	}
 

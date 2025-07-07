@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.0.03.001
+* Version: 9.0.09.002
 *
 */
 
@@ -1519,40 +1519,6 @@ global $wpdb;
 							}
 						}
 
-						// Re-upload
-						if ( wppa_user_is_admin() || ! wppa_switch( 'reup_is_restricted' ) ) {
-							wppa_echo( '
-							<div class="left" style="max-width:500px;">
-								<label>
-									&nbsp;
-								</label><br>
-								<input
-									type="button"
-									class="wppa-admin-button button"
-									onclick="jQuery( \'#re-up-' . $id . '\' ).css( \'display\', \'inline-block\' )"
-									value="' . esc_attr( __( 'Re-upload file', 'wp-photo-album-plus' ) ) . '"
-								/>
-
-								<div id="re-up-' . $id . '" style="display:none">
-									<form
-										id="wppa-re-up-form-' . $crid . '"
-										onsubmit="wppaReUpload( event, \'' . $crid . '\', \'' . $filename . '\' )"
-										>
-										<input
-											type="file"
-											id="wppa-re-up-file-' . $crid . '"
-										/>
-										<input
-											type="submit"
-											class="wppa-admin-button button"
-											id="wppa-re-up-butn-' . $crid . '"
-											value="' . esc_attr( __( 'Upload', 'wp-photo-album-plus' ) ) . '"
-										/>
-									</form>
-								</div>
-							</div>' );
-						}
-
 						// If pdf and imagic show convert to album button
 						if ( ! $quick && wppa_is_pdf( $id ) && wppa_can_magick() ) {
 
@@ -1963,12 +1929,13 @@ global $wpdb;
 										$paths 		= '';
 										$urls 		= '';
 										$downloads 	= '';
+										$ver 		= '?ver=' . wppa_get_version( 'video' );
 										foreach ( $is_video as $fmt ) {
 											$formats 	.= $fmt . ' (' . wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) ) . ')<br>';
 											$paths 		.= str_replace( WPPA_UPLOAD_PATH, '.../wppa', str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) ) . '<br>';
 											$url 		= str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
-											$urls 		.= '<a href="' . $url . '" target="_blank">' . $url . '</a><br>';
-											$download 	=  '<a href="' . $url . '" target="_blank" download="' . wppa_strip_ext( $filename ) . '.' . $fmt . '">
+											$urls 		.= '<a href="' . $url . $ver . '" target="_blank">' . $url . '</a><br>';
+											$download 	=  '<a href="' . $url . $ver . '" target="_blank" download="' . wppa_strip_ext( $filename ) . '.' . $fmt . '">
 																<input type="button" value="' . esc_attr__( 'Download', 'wp-photo-album-plus' ) . '">
 															</a>';
 											$downloads 	.= $download . '<br>';
@@ -2028,6 +1995,7 @@ global $wpdb;
 										$paths 		= '';
 										$urls 		= '';
 										$downloads 	= '';
+										$ver 		= '?ver=' . wppa_get_version( 'audio' );
 										foreach ( $has_audio as $fmt ) {
 											$formats 	.= $fmt . '<br>';
 											$sizes 		.= wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) ) . '<br>';
@@ -2067,8 +2035,9 @@ global $wpdb;
 										$fs 		= wppa_get_filesize( $sp );
 										$path 		= str_replace( WPPA_UPLOAD_PATH, '.../wppa', $sp );
 										$uri 		= str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, $sp );
-										$url 		= '<a href="' . $uri . '" target="_blank">' . $uri . '</a>';
-										$download 	= '<a href="' . $uri . '" target="_blank" download="' . $filename . '">
+										$uriv 		= $uri . '?ver=' . wppa_get_version( 'pdf' );
+										$url 		= '<a href="' . $uriv . '" target="_blank">' . $uri . '</a>';
+										$download 	= '<a href="' . $uriv . '" target="_blank" download="' . $filename . '">
 															<input type="button" value="' . esc_attr__( 'Download', 'wp-photo-album-plus' ) . '">
 														</a>';
 										wppa_echo( '
@@ -2139,6 +2108,7 @@ global $wpdb;
 																	<input type="button" value="'.esc_attr__('Download', 'wp-photo-album-plus').'">
 																</a>';
 										}
+										$ver = '?ver=' . wppa_get_version( 'photo' );
 
 										foreach( $files as $file ) {
 											wppa_echo( '
@@ -2153,7 +2123,7 @@ global $wpdb;
 													$file['path'] . '
 												</td>
 												<td>
-													<a href="' . $file['url'] . '" target="_blank">' . $file['url'] . '</a>
+													<a href="' . $file['url'] . $ver . '" target="_blank">' . $file['url'] . '</a>
 												</td>
 												<td>' .
 													$file['dl'] . '
@@ -2171,6 +2141,7 @@ global $wpdb;
 									}
 									$dp 	= wppa_get_photo_path( $id );
 									$url 	= wppa_get_photo_url( $id );
+									$urlv 	= $url . '?ver=' . wppa_get_version( 'photo' );
 
 									// No stubfiles please
 									if ( substr( $dp, -8 ) == 'stub.png' ) $dp = '';
@@ -2193,12 +2164,12 @@ global $wpdb;
 												str_replace( WPPA_UPLOAD_PATH, '.../wppa', $dp ) . '
 											</td>
 											<td>
-												<a href="'.$url.'" target="_blank">' .
+												<a href="'.$urlv.'" target="_blank">' .
 													$url . '
 												</a>
 											</td>
 											<td>
-												<a href="'.$url.'" target="_blank" download="'.$filename.'">
+												<a href="'.$urlv.'" target="_blank" download="'.$filename.'">
 													<input type="button" value="'.esc_attr__('Download', 'wp-photo-album-plus').'">
 												</a>
 											</td>
@@ -2225,6 +2196,7 @@ global $wpdb;
 
 											$path 	= str_replace( WPPA_UPLOAD_PATH, '.../wppa', $tp );
 											$url 	= str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, $tp );
+											$urlv 	= $url . '?ver=' . wppa_get_version( 'thumb' );
 
 											wppa_echo( '
 											<tr>
@@ -2238,12 +2210,12 @@ global $wpdb;
 													$path . '
 												</td>
 												<td>
-													<a href="'.$url.'" target="_blank">' .
+													<a href="'.$urlv.'" target="_blank">' .
 														$url . '
 													</a>
 												</td>
 												<td>
-													<a href="'.$url.'" target="_blank" download="'.$filename.'-thumbnail">
+													<a href="'.$urlv.'" target="_blank" download="'.$filename.'-thumbnail">
 														<input type="button" value="'.esc_attr__('Download', 'wp-photo-album-plus').'">
 													</a>
 												</td>
@@ -2277,8 +2249,9 @@ global $wpdb;
 
 													$paths .= str_replace( WPPA_UPLOAD_PATH, '.../wppa', $file ) . '<br>';
 
-													$url = str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, $file );
-													$urls .= '<a href="'.$url.'" target="_blank">' . $url . '</a><br>';
+													$url 	= str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, $file );
+													$urlv 	= $url . '?ver=' . wppa_get_version( 'photo' );
+													$urls 	.= '<a href="'.$urlv.'" target="_blank">' . $url . '</a><br>';
 												}
 											}
 											$txt .= '</span>';
@@ -2310,10 +2283,136 @@ global $wpdb;
 
 							wppa_echo( '</fieldset></div>' );
 
+							// Re-upload
+							if ( wppa_user_is_admin() || ! wppa_switch( 'reup_is_restricted' ) ) {
+
+								wppa_echo( '
+								<div class="wppa-flex">
+								<fieldset class="wppa-fieldset" style="margin-right:12px;">
+									<legend class="wppa-legend">' .
+										__( 'Image file', 'wp-photo-album-plus' ) . '
+									</legend>' );
+
+									if ( wppa_is_video( $id ) || wppa_has_audio( $id ) || wppa_is_pdf( $id ) ) {
+										$v = __( '(Re-)upload poster file', 'wp-photo-album-plus' );
+									}
+									else {
+										$v = __( 'Re-upload photo file', 'wp-photo-album-plus' );
+									}
+									wppa_echo( '
+									<div class="left" style="max-width:500px;">
+										<label>
+										</label>
+										<input
+											type="button"
+											class="wppa-admin-button button"
+											onclick="jQuery( \'#re-up-' . $id . '1\' ).css( \'display\', \'inline-block\' );jQuery(this).hide();"
+											value="' . esc_attr( $v ) . '"
+										/>
+
+										<div id="re-up-' . $id . '1" style="display:none">
+											<form
+												id="wppa-re-up-form-' . $crid . '-1"
+												onsubmit="wppaReUpload( event, \'' . $crid . '\', \'' . $filename . '\', true, \'image\', \'1\' )"
+												>
+												<input
+													type="file"
+													accept=".'.wppa_get_ext(wppa_fix_poster_ext(wppa_get_photo_path($id),$id)).'"
+													id="wppa-re-up-file-' . $crid . '-1"
+													style="display:none"
+													onchange="wppaDisplaySelectedFiles(\'wppa-re-up-file-' . $crid . '-1\')"
+												/>
+												<input
+													type="button"
+													class="wppa-admin-button button"
+													id="wppa-re-up-file-' . $crid . '-1-display"
+													onclick="jQuery(\'#wppa-re-up-file-' . $crid . '-1\').trigger(\'click\')"
+													value="'.__('Select file', 'wp-photo-album-plus').'"
+
+												/>
+
+												<input
+													type="submit"
+													class="wppa-admin-button button"
+													id="wppa-re-up-butn-' . $crid . '-1"
+													value="' . esc_attr( __( 'Upload', 'wp-photo-album-plus' ) ) . '"
+												/>
+											</form>
+										</div>
+									</div>' );
+
+								wppa_echo( '</fieldset>' );
+
+								if ( wppa_is_video( $id ) || wppa_has_audio( $id ) || wppa_is_pdf( $id ) ) {
+									wppa_echo( '
+									<fieldset class="wppa-fieldset" style="margin-right:12px;">
+										<legend class="wppa-legend">' .
+											__( 'Multi media file', 'wp-photo-album-plus' ) . '
+										</legend>' );
+
+
+										if ( wppa_is_video( $id ) ) {
+											$v = __( 'Re-upload video file', 'wp-photo-album-plus' );
+											$ty = 'video';
+											$ex = 'mp4';
+										}
+										elseif ( wppa_has_audio( $id ) ) {
+											$v = __( 'Re-upload audio file', 'wp-photo-album-plus' );
+											$ty = 'audio';
+											$ex = 'mp3';
+										}
+										else {
+											$v = __( 'Re-upload pdf file', 'wp-photo-album-plus' );
+											$ty = 'pdf';
+											$ex = 'pdf';
+										}
+										wppa_echo( '
+										<div class="left" style="max-width:500px;">
+											<label>
+											</label>
+											<input
+												type="button"
+												class="wppa-admin-button button"
+												onclick="jQuery( \'#re-up-' . $id . '2\' ).css( \'display\', \'inline-block\' );jQuery(this).hide();"
+												value="' . esc_attr( $v ) . '"
+											/>
+
+											<div id="re-up-' . $id . '2" style="display:none">
+												<form
+													id="wppa-re-up-form-' . $crid . '-2"
+													onsubmit="wppaReUpload( event, \'' . $crid . '\', \'' . str_replace( 'xxx', $ex, $filename ) . '\', true, \'' . $ty . '\', \'2\' )"
+													>
+													<input
+														type="file"
+														accept=".'.$ex.'"
+														id="wppa-re-up-file-' . $crid . '-2"
+														style="display:none"
+														onchange="wppaDisplaySelectedFiles(\'wppa-re-up-file-' . $crid . '-2\')"
+													/>
+													<input
+														type="button"
+														class="wppa-admin-button button"
+														id="wppa-re-up-file-' . $crid . '-2-display"
+														onclick="jQuery(\'#wppa-re-up-file-' . $crid . '-2\').trigger(\'click\')"
+														value="'.__('Select file', 'wp-photo-album-plus').'"
+													/>
+													<input
+														type="submit"
+														class="wppa-admin-button button"
+														id="wppa-re-up-butn-' . $crid . '-2"
+														value="' . esc_attr( __( 'Upload', 'wp-photo-album-plus' ) ) . '"
+													/>
+												</form>
+											</div>
+										</div>' );
+									wppa_echo( '</fieldset>' );
+								}
+							}
+
 							// Remake displayfiles / thumbnail
 							if ( ! $is_video || $has_poster ) {
 								wppa_echo( '
-								<div class="wppa-flex">
+
 									<fieldset class="wppa-fieldset" style="margin-right:12px;">
 										<legend class="wppa-legend">' .
 											__( 'Display file actions', 'wp-photo-album-plus' ) . '

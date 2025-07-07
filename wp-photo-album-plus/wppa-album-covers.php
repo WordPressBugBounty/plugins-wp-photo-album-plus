@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.0.08.004
+* Version: 9.0.09.002
 *
 */
 
@@ -1800,7 +1800,7 @@ global $wpdb;
 
 				// Physical empty? Even no link for admin, except when empty thumblist requested and upload link on thumblist
 				if ( ! $pc && ! $ac ) {
-					if ( ! wppa_switch( 'show_empty_thumblist' ) || wppa_opt( 'upload_link_thumbs' ) == 'none' ) {
+					if ( wppa_opt( 'show_empty_thumblist' ) != 'never' || wppa_opt( 'upload_link_thumbs' ) == 'none' ) {
 						$href_content 		= '';
 						$onclick_content 	= '';
 						$title 				= __( 'This album is empty', 'wp-photo-album-plus' );

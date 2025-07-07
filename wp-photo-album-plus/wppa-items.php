@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version: 9.0.07.002
+* Version: 9.0.09.002
 *
 */
 
@@ -693,7 +693,7 @@ global $wppa_skip_alb_to_gal;
 
 	// Raw data
 	if ( ! $album ) {
-		wppa_log( 'dbg', 'Album desc of non existent album #' . $id . ' requested', true );
+//		wppa_log( 'dbg', 'Album desc of non existent album #' . $id . ' requested', true );
 		return '';
 	}
 	$desc = $album['description'];

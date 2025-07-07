@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the albums/photos/slideshow in a page or post
-* Version 9.0.07.001
+* Version 9.0.09.002
 */
 function wppa_theme() {
 
@@ -519,6 +519,6 @@ function wppa_get_extra_url() {
 function wppa_report_nothing( $where ) {
 
 	$result = "Nothing found. Location: $where";
-	wppa_log( 'dbg', $result );
+//	wppa_log( 'dbg', $result );
 }
 

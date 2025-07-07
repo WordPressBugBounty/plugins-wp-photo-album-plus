@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 9.0.07.002
+* Version: 9.0.09.002
 *
 */
 
@@ -1522,15 +1522,14 @@ global $is_reschedule;
 				wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 				break;
 			case 'wppa_regen_thumbs':
-				wppa_bump_thumb_rev();
+				wppa_bump_version( 'thumb' );
 				break;
 			case 'wppa_file_system':
 				wppa_update_option( 'wppa_file_system', $to );
 				$reload = 'reload';
 				break;
 			case 'wppa_remake':
-				wppa_bump_photo_rev();
-				wppa_bump_thumb_rev();
+				wppa_bump_version( ['photo', 'thumb'] );
 				break;
 			case 'wppa_edit_tag':
 			case 'wppa_covert_usertags':

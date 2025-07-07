@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the actual import functions
-* Version: 9.0.00.000
+* Version: 9.0.09.002
 *
 */
 
@@ -426,8 +426,7 @@ global $wppa_skip;
 
 		wppa_save_source( $file, basename( $file ), $alb, wppa_is_pdf( $is_poster ) );
 		wppa_make_o1_source( $is_poster );
-		wppa_bump_photo_rev();
-		wppa_bump_thumb_rev();
+		wppa_bump_version( ['photo', 'thumb'] );
 
 		// Make new files
 		$bret = wppa_make_the_photo_files( $file, $is_poster, strtolower( wppa_get_ext( basename( $file ) ) ) );
@@ -1019,7 +1018,7 @@ global $wpdb;
 		while ( ! feof( $handle ) ) {
 			$dataline = fgets( $handle, 4096 );
 			if ( $dataline ) {
-				wppa_log( 'dbg', __( 'Read data:', 'wp-photo-album-plus' ) . ' ' . trim( $dataline ) );
+//				wppa_log( 'dbg', __( 'Read data:', 'wp-photo-album-plus' ) . ' ' . trim( $dataline ) );
 				$data_arr = str_getcsv( $dataline, wppa_opt( 'csv_sep' ) );
 				foreach( array_keys( $data_arr ) as $i ) {
 					if ( ! seems_utf8( $data_arr[$i] ) ) {
@@ -1067,12 +1066,12 @@ global $wpdb;
 						wppa_update_photo( $photo['id'], $fields );
 						$processed ++;
 					}
-					wppa_log( 'dbg', 'Processed: ' . $data_arr[0] );
+//					wppa_log( 'dbg', 'Processed: ' . $data_arr[0] );
 				}
 
 				// This line could not be processed
 				else {
-					wppa_log( 'dbg', 'Could not find: ' . $data_arr[0] );
+//					wppa_log( 'dbg', 'Could not find: ' . $data_arr[0] );
 
 					$skipped++;
 				}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains common upload functions
-* Version: 9.0.00.000
+* Version: 9.0.09.002
 *
 */
 
@@ -84,7 +84,7 @@ global $wppa_supported_document_extensions;
 		$new_type = 'unknown';
 	}
 
-	// Cheack against incompatible combinations
+	// Check against incompatible combinations
 	$cerr = false;
 	if ( $ext_type == 'video' && $new_type == 'audio' || $ext_type == 'audio' && $new_type == 'video' ) {
 		$cerr = true;
@@ -133,6 +133,7 @@ global $wppa_supported_document_extensions;
 				wppa_copy( $file['tmp_name'], wppa_get_source_album_dir( $album ) . '/' . $file['name'] );
 				wppa_update_photo( $ext_id, ['filename' => wppa_strip_ext( $file['name'] ) . '.pdf'] );
 				wppa_upload_post_process( $the_type, $album, $ext_id, $from );
+				wppa_bump_version( ['source', 'photo', 'thumb', 'pdf'] );
 				return true;;
 			}
 
@@ -163,7 +164,7 @@ global $wppa_supported_document_extensions;
 
 			// Process posterfile or update existing image file (dups not allowed)
 			if ( $ext_type == 'video' || $ext_type == 'audio' || $ext_type == 'document' || $ext_type == $new_type ) {
-				wppa_log( 'dbg', 'Updating ' . $ext_id . ', ' . $file['name'] . ' ' . $ext_type . ' with ' . $the_type );
+//				wppa_log( 'dbg', 'Updating ' . $ext_id . ', ' . $file['name'] . ' ' . $ext_type . ' with ' . $the_type );
 				wppa_move_uploaded_file( $file['tmp_name'], wppa_get_source_album_dir( $album ) . '/' . $file['name'] );
 				if ( $ext_type == 'document' ) {
 					wppa_update_photo( $ext_id, ['ext' => $the_type] );
@@ -171,6 +172,7 @@ global $wppa_supported_document_extensions;
 				wppa_cache_photo( 'invalidate', $ext_id );
 				wppa_make_the_photo_files( wppa_get_source_album_dir( $album ) . '/' . $file['name'], $ext_id, wppa_get_ext( $file['name'] ) );
 				wppa_upload_post_process( $the_type, $album, $ext_id, $from );
+				wppa_bump_version( ['source', 'photo', 'thumb'] );
 				return true;; // Yes we uploaded a file
 			}
 
@@ -203,6 +205,7 @@ global $wppa_supported_document_extensions;
 			}
 			else {
 				$id = $ext_id;
+				wppa_bump_version( ['source', 'photo', 'thumb', 'video'] );
 			}
 
 			// Add file
@@ -495,7 +498,7 @@ function wppa_fix_wp_read_video_metadata_function( $metadata, $file, $file_forma
 	// Fix if present
 	if ( isset( $data['video']['rotate'] ) ) {
 		$metadata['rotate'] = $data['video']['rotate'];
-		wppa_log( 'dbg', 'Rotate added by wppa: ' . $metadata['rotate'] );
+//		wppa_log( 'dbg', 'Rotate added by wppa: ' . $metadata['rotate'] );
 	}
 	return $metadata;
 }
@@ -517,7 +520,7 @@ function wppa_fix_video_metadata( $id, $where ) {
 	// Does file exist?
 	$file = wppa_strip_ext( wppa_get_photo_path( $id ) ) . '.mp4';
 	if ( ! wppa_is_file( $file ) ) {
-		wppa_log( 'dbg', 'wppa_fix_video_metadata quit because ' . $file . ' does not exists' );
+//		wppa_log( 'dbg', 'wppa_fix_video_metadata quit because ' . $file . ' does not exists' );
 	}
 
 	// Get the info
@@ -525,7 +528,7 @@ function wppa_fix_video_metadata( $id, $where ) {
 
 	// Make sure its a video
 	if ( $mp4info['fileformat'] != 'mp4' ) {
-		wppa_log( 'dbg', 'No mp4 fileformat in ' . $file . ' ' . $where );
+//		wppa_log( 'dbg', 'No mp4 fileformat in ' . $file . ' ' . $where );
 		return false;
 	}
 
@@ -563,7 +566,7 @@ function wppa_fix_video_metadata( $id, $where ) {
 	}
 	else $exifdtm = '';
 
-	wppa_log( 'dbg', 'MP4 Metadata found (' . $videox . 'x' . $videoy . '), ' . $duration . ', ' . $exifdtm . ' in ' . $file . ' ' . $where . ' ' . $rot );
+//	wppa_log( 'dbg', 'MP4 Metadata found (' . $videox . 'x' . $videoy . '), ' . $duration . ', ' . $exifdtm . ' in ' . $file . ' ' . $where . ' ' . $rot );
 
 	return true;
 }

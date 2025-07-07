@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.0.00.000
+* Version 9.0.09.001
 *
 */
 
@@ -429,7 +429,7 @@ global $wppa_import_errors;
 				wppa_import_header_subtitle( sprintf( _n( 'There is %d video in the depot', 'There are %d videos in the depot', $videocount, 'wp-photo-album-plus' ), $videocount ) );
 				wppa_import_header_check( 'del-after-v', __( 'Remove from depot after successful import.', 'wp-photo-album-plus' ) );
 				wppa_import_header_check( 'del-after-fv', __( 'Remove from depot after failed import.', 'wp-photo-album-plus' ) );
-				wppa_echo( '<small> ' . __( 'Files larger than 64MB will always be removed after successful import.', 'wp-photo-album-plus' ) . '</small>' );
+				wppa_import_header_check( 'wppa-update', __( 'Update existing videos', 'wp-photo-album-plus' ), 'checked disabled' );
 				wppa_import_album_select( 'video' );
 				wppa_import_table_start( 'video', '4' );
 
@@ -453,6 +453,7 @@ global $wppa_import_errors;
 				wppa_import_header_subtitle( sprintf( _n( 'There is %d audio in the depot', 'There are %d audios in the depot', $audiocount, 'wp-photo-album-plus' ), $audiocount ) );
 				wppa_import_header_check( 'del-after-u', __( 'Remove from depot after successful import.', 'wp-photo-album-plus' ) );
 				wppa_import_header_check( 'del-after-fu', __( 'Remove from depot after failed import.', 'wp-photo-album-plus' ) );
+				wppa_import_header_check( 'wppa-update', __( 'Update existing audios', 'wp-photo-album-plus' ), 'checked disabled' );
 				wppa_import_album_select( 'audio' );
 				wppa_import_table_start( 'audio', '4' );
 
@@ -1073,7 +1074,7 @@ function wppa_do_import_upload() {
 			wppa_html_tag( 'br' ) .
 			wppa_html_tag( 'div', ['style' => "font-weight:bold"],
 				__( 'Reloading to include the new files, please stand by...', 'wp-photo-album-plus' ) .
-				wppa_html_tag( 'img', ['src' =>"", 'onerror' => "wppaImportReload('php')"] ) );
+				wppa_html_tag( 'img', ['src' => 'pietjepuk', 'class' => 'nolazy', 'style' => 'display:none;', 'onerror' => "wppaImportReload('php')"] ) );
 		}
 	}
 

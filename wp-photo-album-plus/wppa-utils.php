@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.08.008
+* Version: 9.0.09.003
 *
 */
 
@@ -101,14 +101,9 @@ global $blog_id;
 		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
 	}
 
-	$result .= '?ver=' . wppa_get_option( 'wppa_thumb_version', 1 );
+	$result .= '?ver=' . wppa_get_version( 'thumb' );
 
 	return $result;
-}
-
-// Bump thumbnail version number
-function wppa_bump_thumb_rev() {
-	wppa_update_option('wppa_thumb_version', wppa_get_option('wppa_thumb_version', 1) + 1);
 }
 
 // get path of thumb
@@ -210,10 +205,10 @@ global $wppa_supported_stereo_types;
 
 		// Build the url
 		if ( $st == '_flat' ) {
-			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '.jpg' . '?ver=' . wppa_get_option( 'wppa_photo_version', 1 );
+			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '.jpg' . '?ver=' . wppa_get_version( 'photo' );
 		}
 		else {
-			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '-' . $sg . '.jpg' . '?ver=' . wppa_get_option( 'wppa_photo_version', 1 );
+			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '-' . $sg . '.jpg' . '?ver=' . wppa_get_version( 'photo' );
 		}
 
 		// Done
@@ -236,15 +231,10 @@ global $wppa_supported_stereo_types;
 
 	// Social media do not like querystrings
 	if ( ! wppa( 'no_ver' ) ) {
-		$result .= '?ver=' . wppa_get_option( 'wppa_photo_version', 1 );
+		$result .= '?ver=' . wppa_get_version( 'photo' );
 	}
 
 	return $result;
-}
-
-// Bump Fullsize photo version number
-function wppa_bump_photo_rev() {
-	wppa_update_option('wppa_photo_version', wppa_get_option('wppa_photo_version', 1) + 1);
 }
 
 // Bump Download counter
@@ -785,7 +775,7 @@ global $wpdb;
 
 	$dtime = time() - $time;
 	$mem = memory_get_peak_usage( true );
-	wppa_log( 'dbg', "Creating taglist took $dtime seconds and $mem bytes memory" );
+//	wppa_log( 'dbg', "Creating taglist took $dtime seconds and $mem bytes memory" );
 
 	// And return the result
 	return $result;
@@ -2267,7 +2257,7 @@ function wppa_get_hires_url( $id, $add_version = false ) {
 		if ( $url ) return $url;
 	}
 */
-	$ver = ( wppa( 'no_ver' ) ? '' : '?ver=' . wppa_get_option( 'wppa_source_version', 1 ) );
+	$ver = ( wppa( 'no_ver' ) ? '' : '?ver=' . wppa_get_version( 'source' ) );
 
 	// Try the orientation corrected source url
 	$source_path = wppa_get_o1_source_path( $id );
@@ -2577,7 +2567,7 @@ global $wpdb;
 	wppa('rating_start', $start);
 	wppa('rating_end', $end);
 
-	wppa_log('dbg', 'Period='.$period.', start='.wppa_local_date( 'F j, Y, H:i s', $start ).' end='.wppa_local_date( 'F j, Y, H:i s', $end ));
+//	wppa_log('dbg', 'Period='.$period.', start='.wppa_local_date( 'F j, Y, H:i s', $start ).' end='.wppa_local_date( 'F j, Y, H:i s', $end ));
 
 	// Phase 2, get the ratings of the period
 	// find $ratings, ordered by photo id
@@ -2771,6 +2761,11 @@ static $child_list;
 // Remove from childlist
 function wppa_childlist_remove( $alb ) {
 
+	// Its faster to delete it, it will be re-created automatically
+	delete_option('wppa_child_list');
+	return;
+
+	/*
 	$any = false;
 
 	$child_list = wppa_get_option( 'wppa_child_list', array() );
@@ -2785,6 +2780,7 @@ function wppa_childlist_remove( $alb ) {
 	if ( $any ) {
 		wppa_update_option( 'wppa_child_list', $child_list );
 	}
+	*/
 }
 
 function wppa_compress_enum( $enum ) {
@@ -6208,6 +6204,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'onmouseout' 	=> '',
 				 'onscroll' 	=> '',
 				 'onwheel' 		=> '',
+				 'onerror' 		=> '',
 				 'decoding' 	=> '',
 				 'data-id' 		=> '',
 				 'data-title' 	=> '',
@@ -6374,4 +6371,72 @@ function wppa_find_shortcodes( $content ) {
     }
 
     return $result;
+}
+
+// Get media Version
+function wppa_get_version( $what ) {
+
+	$canbe = ['source', 'photo', 'thumb', 'video', 'audio', 'pdf'];
+	if ( ! in_array( $what, $canbe ) ) {
+		wppa_log('err', "Unsupported version item $what in wppa_get_version()");
+		return '1';
+	}
+	return wppa_get_option( 'wppa_'.$what.'_version', '1' );
+}
+
+// Bump media Version
+function wppa_bump_version( $what ) {
+
+	if ( is_array( $what ) ) {
+		foreach ( $what as $it ) {
+			wppa_bump_version( $it );
+		}
+		return true;
+	}
+
+	$canbe = ['source', 'photo', 'thumb', 'video', 'audio', 'pdf'];
+	if ( ! in_array( $what, $canbe ) ) {
+		wppa_log('err', "Unsupported version item $what in wppa_bump_version()");
+		return false;
+	}
+	$oldver = wppa_get_version( $what );
+	$newver = $oldver + 1;
+	wppa_update_option( 'wppa_'.$what.'_version', $newver );
+	return true;
+}
+
+// Check and fix recursive album parentship
+function wppa_fix_recursion() {
+global $wpdb;
+
+	wppa_log( 'cron', 'Checking for recursive parentship' );
+	$done = false;
+	$anyfound = false;
+	while ( ! $done ) {
+		$done = true;
+		$albs = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums ORDER BY id" );
+		foreach ( $albs as $alb ) {
+			$query = "SELECT a_parent FROM $wpdb->wppa_albums WHERE id = $alb";
+			$parent = wppa_get_var( $query );
+			$seen = [];
+			$thisdone = false;
+			while ( $parent != '0' && $parent != '-1' && ! in_array( $parent, $seen ) && ! $thisdone ) {
+				$seen[] = $parent;
+				$query = "SELECT a_parent FROM $wpdb->wppa_albums WHERE id = $parent";
+				$parent = wppa_get_var( $query );
+				if ( in_array( $parent, $seen ) ) {
+					$query = "UPDATE $wpdb->wppa_albums SET a_parent = '-1' WHERE id = $alb";
+					wppa_query( $query );
+					wppa_log( 'err', sprintf( "Recursive album parentship detected for album %s, changed to -separate-", wppa_get_album_name( $alb ) . " ($alb)" ) );
+					$anyfound = true;
+					$thisdone = true;
+					$done = false;
+				}
+			}
+		}
+	}
+	if ( $anyfound ) {
+		delete_option( 'wppa_child_list' );
+		wppa_clear_col( WPPA_ALBUMS, 'treecounts' );
+	}
 }

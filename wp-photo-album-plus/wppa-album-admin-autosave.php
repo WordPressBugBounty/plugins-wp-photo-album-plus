@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.0.08.004
+* Version 9.0.09.003
 *
 */
 
@@ -2841,7 +2841,7 @@ global $wpdb;
 			$t = $seq;
 			$c = count($t);
 			$tmp = array_keys($t);
-			$seq = false;
+			$seq = array();
 			for ( $i = $c-1; $i >=0; $i-- ) {
 				$seq[$tmp[$i]] = 0;
 			}

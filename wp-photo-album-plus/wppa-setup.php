@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.0.00.000
+* Version 9.0.09.003
 *
 */
 
@@ -455,7 +455,7 @@ global $wppa_cron_maintenance_slugs;
 	}
 
 	// Make sure virtual album crypt exist
-	$albs = array( 0, 1, '2', '3', '9' );
+	$albs = array( '0', '1', '2', '3', '9' );
 	foreach( $albs as $alb ) {
 		if ( ! wppa_get_option( 'wppa_album_crypt_' . $alb ) ) {
 			wppa_update_option( 'wppa_album_crypt_' . $alb, wppa_get_unique_crypt() );

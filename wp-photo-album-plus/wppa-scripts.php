@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.0.05.004
+* Version 9.0.09.001
 */
 
 // Place all wppa related js declarations in the header, both admin and frontend
@@ -175,7 +175,7 @@ global $wpdb;
 	wppaRequestInfoDialogText = "' . wppa_opt( 'request_info_text' ) . '",
 	wppaThumbAspect = ' . wppa_thumb_asp() . ',
 	wppaStartStopNew = ' . ( wppa_switch( 'startstop_new' ) ? 'true' : 'false' ) . ',
-	wppaSlideVideoPauseStop = ' . ( wppa_switch( 'wppa_video_pause_stop_ss' ) ? 'true' : 'false' ) . ';';
+	wppaSlideVideoPauseStop = ' . ( wppa_switch( 'video_pause_stop_ss' ) ? 'true' : 'false' ) . ';';
 
 	/* Lightbox vars */
 	$fontsize_lightbox = wppa_opt( 'fontsize_lightbox' ) ? wppa_opt( 'fontsize_lightbox' ) : 10;
@@ -221,7 +221,7 @@ global $wpdb;
 	wppaFontDirectory = "'.WPPA_UPLOAD_URL.'/fonts/",
 	wppaOutputType = "' . wppa_opt( 'photo_shortcode_fe_type' ) . '",
 	wppaOvlNavIconSize = ' . wppa_opt( 'nav_icon_size_lightbox' ) . ',
-	wppaOvlVideoPauseStop = ' . ( wppa_switch( 'wppa_video_pause_stop_lb' ) ? 'true' : 'false' ) . ';';
+	wppaOvlVideoPauseStop = ' . ( wppa_switch( 'video_pause_stop_lb' ) ? 'true' : 'false' ) . ';';
 
 	// Tinymce photo
 	if ( wppa_switch( 'photo_shortcode_enabled' ) ) {

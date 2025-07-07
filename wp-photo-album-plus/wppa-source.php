@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains photo source file management routines
-* Version 9.0.08.008
+* Version 9.0.09.002
 *
 */
 
@@ -11,12 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 function wppa_save_source( $file, $name, $alb, $always = false ) {
 
-	wppa_log( 'dbg', 'Save source called with always='.$always );
+	// No stubfile please
+	$bn = basename( $name );
+	if ( $bn == 'audiostub.jpg' || $bn == 'documentstub.jpg' ) return;
+
+//	wppa_log( 'dbg', 'Save source called with always='.$always );
 	$doit = true;
 
 	if ( wppa_switch( 'keep_source' ) || $always ) {
 
-		wppa_log( 'dbg', 'Saving source');
+//		wppa_log( 'dbg', 'Saving source');
 		if ( ! wppa_is_dir( wppa_opt( 'source_dir' ) ) ) {
 			@ wppa_mktree( wppa_opt( 'source_dir' ) );
 		}
@@ -32,7 +36,7 @@ function wppa_save_source( $file, $name, $alb, $always = false ) {
 			wppa_log( 'Err', 'Could not create source directory ' . $albdir );
 		}
 
-		$dest = $albdir . '/' . wppa_sanitize_file_name( $name );
+		$dest = $albdir . '/' . wppa_sanitize_file_name( basename( $name ) );
 		if ( $file != $dest ) {
 
 			// Delete possible old o1 file
@@ -43,7 +47,7 @@ function wppa_save_source( $file, $name, $alb, $always = false ) {
 
 			// If re-upload, bump rev
 			if ( wppa_is_file( $dest ) ) {
-				wppa_update_option( 'wppa_source_version', wppa_get_option( 'wppa_source_version', 1 ) + 1 );
+				wppa_bump_version( 'source' );
 			}
 			wppa_copy( $file, $dest );
 

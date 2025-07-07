@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.08.007
+* Version: 9.0.09.002
 *
 */
 
@@ -49,6 +49,8 @@ global $wppa_log_file;
 global $wppa_opt;
 global $wppa;
 global $wppa_url_set_extension;
+global $wppa_supported_video_extensions;
+global $wppa_supported_audio_extensions;
 
 	wppa( 'ajax', true );
 	if ( ! defined( 'DOING_WPPA_AJAX' ) ) {
@@ -2201,8 +2203,7 @@ wppa_log('misc', 'leeg');
 				if ( wppa_switch( 'watermark_thumbs' ) ) {
 					wppa_create_thumbnail( $photo );	// create new thumb
 				}
-				wppa_bump_thumb_rev();
-				wppa_bump_photo_rev();
+				wppa_bump_version( ['photo', 'thumb'] );
 				wppa_echo( '||0||'.__( 'Watermark applied. Reloading the page...', 'wp-photo-album-plus' ) );
 				wppa_exit();
 			}
@@ -2369,6 +2370,7 @@ wppa_log('misc', 'leeg');
 						$err =1;
 					}
 					$jsfields['thumbmod'] = true;
+wppa_log('misc', 'Gedaan');
 					break;
 				case 'rotthumbleft':
 				case 'rotthumbright':
@@ -2641,7 +2643,7 @@ wppa_log('misc', 'leeg');
 					}
 
 					// Housekeeping
-					wppa_bump_photo_rev();
+					wppa_bump_version( 'photo' );
 					wppa_create_thumbnail( $photo, false );
 					$dbfields['magickstack'] = $newstack;
 					/* translators: command name, photo id */
@@ -2982,48 +2984,145 @@ wppa_log('misc', 'leeg');
 					}
 
 					if ( ! $err ) {
-						// Make new source filename
-						$filename = wppa_fix_poster_ext( wppa_get_photo_item( $photo, 'filename' ), $photo );
 
-						// If very old, no filename, take new name
-						if ( ! $filename ) {
-							$filename = sanitize_file_name( $file['name'] );
-							$dbfields['filename'] = $filename;
+						// If a video, replace old one
+						$ext = $file_is_ok['ext'];
+
+						if ( in_array( $ext, $wppa_supported_video_extensions ) ) {
+							$path = wppa_strip_ext( wppa_get_photo_path( $photo ) ) . '.' . $ext;
+
+							$fs = filesize( $file['tmp_name'] );
+							if ( $fs > 1024*1024*64 ) {	// copy fails for files > 64 Mb
+
+								// Remove old version if already exists
+								if ( wppa_is_file( $path ) ) {
+									wppa_unlink( $path );
+								}
+								$bret = wppa_rename( $file['tmp_name'], $path, true );
+							}
+							else {
+								$bret = wppa_copy( $file['tmp_name'], $path, true );
+							}
+							wppa_fix_video_metadata( $photo, 're-upload' );
+
+							// Report success or Fail
+							if ( $bret ) {
+								$txt = __( 'Video file updated.', 'wp-photo-album-plus' );
+								wppa_bump_version( 'video' );
+							}
+							else {
+								// Report fail
+								$txt = __( 'Could not update video file', 'wp-photo-album-plus' );
+								$err = 1;
+							}
 						}
-						wppa_save_source( $file['tmp_name'], $filename, wppa_get_photo_item( $photo, 'album') );
+						elseif ( in_array( $ext, $wppa_supported_audio_extensions ) ) {
+							$path = wppa_strip_ext( wppa_get_photo_path( $photo ) ) . '.' . $ext;
 
-						// Make proper oriented source
-						wppa_make_o1_source( $photo );
+							$fs = filesize( $file['tmp_name'] );
+							if ( $fs > 1024*1024*64 ) {	// copy fails for files > 64 Mb
 
-						// Make the files
-						wppa( 'unsanitized_filename', $file['name'] );
-						$alb = wppa_get_photo_item( $photo, 'album' );
-						$source = wppa_get_source_album_dir( $alb ).'/'.$filename;
-						if ( wppa_is_file( $source ) ) {
-							$from = $source;
+								// Remove old version if already exists
+								if ( wppa_is_file( $path ) ) {
+									wppa_unlink( $path );
+								}
+								$bret = wppa_rename( $file['tmp_name'], $path, true );
+							}
+							else {
+								$bret = wppa_copy( $file['tmp_name'], $path, true );
+							}
+							wppa_fix_audio_metadata( $photo, 're-upload' );
+
+							// Report success or Fail
+							if ( $bret ) {
+								wppa_bump_version( 'audio' );
+								$txt = __( 'Audio file updated.', 'wp-photo-album-plus' );
+							}
+							else {
+								// Report fail
+								$txt = __( 'Could not update audio file', 'wp-photo-album-plus' );
+								$err = 1;
+							}
+						}
+						elseif ( $ext == 'pdf' ) {
+							$path = wppa_get_source_path( $photo );
+
+							$fs = filesize( $file['tmp_name'] );
+							if ( $fs > 1024*1024*64 ) {	// copy fails for files > 64 Mb
+
+								// Remove old version if already exists
+								if ( wppa_is_file( $path ) ) {
+									wppa_unlink( $path );
+								}
+								$bret = wppa_rename( $file['tmp_name'], $path, true );
+							}
+							else {
+								$bret = wppa_copy( $file['tmp_name'], $path, true );
+							}
+
+							// Report success or Fail
+							if ( $bret ) {
+								wppa_bump_version( ['pdf', 'photo'] );
+								$txt = __( 'Ducument file updated.', 'wp-photo-album-plus' );
+							}
+							else {
+								// Report fail
+								$txt = __( 'Could not update document file', 'wp-photo-album-plus' );
+								$err = 1;
+							}
 						}
 						else {
-							$from = $file['tmp_name'];
-						}
-						$bret = wppa_make_the_photo_files( $from, $photo, strtolower( wppa_get_ext( $file['name'] ) ) );
-						if ( $bret ) {
 
-							// Update timestamps and sizes
+							// Make new source filename
+			//				if ( wppa_has_audio( $photo ) || wppa_is_pdf( $photo ) || wppa_is_vdeo( $photo ) ) {
+								$filename = wppa_strip_ext( wppa_get_photo_item( $photo, 'filename' ) ) . '.' . $file_is_ok['ext'];
+			//				}
+			//				else {
+			//					$filename = wppa_fix_poster_ext( wppa_get_photo_item( $photo, 'filename' ), $photo );
+			//				}
+
+							// If very old, no filename, take new name
+							if ( ! $filename ) {
+								$filename = sanitize_file_name( $file['name'] );
+								$dbfields['filename'] = $filename;
+							}
+
+							wppa_save_source( $file['tmp_name'], $filename, wppa_get_photo_item( $photo, 'album') );
+
+							// Make proper oriented source
+							wppa_make_o1_source( $photo );
+
+							// Make the files
+							wppa( 'unsanitized_filename', $file['name'] );
 							$alb = wppa_get_photo_item( $photo, 'album' );
-							wppa_update_album( $alb );
-							$dbfields = array_merge( $dbfields, ['modified' => time(), 'thumbx' => 0, 'thumby' => 0, 'photox' => 0, 'photoy' => 0] );
+							$source = wppa_get_source_album_dir( $alb ).'/'.$filename;
+							if ( wppa_is_file( $source ) ) {
+								$from = $source;
+							}
+							else {
+								$from = $file['tmp_name'];
+							}
+							$bret = wppa_make_the_photo_files( $from, $photo, strtolower( wppa_get_ext( $file['name'] ) ) );
+							if ( $bret ) {
 
-							// Report success
-							$txt = __( 'Photo files updated.', 'wp-photo-album-plus' );
-						}
-						else {
+								// Update timestamps and sizes
+								$alb = wppa_get_photo_item( $photo, 'album' );
+								wppa_update_album( $alb );
+								$dbfields = array_merge( $dbfields, ['modified' => time(), 'thumbx' => 0, 'thumby' => 0, 'photox' => 0, 'photoy' => 0] );
 
-							// Report fail
-							$txt = __( 'Could not update files.', 'wp-photo-album-plus' );
-							$err = 1;
+								// Report success
+								$txt = __( 'Photo files updated.', 'wp-photo-album-plus' );
+							}
+							else {
+
+								// Report fail
+								$txt = __( 'Could not update files.', 'wp-photo-album-plus' );
+								$err = 1;
+							}
+							$jsfields['thumbmod'] = true;
+							$jsfields['photomod'] = true;
+							wppa_bump_version( ['source', 'photo', 'thumb'] );
 						}
-						$jsfields['thumbmod'] = true;
-						$jsfields['photomod'] = true;
 					}
 					break;
 
@@ -3034,6 +3133,7 @@ wppa_log('misc', 'leeg');
 					$dbfields['stereo'] = $value;
 					$jsfields['thumbmod'] = true;
 					$jsfields['photomod'] = true;
+					wppa_bump_version( ['photo', 'thumb'] );
 					break;
 
 				case 'panorama':
@@ -3175,6 +3275,7 @@ wppa_log('misc', 'leeg');
 					$txt = sprintf( __( '%1$s of %2$s %3$d updated' , 'wp-photo-album-plus' ), $itemname, wppa_get_type( $photo, true ), $photo );
 				}
 			}
+wppa_log('misc',$photo.' - '. $txt.' - '. $err.' - '.serialize($jsfields));
 			wppa_json_photo_update( $photo, $txt, $err, $jsfields );
 			wppa_exit();
 			break;
@@ -3810,7 +3911,7 @@ wppa_log('misc', 'leeg');
 
 				case 'wppa_newphoto_description':
 					$value = wppa_get( 'value', '', 'html' );
-					if ( wppa_switch( 'wppa_compress_newdesc' ) ) {
+					if ( wppa_switch( 'compress_newdesc' ) ) {
 						$value = wppa_compress_html( $value );
 					}
 					wppa_update_option( $option, $value );
@@ -4459,10 +4560,9 @@ function wppa_json_photo_update( $id, $txt, $err = 0, $flags = array() ) {
 
 	// Just to be sure increment version numbers
 	if ( $mods['thumbmod'] || $mods['magickmod'] ) {
-		wppa_bump_thumb_rev();
-	}
+		wppa_bump_version( 'thumb' );	}
 	if ( $mods['photomod'] || $mods['magickmod'] ) {
-		wppa_bump_photo_rev();
+		wppa_bump_version( 'photo' );
 	}
 
 	// Find and format filesizes

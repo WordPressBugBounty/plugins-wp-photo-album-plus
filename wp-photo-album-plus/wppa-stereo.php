@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the stereo stuff
-* Version 9.0.00.000
+* Version 9.0.09.002
 *
 */
 
@@ -292,7 +292,7 @@ static $f114;
 	}
 
 	// Bump version
-	wppa_bump_photo_rev();
+	wppa_bump_version( 'photo' );
 }
 
 function wppa_get_stereo_path( $id, $type, $glass ) {

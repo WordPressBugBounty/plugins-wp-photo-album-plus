@@ -1,5 +1,13 @@
 WP Photo Album Plus Changelog
 
+= 9.0.09 =
+
+* Auto reload after upload on the import page did not work. Fixed.
+* Import video and audio now shows the replace existing box checked and disabled, so always replace existing wth new imported file.
+* The re-upload feature on the photo admin page has been extended. You can now also re-upload audio, video and pdf files. The buttons have been moved to the Files tab.
+* To prevent confusion due to browser cached old versions, these multimedia items now also have a version number to be used in urls.
+* If a circular album parent structure exists, it will be automatically fixed during the hourly background maintenance procedure.
+
 = 9.0.08 =
 
 * Cosmetic changes for certain site configurations by adding css styles that look redundant but can be required though.
