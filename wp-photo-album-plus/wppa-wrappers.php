@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.0.09.001
+* Version 9.0.10.009
 *
 */
 
@@ -180,6 +180,17 @@ global $wp_filesystem;
 	$bret = $wp_filesystem->copy( $from, $to, $overwrite );
 	$wp_filesystem->chmod( $to );
 	return $bret;
+}
+
+// Wrapper for copy_dir()
+function wppa_copy_dir( $from, $to, $skip ) {
+global $wp_filesystem;
+
+	if ( ! wppa_is_dir( $to ) ) {
+		wppa_mkdir( $to );
+	}
+	$iret = copy_dir( $from, $to, $skip );
+	return $iret;
 }
 
 function wppa_filesize( $file ) {
@@ -989,6 +1000,7 @@ static $allowed_tags;
 			'textarea' => array_merge( $sa, array(
 				'onchange' => true,
 				'rows' => true,
+				'placeholder' => true,
 				) ),
 			'thead' => $sa,
 			'tfoot' => $sa,

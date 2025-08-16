@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.08.004';
+wppaWppaVer = '9.0.10.001';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -1277,7 +1277,6 @@ function wppaGetUploadOptions( yalb, mocc, where, onComplete ) {
 			if (wppaUploadButtonText) jQuery('.wppa-upload-button').val(wppaUploadButtonText);
 		},
 		complete: function(response) {
-
 			var txt;
 			if ( wppaAjaxMethod == 'rest' ) {
 				txt = response.responseJSON.html;
@@ -1287,7 +1286,7 @@ function wppaGetUploadOptions( yalb, mocc, where, onComplete ) {
 				txt = theResult.html;
 			}
 
-			if (txt.indexOf(__( 'Upload failed', 'wp-photo-album-plus' ))!=-1) {
+			if (txt && txt.indexOf(__( 'Upload failed', 'wp-photo-album-plus' ))!=-1) {
 				jQuery('#bar-'+yalb+'-'+mocc).css('backgroundColor','#F77');
 				jQuery('#percent-'+yalb+'-'+mocc).html(__( 'Upload failed', 'wp-photo-album-plus' ));
 				jQuery('#message-'+yalb+'-'+mocc).html( '<span style="font-size: 10px;" >'+txt+'</span>' );

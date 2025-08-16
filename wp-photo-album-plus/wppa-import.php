@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.0.09.001
+* Version 9.0.10.001
 *
 */
 
@@ -218,7 +218,7 @@ global $wppa_import_errors;
 			$files 			= wppa_get_import_files();
 			$zipcount 		= 0;
 			$albumcount 	= 0;
-			$photocount 	= $files ? count( $files ) : 0;
+			$photocount 	= is_array( $files ) ? count( $files ) : 0;
 			$videocount 	= 0;
 			$audiocount 	= 0;
 			$dircount		= 0;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.0.08.004
+* Version: 9.0.10.012
 *
 */
 
@@ -2776,7 +2776,7 @@ function wppa_get_slide_desc( $id ) {
 	$alb = wppa_get_photo_item( $id, 'album' );
 	$desc = '';
 
-	if ( ( ! wppa( 'is_slideonly' ) || wppa_is_item_displayable( $alb, 'description', 'show_full_desc' ) ) && ! wppa( 'is_filmonly' ) ) {
+	if ( ( ! wppa( 'is_slideonly' ) && ! wppa( 'is_filmonly' ) ) || ( wppa_is_item_displayable( $alb, 'description', 'show_full_desc' ) || ( wppa('in_widget') && wppa('desc_on') ) ) ) {
 
 		$desc .= wppa_get_photo_desc( $id, array( 'doshortcodes' => wppa_switch( 'allow_foreign_shortcodes' ), 'dogeo' => true ) );	// Foreign shortcodes is handled here
 
@@ -2807,7 +2807,7 @@ function wppa_get_slide_name_a( $id ) {
 	$name 		= '';
 	$fullname 	= '';
 	$alb 		= wppa_get_photo_item( $id, 'album' );
-	$disp 		= wppa_is_item_displayable( $alb, 'name', 'show_full_name' );
+	$disp 		= wppa_is_item_displayable( $alb, 'name', 'show_full_name' ) || ( wppa('in_widget') && wppa('name_on'));
 	$addmedal 	= true;
 	if ( wppa_switch( 'art_monkey_on' ) && wppa_opt( 'art_monkey_display' ) == 'button' ) $addmedal = false;
 
@@ -4178,6 +4178,7 @@ function wppa_popup() {
 function wppa_run_slidecontainer( $thumbs ) {
 
 	$c = is_array( $thumbs ) ? count( $thumbs ) : 0;
+	$mocc = wppa( 'mocc' );
 
 	if ( wppa( 'is_single' ) && is_feed() ) {	// process feed for single image slideshow here, normal slideshow uses filmthumbs
 		$style_a = wppa_get_fullimgstyle_a( wppa( 'start_photo' ) );
@@ -4223,7 +4224,7 @@ function wppa_run_slidecontainer( $thumbs ) {
 		$index = 0;
 		if ( $thumbs ) {
 
-			$js = 'jQuery(document).ready(function(){';
+			$js = '';
 			foreach ( $thumbs as $thumb ) {
 				if ( wppa_switch( 'next_on_callback' ) ) {
 					$js .= 'wppaStoreSlideInfo( ' . wppa_get_slide_info( $index, strval( intval( $thumb['id'] ) ), strval( intval( $thumb['next_id'] ) ) ) . ' );';
@@ -4234,8 +4235,6 @@ function wppa_run_slidecontainer( $thumbs ) {
 				if ( $startid == $thumb['id'] ) $startindex = $index;	// Found the requested id, put the corresponding index in $startindex
 				$index++;
 			}
-			$js .= '});';
-			wppa_js( $js );
 		}
 
 		// How to start if slideonly
@@ -4251,25 +4250,28 @@ function wppa_run_slidecontainer( $thumbs ) {
 		// Vertical align
 		if ( wppa( 'in_widget' ) ) {
 			$ali = wppa( 'ss_widget_valign' ) ? wppa( 'ss_widget_valign' ) : $ali = 'fit';
-			wppa_js( 'wppaFullValign['.wppa( 'mocc' ).'] = "'.$ali.'";' );
+			$js .= 'wppaFullValign['.$mocc.'] = "'.$ali.'";';
 		}
 		elseif ( wppa( 'is_slideonly' ) ) {
-			wppa_js( 'wppaFullValign['.wppa( 'mocc' ).'] = "'.wppa_opt( 'fullvalign_slideonly' ).'";' );
+			$js .= 'wppaFullValign['.$mocc.'] = "'.wppa_opt( 'fullvalign_slideonly' ).'";';
 		}
 		else {
-			wppa_js( 'wppaFullValign['.wppa( 'mocc' ).'] = "'.wppa_opt( 'fullvalign' ).'";' );
+			$js .= 'wppaFullValign['.$mocc.'] = "'.wppa_opt( 'fullvalign' ).'";';
 		}
 
 		// Horizontal align
-		wppa_js( 'wppaFullHalign['.wppa( 'mocc' ).'] = "'.wppa_opt( 'fullhalign' ).'";' );
+		$js .= 'wppaFullHalign['.$mocc.'] = "'.wppa_opt( 'fullhalign' ).'";';
 
 		// Portrait only ?
 		if ( ( wppa( 'in_widget' ) && wppa( 'portrait_only' ) ) || ( ! wppa( 'in_widget' ) && wppa_switch( 'slide_portrait_only' ) ) ) {
-			wppa_js( 'wppaPortraitOnly['.wppa( 'mocc' ).'] = true;' );
+			$js .= 'wppaPortraitOnly['.$mocc.'] = true;';
 		}
 
 		// Start command with appropriate $startindex: -2 = at norate, -1 run from first, >=0 still at index
-		wppa_js( 'jQuery(document).ready( function() { setTimeout( function(){wppaStartStop( '.wppa( 'mocc' ).', '.$startindex.' );},2) } );' );
+		$js .= 'setTimeout( function(){wppaStartStop( '.$mocc.', '.$startindex.' );},100);';
+
+		// Spit it out...
+		wppa_js( $js, false, false );
 	}
 }
 

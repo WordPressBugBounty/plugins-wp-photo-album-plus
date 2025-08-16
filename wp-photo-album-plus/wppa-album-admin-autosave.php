@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.0.09.003
+* Version 9.0.10.004
 *
 */
 
@@ -662,7 +662,7 @@ global $wppa_revno;
 									__( 'Unchangeable items', 'wp-photo-album-plus' ) . '
 								</legend>' );
 
-								// Album number, crypt, timestamp
+								// Album number, crypt, timestamps
 								wppa_echo( '
 								<div class="left">
 									<label>' .
@@ -687,25 +687,20 @@ global $wppa_revno;
 									<div class="wppa-ldi">' .
 										wppa_local_date( '', $timestamp ) . '
 									</div>
-								</div>' .
-
-								// Index
-								'<div class="left">
+								</div>
+								<div class="left">
 									<label>' .
 										__( 'Indexed', 'wp-photo-album-plus' ) . '
 									</label><br>
-									<div class="wppa-ldi">' .
+									<div id="wppa-indexdtm" class="wppa-ldi">' .
 										( $indexdtm ? htmlspecialchars( wppa_local_date( '', $indexdtm ) ) : __( 'Needs re-indexing', 'wp-photo-album-plus' ) ) . '
 									</div>
-								</div>' );
-
-								// Modified
-								wppa_echo( '
+								</div>
 								<div class="left">
 									<label>' .
 										__( 'Modified', 'wp-photo-album-plus' ) . '
 									</label><br>
-									<div class="wppa-ldi">' );
+									<div id="wppa-modified" class="wppa-ldi">' );
 										if ( $modified > $timestamp ) {
 											wppa_echo( wppa_local_date( '', $modified ) );
 										}
@@ -713,6 +708,16 @@ global $wppa_revno;
 											wppa_echo( esc_html__( 'Not modified', 'wp-photo-album-plus' ) );
 										}
 										wppa_echo( '
+									</div>
+								</div>' .
+
+								// Nameslug
+								'<div class="left">
+									<label>' .
+										__( 'Nameslug', 'wp-photo-album-plus' ) . '
+									</label><br>
+									<div id="wppa-sname" class="wppa-ldi">' .
+										$sname . '
 									</div>
 								</div>' );
 
@@ -1212,21 +1217,16 @@ global $wppa_revno;
 										__( 'Name', 'wp-photo-album-plus' ) . '
 									</legend>
 									<input
+										id="wppa-name"
 										type="text"
 										style="width:100%;"
 										onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'name\', jQuery(this).val() )"
 										value="' . esc_attr( $name ) . '"
+										placeholder="' . __( 'Type the name of the album. Do not leave this empty.', 'wp-photo-album-plus' ) . '"
 									/>
-									<br>
-									<span class="description" >' .
-										__( 'Type the name of the album. Do not leave this empty.', 'wp-photo-album-plus' ) . '
-									</span>
-									<span style="float:right">' .
-										__( 'Name slug', 'wp-photo-album-plus' ) . ': ' . $sname . '
-									</span>
 								</fieldset>' );
 							}
-
+wppa_echo( '</div><div class="wppa-flex-column">' );
 							// Description
 							{
 								wppa_echo( '
@@ -1240,7 +1240,7 @@ global $wppa_revno;
 
 										// Echos itsself, has no return option
 										wp_editor( 	$description,
-													'wppaalbumdesc',
+													'wppa-description',
 													array( 	'wpautop' 		=> true,
 															'media_buttons' => false,
 															'textarea_rows' => '6',
@@ -1254,53 +1254,57 @@ global $wppa_revno;
 											type="button"
 											class="button button-secondary"
 											value="' . esc_attr( __( 'Update Album description', 'wp-photo-album-plus' ) ) . '"
-											onclick="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'description\', wppaGetTinyMceContent(\'wppaalbumdesc\') )"
+											onclick="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'description\', wppaGetTinyMceContent(\'wppa-description\') )"
 										/>' .
 										wppa_html_tag( 'img', ['id' => "wppa-album-spin", 'src' => wppa_get_imgdir('spinner.gif'), 'alt' => "Spin", 'style' => "visibility:hidden"] ) );
 									}
 
 									// Textarea
 									else {
-										wppa_echo( '
-										<div>
-											<label style="font-weight: 600;">' . __( 'Description', 'wp-photo-album-plus' ) . '</label><br>
-											<textarea
-												style="width:100%;height:60px;"
-												onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'description\', jQuery(this).val() )"
-												>' .
-												esc_textarea( stripslashes( $description ) ) . '
-											</textarea>
-										</div>' );
+										wppa_echo(
+
+											wppa_html_tag( 'textarea', ['id' => 'wppa-description',
+																		'style' => 'width:100%;height:60px;',
+																		'onchange' => 'wppaAjaxUpdateAlbum(\'' . $crid . '\', \'description\', jQuery(this).val() )',
+																		'placeholder' => __( 'Enter album description (optionally)', 'wp-photo-album-plus' )],
+																		esc_textarea( stripslashes( $description ) ) )
+										 );
 									}
 								wppa_echo( '
 								</fieldset>' );
 							}
-
+wppa_echo( '</div><div class="wppa-flex">' );
 							// Categories
 							{
 								$result = '
-								<fieldset class="wppa-fieldset">
+								<fieldset class="wppa-fieldset" style="width:100%">
                                     <legend class="wppa-legend">' .
 										__( 'Categories', 'wp-photo-album-plus' ) . '
 									</legend>
+									<div class="left" style="width:60%;max-width:600px;margin-right:4px;">
+									<label for="wppa-cats">' .
+										__( 'Current categories', 'wp-photo-album-plus' ) . '
+									</label><br>
 									<input
-										id="cats"
+										id="wppa-cats"
 										type="text"
 										style="width:100%;"
 										onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cats\', jQuery(this).val() )"
 										value="' . esc_attr( $cats ) . '"
+										placeholder="' . __('Enter categories, seperated by comma\'s and/or select from existing ones', 'wp-photo-album-plus' ) . '"
 									/>
-									<div style="margin: 8px 0;">
-										<span class="description" >' .
-											__( 'Separate categories with commas.', 'wp-photo-album-plus' ) . '
-										</span>&nbsp;
-										<select
-											onchange="wppaAddCat( this.value, \'cats\' ); wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cats\', jQuery(\'#cats\').val())"
-											>';
+									</div>
+									<div class="left">
+									<label for="wppa-cats">' .
+										__( 'Existing categories', 'wp-photo-album-plus' ) . '
+									</label><br>
+									<select id="wppa-catsel"
+										onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cats\', jQuery(\'#wppa-cats\').val()+\',\'+jQuery(\'#wppa-catsel\').val())"
+										>';
 											$catlist = wppa_get_catlist();
 											if ( is_array( $catlist ) ) {
 												$result .= '
-												<option value="" >' . __( '- select to add -', 'wp-photo-album-plus' ) . '</option>';
+												<option value="" disabled selected>' . __( '- select to add -', 'wp-photo-album-plus' ) . '</option>';
 												foreach ( $catlist as $cat ) {
 													$result .= '
 													<option value="' . esc_attr( $cat['cat'] ) . '" >' . htmlspecialchars( $cat['cat'] ) . '</option>';
@@ -1310,13 +1314,13 @@ global $wppa_revno;
 												$result .= '
 												<option value="0" >' . __( 'No categories yet', 'wp-photo-album-plus' ) . '</option>';
 											}
-										$result .= '
-										</select>
+									$result .= '
+									</select>
 									</div>
 								</fieldset>';
 								wppa_echo( $result );
 							}
-
+wppa_echo( '</div><div class="wppa-flex-column">' );
 							// Custom
 							if ( wppa_switch( 'album_custom_fields' ) ) {
 								$custom_data = wppa_unserialize( wppa_get_album_item( $edit_id, 'custom' ) );
@@ -1347,11 +1351,11 @@ global $wppa_revno;
 												<input
 													type="text"
 													style="width:100%"
-													id="album_custom_' . $key . '-' . $id . '"
+													id="wppa-album_custom_' . $key . '"
 													onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'album_custom_' . $key . '\', this.value)"
 													value="' . esc_attr( stripslashes( $custom_data[$key] ) ) . '"
 												/>
-											<div>' );
+											</div>' );
 
 										}
 									}
@@ -1497,7 +1501,7 @@ global $wppa_revno;
 								</label><br>
 								<input
 									type="text"
-									id="default_tags"
+									id="wppa-default_tags"
 									value="' . esc_attr( $default_tags ) . '"
 									style="width:100%"
 									onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'default_tags\', this )"
@@ -3592,7 +3596,7 @@ global $wpdb;
 				id="subalbumorder"
 				style="max-width:200px;"
 				onchange="
-					wppaAjaxUpdateAlbum(\'' . wppa_encrypt_album( $parent ) . '\', \'suba_order_by\', jQuery(this).val() );
+					wppaAjaxUpdateAlbum(\'' . wppa_encrypt_album( $parent ) . '\', \'suba_order_by\', this );
 					var ord=Math.abs(jQuery(this).val());
 					var dft=Math.abs(' . wppa_opt('list_albums_by') . ');
 					if (ord == 1 || (ord == 0 && dft == 1)) {

@@ -4,7 +4,7 @@
 *
 * Copy of wp version
 * Modified by OpaJaap
-* Version 9.0.00.000
+* Version 9.0.10.001
 *
 */
 
@@ -843,10 +843,10 @@ class WPPA_List_Table {
 				style="margin-bottom:3px"
 				onchange="jQuery( \'#wppa-admin-spinner\' ).show();document.location.href=\''.$current_url.'&paged=1&wppa-pagesize=\'+this.value;"
 				>
-				<option value="10" ' . ( $ps == 10 ? 'selected' : '' ) . '>10</option>
+				<option value="10" ' . ( $ps == '10' ? 'selected' : '' ) . '>10</option>
 				<option value="20" ' . ( $ps == '20' ? 'selected' : '' ) . '>20</option>
 				<option value="50" ' . ( $ps == '50' ? 'selected' : '' ) . '>50</option>
-				<option value="100" ' . ( $ps == 100 ? 'selected' : '' ) . '>100</option>
+				<option value="100" ' . ( $ps == '100' ? 'selected' : '' ) . '>100</option>
 				<option value="200" ' . ( $ps == '200' ? 'selected' : '' ) . '>200</option>
 				<option value="500" ' . ( $ps == '500' ? 'selected' : '' ) . '>500</option>
 				<option value="1000" ' . ( $ps == '1000' ? 'selected' : '' ) . '>1000</option>

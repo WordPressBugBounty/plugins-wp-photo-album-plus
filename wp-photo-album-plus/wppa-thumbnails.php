@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.0.08.004
+* Version: 9.0.10.009
 *
 */
 
@@ -264,10 +264,12 @@ global $wpdb;
 				$pdfhtml 	= '';
 			}
 			$pan = wppa_get_pan_a( $id );
+			$posterurl = wppa_has_poster( $id ) ? wppa_fix_poster_ext( wppa_get_photo_url( $id ), $id ) : '';
 
 			// The a img
 			$result .= wppa_html_tag( 'a', ['href' => $link['url'], 'target' => $link['target'], 'data-id' => $xid,
 											'data-videohtml' => $videohtml, 'data-videonatwidth' => $videox, 'data-videonatheight' => $videoy,
+											'data-posterurl' => $posterurl,
 											'data-audiohtml' => $audiohtml, 'data-pdfhtml' => $pdfhtml,
 											'data-rel' => 'wppa[occ'.$mocc.']', 'data-lbtitle' => $title,
 											'data-panorama' => $pan['html'], 'data-pantype' => $pan['type'],
@@ -1645,7 +1647,7 @@ function wppa_get_medal_html_a( $args ) {
 
 	// The medal bronze-silver-gold
 	if ( $medal ) {
-		$src = WPPA_URL . '/img/medal_' . $medal . '_' . $color .'.png';
+		$src = WPPA_UPLOAD_URL . '/icons/medal_' . $medal . '_' . $color .'.png';
 		$style = $sstyle . 'top:4px;position:absolute;border:none;margin:0;padding:0;box-shadow:none;height:'.$size.'px;top:'.$top.'px;';
 		$result .= wppa_html_tag( 'img', ['src' => $src, 'title' => $title, 'alt' => $title, 'style' => $style] );
 	}

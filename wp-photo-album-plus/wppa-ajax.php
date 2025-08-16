@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.09.002
+* Version: 9.0.10.004
 *
 */
 
@@ -1812,7 +1812,13 @@ wppa_log('misc', 'leeg');
 			break;
 
 		case 'update-album':
+
+			$fields = [];
+			$fields['error'] = '0'; 	// Assumen no error
+			$fields['remark'] = '';
+			$done = false;
 			$album = wppa_get( 'album-id' );
+			$oldalb = wppa_cache_album( $album );
 			$nonce = wppa_get( 'nonce' );
 			$item  = wppa_get( 'item', '', 'text' );
 			if ( $item == 'description' ) {
@@ -1835,11 +1841,12 @@ wppa_log('misc', 'leeg');
 
 			// Check validity
 			if ( ! wp_verify_nonce( $nonce, 'wppa-nonce_'.$album ) ) {
-				wppa_echo( '||0||'.__( 'You do not have the rights to update album information' , 'wp-photo-album-plus' ).$nonce );
-				wppa_exit();																// Nonce check failed
+				$fields['error'] = '1';
+				$fields['remark'] = __( 'You do not have the rights to update album information' , 'wp-photo-album-plus' );
+				$done = true;
 			}
 
-			switch ( $item ) {
+			if ( ! $done ) switch ( $item ) {
 				case 'clear_ratings':
 					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album );
 					$photos = wppa_get_results( $query );
@@ -1848,15 +1855,18 @@ wppa_log('misc', 'leeg');
 						$iret2 = wppa_update_photo( $photo['id'], ['mean_rating' => ''] );
 					}
 					if ( $photos && $iret1 !== false && $iret2 !== false ) {
-						wppa_echo( '||0||'.__( 'Ratings cleared' , 'wp-photo-album-plus' ).'||'.__( 'No ratings for this photo.' , 'wp-photo-album-plus' ) );
+						$fields['remark'] = __( 'Ratings cleared' , 'wp-photo-album-plus' );
+						$done = true;
 					}
 					elseif ( $photos ) {
-						wppa_echo( '||1||'.__( 'An error occurred while clearing ratings' , 'wp-photo-album-plus' ) );
+						$fields['error'] = '1';
+						$fields['remark'] = __( 'An error occurred while clearing ratings' , 'wp-photo-album-plus' );
+						$done = true;
 					}
 					else {
-						wppa_echo( '||0||'.__( 'No photos in this album' , 'wp-photo-album-plus' ).'||'.__( 'No ratings for this photo.' , 'wp-photo-album-plus' ) );
+						$fields['remark'] = __( 'No photos in this album' , 'wp-photo-album-plus' );
+						$done = true;
 					}
-					wppa_exit();
 					break;
 				case 'set_deftags':	// to be changed for large albums
 					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album );
@@ -1871,16 +1881,17 @@ wppa_log('misc', 'leeg');
 						$iret = wppa_update_photo( $photo['id'], ['tags' => $tags] );
 					}
 					if ( $photos && $iret !== false ) {
-						wppa_echo( '||0||'.__( 'Tags set to defaults' , 'wp-photo-album-plus' ) );
+						$fields['remark'] = __( 'Tags set to defaults' , 'wp-photo-album-plus' );
 						wppa_update_album( $album );
 					}
 					elseif ( $photos ) {
-						wppa_echo( '||1||'.__( 'An error occurred while setting tags' , 'wp-photo-album-plus' ) );
+						$fields['error'] = '1';
+						$fields['remark'] = __( 'An error occurred while setting tags' , 'wp-photo-album-plus' );
 					}
 					else {
-						wppa_echo( '||0||'.__( 'No photos in this album' , 'wp-photo-album-plus' ) );
+						$fields['remark'] = __( 'No photos in this album' , 'wp-photo-album-plus' );
 					}
-					wppa_exit();
+					$done = true;
 					break;
 				case 'add_deftags':
 					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album );
@@ -1896,16 +1907,17 @@ wppa_log('misc', 'leeg');
 					}
 					if ( $photos && $iret !== false ) {
 						wppa_update_album( $album );
-						wppa_echo( '||0||'.__( 'Tags added with defaults' , 'wp-photo-album-plus' ) );
+						$fields['remark'] = __( 'Tags added with defaults' , 'wp-photo-album-plus' );
 					}
 					elseif ( $photos ) {
-						wppa_echo( '||1||'.__( 'An error occurred while adding tags' , 'wp-photo-album-plus' ) );
+						$fields['error'] = '1';
+						$fields['remark'] = __( 'An error occurred while adding tags' , 'wp-photo-album-plus' );
 					}
 					else {
-						wppa_echo( '||0||'.__( 'No photos in this album' , 'wp-photo-album-plus' ) );
+						$fields['remark'] = __( 'No photos in this album' , 'wp-photo-album-plus' );
 					}
 					wppa_clear_taglist();
-					wppa_exit();
+					$done = true;
 					break;
 				case 'inherit_cats';
 				case 'inhadd_cats':
@@ -1925,18 +1937,18 @@ wppa_log('misc', 'leeg');
 							}
 						}
 						else {
-							wppa_echo( '||0||' . __( 'No sub albums found to process', 'wp-photo-album-plus' ) );
-							wppa_exit();
+							$fields['remark'] = __( 'No sub albums found to process', 'wp-photo-album-plus' );
+							$done = true;
 						}
 					}
 					else {
-						wppa_echo( '||0||' . __( 'No categories found to process', 'wp-photo-album-plus' ) );
-						wppa_exit();
+						$fields['remark'] = __( 'No categories found to process', 'wp-photo-album-plus' );
+						$done = true;
 					}
 					$n = count( $albarr ) - 1;
 					/* translators: number of album(s) */
-					wppa_echo( '||0||' . sprintf( _n( '%d album updated', '%d albums updated', $n, 'wp-photo-album-plus' ), $n ) );
-					wppa_exit();
+					$fields['remark'] = sprintf( _n( '%d album updated', '%d albums updated', $n, 'wp-photo-album-plus' ), $n );
+					$done = true;
 					break;
 				case 'name':
 					$itemname = __( 'Name' , 'wp-photo-album-plus' );
@@ -1949,6 +1961,7 @@ wppa_log('misc', 'leeg');
 					break;
 				case 'main_photo':
 					$itemname = __( 'Cover photo' , 'wp-photo-album-plus' );
+					$fields['main_photo'] = $value;
 					break;
 				case 'a_parent':
 					$itemname = __( 'Parent album' , 'wp-photo-album-plus' );
@@ -1956,8 +1969,9 @@ wppa_log('misc', 'leeg');
 						$value = wppa_decrypt_album( $value );
 					}
 					if ( $value < '-1' || $value == $album || ( $value > 0 && ! wppa_album_exists( $value ) ) ) {
-						wppa_echo( '||3||' . sprintf( __( 'Invalid parent value', 'wp-photo-album-plus' ), $itemname, $album ) );
-						wppa_exit();
+						$fields['error'] = '1';
+						$fields['remark'] = sprintf( __( 'Invalid parent value', 'wp-photo-album-plus' ), $itemname, $album );
+						$done = true;
 					}
 					break;
 				case 'p_order_by':
@@ -2103,6 +2117,7 @@ wppa_log('misc', 'leeg');
 					$custom_data[$index] = wppa_sanitize_custom_field( $value );
 					$value = serialize( $custom_data );
 					$item = 'custom';
+					$fields['album_custom_'.$index] = $custom_data[$index];
 					break;
 
 				case 'scheduledel':
@@ -2128,24 +2143,61 @@ wppa_log('misc', 'leeg');
 			}
 
 			// Do the update
-			$iret = wppa_update_album( $album, [$item => $value] );
+			if ( ! $done ) {
+				$iret = wppa_update_album( $album, [$item => $value] );
+			}
 
-			if ( $iret === 0 ) {
+			// Get the new data
+			wppa_cache_album( 'invalidate', $album );
+			$newalb = wppa_cache_album( $album ); // wppa_get_row( "SELECT * FROM $wpdb->wppa_albums WHERE id = $album" );
+			if ( $item == 'name' ) {
+				$fields['name'] = $newalb['name'];
+				$fields['sname'] = $newalb['sname'];
+			}
+			if ( $item == 'description' ) {
+				$fields['description'] = $newalb['description'];
+			}
+			if ( $item == 'cats' ) {
+				$fields['cats'] = trim( $newalb['cats'], ',' );
+			}
+			if ( $item == 'cover_type' ) {
+				$fields['cover_type'] = $newalb['cover_type'];
+			}
+			if ( $item == 'default_tags' ) {
+				$fields['default_tags'] = trim( $newalb['default_tags'], ',' );
+			}
+
+			// Anything updated?
+			if ( $oldalb['modified'] != $newalb['modified'] ) {
+				$fields['modified'] = wppa_local_date( '', $newalb['modified'] );
+			}
+			if ( $oldalb['indexdtm'] != $newalb['indexdtm'] ) {
+				$fields['indexdtm'] = $newalb['indexdtm'] ? wppa_local_date( '', $newalb['indexdtm'] ) : __( 'Needs re-indexing', 'wp-photo-album-plus' );
+			}
+
+			if ( $iret === 0 || $oldalb[$item] == $newalb[$item] ) {
+				$fields['error'] = '2';
 				/* translators: itemname, album id */
-				wppa_echo( '||1||' . sprintf( __( '%1$s of album %2$d NOT updated', 'wp-photo-album-plus' ), $itemname, $album ) );
+				$fields['remark'] = sprintf( __( '%1$s of album %2$d NOT updated', 'wp-photo-album-plus' ), $itemname, $album );
 			}
 			elseif ( $iret === false ) {
+				$fields['error'] = '1';
 				/* translators: itemname, album id */
-				wppa_echo( '||2||' . sprintf( __( 'An error occurred while trying to update %1$s of album %2$d' , 'wp-photo-album-plus' ), $itemname, $album ) );
+				$fields['remark'] = sprintf( __( 'An error occurred while trying to update %1$s of album %2$d' , 'wp-photo-album-plus' ), $itemname, $album );
 			}
 			else {
 				/* translators: itemname, album id */
-				wppa_echo( '||0||'.sprintf( __( '%1$s of album %2$d updated', 'wp-photo-album-plus' ), $itemname, $album ) );
+				$fields['remark'] = sprintf( __( '%1$s of album %2$d updated', 'wp-photo-album-plus' ), $itemname, $album );
+				/*
 				if ( $item == 'upload_limit' ) {
 					$a = wppa_allow_uploads( $album );
 					if ( $a ) wppa_echo( '||notfull||' . $a );
 					else wppa_echo( '||full' );
 				}
+				*/
+			}
+			if ( ! empty( $fields ) ) {
+				wppa_echo( json_encode( $fields ) );
 			}
 			wppa_exit();
 			break;

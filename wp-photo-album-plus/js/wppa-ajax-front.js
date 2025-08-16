@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.0.07.001';
+var wppaJsAjaxVersion = '9.0.10.002';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -62,6 +62,10 @@ function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
 											else {
 												var result = xresult.html + '<script>' + xresult.js + '</script>';
 											}
+
+											// Re-init lazy loader
+											wppaCheckViewport = true;
+											wppaLazyDone = false;
 
 											// Do not render modal if behind button. When behind button, there is no newurl,
 											// so we test on the existence of newurl to see if it is behind button

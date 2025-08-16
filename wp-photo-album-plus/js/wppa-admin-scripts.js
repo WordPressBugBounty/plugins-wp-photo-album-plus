@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.0.09.001
+/* Version 9.0.10.004
 /* Various js routines used in admin pages
 */
 
@@ -37,7 +37,7 @@ function wppaReUpload( event, photo, expectedName, reload, type, i ) {
 		alert( 'Filename will be set to '+file.name );
 	}
 	else if ( saniFilename != expectedName ) {
-console.log( saniFilename + ' ' + expectedName );
+// console.log( saniFilename + ' ' + expectedName );
 		if ( ! confirm( 'Filename is different.\nIf you continue, the filename will not be updated!.\n\nContinue?' ) ) {
 			jQuery( '#re-up-'+photo ).css( 'display', 'none' );
 			return;
@@ -615,7 +615,7 @@ function wppaAjaxUpdatePhoto( photo, actionslug, value, reload, bef, aft ) {
 											break;
 
 										default:	// No or recoverable error
-console.log(ArrValues[2]);
+// console.log(ArrValues[2]);
 											// Extract update felds
 											var updates = JSON.parse( ArrValues[2] );
 											var fieldName;
@@ -747,8 +747,8 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 	if ( typeof( value ) == 'object' ) value = jQuery( value ).val();
 
 	// Are we using TynyMce?
-	var isTmce = jQuery( "#wppaalbumdesc:visible" ).length == 0;
-	jQuery( "#wppaalbumdesc-html" ).click();
+	var isTmce = jQuery( "#wppa-description:visible" ).length == 0;
+	jQuery( "#wppa-description-html" ).trigger('click');
 
 	jQuery.ajax( { 	url: 		wppaAdminAjaxUrl,
 					data: 		'action=wppa&wppa-action=update-album' +
@@ -762,44 +762,68 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 					beforeSend: function( xhr ) {
 
 									// Show spinner
-									if ( actionslug == 'description' ) {
-										jQuery( '#wppa-album-spin' ).css( { visibility: 'visible' } );
-									}
-
+									jQuery( '#wppa-admin-spinner' ).fadeIn();
+									
 									// Update status
 									jQuery( '#albumstatus-' + album ).html( 'Working, please wait...' );
 								},
 					success: 	function( result, status, xhr ) {
-
-									// Format result
-									var str = wppaTrim( result );
-									var ArrValues = str.split( "||" );
-
+//	console.log(result);							
 									// Any strange results returned?
-									if ( ArrValues[0] != '' ) {
+									if ( result.substring(0,1) != '{' ) {
 										alert( 'The server returned unexpected output:\n' + ArrValues[0] );
+										return;
 									}
 
-									// Update status field
-									switch ( ArrValues[1] ) {
-										case '0':		// No error
-
-											// Update status
-											jQuery( '#albumstatus-' + album ).html( ArrValues[2] );
-											if ( wppaGetCoverPreview ) {
+									var updates = JSON.parse( result );
+									for ( var item in updates ) {
+										var value = updates[item];
+										var clr;
+										switch ( item ) {
+											case 'remark':
+												switch( updates['error'] ) {
+													case '0': clr = 'green';
+														break;
+													case '1': clr = 'red';
+														break;
+													case '2': clr = 'blue';
+														break;
+												}
+												jQuery( '#albumstatus-' + album ).html( '<span style="color:'+clr+'">' + value + '</span>' );
+												break;
+											case 'name':
+											case 'description':
+											case 'default_tags':
+											case 'album_custom_0':
+											case 'album_custom_1':
+											case 'album_custom_2':
+											case 'album_custom_3':
+											case 'album_custom_4':
+											case 'album_custom_5':
+											case 'album_custom_6':
+											case 'album_custom_7':
+											case 'album_custom_8':
+											case 'album_custom_9':
+												jQuery('#wppa-'+item).val( value );
+												break;
+											case 'cats':
+												jQuery('#wppa-cats').val( value );
+												jQuery('#wppa-catsel').val( '' );
+												break;
+											case 'cover_type':
+											case 'main_photo':
 												wppaGetCoverPreview( album, 'cover-preview-'+album );
-											}
-											break;
-
-										case '1': 	// Nothing updated
-											jQuery( '#albumstatus-' + album ).html( '<span style="color:blue">' + ArrValues[2] + ' (' + ArrValues[1] + ')</span>' );
-											break;
-
-										default:		// Any error
-											jQuery( '#albumstatus-' + album ).html( '<span style="color:red">' + ArrValues[2] + ' (' + ArrValues[1] + ')</span>' );
-											break;
+												break;
+											default:
+												jQuery('#wppa-'+item).html( value );
+										}
 									}
+									
+									
 
+
+/*
+									
 									// Process full/notfull. The last action may have caused changing the status of 'album full'
 									if ( typeof( ArrValues[3] ) != 'undefined' ) {
 										wppaProcessFull( ArrValues[3], ArrValues[4] );
@@ -818,6 +842,8 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 										setTimeout( function() { wppaReload() }, 100 );
 										return;
 									}
+									
+									*/
 
 									// Cover link
 									if ( actionslug == 'cover_linktype' ) {
@@ -830,11 +856,6 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 											jQuery( '#-link-url-tr' ).show();
 										}
 									}
-
-									// No reload: Hide spinner
-									if ( actionslug == 'description' ) {
-										jQuery( '#wppa-album-spin' ).css( { visibility: 'hidden' } );
-									}
 								},
 					error: 		function( xhr, status, error ) {
 
@@ -845,7 +866,9 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 									wppaConsoleLog( '_wppaAjaxUpdateAlbum failed. Error = ' + error + ', status = ' + status );
 								},
 					complete: 	function( xhr, status, newurl ) {
-
+						
+									// Hide spinner
+									jQuery( '#wppa-admin-spinner' ).fadeOut();
 								}
 				} );
 }
@@ -1477,6 +1500,7 @@ function wppaSetComBgCol( id ) {
 }
 
 function wppaAddCat(val, id) {
+	return;
 	wppaAddTag(val, id);
 }
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.0.09.002
+* Version: 9.0.10.009
 *
 */
 
@@ -2422,7 +2422,7 @@ global $wpdb;
 											<input
 												type="button"
 												class="wppa-admin-button button wppa-admin-button-icon"
-												style="background-image: url(\'' . WPPA_URL . '/img/remake.png\');"
+												style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/remake.png\');"
 												title="' . esc_attr( __( 'Remake', 'wp-photo-album-plus' ) ) . '"
 												onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'remake\', 0 )"
 												value="' . esc_attr( __( 'Remake', 'wp-photo-album-plus' ) ) . '"
@@ -2432,7 +2432,7 @@ global $wpdb;
 											<input
 											type="button"
 											class="wppa-admin-button button wppa-admin-button-icon"
-											style="background-image: url(\'' . WPPA_URL . '/img/turnleft.png\');"
+											style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/turnleft.png\');"
 											title="' . __( 'Rotate 90&deg; counterclockwise', 'wp-photo-album-plus' ) . '"
 											value="' . __( 'Rotate left', 'wp-photo-album-plus' ) . '"
 											onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'rotdisplayleft\', 0 )"
@@ -2440,7 +2440,7 @@ global $wpdb;
 										<input
 											type="button"
 											class="wppa-admin-button button wppa-admin-button-icon"
-											style="background-image: url(\'' . WPPA_URL . '/img/turnright.png\');"
+											style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/turnright.png\');"
 											title="' . __( 'Rotate 90&deg; clockwise', 'wp-photo-album-plus' ) . '"
 											value="' . __( 'Rotate right', 'wp-photo-album-plus' ) . '"
 											onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'rotdisplayright\', 0 )"
@@ -2457,7 +2457,7 @@ global $wpdb;
 											<input
 												type="button"
 												class="wppa-admin-button button wppa-admin-button-icon"
-												style="background-image: url(\'' . WPPA_URL . '/img/remake.png\');"
+												style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/remake.png\');"
 												title="' . esc_attr( __( 'Remake from source', 'wp-photo-album-plus' ) ) . '"
 												onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'remakethumbfs\', 0 )"
 												value="' . esc_attr( __( 'Remake from source', 'wp-photo-album-plus' ) ) . '"
@@ -2468,7 +2468,7 @@ global $wpdb;
 										<input
 											type="button"
 											class="wppa-admin-button button wppa-admin-button-icon"
-											style="background-image: url(\'' . WPPA_URL . '/img/remake.png\');"
+											style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/remake.png\');"
 											title="' . esc_attr( __( 'Remake from display', 'wp-photo-album-plus' ) ) . '"
 											onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'remakethumbfd\', 0 )"
 											value="' . esc_attr( __( 'Remake from display', 'wp-photo-album-plus' ) ) . '"
@@ -2476,7 +2476,7 @@ global $wpdb;
 										<input
 											type="button"
 											class="wppa-admin-button button wppa-admin-button-icon"
-											style="background-image: url(\'' . WPPA_URL . '/img/turnleft.png\');"
+											style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/turnleft.png\');"
 											title="' . __( 'Rotate thumbnail 90&deg; counterclockwise', 'wp-photo-album-plus' ) . '"
 											value="' . __( 'Rotate left', 'wp-photo-album-plus' ) . '"
 											onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'rotthumbleft\', 0 )"
@@ -2484,18 +2484,17 @@ global $wpdb;
 										<input
 											type="button"
 											class="wppa-admin-button button wppa-admin-button-icon"
-											style="background-image: url(\'' . WPPA_URL . '/img/turnright.png\');"
+											style="background-image: url(\'' . WPPA_UPLOAD_URL . '/icons/turnright.png\');"
 											title="' . __( 'Rotate thumbnail 90&deg; clockwise', 'wp-photo-album-plus' ) . '"
 											value="' . __( 'Rotate right', 'wp-photo-album-plus' ) . '"
 											onclick="wppaAjaxUpdatePhoto(\'' . $crid . '\', \'rotthumbright\', 0 )"
 										/>
 
-									</fieldset>
-								</div>' );
+									</fieldset>' );
 							}
 
 						// End Tab 2
-						wppa_echo( '</div>' );
+						wppa_echo( '</div></div>' );
 					}
 
 					// Tab 3 ImageMagick
@@ -3400,7 +3399,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 
 	$pagesize 		= $parms['pagesize']; // wppa_opt( 'photo_admin_pagesize' ) ? wppa_opt( 'photo_admin_pagesize' ) : '20';
 
-	$next_after 	= wppa_get( 'next-after', 0 ) ? 1 : 0;
+	$next_after 	= wppa_get( 'next-after', 0 ) ? wppa_get( 'next-after', 0 ) : 0;
 	$p 				= $parms['page']; // wppa_get( 'paged', 1 );
 	$page 			= $p + $next_after;
 	$skip 			= ( $page - 1 ) * $pagesize;
@@ -3583,8 +3582,8 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 					$nextafterselhtml = '
 					<select name="next-after">
 						<option value="-1"' . ( $next_after == '-1' ? ' selected' : '' ) . '>' . esc_html__( 'the previous page', 'wp-photo-album-plus' ) . '</option>
-						<option value="0"' . ( $next_after == 0 ? ' selected' : '' ) . '>' . esc_html__( 'the same page', 'wp-photo-album-plus' ) . '</option>
-						<option value="1"' . ( $next_after == 1 ? ' selected' : '' ) . '>' . esc_html__( 'the next page', 'wp-photo-album-plus' ) . '</option>
+						<option value="0"' . ( $next_after == '0' ? ' selected' : '' ) . '>' . esc_html__( 'the same page', 'wp-photo-album-plus' ) . '</option>
+						<option value="1"' . ( $next_after == '1' ? ' selected' : '' ) . '>' . esc_html__( 'the next page', 'wp-photo-album-plus' ) . '</option>
 					</select>';
 					/* translators: page indicator */
 					$result .= sprintf( __( 'Go to %s after Doit!.', 'wp-photo-album-plus' ), $nextafterselhtml );

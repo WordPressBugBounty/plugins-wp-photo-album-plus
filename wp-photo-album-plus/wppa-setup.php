@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.0.09.003
+* Version 9.0.10.009
 *
 */
 
@@ -432,13 +432,6 @@ global $wppa_cron_maintenance_slugs;
 		wppa_copy( $fromfile, $tofile );
 	}
 
-	// Copy transparent.png
-	$fromfile = WPPA_PATH . '/img/transparent.png';
-	$tofile = WPPA_UPLOAD_PATH . '/transparent.png';
-	if ( ! wppa_is_file( $tofile ) ) {
-		wppa_copy( $fromfile, $tofile );
-	}
-
 	// Copy documentstub.png, the default documentstub
 	$fromfile = WPPA_PATH . '/img/documentstub.png';
 	$tofile = WPPA_UPLOAD_PATH . '/documentstub.png';
@@ -447,12 +440,10 @@ global $wppa_cron_maintenance_slugs;
 	}
 
 	// Copy factory supplied icons
-	$fromfiles = array( 'Document-File.svg', 'Music-Note-1.svg', 'Film-Clapper.svg', 'Acrobat.jpg', 'Video-icon.png', 'Audio-icon.jpg' );
-	foreach ( $fromfiles as $file ) {
-		$from 	= WPPA_PATH . '/img/' . $file;
-		$to  	= WPPA_UPLOAD_PATH . '/icons/' . $file;
-		wppa_copy( $from, $to );
-	}
+	$from 		= WPPA_PATH . '/img';
+	$to 		= WPPA_UPLOAD_PATH . '/icons';
+	$exists 	= array_merge( ['documentstub.png', 'audiostub.jpg'], wppa_glob( $from . '/*', WPPA_ONLYFILES ) );
+	wppa_copy_dir( $from, $to, $exists );
 
 	// Make sure virtual album crypt exist
 	$albs = array( '0', '1', '2', '3', '9' );

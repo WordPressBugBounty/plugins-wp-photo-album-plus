@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 9.0.00.000
+* Version 9.0.10.001
 *
 */
 
@@ -645,7 +645,7 @@ function wppa_imagecopymerge_alpha( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $s
         }
     }
     // The image copy
-    imagecopy( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h );
+    imagecopy( $dst_im, $src_im, intval($dst_x), intval($dst_y), intval($src_x), intval($src_y), intval($src_w), intval($src_h) );
 }
 
 function wppa_watermark_file_select( $key, $album = 0 ) {

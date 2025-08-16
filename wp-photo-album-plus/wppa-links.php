@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.0.07.002
+* Version: 9.0.10.009
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -2296,7 +2296,7 @@ function _wppa_get_download_html( $id, $url, $download, $label, $style, $display
 	if ( $display == 'text' ) {
 
 		$result = '
-		<div style="cursor:pointer;' . esc_attr( $style ) . '">
+		<div id="wppadl-'.wppa('mocc').'" style="cursor:pointer;' . esc_attr( $style ) . '">
 		<a
 			href="' . esc_url( $url ) . '"
 			download="' . esc_attr( $download ) . '"

@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '9.0.05.002';
+wppaJsUtilsVersion = '9.0.10.007';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -391,6 +391,7 @@ var wppaLazyStartTime = 0;
 var wppaLazyTimer;
 var wppaLazyBusy = false;
 var wppaLazyProcTime = 0;
+var wppaCheckViewport = true;
 
 function wppaMakeLazyVisible(from) {
 
@@ -403,6 +404,9 @@ function wppaMakeLazyVisible(from) {
 		wppaLazyProcTime += Date.now();
 		return; // No, quit
 	}
+
+	// Done alraedy?
+//	if ( wppaLazyDone ) return; // && !wppaCheckViewport ) return;
 
 	if ( from == 'scroll' ) {
 		clearTimeout(wppaLazyTimer);
@@ -456,13 +460,19 @@ function wppaMakeLazyVisible(from) {
 	var todo = [];
 	var i = 0;
 	while (i<potential.length) {
-		if (wppaIsElementInViewport(potential[i])) {
+		if (!wppaCheckViewport || wppaIsElementInViewport(potential[i])) {
 			todo[i] = potential[i];
 		}
 		i++;
 	}
 
-//	wppaConsoleLog('lazy potential: '+potential.length+', todo: '+todo.length);
+	if ( wppaCheckViewport)  {
+		wppaConsoleLog('lazy potential from '+from+' in viewport: '+todo.length);
+	}
+	else {
+		wppaConsoleLog('lazy potential from '+from+' out of view: '+todo.length);
+		if ( todo.length == 0 ) wppaLazyDone = true;
+	}
 
 	// Process them
 	if ( todo.length > 0 ) {
@@ -475,13 +485,14 @@ function wppaMakeLazyVisible(from) {
 					jQuery(this).parent().css({'min-height':0});
 					jQuery(this).parent().parent().css({'min-height':0});
 					wppaLazyRequested++;
-					wppaLazyDone = true;
+//					wppaLazyDone = true;
 				}
 			}
 		});
 	}
-	else {
-//		wppaLazyStartTime = 0;
+	else if ( wppaCheckViewport ) {
+		wppaCheckViewport = false;
+		wppaMakeLazyVisible('DOM');
 	}
 
 	// If anything done...
@@ -498,7 +509,7 @@ function wppaMakeLazyVisible(from) {
 
 	}
 	// Reset
-	wppaLazyDone = false;
+//	wppaLazyDone = false;
 	wppaLazyBusy = false;
 	wppaLazyProcTime += Date.now();
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version: 9.0.08.007
+* Version: 9.0.10.008
 *
 */
 
@@ -176,7 +176,12 @@ wppa_echo( '
 		// Case 2: [wppa] shortcode
 		if ( ! $the_album ) {
 			$the_page = get_post();
-			$the_content = $the_page->post_content;
+			if ( $the_page ) {
+				$the_content = $the_page->post_content;
+			}
+			else {
+				$the_content = '';
+			}
 
 			$shortcodes = wppa_find_shortcodes( $the_content );
 			foreach ( $shortcodes as $shortcode ) {

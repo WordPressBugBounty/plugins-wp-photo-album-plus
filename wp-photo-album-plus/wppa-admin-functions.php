@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.0.09.002
+* Version: 9.0.10.002
 *
 */
 
@@ -875,7 +875,8 @@ global $warning_given_small;
 
 function wppa_admin_spinner() {
 
-	$result = wppa_html_tag( 'img', ['id' => 'wppa-admin-spinner', 'src' => wppa_get_imgdir( wppa_use_svg( 'admin' ) ? 'loader.svg' : 'loader.gif' ), 'alt' => 'Spinner'] );
+	$result = wppa_html_tag( 'img', ['id' => 'wppa-admin-spinner', 'src' => wppa_get_imgdir( wppa_use_svg( 'admin' ) ? 'loader.svg' : 'loader.gif' ),
+									 'alt' => 'Spinner', 'class' => 'nolazy'] );
 	wppa_echo( $result );
 }
 
@@ -1159,12 +1160,12 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 	if ( $disable_first ) {
 		$output .= '
 		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</span>';
 	} else {
 		$output .= '
 		<a class="first-page button" href="' . esc_url( add_query_arg( 'paged', 1, $current_url ) ) . '">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'title' => __( 'First page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'class' => 'nolazy', 'title' => __( 'First page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</a>';
 	}
 
@@ -1172,12 +1173,12 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 	if ( $disable_prev ) {
 		$output .= '
 		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</span>';
 	} else {
 		$output .= '
 		<a class="prev-page button" href="' . esc_url( add_query_arg( 'paged', max( 1, $current - 1 ) ) ) . '">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'title' => __( 'Previous page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'class' => 'nolazy', 'title' => __( 'Previous page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</a>';
 	}
 
@@ -1210,12 +1211,12 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 	if ( $disable_next ) {
 		$output .= '
 		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</span>';
 	} else {
 		$output .= '
 		<a class="next-page button" href="'.esc_url( add_query_arg( 'paged', min( $total_pages, $current + 1 ), $current_url ) ).'">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'title' => __( 'Next page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'class' => 'nolazy', 'title' => __( 'Next page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</a>';
 	}
 
@@ -1223,12 +1224,12 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 	if ( $disable_last ) {
 		$output .= '
 		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</span>';
 	} else {
 		$output .= '
 		<a class="last-page button" href="'.esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ).'">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'title' => __( 'Last page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'class' => 'nolazy', 'title' => __( 'Last page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
 		</a>';
 	}
 

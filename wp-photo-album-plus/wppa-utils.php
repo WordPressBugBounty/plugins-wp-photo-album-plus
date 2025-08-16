@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.09.003
+* Version: 9.0.10.009
 *
 */
 
@@ -3252,7 +3252,7 @@ function wppa_is_photo( $id ) {
 }
 
 // Does the mm item has a poster image?
-function  wppa_has_poster( $id ) {
+function wppa_has_poster( $id ) {
 
 	if ( ! $id ) return false;
 
@@ -3335,7 +3335,7 @@ function wppa_fix_poster_ext( $fileorurl, $id ) {
 					return WPPA_UPLOAD_URL . '/'. 'audiostub.jpg';
 				}
 				else {
-					return WPPA_UPLOAD_URL . '/'. 'transparent.png';
+					return WPPA_UPLOAD_URL . '/icons/transparent.png';
 				}
 			}
 
@@ -3345,7 +3345,7 @@ function wppa_fix_poster_ext( $fileorurl, $id ) {
 					return WPPA_UPLOAD_PATH . '/' . 'audiostub.jpg';
 				}
 				else {
-					return WPPA_UPLOAD_PATH . '/' . 'transparent.png';
+					return WPPA_UPLOAD_PATH . '/icons/transparent.png';
 				}
 			}
 		}
@@ -6206,12 +6206,14 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'onwheel' 		=> '',
 				 'onerror' 		=> '',
 				 'decoding' 	=> '',
+				 'placeholder' 	=> '',
 				 'data-id' 		=> '',
 				 'data-title' 	=> '',
 				 'data-day' 	=> '',
 				 'data-from' 	=> '',
 				 'data-src' 	=> '',
 				 'data-videohtml' 	=> '',
+				 'data-posterurl' 	=> '',
 				 'data-videonatwidth' 	=> '',
 				 'data-videonatheight' 	=> '',
 				 'data-audiohtml' 	=> '',
@@ -6257,7 +6259,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	// Find vaild tags
 	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio', 'form', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] );
+	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio', 'form', 'input', 'textarea', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] );
 
 	// Report invalid tag
 	if ( ! in_array( $tag, $allowed_tags ) ) {
@@ -6268,9 +6270,9 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 	$result = '<' . $tag;
 
 	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'type', 'value', 'preload', 'poster',
-					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding',
+					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding', 'placeholder',
 					  'disabled', 'selected', 'autoplay', 'controls',
-					  'data-id', 'data-title', 'data-day', 'data-from', 'data-src', 'data-videohtml', 'data-videonatwidth', 'data-videonatheight', 'data-audiohtml',
+					  'data-id', 'data-title', 'data-day', 'data-from', 'data-src', 'data-videohtml', 'data-posterurl', 'data-videonatwidth', 'data-videonatheight', 'data-audiohtml',
 					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama',
 					  ];
 	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
@@ -6355,6 +6357,8 @@ function wppa_get_rating_html( $id ) {
 
 // Get the wppa shortcodes in a text
 function wppa_find_shortcodes( $content ) {
+
+	if ( ! $content ) return array();
 
     preg_match_all('/\[(\w+)([^\]]*)\]/', $content, $matches, PREG_SET_ORDER);
 

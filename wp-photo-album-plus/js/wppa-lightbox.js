@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '9.0.08.003';
+var wppaJsLightboxVersion = '9.0.10.010';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -126,6 +126,7 @@ function wppaOvlShow( arg ) {
 		wppaOvlAlts 				= [];
 		wppaOvlTypes 				= [];
 		wppaOvlVideoHtmls 			= [];
+		wppaOvlPosterUrls 			= [];
 		wppaOvlAudioHtmls 			= [];
 		wppaOvlPdfHtmls 			= [];
 		wppaOvlVideoNaturalWidths 	= [];
@@ -180,6 +181,7 @@ function wppaOvlShow( arg ) {
 						wppaOvlIds[j] 					= jQuery( anchor ).attr( 'data-id' ) ? jQuery( anchor ).attr( 'data-id' ) : '0';
 						wppaOvlAlts[j] 					= jQuery( anchor ).attr( 'data-alt' ) ? jQuery( anchor ).attr( 'data-alt' ) : '';
 						wppaOvlVideoHtmls[j] 			= jQuery( anchor ).attr( 'data-videohtml' ) ? decodeURI( jQuery( anchor ).attr( 'data-videohtml' ) ) : '';
+						wppaOvlPosterUrls[j] 			= jQuery( anchor ).attr( 'data-posterurl' ) ? decodeURI( jQuery( anchor ).attr( 'data-posterurl' ) ) : '';
 						wppaOvlPdfHtmls[j] 				= jQuery( anchor ).attr( 'data-pdfhtml' ) ? decodeURI( jQuery( anchor ).attr( 'data-pdfhtml' ) ) : '';
 						wppaOvlAudioHtmls[j] 			= jQuery( anchor ).attr( 'data-audiohtml' ) ? decodeURI( jQuery( anchor ).attr( 'data-audiohtml' ) ) : '';
 						wppaOvlVideoNaturalWidths[j] 	= jQuery( anchor ).attr( 'data-videonatwidth' ) ? jQuery( anchor ).attr( 'data-videonatwidth' ) : '';
@@ -253,6 +255,7 @@ function wppaOvlShow( arg ) {
 			wppaOvlIds[0] 					= jQuery( arg ).attr( 'data-id' ) ? jQuery( arg ).attr( 'data-id' ) : '0';
 			wppaOvlAlts[0] 					= jQuery( arg ).attr( 'data-alt' ) ? jQuery( arg ).attr( 'data-alt' ) : '';
 			wppaOvlVideoHtmls[0] 			= jQuery( arg ).attr( 'data-videohtml' ) ? decodeURI( jQuery( arg ).attr( 'data-videohtml' ) ) : '';
+			wppaOvlPosterUrls[0] 			= jQuery( arg ).attr( 'data-posterurl' ) ? decodeURI( jQuery( arg ).attr( 'data-posterurl' ) ) : '';
 			wppaOvlAudioHtmls[0] 			= jQuery( arg ).attr( 'data-audiohtml' ) ? decodeURI( jQuery( arg ).attr( 'data-audiohtml' ) ) : '';
 			wppaOvlPdfHtmls[0] 				= jQuery( arg ).attr( 'data-pdfhtml' ) ? decodeURI( jQuery( arg ).attr( 'data-pdfhtml' ) ) : '';
 			wppaOvlVideoNaturalWidths[0] 	= jQuery( arg ).attr( 'data-videonatwidth' ) ? jQuery( arg ).attr( 'data-videonatwidth' ) : '';
@@ -367,6 +370,7 @@ function _wppaOvlShow( idx ) {
 			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<video id="wppa-overlay-img" controls controlsList="nodownload nofullscreen noremoteplayback" preload="metadata"' +
 					( wppaOvlVideoStart ? ' autoplay' : '' ) +
+					( wppaOvlPosterUrls[idx] ? ' poster="' + wppaOvlPosterUrls[idx] + '"' : '' ) +
 					' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
 					' ontouchend="wppaTouchEnd( event );"' +
 					' ontouchmove="wppaTouchMove( event );"' +
@@ -374,12 +378,15 @@ function _wppaOvlShow( idx ) {
 					' onclick="wppaOvlImgClick( event );"' +
 					' onpause="wppaOvlVideoOnPause(this);"' +
 					' onplay="wppaOvlVideoPlaying = true;"' +
+					' oncanplay="wppaOvlVideoLoading = false;"' +
 					' style="border:none; width:'+screen.width+'px; box-shadow:none; position:absolute;"' +
 					' alt="'+wppaOvlAlts[idx]+'"' +
 					' >'+
 						wppaOvlVideoHtmls[idx]+
 				'</video>'+
 			'</div>';
+
+			wppaOvlVideoLoading = true;
 		}
 
 		// Fullsize pdf
@@ -529,8 +536,10 @@ function _wppaOvlShow( idx ) {
 							' onmouseout="jQuery(\'.wppa-ovl-nav-btn\').stop().fadeTo(200,0);"' +
 							' preload="metadata"' +
 							( wppaOvlVideoStart ? ' autoplay' : '' ) +
+							( wppaOvlPosterUrls[idx] ? ' poster="' + wppaOvlPosterUrls[idx] + '"' : '' ) +
 							' onpause="wppaOvlVideoOnPause(this)"' +
 							' onplay="wppaOvlVideoPlaying = true;"' +
+							' oncanplay="wppaOvlVideoLoading = false;"' +
 							' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
 							' ontouchend="wppaTouchEnd( event );"' +
 							' ontouchmove="wppaTouchMove( event );"' +
@@ -557,6 +566,7 @@ function _wppaOvlShow( idx ) {
 						'</video>';
 
 				wppaOvlIsVideo = true;
+				wppaOvlVideoLoading = true;
 			}
 
 			// Not fullsize pdf
@@ -1055,15 +1065,34 @@ function wppaOvlStop() {
 	}
 }
 
+var wppaToggle = '+';
 // Start lb slideshow
 function wppaOvlRun() {
 
 	// Are we stopped??
 	if ( ! wppaOvlRunning ) return;
 
+	var elm = document.getElementById('wppa-overlay-img');
+	var msg = ''; 
+
+	if ( wppaIsVideo ) {
+		msg = wppaToggle+' s='+elm.readyState+', ct='+elm.currentTime+', dr='+elm.duration;
+		if (wppaToggle == '+'){wppaToggle='-';}else {wppaToggle='+';}
+		if ( elm.autoplay ) {
+			if ( elm.readyState < 4 ) {
+				if ( elm.duration != elm.currentTime ) {
+					setTimeout( wppaOvlRun, 1000 );
+//					jQuery('#wppa-ovl-dbg-msg').html(msg+' 1');
+					return;
+				}
+			}
+		}
+	}
+
 	// Wait until playing audio or video ends
-	if ( wppaOvlVideoPlaying || wppaOvlAudioPlaying ) {
-		setTimeout( wppaOvlRun, 50 );
+	if ( wppaOvlVideoLoading || wppaOvlVideoPlaying || wppaOvlAudioPlaying ) {
+//jQuery('#wppa-ovl-dbg-msg').html(msg+' 2');
+		setTimeout( wppaOvlRun, 1000 );
 		return;
 	}
 
@@ -1072,6 +1101,7 @@ function wppaOvlRun() {
 		var elm = document.getElementById( 'wppa-overlay-img' );
 		if ( elm ) {
 			if ( ! wppaIsIe && ! elm.complete ) {
+//jQuery('#wppa-ovl-dbg-msg').html(msg+' 3');
 				setTimeout( wppaOvlRun, 200 );
 				return;
 			}

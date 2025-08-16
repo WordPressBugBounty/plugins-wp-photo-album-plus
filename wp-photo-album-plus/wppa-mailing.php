@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 9.0.01.003
+* Version 9.0.10.002
 *
 */
 
@@ -90,6 +90,8 @@ function wppa_do_mailinglist( $type, $alb = 0, $pho = 0, $com = 0, $url = '', $s
 global $wpdb;
 
 	$log_args = " Args: $alb, $pho, $com, $url, $start.";
+	$sleeptime = 5;
+	$sleeptime_p = $sleeptime++;
 
 	// Add new users to default mailing list subscriptions
 	if ( wppa_opt( 'mailinglist_policy' ) == 'opt-out' ) {
@@ -325,13 +327,14 @@ global $wpdb;
 													'listtype' 		=> 'newalbumnotify',
 													'unsubscribe' 	=> wppa_unsubscribe_link( $usr, $type ),
 													) );
+							sleep( $sleeptime );
 						}
 						else {
 							wppa_unsubscribe_all( $usr );
 						}
 
 						// If time up, reschedule at current user id to run in 15 sec
-						if ( wppa_is_time_up() ) {
+						if ( wppa_is_time_up( '', $sleeptime_p ) ) {
 							wppa_schedule_mailinglist( $type, $alb, $pho, $com, $url, $usr, 15 );
 							wppa_exit();
 						}
@@ -407,13 +410,14 @@ global $wpdb;
 												   'listtype' 		=> $type,
 												   'unsubscribe' 	=> wppa_unsubscribe_link( $usr, $type ),
 												));
+							sleep( $sleeptime );
 						}
 						else {
 							wppa_unsubscribe_all( $usr );
 						}
 
 						// If time up, reschedule at current user id to run in 15 sec
-						if ( wppa_is_time_up() ) {
+						if ( wppa_is_time_up( '', $sleeptime_p ) ) {
 							wppa_schedule_mailinglist( $type, $alb, $pho, $com, $url, $usr, 15 );
 							wppa_exit();
 						}
@@ -543,6 +547,7 @@ global $wpdb;
 												   'listtype' 		=> $type,
 												   'unsubscribe' 	=> wppa_unsubscribe_link( $usr, $type ),
 												));
+							sleep( $sleeptime );
 						}
 
 						// User does not exist, remove him from all lists
@@ -551,7 +556,7 @@ global $wpdb;
 						}
 
 						// If time up, reschedule at current user id to run in 15 sec
-						if ( wppa_is_time_up() ) {
+						if ( wppa_is_time_up( '', $sleeptime_p ) ) {
 							wppa_schedule_mailinglist( $type, $alb, $pho, $com, $url, $usr, 15 );
 							wppa_exit();
 						}

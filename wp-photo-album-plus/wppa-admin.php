@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 9.0.00.000
+* Version: 9.0.10.009
 *
 */
 
@@ -55,7 +55,7 @@ function wppa_add_admin() {
 	if ( $tot_pending_count ) $tot_pending = '<span class="update-plugins"><span class="plugin-count"><b>' . $tot_pending_count . '</b></span></span>';
 
 	// Add wppa menu
-	$icon_url = WPPA_URL . '/img/camera16.png';
+	$icon_url = WPPA_UPLOAD_URL . '/icons/camera16.png';
 
 	$atog = wppa_get_option( 'wppa_album_use_gallery', 'no' ) == 'yes';
 

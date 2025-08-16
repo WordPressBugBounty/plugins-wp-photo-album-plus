@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a slideshow in the sidebar
-* Version: 9.0.00.000
+* Version: 9.0.10.006
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -179,13 +179,14 @@ class SlideshowWidget extends WP_Widget {
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
 		// Album
-		if ( wppa_opt( 'photo_admin_max_albums' ) >= wppa_get_count( WPPA_ALBUMS ) ) {
+		if ( ! wppa_has_many_albums() ) { // wppa_opt( 'photo_admin_max_albums' ) || wppa_opt( 'photo_admin_max_albums' ) >= wppa_get_count( WPPA_ALBUMS ) ) {
 			$body =
-			'<option value="-2"' . ( $instance['album'] == '-2' ? ' selected' : '' ) . ' >' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>' .
+//			'<option value="-2"' . ( $instance['album'] == '-2' ? ' selected' : '' ) . ' >' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>' .
 			wppa_album_select_a( array (
 											'selected' 	=> $instance['album'],
 											'path' 		=> true,
 											'sort' 		=> true,
+											'addall' 	=> true,
 											) );
 
 			wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
@@ -326,9 +327,9 @@ class SlideshowWidget extends WP_Widget {
 	function get_defaults() {
 
 		$defaults = array( 	'title' 	=> __( 'Sidebar Slideshow', 'wp-photo-album-plus' ),
-							'album' 	=> '-2',
+							'album' 	=> '0',
 							'width' 	=> wppa_get_option( 'wppa_widget_width' ),
-							'height' 	=> 0,
+							'height' 	=> '0',
 							'ponly' 	=> 'no',
 							'linkurl' 	=> '',
 							'linktitle' => '',
@@ -338,10 +339,10 @@ class SlideshowWidget extends WP_Widget {
 							'timeout' 	=> '4',
 							'film' 		=> 'no',
 							'browse' 	=> 'no',
-							'name' 		=> 'no',
+							'name' 		=> 'on',
 							'numbar'	=> 'no',
 							'desc' 		=> 'no',
-							'maxslides' => 100,
+							'maxslides' => '100',
 							'random' 	=> 'no',
 							'incsubs' 	=> 'no',
 							'logonly' 	=> 'no',

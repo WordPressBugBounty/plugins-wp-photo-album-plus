@@ -1,5 +1,19 @@
 WP Photo Album Plus Changelog
 
+= 9.0.10 =
+
+* Built in a 5 seconds time delay between emails sent to prevent email server overload.
+* Minor fixes to comply with newer php versions.
+* Go to previous page after doit did not work on the bulk photo admin page. Fixed.
+* The spinner on admin pages will now be displayed immediately, regarless of the lazy load setting.
+* Improved lazy-load behaviour.
+* Fixed a layout issue on the photo admin page that showed up for videos without posterfile.
+* Improved functionality of the album admin update feature.
+* When the first item in a lightbox auto running slideshow was a large video, the next image/video could show up when loading the initial video took more time than the slideshow timeout. Fixed.
+* When a slideshow widget specifies the display of name and/or description and the normal slideshow does not, the name and/or description did not show up in the widget. Fixed.
+* Icons and navigation symbols moved to a subdir in uploads, so there is no need anymore for http access in the plugin folder.
+* Improved functionality of videos on lightbox.
+
 = 9.0.09 =
 
 * Auto reload after upload on the import page did not work. Fixed.

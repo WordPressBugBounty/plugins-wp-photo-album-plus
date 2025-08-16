@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.0.09.002
+* Version: 9.0.10.009
 *
 */
 
@@ -774,6 +774,7 @@ global $cover_count_key;
 // Output goes directly to wppa_out()
 function wppa_the_coverphoto( $albumid, $image, $src, $photo_pos, $photolink, $title, $imgattr_a = array(), $onmouseover = '', $onmouseout = '', $is_grid = false ) {
 global $wpdb;
+global $wppa_no_lightbox;
 
 	if ( ! $image ) {
 		return;
@@ -871,7 +872,7 @@ global $wpdb;
 			wppa_out( wppa_get_medal_html_a( array( 'id' => $id, 'size' => wppa_opt( 'icon_size_multimedia' ), 'where' => 'top', 'thumb' => true ) ) );
 
 			// The link from the coverphoto
-			if ( $photolink ) {
+			if ( $photolink && ! $wppa_no_lightbox ) {
 
 				// If lightbox, we need all the album photos to set up a lightbox set
 				if ( $photolink['is_lightbox'] ) {
@@ -1031,6 +1032,7 @@ function wppa_the_coverphotos( $albumid, $images, $srcs, $photo_pos, $photolinks
 										 'href' 				=> $link,
 										 'style' 				=> 'border:0;color:transparent;cursor:wait;',
 										 'data-videohtml' 		=> ( $is_video ? esc_attr( wppa_get_video_body( $tid ) ) : ''),
+										 'data-posterurl' 		=> ( $is_video ? esc_url( wppa_fix_poster_ext( wppa_get_photo_url( $tid ), $tid ) ) : '' ),
 										 'data-videonatwidth' 	=> ( $is_video ? wppa_get_videox( $tid ) : '' ),
 										 'data-videonatheight' 	=> ( $is_video ? wppa_get_videoy( $tid ) : '' ),
 										 'data-audiohtml' 		=> ( $has_audio ? wppa_get_audio_body( $tid ) : '' ),
@@ -2018,12 +2020,15 @@ global $wppa_no_lightbox;
 		else {
 			$pdfhtml = '';
 		}
+		$posterurl = wppa_has_poster( $tid ) ? wppa_fix_poster_ext( wppa_get_photo_url( $tid ), $tid ) : '';
 
 		$pan = wppa_get_pan_a( $tid );
 
 		// Open the anchor tag for lightbox
 		$result .= wppa_html_tag( 'a', ['data-id' => wppa_encrypt_photo( $tid ), 'href' => $link, 'class' => ($first?'first-'.$albumid:''),
-										'style' => 'border:0;color:transparent;', 'data-videohtml' => $videohtml, 'data-videonatwidth' => $videonatwidth, 'data-videonatheight' => $videonatheight,
+										'style' => 'border:0;color:transparent;', 
+										'data-videohtml' => $videohtml, 
+										'data-posterurl' => $posterurl, 'data-videonatwidth' => $videonatwidth, 'data-videonatheight' => $videonatheight,
 										'data-audiohtml' => $audiohtml, 'data-pdfhtml' => $pdfhtml,
 										'data-rel' => 'wppa[alw-'.$mocc.'-'.$albumid.']', 'data-lbtitle' => $title,
 										'data-panorama' => $pan['html'], 'data-pantype' => $pan['type'],

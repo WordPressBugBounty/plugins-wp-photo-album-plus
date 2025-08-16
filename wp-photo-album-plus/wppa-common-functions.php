@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.0.03.003
+* Version: 9.0.10.009
 *
 */
 
@@ -373,7 +373,7 @@ global $wppa_randseed_modified;
 // get the url to the plugins image directory
 function wppa_get_imgdir( $file = '', $rel = false ) {
 
-	$result = WPPA_URL . '/img/';
+	$result = WPPA_UPLOAD_URL . '/icons/';
 	if ( is_ssl() ) $result = str_replace( 'http://', 'https://', $result );
 	$result .= $file;
 
@@ -1605,7 +1605,7 @@ static $cache1, $cache2;
 	$is_many = false;
 	if ( $args['checkarray'] && ! empty( $args['array'] ) ) {
 		$c = count( $args['array'] );
-		if ( wppa_opt( 'photo_admin_max_albums' ) && wppa_opt( 'photo_admin_max_albums' ) > 0 && $c > wppa_opt( 'photo_admin_max_albums' ) ) {
+		if ( wppa_opt( 'photo_admin_max_albums' ) > '0' && $c > wppa_opt( 'photo_admin_max_albums' ) ) {
 			$is_many = true;
 		}
 	}

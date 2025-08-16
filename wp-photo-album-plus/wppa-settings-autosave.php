@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.0.09.002
+* Version: 9.0.10.014
 *
 */
 
@@ -3382,7 +3382,7 @@ global $wppa_hide_this;
 								];
 						$vals = [1, '1.25', '1.33333', '1.5', '1.6', '1.77777', '2', '0.8', '0.75', '0.66667', '0.625', '0.5625', '0.5', ];
 						$html = wppa_select($slug, $opts, $vals);
-						wppa_setting_new($slug, '4', $name, $desc, $html, $help, wppa_switch('film_type')=='canvas');
+						wppa_setting_new($slug, '4', $name, $desc, $html, $help, wppa_opt('film_type')=='canvas');
 
 						$name = __('Filmstrip Thumbnail Size', 'wp-photo-album-plus' );
 						$desc = __('The size of the filmstrip images.', 'wp-photo-album-plus' );
@@ -8288,8 +8288,8 @@ global $wppa_hide_this;
 						$desc = __('Max albums to show in album selectionbox.', 'wp-photo-album-plus' );
 						$help = __('If there are more albums in the system, display an input box asking for album id#', 'wp-photo-album-plus' );
 						$slug = 'wppa_photo_admin_max_albums';
-						$opts = array( __( '--- off ---', 'wp-photo-album-plus' ), 10, '20', '50', 100, '200', '500', '1000', '2000', '3000', '4000', '5000' );
-						$vals = array( 0, 10, '20', '50', 100, '200', '500', '1000', '2000', '3000', '4000', '5000' );
+						$opts = array( __( '--- off ---', 'wp-photo-album-plus' ), '10', '20', '50', '100', '200', '500', '1000', '2000', '3000', '4000', '5000' );
+						$vals = array( '0', '10', '20', '50', '100', '200', '500', '1000', '2000', '3000', '4000', '5000' );
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '6', $name, $desc, $html, $help);
 

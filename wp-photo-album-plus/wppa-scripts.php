@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.0.09.001
+* Version 9.0.10.014
 */
 
 // Place all wppa related js declarations in the header, both admin and frontend
@@ -314,9 +314,7 @@ global $wppa_opt;
 	$js_ver = gmdate( "ymd-Gis", filemtime( $decl_file ) );
 	wppa_enqueue_script( 'wppa-decls', WPPA_URL . '/js/wppa-decls.js', array(), $js_ver );
 
-	$footer = false; // true;
-
-//	$footer = ['in_footer' => true, 'strategy' => 'defer'];
+	$footer = false;
 
 	// The js dependancies
 	$js_depts = array(	'jquery',
@@ -374,8 +372,9 @@ global $wppa_opt;
 
 	// Add inits
 	$the_js = 'const { __ } = wp.i18n;';
-	wppa_add_inline_script( 'wppa', $the_js );
-	wppa_add_inline_script( 'wppa', wppa_initialize_javascript() );
+
+	wppa_add_inline_script( 'wppa-decls', $the_js );
+	wppa_add_inline_script( 'wppa-decls', wppa_initialize_javascript() );
 
 	// google maps
 	// Not in ajax to avoid duplicate loading
@@ -451,6 +450,7 @@ global $wppa_opt;
 		onclick="wppaOvlOnclick(event)"
 		onwheel="return false;"
 		onscroll="return false;">
+		<div id="wppa-ovl-dbg-msg" style="position:fixed;top:0;left:0;padding:0 4px;background-color:white;color:black"></div>
 	</div>
 	<div
 		id="wppa-overlay-ic"
@@ -526,22 +526,20 @@ function wppa_add_js_language_files( $where ) {
 
 // Add script to the page specific data. Input text should have no <script> tag
 // If admin or no defer js or cached: output with tags by wppa_out()
-function wppa_js( $txt, $now = false ) {
+function wppa_js( $txt, $now = false, $needready = true ) {
 global $wppa_js_page_data;
 global $wppa_script_open;
 global $wppa_gutenberg_preview;
 
 	// Do it
 	if ( wppa_is_caching() || $now || $wppa_gutenberg_preview || defined( 'DOING_AJAX' ) || wppa_in_widget() ) {
-/*
-		if ( defined( 'DOING_AJAX' ) ) {
+
+		if ( $needready) {
 			wppa_out( '<script>jQuery(document).ready(function(){' . $txt . '})</script>' );
 		}
 		else {
-			wppa_add_inline_script( 'wppa', 'jQuery(document).ready(function(){' . $txt . '})' );
+			wppa_out( '<script>' . $txt . '</script>' );
 		}
-*/
-		wppa_out( '<script>jQuery(document).ready(function(){' . $txt . '})</script>' );
 		return;
 	}
 
@@ -550,8 +548,7 @@ global $wppa_gutenberg_preview;
 		$wppa_script_open = true;
 	}
 	else {
-		$wppa_js_page_data .= '
-			' . $txt;
+		$wppa_js_page_data .= $txt;
 	}
 }
 

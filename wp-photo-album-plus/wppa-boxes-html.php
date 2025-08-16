@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.0.07.002
+* Version 9.0.10.009
 *
 */
 
@@ -338,7 +338,7 @@ global $wpdb;
 								}
 								switch ( $this_rank ) {
 									case 1:
-										$src = WPPA_URL . '/img/medal_gold_' . wppa_opt( 'medal_color' ) . '.png';
+										$src = WPPA_UPLOAD_URL . '/icons/medal_gold_' . wppa_opt( 'medal_color' ) . '.png';
 										$med = __( 'Gold medal', 'wp-photo-album-plus' );
 										$result .=
 											wppa_html_tag( 'span', ['style' => "font-size:2em"], 1 ) .
@@ -346,7 +346,7 @@ global $wpdb;
 											wppa_html_tag( 'img', ['src' => $src, 'alt' => $med, 'title' => $med] );
 										break;
 									case 2:
-										$src = WPPA_URL . '/img/medal_silver_' . wppa_opt( 'medal_color' ) . '.png';
+										$src = WPPA_UPLOAD_URL . '/icons/medal_silver_' . wppa_opt( 'medal_color' ) . '.png';
 										$med = __( 'Silver medal', 'wp-photo-album-plus' );
 										$result .=
 											wppa_html_tag( 'span', ['style' => "font-size:1.75em"], 2 ) .
@@ -354,7 +354,7 @@ global $wpdb;
 											wppa_html_tag( 'img', ['src' => $src, 'alt' => $med, 'title' => $med] );
 										break;
 									case 3:
-										$src = WPPA_URL . '/img/medal_bronze_' . wppa_opt( 'medal_color' ) . '.png';
+										$src = WPPA_UPLOAD_URL . '/icons/medal_bronze_' . wppa_opt( 'medal_color' ) . '.png';
 										$med = __( 'Bronze medal', 'wp-photo-album-plus' );
 										$result .=
 											wppa_html_tag( 'span', ['style' => "font-size:1.5em"], 3 ) .

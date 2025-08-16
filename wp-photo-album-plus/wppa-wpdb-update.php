@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.0.05.001
+* Version: 9.0.10.003
 *
 */
 
@@ -45,13 +45,15 @@ global $wpdb;
 			$fields['name'] 	= $n;
 			$fields['sname'] 	= wppa_name_slug( $n );
 			$modified 			= true;
+			$fields['indexdtm'] = '';
 		}
 	}
 
 	// Description
 	if ( isset( $args['description'] ) ) {
-		$fields['description'] = $args['description'];
+		$fields['description']  = sanitize_textarea_field( $args['description'] );
 		$modified 				= true;
+		$fields['indexdtm'] 	= '';
 	}
 
 	// Album order
@@ -186,6 +188,7 @@ global $wpdb;
 		$fields['cats'] = str_replace( '-none-,', '', $fields['cats'] );
 		wppa_clear_catlist();
 		$modified = true;
+		$fields['indexdtm'] = '';
 	}
 
 	// Scheduledtm

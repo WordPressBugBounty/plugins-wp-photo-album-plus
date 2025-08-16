@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.0.08.004
+* Version 9.0.10.014
 *
 */
 
@@ -710,7 +710,6 @@ function wppa_get_spheric_pan_html( $args ) {
 	}
 
 	$onload = '
-	jQuery(document).ready(function(){
 		var data' . $mocc . ' =
 			{	mocc				:' . $mocc . ',
 				id					:' . $id . ',
@@ -737,8 +736,7 @@ function wppa_get_spheric_pan_html( $args ) {
 				slide 				:' . ( $slide ? 'true' : 'false' ) . ',
 				pancontrolheight 	:' . wppa_get_pan_control_height() . '
 			};
-		wppaDoSphericPan(' . $mocc . ', data' . $mocc . ');
-		});';
+		wppaDoSphericPan(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
 	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
@@ -1024,8 +1022,7 @@ function wppa_get_flat_pan_html( $args ) {
 	'</div>';
 
 	// Add placeholder for image
-	$onload =
-	'jQuery(document).ready(function(){
+	$onload = '
 		var data' . $mocc . ' =
 		{	mocc				:' . $mocc . ',
 			id					:' . $id . ',
@@ -1049,8 +1046,7 @@ function wppa_get_flat_pan_html( $args ) {
 			pancontrolheight 	:' . wppa_get_pan_control_height() . '
 		};
 		jQuery( \'#wppa-spinner-'.$mocc.'\' ).hide();
-		wppaDoFlatPanorama(' . $mocc . ', data' . $mocc . ');
-	});';
+		wppaDoFlatPanorama(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
 	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
@@ -1342,8 +1338,7 @@ function wppa_get_zoom_pan_html( $args ) {
 		}
 
 		// Add placeholder for image
-		$onload =
-		'jQuery(document).ready(function(){
+		$onload = '
 			var data' . $mocc . ' =
 			{	mocc				:' . $mocc . ',
 				id					:' . $id . ',
@@ -1365,8 +1360,7 @@ function wppa_get_zoom_pan_html( $args ) {
 				pancontrolheight 	:' . wppa_get_pan_control_height() . '
 			};
 			jQuery( \'#wppa-spinner-'.$mocc.'\' ).hide();
-			wppaDoZoomPan(' . $mocc . ', data' . $mocc . ');
-		});';
+			wppaDoZoomPan(' . $mocc . ', data' . $mocc . ');';
 
 		$result .=
 		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
