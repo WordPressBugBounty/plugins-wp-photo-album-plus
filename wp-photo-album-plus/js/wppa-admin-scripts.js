@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.0.10.004
+/* Version 9.0.11.002
 /* Various js routines used in admin pages
 */
 
@@ -672,6 +672,11 @@ function wppaAjaxUpdatePhoto( photo, actionslug, value, reload, bef, aft ) {
 													case 'tags':
 														jQuery( '#tags-' + photo ).val( fieldValue );
 														break;
+														
+													case 'description':
+														fieldValue = wppaEntityDecode( fieldValue );
+														jQuery( "#" + fieldName + "-" + photo ).html( fieldValue );
+														break;
 
 													default:
 														jQuery( "#" + fieldName + "-" + photo ).html( fieldValue );
@@ -767,8 +772,7 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 									// Update status
 									jQuery( '#albumstatus-' + album ).html( 'Working, please wait...' );
 								},
-					success: 	function( result, status, xhr ) {
-//	console.log(result);							
+					success: 	function( result, status, xhr ) {							
 									// Any strange results returned?
 									if ( result.substring(0,1) != '{' ) {
 										alert( 'The server returned unexpected output:\n' + ArrValues[0] );
@@ -791,8 +795,11 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 												}
 												jQuery( '#albumstatus-' + album ).html( '<span style="color:'+clr+'">' + value + '</span>' );
 												break;
-											case 'name':
 											case 'description':
+												value = wppaEntityDecode( value );
+												jQuery('#wppa-'+item).val( value );
+												break;
+											case 'name':
 											case 'default_tags':
 											case 'album_custom_0':
 											case 'album_custom_1':

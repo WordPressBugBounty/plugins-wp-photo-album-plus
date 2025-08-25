@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.0.10.012
+* Version: 9.0.11.007
 *
 */
 
@@ -1160,19 +1160,19 @@ global $wppa_session;
 		}
 
 		// Select order
-		if ( wppa_switch( 'lasten_random' ) ) {
-			$order_by = 'RAND()';
-		}
-		else { // Not random
+//		if ( wppa_switch( 'lasten_random' ) ) {
+//			$order_by = 'RAND()';
+//		}
+//		else { // Not random
 			if ( wppa_switch( 'lasten_use_modified' ) ) {
 				$order_by = 'modified DESC';
 			}
 			else {
 				$order_by = 'timestamp DESC';
 			}
-		}
+//		}
 
-		// Newtime
+/*		// Newtime
 		if ( wppa_switch( 'lasten_use_modified' ) ) {
 			if ( wppa_opt( 'max_photo_modtime' ) ) {
 				$newtime_clause = "AND modified >= " . ( time() - wppa_opt( 'max_photo_modtime' ) );
@@ -1189,7 +1189,7 @@ global $wppa_session;
 				$newtime_clause = '';
 			}
 		}
-
+*/
 		// Owner
 		$owner = sanitize_user( wppa( 'is_upldr' ) );
 		if ( $owner == '#me' ) {
@@ -1197,10 +1197,26 @@ global $wppa_session;
 		}
 		$owner_clause = ( wppa( 'is_upldr' ) ) ? "AND owner = `" . $owner . "` " : "";
 
-		$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE %s %s %s %s %s ORDER BY %s LIMIT %d",
-								  $album_clause, $landscape_clause, $newtime_clause, $owner_clause, $status_clause, $order_by, $max );
+		if ( wppa_switch( 'lasten_random' ) ) {
+			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE %s %s %s %s ORDER BY %s LIMIT %d",
+									 $album_clause, $landscape_clause, $owner_clause, $status_clause, $order_by, $max );
+			$query = wppa_fix_query( $query );
+			$ids = wppa_get_col( $query );
+			if ( count( $ids ) ) {
+				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN (%s) ORDER BY RAND()", implode(',',$ids) );
+				$query = wppa_fix_query( $query );
+			}
+		}
+		else {
+			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE %s %s %s %s ORDER BY %s LIMIT %d",
+									 $album_clause, $landscape_clause, $owner_clause, $status_clause, $order_by, $max );
+		}
 		$query = wppa_fix_query( $query );
 		$count_first = false;
+
+		// Do query and return result after copy result to $thumbs!!
+		$thumbs = wppa_do_get_thumbs_query( $query );
+		return $thumbs;
 	}
 
 	// Comten?
@@ -4168,7 +4184,6 @@ function wppa_popup() {
 					' id="wppa-popup-'.wppa( 'mocc' ).'"' .
 					' class="wppa-popup-frame wppa-thumb-text"' .
 					' style="max-width:2048px;"' .
-					' onmouseout="wppaPopDown( '.wppa( 'mocc' ).' );"' .
 					' >' .
 				'</div>' .
 				'<div style="clear:both">' .
@@ -4976,7 +4991,7 @@ global $wppa_alert;
 
 
 			$album = wppa_create_album_entry( array( 	'name' 			=> $albumname,
-														'description' 	=> wp_strip_all_tags( wppa_get( 'album-desc' ) ),
+														'description' 	=> wp_kses(html_entity_decode(wppa_get( 'album-desc', '', 'html' )),wppa_allowed_simple_tags()),
 														'a_parent' 		=> $parent,
 														'owner' 		=> wppa_switch( 'frontend_album_public' ) ? '--- public ---' : wppa_get_user()
 														 ) );
@@ -5239,7 +5254,7 @@ global $wppa_alert;
 			}
 
 			// Description
-			$description 	= wppa_get( 'albumeditdesc', '', 'html' );
+			$description 	= wp_kses(html_entity_decode(wppa_get( 'albumeditdesc', '', 'html' )),wppa_allowed_simple_tags());
 
 			// Custom data
 			$custom_data = wppa_unserialize( wppa_get_album_item( $alb, 'custom' ) );

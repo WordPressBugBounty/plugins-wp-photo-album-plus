@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.0.00.010
+* Version 9.0.11.007
 *
 */
 
@@ -271,7 +271,7 @@ global $wpdb;
 	$data = apply_filters( 'wppa_photo_entry', $data );
 
 	$data['name'] 			= trim( $data['name'] );
-	$data['description'] 	= trim( $data['description'] );
+	$data['description'] 	= wp_kses( html_entity_decode( $data['description'] ), wppa_allowed_simple_tags() );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['tags'] 			= str_replace( '-none-,', '', $data['tags'] );
 	$sdtm = wppa_get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %s", $data['album'] ) );
@@ -353,7 +353,7 @@ global $wpdb;
 					) );
 
 	$data['name'] 			= trim( $data['name'] );
-	$data['description'] 	= trim( $data['description'] );
+	$data['description'] 	= wp_kses( html_entity_decode( $data['description'] ), wppa_allowed_simple_tags() );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['cats'] 			= str_replace( '-none-,', '', $data['cats'] );
 

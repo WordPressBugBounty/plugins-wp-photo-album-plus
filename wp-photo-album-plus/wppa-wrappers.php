@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.0.10.009
+* Version 9.0.11.007
 *
 */
 
@@ -795,6 +795,24 @@ function wppa_echo( $html, $flags = array() ) {
 	else {
 		echo wp_kses( $html, $t, $p );
 	}
+}
+
+function wppa_allowed_simple_tags() {
+	$result = array(
+		'ul' => true,
+		'ol' => true,
+		'li' => true,
+		'p' => true,
+		'a' => array(
+				'href' => array(),
+				'title' => array()
+				),
+		'b' => true,
+		'i' => true,
+		'br' => true,
+		'strong' => true,
+	);
+	return $result;
 }
 
 function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => false, 'needjs' => false] ) { //, 'needonerror' => false] ) {

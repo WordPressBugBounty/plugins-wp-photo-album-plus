@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.0.02.001
+* Version: 9.0.11.006
 *
 */
 
@@ -168,6 +168,7 @@ function wppa_get_get_filter( $name ) {
 		case 'upn-description':
 		case 'user-desc': 		// Desc by user during fe upload
 		case 'albumeditdesc': 	// Fe album desc
+		case 'album-desc': 		// Desc by user during creation
 			$result = 'html';
 			break;
 
@@ -315,12 +316,7 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 
 		case 'html':
 		case 'custom':
-			if ( current_user_can( 'unfiltered_html' ) ) {
-				return isset( $_REQUEST[$key] ) ? wp_kses( wp_unslash( $_REQUEST[$key] ), wppa_allowed_tags() ) : '';
-			}
-			else {
-				return isset( $_REQUEST[$key] ) ? wp_strip_all_tags( wp_unslash( $_REQUEST[$key] ) ) : $default;
-			}
+			return isset( $_REQUEST[$key] ) ? wp_kses( wp_unslash( $_REQUEST[$key] ), wppa_allowed_tags() ) : $default;
 			break;
 
 		case 'tag':

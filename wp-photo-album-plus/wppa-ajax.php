@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.10.004
+* Version: 9.0.11.002
 *
 */
 
@@ -2197,7 +2197,10 @@ wppa_log('misc', 'leeg');
 				*/
 			}
 			if ( ! empty( $fields ) ) {
-				wppa_echo( json_encode( $fields ) );
+				if ( isset( $fields['description'] ) ) {
+					$fields['description'] = htmlentities( $fields['description'] );
+				}
+				wppa_echo( wp_json_encode( $fields ) );
 			}
 			wppa_exit();
 			break;
@@ -2422,7 +2425,6 @@ wppa_log('misc', 'leeg');
 						$err =1;
 					}
 					$jsfields['thumbmod'] = true;
-wppa_log('misc', 'Gedaan');
 					break;
 				case 'rotthumbleft':
 				case 'rotthumbright':

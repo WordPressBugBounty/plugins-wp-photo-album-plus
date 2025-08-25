@@ -1,5 +1,12 @@
 WP Photo Album Plus Changelog
 
+= 9.0.11 =
+
+* Improved behaviour thumbnail popups.
+* Album and photo descriptions now allow for html tags that are also allowed in posts.
+* Shortcodes with album spec #lasten is no longer limited by the newtime setting.
+* Fixed a security issue.
+
 = 9.0.10 =
 
 * Built in a 5 seconds time delay between emails sent to prevent email server overload.

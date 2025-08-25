@@ -175,7 +175,8 @@ global $wpdb;
 	wppaRequestInfoDialogText = "' . wppa_opt( 'request_info_text' ) . '",
 	wppaThumbAspect = ' . wppa_thumb_asp() . ',
 	wppaStartStopNew = ' . ( wppa_switch( 'startstop_new' ) ? 'true' : 'false' ) . ',
-	wppaSlideVideoPauseStop = ' . ( wppa_switch( 'video_pause_stop_ss' ) ? 'true' : 'false' ) . ';';
+	wppaSlideVideoPauseStop = ' . ( wppa_switch( 'video_pause_stop_ss' ) ? 'true' : 'false' ) . ',
+	wppaThumbNolink = ' . ( wppa_opt( 'thumb_linktype' ) == 'none' ? 'true' : 'false' ) . ';';
 
 	/* Lightbox vars */
 	$fontsize_lightbox = wppa_opt( 'fontsize_lightbox' ) ? wppa_opt( 'fontsize_lightbox' ) : 10;

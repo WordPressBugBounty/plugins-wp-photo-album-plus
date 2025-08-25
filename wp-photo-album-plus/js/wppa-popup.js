@@ -3,10 +3,18 @@
 // Contains popup modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsPopupVersion = '9.0.00.006';
+var wppaJsPopupVersion = '9.0.11.006';
+
+jQuery(document).on('click',function(){wppaPopDown()});
+var wppaSkipPop = false;
 
 // Popup of thumbnail images
 function wppaPopUp( mocc, elm, id, name, desc, rating, ncom, videohtml, maxsizex, maxsizey ) {
+
+	if ( wppaSkipPop ) {
+		wppaSkipPop = false;
+		return;
+	}
 
 	// Before we start, make sure old popups vanish
 	wppaPopDown();
@@ -30,7 +38,12 @@ function wppaPopUp( mocc, elm, id, name, desc, rating, ncom, videohtml, maxsizex
 	imghtml += videohtml != '' ? videohtml : '<img id="wppa-img-'+mocc+'" src="'+elm.src+'" title="" style="border-width: 0px;" />';
 	imghtml += href ? '</a>' : '';
 	jQuery( '#wppa-popup-'+mocc ).html( '<div class="wppa-popup" style="background-color:'+wppaBackgroundColorImage+';box-sizing:content-box;text-align:center;">'+imghtml+popuptext+'</div>' );
-	jQuery( '.wppa-popup' ).on( 'click', function(){jQuery(elm).trigger('click');return false;});
+	if ( wppaThumbNolink ) {
+		jQuery( '.wppa-popup' ).on( 'click', function(){wppaStopProp(event)} );
+	}
+	else {
+		jQuery( '.wppa-popup' ).on( 'click', function(){wppaSkipPop=true;jQuery(elm).trigger('click');return false;});
+	}
 	jQuery( '.wppa-popup' ).css({cursor:elmCursor});
 
 	// Compute ending sizes
