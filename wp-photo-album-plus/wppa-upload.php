@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 9.0.07.002
+* Version 9.0.12.001
 *
 */
 
@@ -71,12 +71,12 @@ global $upload_album;
 			if ( current_user_can( 'wppa_admin' ) ) {
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) );
 				$link = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=' . wppa_encrypt_album( $upload_album ) . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce', 'wppa-nonce' );
-				wppa_echo( wppa_html_tag( 'img', ['src' => 'dummy', 'style' => 'display:none;', 'class' => 'nolazy', 'onerror' => 'document.location=\'' . $link . '\''] ), ['onerror' => true] );
+				wppa_echo( wppa_html_tag( 'img', ['src' => 'dummy', 'style' => 'display:none;', 'class' => 'nolazy', 'onerror' => 'document.location=\'' . $link . '\''] ), ['needonerror' => true] );
 			}
 			elseif ( wppa_opt( 'upload_edit' ) != '-none-' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) );
 				$link = get_admin_url().'admin.php?page=wppa_edit_photo';
-				wppa_echo( wppa_html_tag( 'img', ['src' => 'dummy', 'style' => 'display:none;', 'class' => 'nolazy', 'onerror' => 'document.location=\'' . $link . '\''] ), ['onerror' => true] );
+				wppa_echo( wppa_html_tag( 'img', ['src' => 'dummy', 'style' => 'display:none;', 'class' => 'nolazy', 'onerror' => 'document.location=\'' . $link . '\''] ), ['needonerror' => true] );
 			}
 		}
 	}

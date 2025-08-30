@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.0.11.007
+* Version 9.0.12.001
 *
 */
 
@@ -776,15 +776,12 @@ function wppa_filetime( $path, $log = false ) {
 	return filemtime( $path );
 }
 
+// Outgoing html
 function wppa_echo( $html, $flags = array() ) {
 
 	$flags = wp_parse_args( $flags, ['return' => false, 'keeplinebreaks' => false, 'needjs' => false, 'needonerror' => false] );
 
-	$t = wppa_allowed_tags();
-	if ( $flags['needjs'] ) {
-		$t['script'] = true;
-		$t['style'] = true;
-	}
+	$t = wppa_allowed_tags( $flags );
 	$p = wp_allowed_protocols();
 
 	$html = wppa_compress_html( $html, $flags['keeplinebreaks'] );
@@ -799,264 +796,288 @@ function wppa_echo( $html, $flags = array() ) {
 
 function wppa_allowed_simple_tags() {
 	$result = array(
+		'div' => array(
+					'class' => true,
+					'style' => true,
+					),
 		'ul' => true,
 		'ol' => true,
 		'li' => true,
 		'p' => true,
 		'a' => array(
-				'href' => array(),
-				'title' => array()
+				'href' => true,
+				'title' => true,
+				'onclick' => true,
 				),
 		'b' => true,
 		'i' => true,
 		'br' => true,
 		'strong' => true,
+		'table' => array(
+					'class' => true,
+					'style' => true,
+					),
+		'thead' => true,
+		'tfoot' => true,
+		'tr' => array(
+					'class' => true,
+					),
+		'th' => array(
+					'class' => true,
+					),
+		'td' => array(
+					'class' => true,
+					),
 	);
 	return $result;
 }
 
-function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => false, 'needjs' => false] ) { //, 'needonerror' => false] ) {
-static $allowed_tags;
+function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => false, 'needjs' => false, 'needonerror' => false] ) {
 
-	if ( ! is_array( $allowed_tags ) ) {
+	// Standard allowed attributes
+	$sa = array(
+		'id' => true,
+		'name' => true,
+		'title' => true,
+		'class' => true,
+		'style' => true,
+		'onclick' => true,
+		'ondblclick' => true,
+		'onmouseover' => true,
+		'onmouseout' => true,
+		'onwheel' => true,
+		'onscroll' => true,
+		'data-wppa' => true,
+		'data-alt' => true,
+		'ontouchstart' => true,
+		'ontouchend' => true,
+		'onfocus' => true,
+		'onblur' => true,
+		'rel' => true,
+		'z-index' => true,
+		'background-image' => true,
+		'background-position' => true,
+		'background-repeat' => true,
+		);
 
-		// Standard allowed attributes
-		$sa = array(
-			'id' => true,
-			'name' => true,
-			'title' => true,
+	$allowed_tags =
+	array(
+		'a' => array_merge( $sa, array(
+			'href' => true,
+			'target' => true,
+			'onclick' => true,
+			'data-rel' => true,
+			'data-id' => true,
+			'data-lbtitle' => true,
+			'data-panorama' => true,
+			'data-pantype' => true,
+			'box-sizing' => true,
+			'download' => true,
+			) ),
+		'aside' => $sa,
+		'audio' => array_merge( $sa, array(
+			'data-from' => true,
+			'controls' => true,
+			'preload' => true,
+			'type' => true,
+			) ),
+		'b' => $sa,
+		'br' => $sa,
+		'canvas' => $sa,
+		'div' => $sa,
+		'em' => $sa,
+		'form' => array_merge( $sa, array(
+			'onsubmit' => true,
+			'action' => true,
+			'method' => true,
+			'enctype' => true,
+			) ),
+		'h1' => $sa,
+		'h2' => $sa,
+		'h3' => $sa,
+		'h4' => $sa,
+		'h5' => $sa,
+		'h6' => $sa,
+		'hr' => $sa,
+		'i' => $sa,
+		'img' => array_merge( $sa, array(
+			'alt' => true,
+			'src' => true,
+			'data-src' => true,
+			'placeholder' => true,
+			'srcset' => true,
+			'onload' => true,
+			'decoding' => true,
+			) ),
+		'input' => array_merge( $sa, array(
+			'type' => true,
+			'value' => true,
+			'onchange' => true,
+			'checked' => true,
+			'min' => true,
+			'max' => true,
+			'multiple' => true,
+			'onkeyup' => true,
+			'disabled' => true,
+			'accept' => true,
+			'placeholder' => true,
+			'download' => true,
+			'size' => true,
+			'aria-describedby' => true,
+			'data-type' => true,
+			) ),
+		'label' => array(
+			'for' => true,
 			'class' => true,
 			'style' => true,
-			'onclick' => true,
-			'ondblclick' => true,
-			'onmouseover' => true,
-			'onmouseout' => true,
+			),
+		'link' => array(
+			'rel' => true,
+			'href' => true,
+			),
+		'meta' => array(
+			'name' => true,
+			'content' => true,
+			'property' => true,
+			),
+		'noscript' => array_merge( $sa, array(
+			'style' => true,
+			) ),
+		'option' => array_merge( $sa, array(
+			'selected' => true,
+			'value' => true,
+			'disabled' => true,
+			) ),
+		'p' => $sa,
+		'select' => array_merge( $sa, array(
+			'onchange' => true,
+			'value' => true,
+			'multiple' => true,
 			'onwheel' => true,
 			'onscroll' => true,
-			'data-wppa' => true,
-			'data-alt' => true,
-			'ontouchstart' => true,
-			'ontouchend' => true,
 			'onfocus' => true,
-			'onblur' => true,
-			'rel' => true,
-			'z-index' => true,
-			'background-image' => true,
-			'background-position' => true,
-			'background-repeat' => true,
-			);
+			'size' => true,
+			) ),
+		'small' => $sa,
+		'span' => $sa,
+		'strong' => $sa,
+		'sup' => array(),
 
-		$allowed_tags =
-		array(
-			'a' => array_merge( $sa, array(
-				'href' => true,
-				'target' => true,
-				'onclick' => true,
-				'data-rel' => true,
-				'data-id' => true,
-				'data-lbtitle' => true,
-				'data-panorama' => true,
-				'data-pantype' => true,
-				'box-sizing' => true,
-				'download' => true,
-				) ),
-			'aside' => $sa,
-			'audio' => array_merge( $sa, array(
-				'data-from' => true,
-				'controls' => true,
-				'preload' => true,
-				'type' => true,
-				) ),
-			'b' => $sa,
-			'br' => $sa,
-			'canvas' => $sa,
-			'div' => $sa,
-			'em' => $sa,
-			'form' => array_merge( $sa, array(
-				'onsubmit' => true,
-				'action' => true,
-				'method' => true,
-				'enctype' => true,
-				) ),
-			'h1' => $sa,
-			'h2' => $sa,
-			'h3' => $sa,
-			'h4' => $sa,
-			'h5' => $sa,
-			'h6' => $sa,
-			'hr' => $sa,
-			'i' => $sa,
-			'img' => array_merge( $sa, array(
-				'alt' => true,
-				'src' => true,
-				'data-src' => true,
-				'placeholder' => true,
-				'srcset' => true,
-				'onload' => true,
-				'onerror' => true,
-				'decoding' => true,
-				) ),
-			'input' => array_merge( $sa, array(
-				'type' => true,
-				'value' => true,
-				'onchange' => true,
-				'checked' => true,
-				'min' => true,
-				'max' => true,
-				'multiple' => true,
-				'onkeyup' => true,
-				'disabled' => true,
-				'accept' => true,
-				'placeholder' => true,
-				'download' => true,
-				'size' => true,
-				'aria-describedby' => true,
-				'data-type' => true,
-				) ),
-			'label' => array(
-				'for' => true,
-				'class' => true,
-				'style' => true,
-				),
-			'link' => array(
-				'rel' => true,
-				'href' => true,
-				),
-			'meta' => array(
-				'name' => true,
-				'content' => true,
-				'property' => true,
-				),
-			'noscript' => array_merge( $sa, array(
-				'style' => true,
-				) ),
-			'option' => array_merge( $sa, array(
-				'selected' => true,
-				'value' => true,
-				'disabled' => true,
-				) ),
-			'p' => $sa,
-			'select' => array_merge( $sa, array(
-				'onchange' => true,
-				'value' => true,
-				'multiple' => true,
-				'onwheel' => true,
-				'onscroll' => true,
-				'onfocus' => true,
-				'size' => true,
-				) ),
-			'small' => $sa,
-			'span' => $sa,
-			'strong' => $sa,
-			'sup' => array(),
-
-			// Start svg
-			'svg' => array_merge( $sa, array(
-				'width' => true,
-				'height' => true,
-				'x' => true,
-				'y' => true,
-				'viewbox' => true,
-				'xml:space' => true,
-				'xmlns' => true,
-				'preserveaspectratio' => true,
-				'stroke' => true,
-				'version' => true,
-				) ),
-			'g' => array(
-				'transform' => true,
-				'fill' => true,
-				'fill-rule' => true,
-				'stroke-width' => true,
-				),
-			'path' => array(
-				'd' => true,
-				),
-			'rect' => array(
-				'width' => true,
-				'height'=> true,
-				'rx' => true,
-				'ry' => true,
-				'x' => true,
-				'y' => true,
-				'fill' => true,
-				'class' => true,
-				'transform' => true,
-				),
-			'animate' => array(
-				'attributename' => true,
-				'begin' => true,
-				'from' => true,
-				'to' => true,
-				'dur' => true,
-				'values' => true,
-				'repeatcount' => true,
-				'calcmode' => true,
-				'opacity' => true,
-				),
-			'animatetransform' => array(
-				'attributename' => true,
-				'type' => true,
-				'from' => true,
-				'to' => true,
-				'dur' => true,
-				'repeatcount' => true,
-				),
-			'circle' => array(
-				'cx' => true,
-				'cy' => true,
-				'r' => true,
-				'stroke-opacity' => true,
+		// Start svg
+		'svg' => array_merge( $sa, array(
+			'width' => true,
+			'height' => true,
+			'x' => true,
+			'y' => true,
+			'viewbox' => true,
+			'xml:space' => true,
+			'xmlns' => true,
+			'preserveaspectratio' => true,
+			'stroke' => true,
+			'version' => true,
+			) ),
+		'g' => array(
+			'transform' => true,
+			'fill' => true,
+			'fill-rule' => true,
+			'stroke-width' => true,
 			),
+		'path' => array(
+			'd' => true,
+			),
+		'rect' => array(
+			'width' => true,
+			'height'=> true,
+			'rx' => true,
+			'ry' => true,
+			'x' => true,
+			'y' => true,
+			'fill' => true,
+			'class' => true,
+			'transform' => true,
+			),
+		'animate' => array(
+			'attributename' => true,
+			'begin' => true,
+			'from' => true,
+			'to' => true,
+			'dur' => true,
+			'values' => true,
+			'repeatcount' => true,
+			'calcmode' => true,
+			'opacity' => true,
+			),
+		'animatetransform' => array(
+			'attributename' => true,
+			'type' => true,
+			'from' => true,
+			'to' => true,
+			'dur' => true,
+			'repeatcount' => true,
+			),
+		'circle' => array(
+			'cx' => true,
+			'cy' => true,
+			'r' => true,
+			'stroke-opacity' => true,
+		),
+		// End svg
 
-			// End svg
+		'table' => $sa,
+		'tbody' => $sa,
+		'colgroup' => $sa,
+		'col' => $sa,
+		'textarea' => array_merge( $sa, array(
+			'onchange' => true,
+			'rows' => true,
+			'placeholder' => true,
+			) ),
+		'thead' => $sa,
+		'tfoot' => $sa,
+		'tr' => $sa,
+		'td' => array_merge( $sa, array(
+			'colspan' => true,
+			) ),
+		'th' => $sa,
+		'title' => $sa,
+		'video' => array_merge( $sa, array(
+			'preload' => true,
+			'type' => true,
+			'controls' => true,
+			'onmouseover' => true,
+			'onmouseout' => true,
+			'autoplay' => true,
+			'muted' => true,
+			'onloadedmetadata' => true,
+			'onpause' => true,
+			'onplaying' => true,
+			'poster' => true,
+			'oncanplay' => true,
+			) ),
+		'source' => array(
+			'src' => true,
+			'type' => true,
+			),
+		'ul' => $sa,
+		'ol' => $sa,
+		'li' => $sa,
+		'fieldset' => $sa,
+		'legend' => $sa,
+		'summary' => $sa,
+		'details' => array_merge( $sa, array(
+			'open' => true,
+			) ),
+	);
 
-			'table' => $sa,
-			'tbody' => $sa,
-			'colgroup' => $sa,
-			'col' => $sa,
-			'textarea' => array_merge( $sa, array(
-				'onchange' => true,
-				'rows' => true,
-				'placeholder' => true,
-				) ),
-			'thead' => $sa,
-			'tfoot' => $sa,
-			'tr' => $sa,
-			'td' => array_merge( $sa, array(
-				'colspan' => true,
-				) ),
-			'th' => $sa,
-			'title' => $sa,
-			'video' => array_merge( $sa, array(
-				'preload' => true,
-				'type' => true,
-				'controls' => true,
-				'onmouseover' => true,
-				'onmouseout' => true,
-				'autoplay' => true,
-				'muted' => true,
-				'onloadedmetadata' => true,
-				'onpause' => true,
-				'onplaying' => true,
-				'poster' => true,
-				'oncanplay' => true,
-				) ),
-			'source' => array(
-				'src' => true,
-				'type' => true,
-				),
-			'ul' => $sa,
-			'ol' => $sa,
-			'li' => $sa,
-			'fieldset' => $sa,
-			'legend' => $sa,
-			'summary' => $sa,
-			'details' => array_merge( $sa, array(
-				'open' => true,
-				) ),
-		);
+	if ( $flags['needonerror'] ) {
+		$allowed_tags['img']['onerror'] = true;
 	}
+	
+	if ( $flags['needjs'] ) {
+		$allowed_tags['script'] = true;
+		$allowed_tags['style'] = true;
+	}
+
 	return $allowed_tags;
 }
 

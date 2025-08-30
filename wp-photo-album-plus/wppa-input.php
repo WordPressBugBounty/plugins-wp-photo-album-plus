@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.0.11.006
+* Version: 9.0.12.001
 *
 */
 
@@ -316,7 +316,7 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 
 		case 'html':
 		case 'custom':
-			return isset( $_REQUEST[$key] ) ? wp_kses( wp_unslash( $_REQUEST[$key] ), wppa_allowed_tags() ) : $default;
+			return isset( $_REQUEST[$key] ) ? wppa_filter_html( $_REQUEST[$key] ) : $default;
 			break;
 
 		case 'tag':
@@ -540,4 +540,10 @@ function wppa_http_x_forwarded_for() {
 		return sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
 	}
 	return '';
+}
+
+// Filter/sanitize inputted html
+function wppa_filter_html( $html ) {
+	$allowed = current_user_can( 'unfiltered_html' ) ? wppa_allowed_tags() : wppa_allowed_simple_tags();
+	return wp_kses( wp_unslash( html_entity_decode( $html ) ), $allowed );
 }

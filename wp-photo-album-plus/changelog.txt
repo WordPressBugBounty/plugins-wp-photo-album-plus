@@ -1,5 +1,10 @@
 WP Photo Album Plus Changelog
 
+= 9.0.12 =
+
+* Non-admin users can now use the following tags in photo- and albumdescription: 'div', 'ul', 'ol', 'li', 'p', 'a', 'b', 'i', 'br', 'strong', 'table', 'thead', 'tr', 'th', 'td', 'tfoot',
+with limited attributes. This makes the default photo description (and alikes) usable again.
+
 = 9.0.11 =
 
 * Improved behaviour thumbnail popups.

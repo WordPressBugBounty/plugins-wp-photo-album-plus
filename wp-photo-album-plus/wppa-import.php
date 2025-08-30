@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.0.10.001
+* Version 9.0.12.001
 *
 */
 
@@ -1082,7 +1082,7 @@ function wppa_do_import_upload() {
 		$result = 0 . __( 'Upload failed', 'wp-photo-album-plus' );
 	}
 
-	wppa_echo( $result, ['onerror' => true] );
+	wppa_echo( $result, ['needonerror' => true] );
 
 }
 

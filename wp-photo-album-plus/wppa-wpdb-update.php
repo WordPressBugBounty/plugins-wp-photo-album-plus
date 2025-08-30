@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.0.11.007
+* Version: 9.0.12.001
 *
 */
 
@@ -51,7 +51,7 @@ global $wpdb;
 
 	// Description
 	if ( isset( $args['description'] ) ) {
-		$fields['description']  = wp_kses( html_entity_decode( $args['description'] ), wppa_allowed_simple_tags() );
+		$fields['description']  = wppa_filter_html( $args['description'] );
 		$modified 				= true;
 		$fields['indexdtm'] 	= '';
 	}
@@ -356,7 +356,7 @@ global $wpdb;
 
 	// Description
 	if ( isset( $args['description'] ) ) {
-		$fields['description'] = wp_kses( html_entity_decode( $args['description'] ), wppa_allowed_simple_tags() );
+		$fields['description'] = wppa_filter_html( $args['description'] );
 		$modified = true;
 	}
 
@@ -789,7 +789,7 @@ global $wpdb;
 	}
 
 	if ( isset( $args['comment'] ) ) {
-		$fields['comment'] = $args['comment'];
+		$fields['comment'] = wppa_filter_html( $args['comment'] );
 	}
 
 	if ( isset( $args['status'] ) ) {

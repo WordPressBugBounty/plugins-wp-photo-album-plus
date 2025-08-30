@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.0.11.007
+* Version: 9.0.12.001
 *
 */
 
@@ -2906,7 +2906,7 @@ global $wppa_done;
 
 	// Retrieve and filter comment
 	$comment = wppa_get( 'comment', '', 'textarea' );
-	$comment = wppa_decode( $comment ); 	// Convert ['%23', '%26', '%2B'] to ['#', '&', '+']
+	$comment = wppa_filter_html( $comment );
 	$comment = wp_strip_all_tags( $comment );
 
 	$policy = wppa_opt( 'moderate_comment' );
@@ -4989,9 +4989,8 @@ global $wppa_alert;
 				}
 			}
 
-
 			$album = wppa_create_album_entry( array( 	'name' 			=> $albumname,
-														'description' 	=> wp_kses(html_entity_decode(wppa_get( 'album-desc', '', 'html' )),wppa_allowed_simple_tags()),
+														'description' 	=> wppa_get( 'album-desc', '', 'html' ),
 														'a_parent' 		=> $parent,
 														'owner' 		=> wppa_switch( 'frontend_album_public' ) ? '--- public ---' : wppa_get_user()
 														 ) );
@@ -5254,7 +5253,7 @@ global $wppa_alert;
 			}
 
 			// Description
-			$description 	= wp_kses(html_entity_decode(wppa_get( 'albumeditdesc', '', 'html' )),wppa_allowed_simple_tags());
+			$description 	= wppa_get( 'albumeditdesc', '', 'html' );
 
 			// Custom data
 			$custom_data = wppa_unserialize( wppa_get_album_item( $alb, 'custom' ) );
