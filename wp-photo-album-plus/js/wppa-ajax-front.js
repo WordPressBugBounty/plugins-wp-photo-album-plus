@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.0.10.002';
+var wppaJsAjaxVersion = '9.1.07.006';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -1378,7 +1378,8 @@ function wppaAjaxComment( mocc, id ) {
 // New style front-end edit photo
 function wppaUpdatePhotoNew(id,mocc) {
 
-	var myItems = [ 'upn-name',
+	var myItems = [ 'upn-album',
+					'upn-name',
 					'upn-description',
 					'upn-tags',
 					'custom_0',

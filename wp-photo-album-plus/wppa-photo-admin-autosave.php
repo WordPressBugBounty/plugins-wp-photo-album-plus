@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.0.10.009
+* Version: 9.1.07.008
 *
 */
 
@@ -106,6 +106,7 @@ global $wpdb;
 	$skip 		= ( $page - 1 ) * $pagesize;
 	$is_album 	= false;
 	$photos 	= array();
+	$is_all 	= $album == 'all';
 
 	// Edit the photos in a specific album
 	if ( $album ) {
@@ -146,6 +147,21 @@ global $wpdb;
 														   WHERE id = %d", $p ) );
 			$count 	= is_array( $photos ) ? count( $photos ) : 0;
 			$link 	= '';
+		}
+
+		// All albums
+		elseif ( $album == 'all' ) {
+			$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
+														   ORDER BY timestamp DESC, id DESC
+														   LIMIT %d, %d", $skip, $pagesize ) );
+			$count 	= wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
+
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
+				wppa_album_photos( $album );
+				return;
+			}
+
+			$link 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=all&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 		}
 
 		// A physical album
@@ -241,8 +257,13 @@ global $wpdb;
 		$link 	= get_admin_url() . 'admin.php?page=wppa_moderate_'.$what.'&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 	}
 
+	// All photos?
+	elseif ( $is_all ) {
+	}
+
 	// If not one of the cases above apply, log error and quit
 	else {
+		wppa_log('misc', 'is_all = '.$is_all.' album = '.$album);
 		wppa_log( 'Err', 'Missing required argument in wppa_album_photos() 1' );
 		return;
 	}
@@ -255,6 +276,7 @@ global $wpdb;
 		// Single photo moderate requested
 		if ( $photo ) {
 			wppa_echo( '<p>' . esc_html__( 'This photo is no longer awaiting moderation' , 'wp-photo-album-plus' ) . '</p>' );
+			return;
 		}
 
 		// Multiple photos to moderate requested
@@ -269,26 +291,12 @@ global $wpdb;
 		// If i am admin, i can edit all photos here, sorted by timestamp desc
 		if ( wppa_user_is_admin() && ! wppa_is_int( $album ) ) {
 
-			wppa_echo( '<p>' . esc_html( 'Instead, here is a list of all items ordered by timestamp, most recently first', 'wp-photo-album-plus' ) . '</p>' );
-			wppa_echo( '<h1>' . esc_html__( 'Manage all photos by timestamp', 'wp-photo-album-plus' ) . '</h1>' );
+			wppa_echo( '<p>' . esc_html__( 'Instead, here is a list of all items ordered by timestamp, most recently first', 'wp-photo-album-plus' ) . '</p>' );
+			$link 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=all&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 
-			$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
-														   ORDER BY timestamp DESC
-														   LIMIT %d, %d", $skip, $pagesize ) );
-
-			if ( ! count( $photos ) && $parms['page'] > 1 ) {
-				wppa_album_photos( $album, $photo, $owner, $moderate, true );
-				return;
-			}
-
-			$count  = wppa_get_count( WPPA_PHOTOS );
-			$link 	= get_admin_url() . 'admin.php?page=wppa_moderate_photos&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+			wppa_album_photos('all');
+			return;
 		}
-
-		// Nothing to do
-		wppa_photo_admin_footer( $album );
-
-		return;
 	}
 
 	// Quick edit skips a few time consuming settings like copy and move to other album
@@ -351,13 +359,20 @@ global $wpdb;
 
 			if ( $skip >= $count ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
-
 				return;
+			}
+
+			// If all photos only the ids are there for mem size limitation
+			if ( wppa_is_int( $photos[0] ) ) {
+				$ids = $photos;
+				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN (%s) ORDER BY timestamp DESC", implode( "','", $ids ) );
+				$photos = wppa_get_results( stripslashes( $query ) );
 			}
 		}
 
 		// Display the pagelinks
-		wppa_admin_pagination( $pagesize, $page, $count, $link, 'top' );
+		$xcount = $count;
+		wppa_admin_pagination( $pagesize, $page, $xcount, $link, 'top' );
 
 		// Horizon
 		wppa_echo( '<div id="wppa-horizon"><hr></div>' );
@@ -367,8 +382,7 @@ global $wpdb;
 		static $modalbum;
 
 		// Display all photos
-		foreach ( $photos as $photo ) {
-
+		foreach ( $photos as $photo ) if ( is_array( $photo ) ) {
 			// We may not use extract(), so we do something like it here manually, hence controlled.
 			$id 			= $photo['id'];
 			$crid 			= wppa_encrypt_photo( $id );
@@ -591,8 +605,6 @@ global $wpdb;
 						}
 						else {
 							if ( $has_audio ) {
-					//			$src = wppa_get_thumb_url( $id );
-					//			$big = wppa_get_photo_url( $id );
 
 								// If no duration stored, try to find it and store it
 								if ( ! $duration ) {
@@ -2407,6 +2419,7 @@ global $wpdb;
 										</div>' );
 									wppa_echo( '</fieldset>' );
 								}
+								wppa_echo( '</div>' );
 							}
 
 							// Remake displayfiles / thumbnail
@@ -2494,7 +2507,7 @@ global $wpdb;
 							}
 
 						// End Tab 2
-						wppa_echo( '</div></div>' );
+						wppa_echo( '</div>' );
 					}
 
 					// Tab 3 ImageMagick
@@ -3189,8 +3202,7 @@ global $wpdb;
 			wppa_echo( '</details>');
 
 		} /* foreach photo */
-
-		wppa_admin_pagination( $pagesize, $page, $count, $link, 'bottom' );
+		wppa_admin_pagination( $pagesize, $page, $xcount, $link, 'bottom' );
 
 	} /* photos not empty */
 
@@ -3237,6 +3249,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 	wppa_add_local_js( 'wppa_album_photos_bulk' );
 	$count = 0;
 	$abort = false;
+
 
 	if ( wppa_get( 'bulk-action' ) ) {
 		check_admin_referer( 'wppa-bulk', 'wppa-bulk' );
@@ -3403,6 +3416,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 	$p 				= $parms['page']; // wppa_get( 'paged', 1 );
 	$page 			= $p + $next_after;
 	$skip 			= ( $page - 1 ) * $pagesize;
+	$is_all 	= $album == 'all';
 
 	if ( $album ) {
 		if ( $album == 'moderate' ) {
@@ -3450,6 +3464,21 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 										'&edit-id=trash' .
 										'&bulk=1' .
 										'&wppa-nonce=' . wp_create_nonce('wppa-nonce');
+		}
+
+		// All albums
+		elseif ( $album == 'all' ) {
+			$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
+														   ORDER BY timestamp DESC, id DESC
+														   LIMIT %d, %d", $skip, $pagesize ) );
+			$count 	= wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
+
+			if ( ! count( $photos ) && $parms['page'] > 1 ) {
+				wppa_album_photos( $album );
+				return;
+			}
+
+			$link 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=all&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 		}
 		else {
 			$count 	= wppa_get_count( WPPA_PHOTOS, ['album' => $album] );
@@ -4149,6 +4178,7 @@ global $wppa_search_stats;
 
 // New style fron-end edit photo
 function wppa_fe_edit_photo( $photo ) {
+global $wpdb;
 
 	$items 	= array( 	'upn-name',
 						'upn-description',
@@ -4237,6 +4267,28 @@ function wppa_fe_edit_photo( $photo ) {
 				value="' . wp_create_nonce( 'wppa-nonce-' . $photo ) . '"
 			/>';
 
+	// Get album selection
+	if ( wppa_switch( 'fe_edit_move' ) ) {
+		$the_album = wppa_get_photo_item( $photo, 'album' );
+		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE owner = '--- pubic ---' OR owner = %s", wppa_get_user() );
+		$albs = wppa_get_col( $query );
+		foreach( $albs as $alb ) {
+			if ( ! wppa_allow_uploads( $alb ) ) unset( $albums[$alb] );
+		}
+		if ( count ( $albs ) ) {
+			$result .= '<h6>' . __( 'Album', 'wp-photo-album-plus' ) . '</h6>';
+			$result .= '
+			<select id="upn-album" name="upn-album" style="padding: 5px 3px 3px 5px;">' .
+				wppa_album_select_a( array( 'selected' => $the_album,
+											'checkaccess' => true,
+											'array' => $albs,
+											'sort' => true,
+											'path' => true,
+											'crypt' => true ) ) . '
+			</select>';
+		}
+	}
+
 	// Get custom data
 	$custom = wppa_get_photo_item( $photo, 'custom' );
 	if ( $custom ) {
@@ -4283,8 +4335,8 @@ function wppa_fe_edit_photo( $photo ) {
 			// Or a multiline text item
 			if ( $types[$idx] == 'textarea' ) {
 
-				// Visual editor, see Advanced settings -> Admin -> VI -> Item 14
-				if ( wppa_switch( 'use_wp_editor' ) ) {
+				// Visual editor, see Advanced settings -> Admin -> VI -> Item 14. Does not work here
+				if ( false && wppa_switch( 'use_wp_editor' ) ) {
 
 					$result .= bc_get_wp_editor(  $value,
 								$items[$idx],

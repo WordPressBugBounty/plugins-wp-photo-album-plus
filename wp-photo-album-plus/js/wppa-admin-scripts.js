@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.0.11.002
+/* Version 9.1.06.008
 /* Various js routines used in admin pages
 */
 
@@ -575,6 +575,12 @@ function wppaAjaxUpdatePhoto( photo, actionslug, value, reload, bef, aft ) {
 	// Set it to the desired state
 	wppaFeAjaxLog('in');
 
+console.log('Data = '+'action=wppa&wppa-action=update-photo' +
+								'&photo-id=' + photo +
+								'&item=' + actionslug +
+								'&wppa-nonce=' + document.getElementById( 'photo-nonce-' + photo ).value +
+								'&value=' + wppaEncode( value ) );
+
 	// Open ajax object
 	jQuery.ajax( { 	url: 		wppaAdminAjaxUrl,
 					data: 		'action=wppa&wppa-action=update-photo' +
@@ -672,7 +678,7 @@ function wppaAjaxUpdatePhoto( photo, actionslug, value, reload, bef, aft ) {
 													case 'tags':
 														jQuery( '#tags-' + photo ).val( fieldValue );
 														break;
-														
+
 													case 'description':
 														fieldValue = wppaEntityDecode( fieldValue );
 														jQuery( "#" + fieldName + "-" + photo ).html( fieldValue );
@@ -729,7 +735,7 @@ function wppaChangeScheduleAlbum(album, elem) {
 	}
 	else {
 		jQuery('.wppa-datetime-'+album).css('display', 'none');
-		wppaAjaxUpdateAlbum(album, 'scheduledtm', Math.rand() );
+		wppaAjaxUpdateAlbum(album, 'scheduledtm', Math.random() );
 	}
 }
 
@@ -740,7 +746,7 @@ function wppaChangeScheduleDelAlbum(album, elem) {
 	}
 	else {
 		jQuery('.wppa-datetimedel-'+album).css('display', 'none');
-		wppaAjaxUpdateAlbum(album, 'scheduledel', Math.rand() );
+		wppaAjaxUpdateAlbum(album, 'scheduledel', Math.random() );
 	}
 }
 
@@ -768,11 +774,11 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 
 									// Show spinner
 									jQuery( '#wppa-admin-spinner' ).fadeIn();
-									
+
 									// Update status
 									jQuery( '#albumstatus-' + album ).html( 'Working, please wait...' );
 								},
-					success: 	function( result, status, xhr ) {							
+					success: 	function( result, status, xhr ) {
 									// Any strange results returned?
 									if ( result.substring(0,1) != '{' ) {
 										alert( 'The server returned unexpected output:\n' + ArrValues[0] );
@@ -825,12 +831,12 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 												jQuery('#wppa-'+item).html( value );
 										}
 									}
-									
-									
+
+
 
 
 /*
-									
+
 									// Process full/notfull. The last action may have caused changing the status of 'album full'
 									if ( typeof( ArrValues[3] ) != 'undefined' ) {
 										wppaProcessFull( ArrValues[3], ArrValues[4] );
@@ -849,7 +855,7 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 										setTimeout( function() { wppaReload() }, 100 );
 										return;
 									}
-									
+
 									*/
 
 									// Cover link
@@ -873,7 +879,7 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 									wppaConsoleLog( '_wppaAjaxUpdateAlbum failed. Error = ' + error + ', status = ' + status );
 								},
 					complete: 	function( xhr, status, newurl ) {
-						
+
 									// Hide spinner
 									jQuery( '#wppa-admin-spinner' ).fadeOut();
 								}
@@ -942,6 +948,8 @@ function wppaAjaxUpdateOptionCheckBox(slug, elm) {
 					'&wppa-nonce='+document.getElementById('wppa-nonce').value;
 					if (elm.checked) myData += '&value=yes';
 					else myData += '&value=no';
+
+	var xmlhttp = wppaGetXmlHttp();
 
 			//		jQuery('#img_'+slug).attr('src',wppaImageDirectory+'spinner.gif');
 
@@ -2092,6 +2100,68 @@ function wppaCommentAdminUpdateHref( id ) {
 	jQuery("#href-"+id).attr("href", href);
 //	jQuery("#href-"+id).css("display","inline");
 }
+
+// Update comment on comment admin page
+function wppaAjaxCommentUpdate( elm, id ) {
+
+	// Make the Ajax send data
+	var theComment = jQuery( elm ).val();
+	theComment = theComment.replace(/&/g,'%26');
+	var data = {
+				 admin: 	1,
+				 comment: 	theComment,
+				 comid: 	id,
+				 nonce: 	jQuery('#nonce-'+id).html(),
+	};
+console.log(data);
+	var theData = JSON.stringify( data );
+console.log(theData);
+	// Do the ajax commit
+	jQuery.ajax( { 	url: 		wppaAjaxUrl + '?action=wppa&wppa-action=do-comment',
+					data: 		'data='+theData,
+					async: 		true,
+					type: 		'POST',
+					timeout: 	60000,
+					beforeSend: function( xhr ) {
+
+									if ( wppaAjaxMethod == 'rest' ) {
+										xhr.setRequestHeader( 'X-WP-NONCE', wppaObj.restNonce );
+									}
+
+									// Show spinner
+									jQuery( '#wppa-admin-spinner' ).show();
+								},
+					success: 	function( xresult, status, xhr ) {
+									var result;
+									if ( xresult.txt ) {
+										result = xresult.txt;
+									}
+									else {
+										theResult = JSON.parse( xresult );
+										result = theResult.txt;
+									}
+console.log('result = '+result);
+									// sanitize
+									if ( result ) {
+										result = result.replace( /\\/g, '' );
+
+										// Show result
+										jQuery( elm ).val( result );
+			console.log('hier '+result);
+									}
+
+								},
+					error: 		function( xhr, status, error ) {
+									wppaConsoleLog( 'wppaAjaxComment failed. Error = ' + error + ', status = ' + status );
+								},
+					complete: 	function( xhr, status, newurl ) {
+
+									// Hide spinner
+									jQuery( '#wppa-admin-spinner' ).hide();
+								}
+				} );
+}
+
 
 // Init Imagick on photo admin page
 function wppaInitMagick(id) {

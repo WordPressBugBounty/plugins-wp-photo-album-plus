@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 9.0.00.000
+* Version 9.1.00.017
 *
 */
 
@@ -161,11 +161,20 @@ static $current_user;
 }
 
 // Get display name of owner from login name
-function wppa_get_owner_display( $owner ) {
+function wppa_get_owner_display( $xowner ) {
+static $cache;
 
-	if ( $owner == '#me' ) {
+	if ( !is_array( $cache ) ) {
+		$cache = array();
+	}
+	if ( isset( $cache[$xowner] ) ) {
+		return $cache[$xowner];
+	}
+
+	if ( $xowner == '#me' ) {
 		$owner = wppa_get_user();
 	}
+	else $owner = $xowner;
 	$usr = get_user_by( 'login', $owner );
 
 	// If user does not exist, probably ip address, return untranslated
@@ -173,7 +182,8 @@ function wppa_get_owner_display( $owner ) {
 		return __( 'Unknown user', 'wp-photo-album-plus' );
 	}
 
-	return $usr->display_name;
+	$cache[$xowner] = $usr->display_name;
+	return $cache[$owner]; //$usr->display_name;
 }
 
 // Get display name of login name

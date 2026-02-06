@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 9.0.00.005
+* Version 9.1.06.001
 */
 
 class TopTenWidget extends WP_Widget {
@@ -70,7 +70,7 @@ class TopTenWidget extends WP_Widget {
 
 		// Non-zero
 		$non_zero = "";
-		if ( wppa_switch( 'topten_non_zero' ) ) {
+	//	if ( wppa_switch( 'topten_non_zero' ) ) {
 			if ( $instance['sortby'] == 'views' ) {
 				$non_zero = "AND views > 0 ";
 			}
@@ -80,7 +80,7 @@ class TopTenWidget extends WP_Widget {
 			else {
 				$non_zero = "AND rating_count > 0 ";
 			}
-		}
+//		}
 
 		// Non-private
 		$non_private = is_user_logged_in() ? "" : "AND status <> 'private' ";

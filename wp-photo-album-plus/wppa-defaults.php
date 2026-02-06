@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 9.0.10.006
+* Version: 9.1.07.007
 *
 */
 
@@ -145,7 +145,7 @@ horizrailenabled:false,";
 
 						// F Widgets
 						'wppa_topten_count' 			=> 10,	// 1
-						'wppa_topten_non_zero' 			=> 'no',
+	//					'wppa_topten_non_zero' 			=> 'no',
 						'wppa_topten_size' 				=> 86,	// 2
 						'wppa_comten_count'				=> 10,	// 3
 						'wppa_comten_size'				=> 86,	// 4
@@ -527,6 +527,7 @@ horizrailenabled:false,";
 						'wppa_request_info_text' 		=> __('Please specify your question', 'wp-photo-album-plus' ),
 						'wppa_album_use_gallery' 		=> 'no',
 						'wppa_zoom_on' 					=> 'no',
+						'wppa_zoom_no_widget' 			=> 'no',
 						'wppa_fs_policy' 				=> 'lightbox',
 						'wppa_cache_overrule' 			=> 'default',
 						'wppa_cache_maxfiles' 			=> 50,
@@ -821,6 +822,7 @@ horizrailenabled:false,";
 						// Table VII: Security
 						// B
 						'wppa_user_album_edit_on' 		=> 'no',
+						'wppa_user_album_parent_on' 	=> 'no',
 						'wppa_upload_moderate'			=> 'no',
 						'wppa_fe_upload_private' 		=> 'no',
 						'wppa_photoapproved' 			=> 'no',
@@ -828,6 +830,7 @@ horizrailenabled:false,";
 						'wppa_upload_edit_users' 		=> 'admin',
 						'wppa_upload_edit_period' 		=> 0,
 						'wppa_upload_edit_theme_css' 	=> 'no',
+						'wppa_fe_edit_move' 			=> 'no',
 						'wppa_fe_edit_name' 			=> 'yes',
 						'wppa_fe_edit_desc' 			=> 'yes',
 						'wppa_fe_edit_tags' 			=> 'yes',
@@ -1059,6 +1062,7 @@ horizrailenabled:false,";
 						'wppa_load_nicescroller' 		=> 'no',
 						'wppa_nice_mobile'				=> 'no',
 						'wppa_csv_sep' 					=> ',',
+						'wppa_print_debug' 				=> 'none',
 
 						// IX D New
 						'wppa_max_album_newtime'		=> 0,		// 1
@@ -1070,7 +1074,7 @@ horizrailenabled:false,";
 						'wppa_new_mod_label_is_text' 	=> 'yes',
 						'wppa_lasten_limit_new' 		=> 'no',
 						'wppa_lasten_use_modified' 		=> 'no',
-						'wppa_lasten_random' 			=> 'no',
+//						'wppa_lasten_random' 			=> 'no',
 						'wppa_new_label_text' 			=> __('NEW', 'wp-photo-album-plus' ),
 						'wppa_new_label_color' 			=> 'orange',
 						'wppa_mod_label_text' 			=> __('MODIFIED', 'wp-photo-album-plus' ),
@@ -1138,8 +1142,6 @@ horizrailenabled:false,";
 						'wppa_tags_not_on' 				=> 'no',
 						'wppa_wild_front'				=> 'no',
 						'wppa_search_display_type' 		=> 'content',
-						'wppa_ss_name_max' 				=> 0,
-						'wppa_ss_text_max' 				=> 0,
 						'wppa_search_toptext' 			=> '',
 						'wppa_search_in_section' 		=> __( 'Search in current section', 'wp-photo-album-plus' ),
 						'wppa_search_in_results' 		=> __( 'Search in current results', 'wp-photo-album-plus' ),

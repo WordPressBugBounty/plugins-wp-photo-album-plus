@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.0.12.001
+* Version 9.1.07.001
 *
 */
 
@@ -30,9 +30,17 @@ global $wppa_import_errors;
 
 	// Init
 	wppa_add_local_js( '_wppa_page_import' );
+	$user = wppa_get_user();
+
+	// Set local / remote
+	if ( wppa_get( 'local-remote' ) && in_array( wppa_get( 'local-remote' ), array( 'local', 'remote' ) ) ) {
+		if ( ! check_admin_referer( 'wppa-import-nonce', 'wppa-import-nonce' ) ) {
+			wp_die( esc_html__( 'Security check failure', 'wp-photo-album-plus' ) );
+		}
+		wppa_update_option( 'wppa_import_source_type_' . $user, wppa_get( 'local-remote' ) );
+	}
 
 	// Get this users current source directory setting
-	$user 			= wppa_get_user();
 	$source_type 	= wppa_get_option( 'wppa_import_source_type_' . $user, 'local' );		// Local, Remote or from realmedia plugin
 	if ( $source_type == 'remote' ) wppa( 'is_remote', true ); 								// Make remote globally known
 	$source 		= wppa_get_option( 'wppa_import_source_' . $user, WPPA_DEPOT_PATH ); 	// Current source path
@@ -94,14 +102,6 @@ global $wppa_import_errors;
 	}
 	if ( ! wppa_album_exists( wppa_get_option( 'wppa-document-album-import-' . wppa_get_user(), 0 ) ) ) {
 		wppa_update_option( 'wppa-document-album-import-' . wppa_get_user(), 0 );
-	}
-
-	// Set local / remote
-	if ( wppa_get( 'local-remote' ) && in_array( wppa_get( 'local-remote' ), array( 'local', 'remote' ) ) ) {
-		if ( ! check_admin_referer( 'wppa-import-nonce', 'wppa-import-nonce' ) ) {
-			wp_die( esc_html__( 'Security check failure', 'wp-photo-album-plus' ) );
-		}
-		wppa_update_option( 'wppa_import_source_type_' . $user, wppa_get( 'local-remote' ) );
 	}
 
 	// Set import source dir ( when local )
@@ -613,7 +613,7 @@ global $wppa_import_errors;
 										$img_url = str_replace( 'http://', 'https://', $img_url );
 									}
 								}
-								wppa_echo( wppa_html_tag( 'img', ['src' => $img_url, ' alt' => _x( 'n.a.', 'not available', 'wp-photo-album-plus' ), 'style' => "max-height:48px;",
+								wppa_echo( wppa_html_tag( 'img', ['src' => $img_url, 'alt' => ' '.__( 'not readable', 'wp-photo-album-plus' ), 'style' => "max-height:48px;",
 																  'onmouseover' => "if (jQuery('#wppa-zoom').prop('checked')) jQuery(this).css('max-height', '144px')",
 																  'onmouseout' => "if (jQuery('#wppa-zoom').prop('checked')) jQuery(this).css('max-height', '48px')"] ) );
 							}

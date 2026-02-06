@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 9.0.09.002
+* Version: 9.1.02.003
 *
 */
 
@@ -1603,7 +1603,7 @@ global $wppa_log_file;
 	'<div' .
 		' id="wppa-maintenance-list"' .
 		( strpos( wppa_request_uri(), 'page=wppa_log' ) !== false || wppa_get( 'raw' ) ? '' : ' style="max-height:500px; overflow:auto;width:100%;"' ) .
-		' >';
+		' onscroll="wppaStopProp(event);" omwheel="wppaStopProp(event);" >';
 
 	// Open nicescroller wrapper
 	$result .= '<div class="wppa-nicewrap" >';

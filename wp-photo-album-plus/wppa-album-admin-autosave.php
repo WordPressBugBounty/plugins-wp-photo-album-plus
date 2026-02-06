@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.0.10.004
+* Version 9.1.06.008
 *
 */
 
@@ -13,6 +13,7 @@ function _wppa_admin() {
 global $wpdb;
 global $q_config;
 global $wppa_revno;
+global $wp_roles;
 
 	// Are we legally here?
 	if ( ! current_user_can( 'wppa_admin' ) ) {
@@ -130,7 +131,7 @@ global $wppa_revno;
 		$edit_id = wppa_get( 'edit-id' );
 
 		// If its not a keyword, it must be an encrypted album id
-		if ( ! in_array( $edit_id, ['new', 'single', 'search', 'trash', 'new'] ) ) {
+		if ( ! in_array( $edit_id, ['new', 'single', 'search', 'trash', 'new', 'all'] ) ) {
 			$edit_id = wppa_get( 'edit-id', '', 'acrypt', 'strict' );
 		}
 
@@ -204,6 +205,23 @@ global $wppa_revno;
 			if ( $edit_id == 'trash' ) {
 
 				$h2   = __( 'Manage Trashed Photos', 'wp-photo-album-plus' );
+				$task = __( 'Edit photo information', 'wp-photo-album-plus' );
+				wppa_echo( '<div class="wrap"><a name="manage-photos" id="manage-photos" ></a><h1>' . $h2 . ' - <small><i>' . $task . '</i></small></h1>' );
+				if ( wppa_get( 'bulk' ) ) {
+					wppa_album_photos_bulk( $edit_id );
+				}
+				else {
+					wppa_album_photos( $edit_id );
+				}
+				wppa_echo( '</div>' );
+
+				return;
+			}
+
+			// all
+			if ( $edit_id == 'all' ) {
+
+				$h2   = __( 'Manage All Photos', 'wp-photo-album-plus' );
 				$task = __( 'Edit photo information', 'wp-photo-album-plus' );
 				wppa_echo( '<div class="wrap"><a name="manage-photos" id="manage-photos" ></a><h1>' . $h2 . ' - <small><i>' . $task . '</i></small></h1>' );
 				if ( wppa_get( 'bulk' ) ) {
@@ -485,6 +503,7 @@ global $wppa_revno;
 			$has_children  	= wppa_get_var( $query );
 			$indexdtm 		= $albuminfo['indexdtm'];
 			$usedby 		= ( $albuminfo['usedby'] && $albuminfo['usedby'] != '..' ) ? explode( ".", trim( $albuminfo['usedby'], '. ' ) ) : array();
+			$capability 	= $albuminfo['capability'];
 
 			// Get number of allowed uploads, -1 is unlimited
 			$a = wppa_allow_uploads( $id );
@@ -906,7 +925,6 @@ global $wppa_revno;
 											for="wppa-parsel">' .
 											__( 'Parent album', 'wp-photo-album-plus' ) . '
 										</label><br>';
-									//	if ( wppa_extended_access() ) {
 											$result .=
 											wppa_album_select_a( array( 'checkaccess' 		=> true,
 																		'void' 				=> $id,
@@ -927,30 +945,8 @@ global $wppa_revno;
 																		'crypt' 			=> ! wppa_has_many_albums(), // true
 																		'tagonchange' 		=> 'wppaAjaxUpdateAlbum(\'' . $crid . '\', \'a_parent\', jQuery(this).val())',
 																		)
-																) .
-											'</select>';
-									//	}
-									/*	else {
-											$result .= '
-											<select
-												id="wppa-parsel"
-												style="max-width:200px;"
-												onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'a_parent\', jQuery(this).val())"
-												>' .
-												wppa_album_select_a( array( 'checkaccess' 		=> true,
-																			'void' 				=> $id,
-																			'selected' 			=> $a_parent,
-																			'addnone' 			=> wppa_can_create_top_album(),
-																			'addselected' 		=> true,
-																			'disableancestors' 	=> true,
-																			'path' 				=> true,
-																			'sort' 				=> true,
-																			'crypt' 			=> true,
-																			)
-																	) .
-											'</select>';
-										}
-									*/
+																);
+
 									$result .= '
 									</div>';
 									wppa_echo( $result );
@@ -1226,7 +1222,7 @@ global $wppa_revno;
 									/>
 								</fieldset>' );
 							}
-wppa_echo( '</div><div class="wppa-flex-column">' );
+							wppa_echo( '</div><div class="wppa-flex-column">' );
 							// Description
 							{
 								wppa_echo( '
@@ -1273,7 +1269,7 @@ wppa_echo( '</div><div class="wppa-flex-column">' );
 								wppa_echo( '
 								</fieldset>' );
 							}
-wppa_echo( '</div><div class="wppa-flex">' );
+							wppa_echo( '</div><div class="wppa-flex">' );
 							// Categories
 							{
 								$result = '
@@ -1320,7 +1316,7 @@ wppa_echo( '</div><div class="wppa-flex">' );
 								</fieldset>';
 								wppa_echo( $result );
 							}
-wppa_echo( '</div><div class="wppa-flex-column">' );
+							wppa_echo( '</div><div class="wppa-flex-column">' );
 							// Custom
 							if ( wppa_switch( 'album_custom_fields' ) ) {
 								$custom_data = wppa_unserialize( wppa_get_album_item( $edit_id, 'custom' ) );
@@ -1362,12 +1358,6 @@ wppa_echo( '</div><div class="wppa-flex-column">' );
 
 								wppa_echo( '</fieldset>' );
 							}
-
-							// End Section 2
-							wppa_echo( '
-							</tbody>
-						</table>' );
-
 
 						// End flex column
 						wppa_echo( '</div>' );
@@ -2068,6 +2058,43 @@ wppa_echo( '</div><div class="wppa-flex-column">' );
 						// End wppa-flex div
 						wppa_echo( '</div>' );
 
+						// Limit visibility by role/capability
+						// Explanation
+						wppa_echo( '
+						<h2 class="description" style="margin:1em">' .
+							__( 'If you want to limit visibility of this album and its entire content to users with a specific role or capability you can select it here', 'wp-photo-album-plus' ) . '
+						</h2>' );
+
+						wppa_echo( '<div class="wppa-flex">' );
+							$roles = $wp_roles->roles;
+							$rolecap = [];
+							foreach (array_keys($roles) as $key) {
+								$role = $roles[$key];
+								$rolename = $role['name'];
+								$rolecap[] = '* '.$key;
+								foreach ( array_keys( $role['capabilities'] ) as $cap ) {
+									$rolecap[] = $cap;
+								}
+							}
+							$rolecap = array_unique( $rolecap );
+							sort( $rolecap );
+							wppa_echo( '<select id="wppa-copsel"
+												style="max-width:200px;' . ( $capability ? '' : 'font-style:italic;' ) . '"
+												onchange="if (jQuery(this).val()) {jQuery(this).css(\'font-style\',\'normal\');} else {jQuery(this).css(\'font-style\',\'italic\');}
+														  wppaAjaxUpdateAlbum(\'' . $crid . '\', \'capability\', jQuery(this).val())" >' );
+								wppa_echo( '<option value="" style="font-style:italic;">'.__('Unlimited', 'wp-photo-album-plus').'</option>' );
+								foreach( $rolecap as $cap ) {
+									$s = substr( $cap, 0, 2 ) == '* ';
+									$cap = ltrim( $cap, '* ');
+									wppa_echo( '<option value="'.esc_attr($cap).'" style="font-style:normal;" '.($cap==$capability?'selected':'').'>'.($s?'* '.$roles[$cap]['name']:translate_user_role($cap)).'</option> ');
+								}
+							wppa_echo( '</select>' );
+
+							wppa_echo( '&nbsp;' . __( 'Even when the user does not have the selected role/capability, the items will always be visible to admin, wppa superusers and the item owner', 'wp-photo-album-plus' ) );
+
+						// End wppa-flex div
+						wppa_echo( '</div>' );
+
 					// End Tab 5
 					wppa_echo( '
 					</div>' );
@@ -2079,7 +2106,7 @@ wppa_echo( '</div><div class="wppa-flex-column">' );
 						<div
 							id="albumusedby-' . $id . '"
 							class="wppa-table-wrap wppa-tabcontent"
-							style="position:relative;padding-bottom:12px;padding-left:12px;display:none;min-height:20px;"
+							style="position:relative;padding-bottom:12px;padding-left:12px;display:none;"
 							>' );
 
 							wppa_echo( '
@@ -3048,6 +3075,41 @@ global $plugin_page;
 		<td></td><td></td><td></td>
 		<td colspan="' . strval( 1 + ( current_user_can( 'wppa_upload' ) ? 1 : 0 ) + ( current_user_can( 'wppa_import' ) ? 1 : 0 ) ) . '"></td>
 	</tr>';
+
+	if ( current_user_can( 'administrator' ) ) {
+		$result .= '
+		<tr class="alternate" >' .
+			( $collapsible ? '<td></td>' : '' ) . '
+			<td id="src-alb" >' .
+				__( 'Any', 'wp-photo-album-plus' ) . '
+			</td>' .
+			( $collapsible ? '<td></td><td></td><td></td><td></td><td></td>' : '' ) . '
+			<td>' .
+				__( 'Edit all', 'wp-photo-album-plus' ) . '
+			</td>
+			<td colspan="4" >' .
+				__( 'Edit all media items sorted by timestamp, most recently first', 'wp-photo-album-plus' ) . '
+			</td>' .
+			( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ? '<td></td>' : '' ) . '
+			<td>
+				<a class="wppaedit" onclick="document.location.href=\''.wppa_ea_url('all').'\'" >
+					<span style="font-weight:bold">' . __( 'Edit', 'wp-photo-album-plus' ) . '</span>
+				</a>
+			</td>
+			<td>
+				<a class="wppaedit" onclick="document.location.href=\''.wppa_ea_url('all').'&quick\'" >
+					<span style="font-weight:bold">' . __( 'Quick', 'wp-photo-album-plus' ) . '</span>
+				</a>
+			</td>
+			<td>
+				<a class="wppaedit" onclick="document.location.href=\''.wppa_ea_url('all').'&bulk=1\'" >
+					<span style="font-weight:bold">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</span>
+				</a>
+			</td>
+			<td></td><td></td><td></td>
+			<td colspan="' . strval( 1 + ( current_user_can( 'wppa_upload' ) ? 1 : 0 ) + ( current_user_can( 'wppa_import' ) ? 1 : 0 ) ) . '"></td>
+		</tr>';
+	}
 
 	return $result;
 }

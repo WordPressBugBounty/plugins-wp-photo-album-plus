@@ -1,7 +1,7 @@
 /* admin-styles.css
 *
 * wp-photo-album-plus
-* version 9.0.00.005
+* version 9.1.06.008
 */
 
 /* Seems to fix a layout issue on admin pages that i can not reproduce */
@@ -671,7 +671,7 @@ details.hidden {
 }
 
 .wppa-tabcontent {
-	min-height: 530px;
+	padding-bottom: 12px;
 }
 
 .wppa-table-header-box {

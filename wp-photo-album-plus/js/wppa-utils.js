@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '9.0.10.007';
+wppaJsUtilsVersion = '9.1.00.014';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -814,3 +814,23 @@ function wppaStopProp(event) {
 	event.stopPropagation();
 }
 
+// screenwidth and screen.height not always give the right vakue
+function wppaScreenWidth() {
+	/*
+	var result = jQuery('#wppa-screen-anchor').position().left + 10;
+	console.log( 'W = '+result );
+	*/
+	var result = window.innerWidth; // screen.width;
+	return result;
+}
+function wppaScreenHeight() {
+	/*
+	var result = jQuery('#wppa-screen-anchor').position().top + 10;
+	if ( wppaOvlIsVideo ) {
+		result -= wppaOvlNavIconSize;
+	}
+	console.log( 'H = '+result );
+	*/
+	var result = window.innerHeight // screen.height;
+	return result;
+}

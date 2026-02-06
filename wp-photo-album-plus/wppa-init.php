@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version: 9.0.00.009
+* Version: 9.1.00.011
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -70,6 +70,7 @@ require_once 'wppa-boxes-html.php';
 require_once 'wppa-slideshow.php';
 require_once 'wppa-picture.php';
 require_once 'wppa-input.php';
+require_once 'wppa-conversions.php';
 
 // Here because it is required for block widgets
 require_once 'wppa-setting-see-also.php';
@@ -104,7 +105,7 @@ require_once 'wppa-non-admin.php';
 require_once 'wppa-ajax.php';
 
 // Load textdomain conditionally
-function wppa_load_plugin_textdomain() {
+function wppa_init_language() {
 global $wppa_lang;
 global $wppa_locale;
 global $wp_version;
@@ -119,10 +120,6 @@ global $locale;
 	else {
 		$wppa_locale = get_locale() ? get_locale() : 'en_US';
 		$wppa_lang = substr( $wppa_locale, 0, 2 );
-	}
-
-	if ( version_compare( $wp_version, '6.6' ) < 1 ) {
-		$bret = load_plugin_textdomain( 'wp-photo-album-plus', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
 }
 
@@ -422,6 +419,7 @@ global $wppa_lang;
 	}
 
 	// WPPA Native
+	if ( ! $text ) return '';
 	$s_pos = strpos( $text, '[:' );
 	while ( $s_pos !== false ) {
 

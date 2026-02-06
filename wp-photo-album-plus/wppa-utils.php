@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.0.10.009
+* Version: 9.1.07.008
 *
 */
 
@@ -29,7 +29,7 @@ global $blog_id;
 	if ( ! $thumb ) return '';
 
 	// Set owner if required
-	wppa_set_owner_to_name( $id );
+//	wppa_set_owner_to_name( $id );
 
 	$thumb = wppa_cache_photo( $id );
 
@@ -141,7 +141,7 @@ global $wppa_supported_stereo_types;
 	if ( ! $thumb ) return '';
 
  	// Set owner if required
-	wppa_set_owner_to_name( $id );
+//	wppa_set_owner_to_name( $id );
 
 	// Must re-get cached thumb
 	$thumb = wppa_cache_photo( $id );
@@ -476,7 +476,6 @@ global $wppa_opt;
 
 	// Old style?
 	if ( substr( $xkey, 0, 5 ) == 'wppa_' ) {
-		wppa_log( 'dbg', $xkey . ' used as old style switch' );
 		$key = $xkey;
 	}
 	else {
@@ -486,7 +485,7 @@ global $wppa_opt;
 	if ( isset( $wppa_opt[$key] ) ) {
 		if ( $wppa_opt[$key] === 'yes' ) return true;
 		elseif ( $wppa_opt[$key] === 'no' ) return false;
-		else wppa_log( 'dbg', '$wppa_opt['.$key.'] is not a yes/no setting' );
+		else wppa_log( 'misc', '$wppa_opt['.$key.'] is not a yes/no setting' );
 		return $wppa_opt[$key]; // Return the right value afterall
 	}
 
@@ -1503,7 +1502,17 @@ function wppa_sanitize_tags( $value, $keepsemi = false, $keephash = false ) {
 		// Sort
 		asort( $temp );
 
-		// Remove dups and recombine
+		// Remove dups
+		$temp = array_unique( $temp );
+
+		// Recombine
+		$value = '';
+		if ( count( $temp ) ) {
+			$value = $sep . trim( implode( $sep, $temp ), $sep ) . $sep;
+		}
+		if ( $value == $sep.$sep ) $value = '';
+
+		/*
 		$value = '';
 		$first = true;
 		$previdx = '';
@@ -1524,11 +1533,12 @@ function wppa_sanitize_tags( $value, $keepsemi = false, $keephash = false ) {
 				}
 			}
 		}
+		*/
 	}
 
-	if ( $sep == ',' && $value != '' ) {
-		$value = $sep . $value . $sep;
-	}
+//	if ( $sep == ',' && $value != '' ) {
+//		$value = $sep . $value . $sep;
+//	}
 	return $value;
 }
 
@@ -1725,6 +1735,10 @@ static $repeat_count;
 
 	// Debug mode on?
 	$dbg = wppa_switch( 'enable_debug' );
+
+	if ( wppa_switch( 'enable_ext_logging' ) ) {
+		$msg = '{b}'.$wppa_current_shortcode . '{/b} ' . $msg;
+	}
 
 	// Sanitize message
 	$msg = wp_strip_all_tags( $msg );
@@ -2801,6 +2815,7 @@ function wppa_compress_enum( $enum ) {
 }
 
 function wppa_expand_enum( $enum ) {
+	if ( ! $enum ) return '';
 	$result = $enum;
 	$result = str_replace( '.', ',', $result );
 	$result = str_replace( ',,', '..', $result );
@@ -2933,7 +2948,7 @@ function wppa_sanitize_file_name( $file, $check_length = true ) {
 	}
 
 	// Make sure its utf8
-	if ( ! seems_utf8( $file ) ) {
+	if ( ! wppa_is_valid_utf8( $file ) ) {
 		$file = utf8_encode( $file );
 	}
 
@@ -3163,18 +3178,20 @@ global $wpdb;
 	}
 
 	// Find raw commented photo ids
-	$query = $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE status = 'approved' ORDER BY timestamp DESC LIMIT %d", 100 * $max_count );
+	$query = $wpdb->prepare( "SELECT DISTINCT photo FROM $wpdb->wppa_comments WHERE status = 'approved' ORDER BY timestamp DESC LIMIT %d", 100 * $max_count );
+
 	$photo_ids = wppa_get_col( $query );
+
 
 	$result = array();
 
-	// Get unique photo ids in possibly supplied albums
+	// Get photo ids in possibly supplied albums
 	if ( is_array( $photo_ids ) ) {
 		foreach( $photo_ids as $ph ) {
 			if ( empty( $albums ) || in_array( wppa_get_photo_item( $ph, 'album' ), $albums ) ) {
-				if ( ! in_array( $ph, $result ) ) {
+
 					$result[] = $ph;
-				}
+
 			}
 		}
 	}
@@ -3186,6 +3203,8 @@ global $wpdb;
 	if ( count( $result ) > $max_count ) {
 		$result = array_slice( $result, 0, $max_count );
 	}
+
+	wppa_show_query( '70: '.$query, count($photo_ids).' clipped to '.count($result) );
 
 	return $result;
 }
@@ -3269,17 +3288,15 @@ function wppa_has_poster( $id ) {
 // Is it a zoomable photo?
 function wppa_is_zoomable( $id ) {
 
-	if ( ! $id ) return false;
+	if ( ! $id ) return false; 													// Bad call
+	if ( ! wppa_switch( 'zoom_on' ) ) return false; 							// Feature not enabled
+	if ( ! wppa_is_photo( $id ) ) return false; 								// Not a photo
+	if ( wppa_is_panorama( $id ) ) return false; 								// Is panorama
+	if ( wppa('in_widget') && wppa_switch( 'zoom_no_widget' ) ) return false; 	// Not in a widget
 
-	if ( ! wppa_is_photo( $id ) ) return false;
-	if ( wppa_is_panorama( $id ) ) return false;
-
+	// See what the album says
 	$album_zoom = wppa_get_album_item( wppa_get_photo_item( $id, 'album' ), 'zoomable' );
-
-	if ( $album_zoom ) { // can be 'on', 'off', '' (=default: see global setting 'zoom_on' )
-		return $album_zoom == 'on';
-	}
-	return ( wppa_switch( 'zoom_on' ) );
+	return $album_zoom == 'on';
 }
 
 function wppa_fix_poster_ext( $fileorurl, $id ) {
@@ -5134,7 +5151,7 @@ function wppa_rename_files_sanitized( $root ) {
 		foreach( $my_import_files as $path ) {
 
 			// See if path is utf8 encoded
-			if ( ! seems_utf8( $path ) ) {
+			if ( ! wppa_is_valid_utf8( $path ) ) {
 				$path = utf8_encode( $path );
 			}
 			$file = basename( $path );
@@ -5391,7 +5408,7 @@ global $wppa_is_caching;
 
 // Make sure text is utf8 encoded
 function wppa_utf8( $string ) {
-	if ( ! seems_utf8( $string ) ) {
+	if ( ! wppa_is_valid_utf8( $string ) ) {
 		$string = utf8_encode( $string );
 	}
 	return $string;
@@ -6219,6 +6236,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'data-audiohtml' 	=> '',
 				 'data-pdfhtml' 	=> '',
 				 'data-rel' 		=> '',
+				 'data-type' 		=> '',
 				 'data-lbtitle' 	=> '',
 				 'data-alt'			=> '',
 				 'data-pantype' 	=> '',
@@ -6273,7 +6291,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding', 'placeholder',
 					  'disabled', 'selected', 'autoplay', 'controls',
 					  'data-id', 'data-title', 'data-day', 'data-from', 'data-src', 'data-videohtml', 'data-posterurl', 'data-videonatwidth', 'data-videonatheight', 'data-audiohtml',
-					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama',
+					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama', 'data-type',
 					  ];
 	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
 
@@ -6442,5 +6460,54 @@ global $wpdb;
 	if ( $anyfound ) {
 		delete_option( 'wppa_child_list' );
 		wppa_clear_col( WPPA_ALBUMS, 'treecounts' );
+	}
+}
+
+function wppa_find_first_visible( $photo_arr ) {
+
+	if ( ! is_array( $photo_arr ) ) return false;
+	foreach( $photo_arr as $id ) {
+		if ( wppa_is_photo_visible( $id ) ) {
+			return $id;
+		}
+	}
+	return false;
+}
+
+function wppa_max_upl_me_alb_now( $alb = '' ) {
+
+	// Find max files for the user
+	$allow_me = wppa_allow_user_uploads( $alb );
+	if ( ! $allow_me ) {
+//		return 0;
+	}
+
+	// Find max files for the album
+	if ( wppa_is_int( $alb ) ) {
+		$allow_alb = wppa_allow_uploads( $alb );
+//		return 0;
+	}
+	else {
+		$allow_alb = '-1';
+	}
+
+	if ( wppa_is_user_blacklisted() ) return 0;
+
+	// Find max files for the system
+	$allow_sys = ini_get( 'max_file_uploads' );
+
+	// THE max
+	if ( $allow_me == '-1' ) $allow_me = $allow_sys;
+	if ( $allow_alb == '-1' ) $allow_alb = $allow_sys;
+	$max = min( $allow_me, $allow_alb, $allow_sys );
+	return $max;
+}
+
+function wppa_is_valid_utf8( $string ) {
+	if ( function_exists( 'wp_is_valid_utf8' ) ) {
+		return wp_is_valid_utf8( $string );
+	}
+	else {
+		return seems_utf8( $string );
 	}
 }

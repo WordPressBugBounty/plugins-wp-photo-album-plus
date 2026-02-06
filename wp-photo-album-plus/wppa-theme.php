@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the albums/photos/slideshow in a page or post
-* Version 9.0.09.002
+* Version 9.1.06.008
 */
 function wppa_theme() {
 
@@ -395,7 +395,11 @@ global $wppa_empty_content;
 		}
 
 		// Empty results?
-		if ( ! $didsome && ! $wanted_empty ) {
+		global $hide_empty_message;
+		if ( ! $didsome && $hide_empty_message ) {
+			$hide_empty_message = false;
+		}
+		elseif ( ! $didsome && ! $wanted_empty ) {
 			if ( wppa( 'photos_only' ) ) {
 				wppa_out( wppa_errorbox( __( 'No photos found matching your search criteria.', 'wp-photo-album-plus' ) ) );
 				wppa_report_nothing(1);
@@ -475,7 +479,7 @@ function wppa_get_extra_url() {
 	if ( $photo ) $extra_url .= '&amp;wppa-photo=' . wppa_get( 'photo' );
 
 	// Topten?
-	if ( wppa( 'is_topten' ) ) $extra_url .= '&amp;wppa-topten='.wppa( 'topten_count' );
+	if ( wppa( 'is_topten' ) ) $extra_url .= '&amp;wppa-topten='.wppa( 'is_topten' );
 
 	// Lasten?
 	if ( wppa( 'is_lasten' ) ) $extra_url .= '&amp;wppa-lasten='.wppa( 'lasten_count' );

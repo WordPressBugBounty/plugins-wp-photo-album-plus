@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.0.09.002
+* Version: 9.1.07.008
 *
 */
 
@@ -25,17 +25,14 @@ function wppa_make_o1_source( $id ) {
 
 	// Only needed for non-standard orientations
 	$orient = wppa_get_exif_orientation( $src_path );
-//wppa_log('dbg', 'Orient = '.$orient);
 	if ( ! in_array( $orient, array( '2', '3', '4', '5', '6', '7', '8' ) ) ) return false;
 
 	// Only on jpg file type
 	$ext = wppa_get_ext( $src_path );
-//wppa_log('dbg', 'Ext = '.$ext);
 	if ( ! in_array( $ext, array( 'jpg', 'JPG', 'jpeg', 'JPEG' ) ) ) return false;
 
 	// Make destination path
 	$dst_path = wppa_get_o1_source_path( $id );
-//wppa_log('dbg', 'O1path = '.$dst_path);
 
 	// ImageMagick
 	if ( wppa_can_magick() ) {

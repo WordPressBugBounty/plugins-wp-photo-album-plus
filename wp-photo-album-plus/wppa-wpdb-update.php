@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.0.12.001
+* Version: 9.1.07.008
 *
 */
 
@@ -31,7 +31,7 @@ global $wpdb;
 	$cols = ['id', 'name', 'description', 'a_order', 'main_photo', 'a_parent', 'p_order_by', 'cover_linktype', 'cover_linkpage', 'cover_link', 'owner',
 					'timestamp', 'modified', 'upload_limit', 'alt_thumbsize', 'default_tags', 'cover_type', 'suba_order_by',
 					'views', 'cats', 'scheduledtm', 'custom', 'crypt', 'treecounts', 'wmfile', 'wmpos', 'indexdtm', 'sname', 'zoomable', 'displayopts',
-					'upload_limit_tree', 'scheduledel', 'status', 'max_children', 'rml_id', 'usedby'];
+					'upload_limit_tree', 'scheduledel', 'status', 'max_children', 'rml_id', 'usedby', 'capability'];
 
 	// Fields to update are
 	$fields = [];
@@ -51,7 +51,7 @@ global $wpdb;
 
 	// Description
 	if ( isset( $args['description'] ) ) {
-		$fields['description']  = wppa_filter_html( $args['description'] );
+		$fields['description']  = strip_shortcodes( wppa_filter_html( $args['description'] ) );
 		$modified 				= true;
 		$fields['indexdtm'] 	= '';
 	}
@@ -280,6 +280,11 @@ global $wpdb;
 		$fields['usedby'] = $args['usedby'];
 	}
 
+	// capability
+	if ( isset( $args['capability'] ) ) {
+		$fields['capability'] = $args['capability'];
+	}
+
 	// If modified substantially, mark it
 	if ( $modified ) {
 		$fields['modified'] = time();
@@ -287,7 +292,7 @@ global $wpdb;
 
 	// Do the update
 	try {
-		$iret = wppa_update( WPPA_ALBUMS, $fields, ['id' => $id] );
+		$iret = $wpdb->update( WPPA_ALBUMS, $fields, ['id' => $id] );
 		wppa_clear_cache( array( 'album' => $id ) );
 		wppa_cache_album( 'invalidate', $id );
 		if ( isset( $fields['a_parent'] ) ) {
@@ -299,6 +304,8 @@ global $wpdb;
 		$iret = false;
 	}
 
+	wppa_clear_query_cache();
+	wppa_cache_album( 'invalidate' );
 	return $iret;
 }
 
@@ -356,7 +363,7 @@ global $wpdb;
 
 	// Description
 	if ( isset( $args['description'] ) ) {
-		$fields['description'] = wppa_filter_html( $args['description'] );
+		$fields['description'] = strip_shortcodes( wppa_filter_html( $args['description'] ) );
 		$modified = true;
 	}
 
@@ -641,7 +648,7 @@ global $wpdb;
 
 	// Do the update
 	try {
-		$iret = wppa_update( WPPA_PHOTOS, $fields, ['id' => $id] );
+		$iret = $wpdb->update( WPPA_PHOTOS, $fields, ['id' => $id] );
 	}
 	catch( Exception $e ) {
 		wppa_log( 'err', 'wppa_update_photo() caught exception: ' .  $e->getMessage() );
@@ -664,6 +671,8 @@ global $wpdb;
 		}
 	}
 
+	wppa_clear_query_cache();
+	wppa_cache_photo( 'invalidate' );
 	return $iret;
 }
 
@@ -727,13 +736,14 @@ global $wpdb;
 
 	// Do the update
 	try {
-		$iret = wppa_update( WPPA_RATING, $fields, ['id' => $id] );
+		$iret = $wpdb->update( WPPA_RATING, $fields, ['id' => $id] );
 	}
 	catch( Exception $e ) {
 		wppa_log( 'err', 'wppa_update_rating() caught exception: ' .  $e->getMessage() );
 		$iret = false;
 	}
 
+	wppa_clear_query_cache();
 	return $iret;
 }
 
@@ -798,13 +808,14 @@ global $wpdb;
 
 	// Do the update
 	try {
-		$iret = wppa_update( WPPA_COMMENTS, $fields, ['id' => $id] );
+		$iret = $wpdb->update( WPPA_COMMENTS, $fields, ['id' => $id] );
 	}
 	catch( Exception $e ) {
 		wppa_log( 'err', 'wppa_update_comment() caught exception: ' .  $e->getMessage() );
 		$iret = false;
 	}
 
+	wppa_clear_query_cache();
 	return $iret;
 }
 
@@ -843,13 +854,14 @@ global $wpdb;
 
 	// Do the update
 	try {
-		$iret = wppa_update( WPPA_INDEX, $fields, ['id' => $id] );
+		$iret = $wpdb->update( WPPA_INDEX, $fields, ['id' => $id] );
 	}
 	catch( Exception $e ) {
 		wppa_log( 'err', 'wppa_update_index() caught exception: ' .  $e->getMessage() );
 		$iret = false;
 	}
 
+	wppa_clear_query_cache();
 	return $iret;
 }
 
@@ -869,6 +881,8 @@ global $wpdb;
 		wppa_log( 'err', 'wppa_clear_col() caught exception: ' .  $e->getMessage() );
 		return false;
 	}
+
+	wppa_clear_query_cache();
 	return true;
 }
 
@@ -884,6 +898,7 @@ global $wpdb;
 		wppa_log( 'err', 'wppa_clear_table() caught exception: ' .  $e->getMessage() );
 		return false;
 	}
+	wppa_clear_query_cache();
 	return true;
 }
 
@@ -900,6 +915,8 @@ global $wpdb;
 		wppa_log( 'err', 'wppa_del_row() caught exception: ' .  $e->getMessage() );
 		return false;
 	}
+
+	wppa_clear_query_cache();
 	return $iret;
 }
 

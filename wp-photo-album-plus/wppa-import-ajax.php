@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the actual import functions
-* Version: 9.0.09.002
+* Version: 9.1.07.008
 *
 */
 
@@ -1018,10 +1018,9 @@ global $wpdb;
 		while ( ! feof( $handle ) ) {
 			$dataline = fgets( $handle, 4096 );
 			if ( $dataline ) {
-//				wppa_log( 'dbg', __( 'Read data:', 'wp-photo-album-plus' ) . ' ' . trim( $dataline ) );
 				$data_arr = str_getcsv( $dataline, wppa_opt( 'csv_sep' ) );
 				foreach( array_keys( $data_arr ) as $i ) {
-					if ( ! seems_utf8( $data_arr[$i] ) ) {
+					if ( ! wppa_is_valid_utf8( $data_arr[$i] ) ) {
 						$data_arr[$i] = utf8_encode( $data_arr[$i] );
 					}
 				}
@@ -1066,13 +1065,10 @@ global $wpdb;
 						wppa_update_photo( $photo['id'], $fields );
 						$processed ++;
 					}
-//					wppa_log( 'dbg', 'Processed: ' . $data_arr[0] );
 				}
 
 				// This line could not be processed
 				else {
-//					wppa_log( 'dbg', 'Could not find: ' . $data_arr[0] );
-
 					$skipped++;
 				}
 			}

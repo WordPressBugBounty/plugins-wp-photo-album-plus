@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.0.10.009
+* Version 9.1.07.008
 *
 */
 
@@ -37,7 +37,7 @@ function wppa_thumb_area( $action ) {
 				style="' . ( $maxh > 1 ? 'max-height:' . $maxh . 'px;' : '' ) . ' overflow:' . $overflow . ';"
 			>';
 
-			if ( wppa_is_int( wppa( 'start_album' ) ) ) {
+			if ( wppa_is_posint( wppa( 'start_album' ) ) ) {
 				wppa_bump_viewcount( 'album', wppa( 'start_album') );
 			}
 		}
@@ -467,6 +467,10 @@ global $wppa_session;
 													__( 'Photo search results', 'wp-photo-album-plus' )
 												);
 	}
+	if ( ! wppa_is_posint( $page ) ) {
+		wppa_out( 'Error in landing page specification. Should be an integer page id or defined by the settings' );
+		return;
+	}
 	$pagelink 		= get_page_link( $page );
 	$cansubsearch  	= $sub && $wppa_session['use_searchstring'];
 	$value 			= $cansubsearch ? '' : wppa_test_for_search( true );
@@ -803,7 +807,7 @@ global $photos_used;
 											);
 	$pagelink 	= get_page_link( $page );
 	$fontsize 	= wppa_in_widget() ? 'font-size: 9px;' : '';
-	$query 		= "SELECT id, name, owner FROM $wpdb->wppa_albums
+	$query 		= "SELECT id, name, sname, owner FROM $wpdb->wppa_albums
 				   ORDER BY name";
 	$albums 	= wppa_get_results( $query );
 	$query 		= "SELECT DISTINCT name FROM $wpdb->wppa_photos
@@ -900,40 +904,6 @@ global $photos_used;
 		}
 	}
 	if ( empty( $albums ) ) $albums = array();
-
-	// Compress photonames if partial length search
-	if ( wppa_opt( 'ss_name_max' ) ) {
-		$maxl = wppa_opt( 'ss_name_max' );
-		$last = '';
-		foreach ( array_keys( $photonames ) as $key ) {
-			if ( strlen( $photonames[$key]['name'] ) > $maxl ) {
-				$photonames[$key]['name'] = substr( $photonames[$key]['name'], 0, $maxl ) . '...';
-			}
-			if ( $photonames[$key]['name'] == $last ) {
-				unset( $photonames[$key] );
-			}
-			else {
-				$last = $photonames[$key]['name'];
-			}
-		}
-	}
-
-	// Compress phototxt if partial length search
-	if ( wppa_opt( 'ss_text_max' ) ) {
-		$maxl = wppa_opt( 'ss_text_max' );
-		$last = '';
-		foreach ( array_keys( $phototxt ) as $key ) {
-			if ( strlen( $phototxt[$key]['slug'] ) > $maxl ) {
-				$phototxt[$key]['slug'] = substr( $phototxt[$key]['slug'], 0, $maxl ) . '...';
-			}
-			if ( $phototxt[$key]['slug'] == $last ) {
-				unset( $phototxt[$key] );
-			}
-			else {
-				$last = $phototxt[$key]['slug'];
-			}
-		}
-	}
 
 	// Remove dup photo owners
 	$last = '';
@@ -1072,7 +1042,7 @@ global $photos_used;
 				$sel = ( $ss_data['3'] == $name && $ss_data[0] == 'a' && $ss_data[1] == 'n' );
 				wppa_echo( '
 				<option
-					value="' . esc_attr( $name ) . '"' .
+					value="' . esc_attr( $album['sname'] ) . '"' .
 					( $sel ? ' selected' : '' ) . '
 					>' .
 					wppa_translate( $name ) . '
@@ -2484,6 +2454,11 @@ function wppa_user_destroy_html( $alb, $width, $where, $rsp ) {
 		return;
 	}
 
+	// Not admin and not owner?
+	if ( ! wppa_user_is_admin() && wppa_get_user() != wppa_get_album_item( $alb, 'owner' ) ) {
+		return;
+	}
+
 	// Been naughty ?
 	if ( wppa_is_user_blacklisted() ) {
 		return;
@@ -2523,6 +2498,11 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 
 	// Basic users are not allowed to create sub albums
 	if ( wppa_user_is_basic() ) {
+		return '';
+	}
+
+	// Test for bp profile
+	if ( wppa( 'bpprofile' ) && wppa( 'bpprofile' ) != wppa_get_user() ) {
 		return '';
 	}
 
@@ -2778,6 +2758,11 @@ static $albums_granted;
 
 	// Basic users are not allowed to upload
 	if ( wppa_user_is_basic() ) {
+		return '';
+	}
+
+	// Test for bp profile
+	if ( wppa( 'bpprofile' ) && wppa( 'bpprofile' ) != wppa_get_user() ) {
 		return '';
 	}
 
@@ -3777,7 +3762,70 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 				' name="wppa-albumeditid"' .
 				' id="wppaalbum-id-'.wppa( 'mocc' ).'-'.$alb.'"' .
 				' value="'.$alb.'"' .
-				' />
+				' />';
+				if ( wppa_switch( 'user_album_parent_on' ) ) {
+					$result .= '
+					<div' .
+						' class="wppa-box-text wppa-td"' .
+						' style="' .
+							'clear:both;' .
+							'float:left;' .
+							'text-align:left;' .
+							'"' .
+						' >'.
+						__( 'Select parent album', 'wp-photo-album-plus' ) . '
+					</div>
+					<select id="wppa-albumeditparent-'.wppa( 'mocc' ).'-'.$alb.'" name="wppa-albumeditparent" style="padding: 5px 3px 3px 5px;width:100%;">' .
+						wppa_album_select_a( array( 'selected' 			=> $album['a_parent'],
+													'addselected'		=> true,
+													'addnone'			=> true,
+													'addseparate' 		=> true,
+													'checkaccess' 		=> true,
+													'checkcreate' 		=> true,
+													'sort' 				=> true,
+													'path' 				=> true,
+													'disablechildren'	=> $alb,
+													'crypt' 			=> true
+											/*
+												'void' 				=> '',
+											'selected' 			=> '',
+											'disabled' 			=> '',
+											'addpleaseselect' 	=> false,
+											'addnone' 			=> false,
+											'addall' 			=> false,
+											'addgeneric'		=> false,
+											'addblank' 			=> false,
+											'addselected'		=> false,
+											'addseparate' 		=> false,
+											'addselbox'			=> false,
+											'addowner' 			=> false,
+											'disableancestors' 	=> false,
+											'checkaccess' 		=> false,
+											'checkowner' 		=> false,
+											'checkupload' 		=> false,
+											'addmultiple' 		=> false,
+											'addnumbers' 		=> false,
+											'path' 				=> false,
+											'root' 				=> false,
+											'content'			=> false,
+											'sort'				=> false,
+											'checkarray' 		=> false,
+											'array' 			=> array(),
+											'optionclass' 		=> '',
+											'tagopen' 			=> '',
+											'tagname' 			=> '',
+											'tagid' 			=> '',
+											'tagonchange' 		=> '',
+											'multiple' 			=> false,
+											'tagstyle' 			=> '',
+											'checkcreate' 		=> false,
+											'crypt' 			=> false,
+											*/
+
+													) ) . '
+					</select>';
+				}
+				$result .= '
 			<div' .
 				' class="wppa-box-text wppa-td"' .
 				' style="' .
@@ -3817,8 +3865,37 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 					'height:120px;' .
 					'width:100%;' .
 					'"' .
-				' >' . $desc .
-			'</textarea>';
+				' >' . $desc . '
+			</textarea>
+			<div' .
+				' class="wppa-box-text wppa-td"' .
+				' style="' .
+					'clear:both;' .
+					'float:left;' .
+					'text-align:left;' .
+					'"' .
+				' >'.
+				__( 'Album status:', 'wp-photo-album-plus' ).'
+			</div>
+			<select' .
+				' name="wppa-albumeditstatus"' .
+				' id="wppaalbum-stat-'.wppa( 'mocc' ).'-'.$alb.'"' .
+				' class="wppa-user-select wppa-box-text wppa-file-'.$t.wppa( 'mocc' ).'"' .
+				' style="' .
+					'padding: 5px 3px 3px 5px;' .
+					'width:100%;font-size:1em;' .
+					'"' .
+				' >
+				<option value="publish"' . ( $album['status'] == 'publish' ? ' selected' : '' ) . '>' .
+					__( 'Publish (visible for anyone)', 'wp-photo-album-plus' ) . '
+				</option>
+				<option value="private"' . ( $album['status'] == 'private' ? ' selected' : '' ) . '>' .
+					__( 'Private  (visible for loggedin visitors)', 'wp-photo-album-plus' ) . '
+				</option>
+				<option value="hidden"' . ( $album['status'] == 'hidden' ? ' selected' : '' ) . '>' .
+					__( 'Hidden (visible for me and admin)', 'wp-photo-album-plus' ) . '
+				</option>
+			</select>';
 
 			// Custom data
 			$custom_data = wppa_unserialize( wppa_get_album_item( $alb, 'custom' ) );

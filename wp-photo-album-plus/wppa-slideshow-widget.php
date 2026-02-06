@@ -339,7 +339,7 @@ class SlideshowWidget extends WP_Widget {
 							'timeout' 	=> '4',
 							'film' 		=> 'no',
 							'browse' 	=> 'no',
-							'name' 		=> 'on',
+							'name' 		=> 'no',
 							'numbar'	=> 'no',
 							'desc' 		=> 'no',
 							'maxslides' => '100',

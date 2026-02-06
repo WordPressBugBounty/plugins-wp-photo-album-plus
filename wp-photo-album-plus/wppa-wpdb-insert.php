@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.0.12.001
+* Version 9.1.07.008
 *
 */
 
@@ -171,8 +171,8 @@ global $wpdb;
 					) );
 	$format = array( '%d', '%s', '%d', '%s', '%d', '%s', '%s', '%s', '%s' );
 
-	$data['comment'] = wppa_filter_html( $data['comment'] );
-	
+	$data['comment'] = strip_shortcodes( wppa_filter_html( $data['comment'] ) );
+
 	$bret = wppa_insert( $table, $data, $format );
 	if ( $bret ) {
 		if ( wppa_switch( 'search_comments' ) ) {
@@ -274,7 +274,7 @@ global $wpdb;
 
 	$data['name'] 			= trim( $data['name'] );
 	$allowed = current_user_can( 'unfiltered_html' ) ? wppa_allowed_tags() : wppa_allowed_simple_tags();
-	$data['description'] 	= wppa_filter_html( $data['description'] );
+	$data['description'] 	= strip_shortcodes( wppa_filter_html( $data['description'] ) );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['tags'] 			= str_replace( '-none-,', '', $data['tags'] );
 	$sdtm = wppa_get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %s", $data['album'] ) );
@@ -285,7 +285,7 @@ global $wpdb;
 	if ( $data['scheduledtm'] ) $data['status'] = 'scheduled';
 
 	if ( $data['filename'] ) {
-		if ( ! seems_utf8( $data['filename'] ) ) {
+		if ( ! wppa_is_valid_utf8( $data['filename'] ) ) {
 			$data['filename'] = utf8_encode( $data['filename'] );
 		}
 		if ( wppa_switch( 'remove_accents' ) ) {
@@ -353,10 +353,11 @@ global $wpdb;
 					'max_children' 		=> 0,
 					'rml_id' 			=> '',
 					'usedby' 			=> '',
+					'capability' 		=> '',
 					) );
 
 	$data['name'] 			= trim( $data['name'] );
-	$data['description'] 	= wppa_filter_html( $data['description'] );
+	$data['description'] 	= strip_shortcodes( wppa_filter_html( $data['description'] ) );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['cats'] 			= str_replace( '-none-,', '', $data['cats'] );
 

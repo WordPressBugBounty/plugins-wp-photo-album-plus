@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.0.10.014
+* Version 9.1.04.005
 */
 
 // Place all wppa related js declarations in the header, both admin and frontend
@@ -259,7 +259,7 @@ global $wpdb;
 	if ( isset( $wppa_session['photo'] ) ) {
 		foreach ( array_keys( $wppa_session['photo'] ) as $p ) {
 		$result .= '
-		jQuery(document).ready(function(){wppaPhotoView[' . $p . '] = true;});';
+		wppaPhotoView[' . $p . '] = true;';
 		}
 	}
 
@@ -447,7 +447,7 @@ global $wppa_opt;
 	jQuery("body").append(\'
 	<div
 		id="wppa-overlay-bg"
-		style="text-align:center;display:none;position:fixed;top:0;left:0;width:100%;height:10000px;background-color:black;opacity:'.(wppa_opt('ovl_opacity')/100).';"
+		style="text-align:center;display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:black;opacity:'.(wppa_opt('ovl_opacity')/100).';"
 		onclick="wppaOvlOnclick(event)"
 		onwheel="return false;"
 		onscroll="return false;">
@@ -485,6 +485,7 @@ global $wppa_opt;
 		id="wppa-pre-curr"
 		style="position:fixed;left:0;top:0;visibility:hidden"
 		class="wppa-preload-curr wppa-ovl-preload">' .
+//	<div id="wppa-screen-anchor" style="position:fixed;bottom:0;right:0;background-color:transparent;width:10px;height:10px;" ></div>' .
 		wppa_get_spinner_svg_html( array( 	'id' 		=> 'wppa-ovl-spin',
 											'position' 	=> 'fixed',
 											'lightbox' 	=> true,

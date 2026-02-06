@@ -4,7 +4,7 @@
 // Dependancies: wppa.js and default wp $ library
 //
 //
-var wppaJsLightboxVersion = '9.0.10.010';
+var wppaJsLightboxVersion = '9.1.04.005';
 var wppaOvlActivePanorama = 0;
 
 // Initial initialization
@@ -367,9 +367,10 @@ function _wppaOvlShow( idx ) {
 		else if ( wppaIsVideo ) {
 
 			html =
-			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
+			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+wppaScreenWidth()+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<video id="wppa-overlay-img" controls controlsList="nodownload nofullscreen noremoteplayback" preload="metadata"' +
-					( wppaOvlVideoStart ? ' autoplay' : '' ) +
+					( wppaOvlVideoStart || wppaIsIntro ? ' autoplay' : '' ) +
+					( wppaIsIntro ? ' muted' : '' ) +
 					( wppaOvlPosterUrls[idx] ? ' poster="' + wppaOvlPosterUrls[idx] + '"' : '' ) +
 					' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
 					' ontouchend="wppaTouchEnd( event );"' +
@@ -379,7 +380,7 @@ function _wppaOvlShow( idx ) {
 					' onpause="wppaOvlVideoOnPause(this);"' +
 					' onplay="wppaOvlVideoPlaying = true;"' +
 					' oncanplay="wppaOvlVideoLoading = false;"' +
-					' style="border:none; width:'+screen.width+'px; box-shadow:none; position:absolute;"' +
+					' style="border:none; width:'+wppaScreenWidth()+'px; box-shadow:none; position:absolute;"' +
 					' alt="'+wppaOvlAlts[idx]+'"' +
 					' >'+
 						wppaOvlVideoHtmls[idx]+
@@ -393,7 +394,7 @@ function _wppaOvlShow( idx ) {
 		else if ( wppaOvlIsPdf ) {
 
 			html =
-			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
+			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+wppaScreenWidth()+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<iframe'+
 					' id="wppa-overlay-img"' +
 					' ' + wppaOvlPdfHtmls[idx] +
@@ -402,7 +403,7 @@ function _wppaOvlShow( idx ) {
 					' ontouchmove="wppaTouchMove( event );"' +
 					' ontouchcancel="wppaTouchCancel( event );"' +
 					' onclick="wppaOvlImgClick( event );"' +
-					' style="border:none; width:'+screen.width+'px; box-shadow:none; position:absolute;"' +
+					' style="border:none; width:'+wppaScreenWidth()+'px; box-shadow:none; position:absolute;"' +
 					' alt="'+wppaOvlAlts[idx]+'"' +
 					' >'+
 				'</iframe>'+
@@ -412,7 +413,7 @@ function _wppaOvlShow( idx ) {
 		// Fullsize Photo
 		else {
 			html =
-			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
+			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+wppaScreenWidth()+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<img id="wppa-overlay-img"'+
 					' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"'+
 					' ontouchend="wppaTouchEnd( event );"'+
@@ -420,7 +421,7 @@ function _wppaOvlShow( idx ) {
 					' ontouchcancel="wppaTouchCancel( event );"'+
 					' onclick="wppaOvlImgClick( event );"' +
 					' src="'+wppaOvlUrls[idx]+'"'+
-					' style="border:none; width:'+screen.width+'px; visibility:hidden; box-shadow:none; position:absolute;"'+
+					' style="border:none; width:'+wppaScreenWidth()+'px; visibility:hidden; box-shadow:none; position:absolute;"'+
 					' alt="'+wppaOvlAlts[idx]+'"'+
 				' />';
 
@@ -432,7 +433,7 @@ function _wppaOvlShow( idx ) {
 						' data-from="wppa"' +
 						' preload="metadata"' +
 						( ( wppaOvlAudioStart ) ? ' autoplay' : '' ) +
-						' onpause="wppaOvlAudioPlaying = false;"' +
+						' onpause="wppaAudioOnPase(this);"' +
 						' onplay="wppaOvlAudioPlaying = true;"' +
 						' style="' +
 							'width:100%;' +
@@ -529,13 +530,13 @@ function _wppaOvlShow( idx ) {
 
 			// Not Fullsize Video
 			if ( wppaIsVideo ) {
-
 				html += '<video' +
 							' id="wppa-overlay-img"' +
 							' onmouseover="jQuery(\'.wppa-ovl-nav-btn\').stop().fadeTo(200,0.8);"' +
 							' onmouseout="jQuery(\'.wppa-ovl-nav-btn\').stop().fadeTo(200,0);"' +
 							' preload="metadata"' +
-							( wppaOvlVideoStart ? ' autoplay' : '' ) +
+							( wppaOvlVideoStart || wppaIsIntro ? ' autoplay' : '' ) +
+							( wppaIsIntro ? ' muted' : '' ) +
 							( wppaOvlPosterUrls[idx] ? ' poster="' + wppaOvlPosterUrls[idx] + '"' : '' ) +
 							' onpause="wppaOvlVideoOnPause(this)"' +
 							' onplay="wppaOvlVideoPlaying = true;"' +
@@ -637,7 +638,9 @@ function _wppaOvlShow( idx ) {
 								' class="wppa-overlay-audio"' +
 								' data-from="wppa"' +
 								' preload="metadata"' +
-								' onpause="wppaOvlAudioPlaying = false;"' +
+								( wppaOvlAudioStart || wppaIsIntro ? ' autoplay' : '' ) +
+								( wppaIsIntro ? ' muted' : '' ) +
+								' onpause="wppaAudioOnPase(this);"' +
 								' onplay="wppaOvlAudioPlaying = true;"' +
 								' style="' +
 									'width:100%;' +
@@ -776,11 +779,16 @@ function _wppaOvlShow( idx ) {
 // What to do when a video is paused
 function wppaOvlVideoOnPause(elm) {
 
+	// Indicate that the video no longer playes
+	wppaOvlVideoPlaying = false;
+
 	// Pause event at the end ?
 	if ( elm.ended ) {
 
-		// Indicate that the video no longer playes
-		wppaOvlVideoPlaying = false;
+		// Quit on end video?
+		if ( wppaIsIntro ) {
+			wppaOvlHide();
+		}
 	}
 
 	// If we want to stop the running show when manually paused
@@ -790,6 +798,20 @@ function wppaOvlVideoOnPause(elm) {
 		 elm.played.end(0) > 0 ) { 			// must have run for some time
 			wppaOvlStop(); 					// stop the show
 			wppaOvlVideoPlaying = false; 	// Indicate that the video no longer playes
+	}
+}
+
+// What to do when a video is paused
+function wppaAudioOnPase(elm) {
+
+	// Indicate that the video no longer playes
+	wppaOvlAudioPlaying = false;
+
+	// Pause event at the end ?
+	if ( elm.ended ) {
+		if ( wppaIsIntro ) {
+			wppaOvlHide();
+		}
 	}
 }
 
@@ -926,12 +948,6 @@ function wppaOvlFormatFull() {
 	var img;
 	var natWidth;
 	var natHeight;
-	var screenheight = screen.height;
-
-	// If video, fake a smaller screen height to allow for video control bar above lb control bar
-	if ( wppaOvlIsVideo ) {
-		screenheight -= wppaOvlNavIconSize;
-	}
 
 	// Find the natural image sizes
 	if ( wppaOvlIsVideo ) {
@@ -941,8 +957,8 @@ function wppaOvlFormatFull() {
 	}
 	else if ( wppaOvlIsPdf  ) {
 		img 		= document.getElementById( 'wppa-overlay-img' );
-		natWidth 	= screen.width;
-		natHeight 	= screenheight;
+		natWidth 	= wppaScreenWidth();
+		natHeight 	= wppaScreenHeight();
 	}
 	else {
 		img 		= document.getElementById( 'wppa-overlay-img' );
@@ -956,7 +972,7 @@ function wppaOvlFormatFull() {
 	 	natHeight 	= img.naturalHeight;
 	}
 
-	var screenRatio = screen.width / screenheight;
+	var screenRatio = wppaScreenWidth() / wppaScreenHeight();
 	var imageRatio 	= natWidth / natHeight;
 	var margLeft 	= 0;
 	var margTop 	= 0;
@@ -967,16 +983,16 @@ function wppaOvlFormatFull() {
 	var Overflow 	= 'hidden';
 
 	if ( screenRatio > imageRatio ) {	// Picture is more portrait
-		margLeft 	= ( screen.width - screenheight * imageRatio ) / 2;
+		margLeft 	= ( wppaScreenWidth() - wppaScreenHeight() * imageRatio ) / 2;
 		margTop 	= 0;
-		imgHeight 	= screenheight;
-		imgWidth 	= screenheight * imageRatio;
+		imgHeight 	= wppaScreenHeight();
+		imgWidth 	= wppaScreenHeight() * imageRatio;
 	}
 	else {
 		margLeft 	= 0;
-		margTop 	= ( screenheight - screen.width / imageRatio ) / 2;
-		imgHeight 	= screen.width / imageRatio;
-		imgWidth 	= screen.width;
+		margTop 	= ( wppaScreenHeight() - wppaScreenWidth() / imageRatio ) / 2;
+		imgHeight 	= wppaScreenWidth() / imageRatio;
+		imgWidth 	= wppaScreenWidth();
 	}
 
 	margLeft 	= parseInt( margLeft );
@@ -993,8 +1009,14 @@ jQuery('#wppa-ovl-full-bg').css({visibility:'hidden'});
 
 	// Add navbar
 	html = jQuery( '#wppa-overlay-ic' ).html();
-	html += '<div style="position:fixed;bottom:0;left:0;right:0;" >' + wppaOvlNavBar() + '</div>';
+	html += '<div id="ovl-navbar" style="position:fixed;bottom:0;left:0;right:0;" >' + wppaOvlNavBar() + '</div>';
+
+	// Recompute wppaScreenHeight()
+
+//	html += '<script>setTimeout(function(){wppaScreenHeight() = jQuery("#ovl-navbar").position().top+wppaOvlNavIconSize;},20);</script>';
+
 	jQuery( '#wppa-overlay-ic' ).html( html );
+
 
 	wppaFsShow();
 
@@ -1073,7 +1095,7 @@ function wppaOvlRun() {
 	if ( ! wppaOvlRunning ) return;
 
 	var elm = document.getElementById('wppa-overlay-img');
-	var msg = ''; 
+	var msg = '';
 
 	if ( wppaIsVideo ) {
 		msg = wppaToggle+' s='+elm.readyState+', ct='+elm.currentTime+', dr='+elm.duration;
@@ -1219,6 +1241,9 @@ function wppaOvlHide(keepState) {
 	// Stop audio
 	wppaStopAudio();
 
+	// Clear initial Start
+	wppaIsIntro = false;
+
 	// Give up fullscreen mode optionally
 	if ( ! keepState && wppaFsPolicy == 'lightbox' ) {
 		if ( wppaIsFs() ) {
@@ -1303,7 +1328,7 @@ function wppaOvlOnclick( event ) {
 			var x = event.screenX - window.screenX;
 			var y = event.clientY;
 			if ( y > 48 ) {
-				if ( x < screen.width / 2 ) wppaOvlShowPrev();
+				if ( x < wppaScreenWidth() / 2 ) wppaOvlShowPrev();
 				else wppaOvlShowNext();
 			}
 			break;
@@ -1414,7 +1439,7 @@ function wppaOvlResize() {
 function wppaOvlImgClick( event ) {
 
 	if ( wppaOvlBrowseOnClick && ! wppaOvlIsSingle ) {
-		if ( event.screenX < ( screen.width / 2 ) ) {
+		if ( event.screenX < ( wppaScreenWidth() / 2 ) ) {
 			wppaOvlShowPrev();
 		}
 		else {
@@ -1550,4 +1575,30 @@ function wppaOvlNavBar() {
 	}
 
 	return html;
+}
+
+jQuery(document).ready(function(){jQuery(document).ready(function(){wppaAutoStartOvl()})});
+
+function wppaAutoStartOvl() {
+
+	var id = wppaIsIntro;
+
+	// Feature enabled?
+	if ( id == 0 ) { // No
+		wppaIsIntro = false;
+		return;
+	}
+
+	jQuery(document).ready(function(){
+
+		// Is the expected item on board?
+		var elm = jQuery("[data-id='"+id+"']");
+		if ( elm.length == 0 ) { // No
+			wppaIsIntro = false;
+			return;
+		}
+
+		// Now doit
+		jQuery( elm[0] ).trigger('click');
+	});
 }

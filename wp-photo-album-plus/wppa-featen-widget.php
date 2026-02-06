@@ -58,7 +58,7 @@ class FeaTenWidget extends WP_Widget {
 			case '-3':
 				$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
 											 WHERE status = 'featured'
-											 ORDER BY RAND(" . wppa_get_randseed() . ") DESC" );
+											 ORDER BY RAND(" . wppa_get_randseed( 'session' ) . ")" );
 				if ( $temp ) {
 					$c = 0;
 					$thumbs = array();
@@ -80,7 +80,7 @@ class FeaTenWidget extends WP_Widget {
 			case '-2':
 				$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
 											 WHERE status = 'featured'
-											 ORDER BY RAND(" . wppa_get_randseed() . ") DESC" );
+											 ORDER BY RAND(" . wppa_get_randseed( 'session' ) . ")" );
 				if ( $temp ) {
 					$c = 0;
 					$thumbs = array();
@@ -101,13 +101,13 @@ class FeaTenWidget extends WP_Widget {
 			case 0:
 				$thumbs = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
 											   WHERE status = 'featured'
-											   ORDER BY RAND(" . wppa_get_randseed() . ") DESC LIMIT " . $max );
+											   ORDER BY RAND(" . wppa_get_randseed( 'session' ) . ") LIMIT " . $max );
 				break;
 
 			// Album spec
 			default:
 				if ( wppa_is_album_visible( $album ) ) {
-					$thumbs = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' AND album = %d ORDER BY RAND(%d) LIMIT %d", $album, wppa_get_randseed(), $max ) );
+					$thumbs = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' AND album = %d ORDER BY RAND(%d) LIMIT %d", $album, wppa_get_randseed( 'session' ), $max ) );
 				}
 				else {
 					$thumbs = array();

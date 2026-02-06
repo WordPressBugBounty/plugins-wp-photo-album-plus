@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.0.10.009
+* Version 9.1.06.006
 *
 */
 
@@ -78,6 +78,7 @@ global $wppa_cron_maintenance_slugs;
 					max_children tinytext NOT NULL,
 					rml_id tinytext NOT NULL,
 					usedby tinytext NOT NULL,
+					capability varchar(32) NOT NULL,
 					PRIMARY KEY  (id),
 					KEY parentkey (a_parent)
 					) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci";

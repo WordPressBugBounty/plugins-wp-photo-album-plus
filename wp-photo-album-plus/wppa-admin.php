@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 9.0.10.009
+* Version: 9.1.07.008
 *
 */
 
@@ -120,7 +120,7 @@ function wppa_add_admin() {
 	}
 
 	// Moderate uploads *
-	if ( $upl_pending )
+	if ( $upl_pending || current_user_can('administrator' ) )
 	add_submenu_page( 'wppa_admin_menu',
 						__( 'Moderate uploads', 'wp-photo-album-plus' ),		 // page_title
 						_x( 'Moderate uploads', 'menu-item', 'wp-photo-album-plus' ) . $upl_pending,
@@ -448,7 +448,6 @@ function wppa_add_scgens() {
 	if ( wppa_show_scgens() ) {
 		require_once 'wppa-tinymce-shortcodes.php';
 		require_once 'wppa-tinymce-photo.php';
-
 		require_once 'wppa-gutenberg-wppa.php';
 	}
 }

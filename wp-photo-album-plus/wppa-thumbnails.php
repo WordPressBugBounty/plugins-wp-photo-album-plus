@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.0.10.009
+* Version: 9.1.07.007
 *
 */
 
@@ -173,68 +173,65 @@ global $wpdb;
 	if ( $link ) {
 
 		// Is link an url?
-		if ( $link['is_url'] ) {
-			if ( wppa_opt( 'thumb_linktype' ) == 'photo' 								// linktype must be to slideshow image
-				&& wppa_opt( 'thumb_linkpage' ) == 0									// same page/post
-				&& ! wppa_switch( 'thumb_blank' )										// not on a new tab
-				&& ! ( wppa_switch( 'thumb_overrule' ) && $thumb['linkurl'] )			// no ( ps overrule set AND link present )
-				&& ! wppa( 'is_topten' )													// no topten selection
-				&& ! wppa( 'is_lasten' )													// no lasten selection
-				&& ! wppa( 'is_comten' )													// no comten selection
-				&& ! wppa( 'is_featen' )
-				&& ! wppa( 'is_tag' )														// no tag selection
-				&& ! wppa( 'is_upldr' )														// not on uploader deisplay
-				&& ! wppa( 'src' )															// no search
-				&& ! wppa( 'supersearch' )													// no supersearch
-				&& ! wppa( 'is_potdhis' ) 													// not on potd history
-//				&& ! wppa( 'calendar' )
-				&& ( wppa_is_int( wppa( 'start_album' ) ) || wppa( 'start_album' ) == '' )	// no set of albums
+		if ( $link['is_url'] ) {	// is url
+			if ( wppa_opt( 'thumb_linktype' ) == 'photo' 							// linktype must be to slideshow image
+				&& wppa_opt( 'thumb_linkpage' ) == 0								// same page/post
+				&& ! wppa_switch( 'thumb_blank' )									// not on a new tab
+				&& ! ( wppa_switch( 'thumb_overrule' ) && $thumb['linkurl'] )		// no ( ps overrule set AND link present )
+		//		&& ! wppa( 'is_topten' )													// no topten selection
+		//		&& ! wppa( 'is_lasten' )													// no lasten selection
+		//		&& ! wppa( 'is_comten' )													// no comten selection
+		//		&& ! wppa( 'is_featen' )
+		//		&& ! wppa( 'is_tag' )													// no tag selection
+		//		&& ! wppa( 'is_upldr' )													// not on uploader deisplay
+		//		&& ! wppa( 'src' )														// no search
+		//		&& ! wppa( 'supersearch' )													// no supersearch
+		//		&& ! wppa( 'is_potdhis' ) 													// not on potd history
+		//		&& ( wppa_is_int( wppa( 'start_album' ) ) || wppa( 'start_album' ) == '' )	// no set of albums
 				 )
 			{ 	// Ajax	possible
 
 				// The a img ajax
-				$p =  wppa( 'calendar' ) ? '' : $xid;
+				$p =  wppa( 'calendar') ? '' : $xid;
 
 				$ajax_url = wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ),
 																'photo' => $p ) );
+
 				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ),
 														   'photo' => $p ) );
-				$onclick = "wppaDoAjaxRender(event, $tmocc, '$ajax_url', '$href_url' );return false;";
 
-				$result .= wppa_html_tag( 'a', ['style' => 'position:static;', 'class' => 'thumb-img', 'id' => 'x-'.$xid.'-'.$mocc, 'href' => $href_url, 'onclick' => $onclick], false );
+				$onclick = "wppaDoAjaxRender(event,$tmocc,'$ajax_url','$href_url'); return false;";
 
-				// Video?
+				$result .= '
+				<a
+					style="position:static;"
+					class="thumb-img"
+					id="x-'.$id.'-'.$mocc.'"
+					href="' . $href_url . '"
+					onclick="' . $onclick . '" >';
+
 				if ( $is_video ) {
-					$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;',
+					$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
 													 'controls' => wppa_switch('thumb_video'), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
-
-				// No video
 				else {
-					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer',
-													  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'style' => $imgstyle.'cursor:pointer', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
-
-				// Close the a img ajax
-				$result .= wppa_close_tag( 'a', false, true );
+				$result .= '</a>';
 			}
-
-			// non ajax
-			else {
-
+			else { 	// non ajax
 				// The a img non ajax
 				$result .= '<a style="position:static;" href="'.$link['url'].'" target="'.$link['target'].'" class="thumb-img" id="x-'.$xid.'-'.$mocc.'">';
 				if ( $is_video ) {
-					$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;',
+					$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
 													 'controls' => wppa_switch('thumb_video'), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				else {
-					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;',
-													  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'style' => $imgstyle.'cursor:pointer;', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
-
-				// Close the img non ajax
-				$result .= wppa_close_tag( 'a', false, true );
+				$result .= '</a>';
 			}
 		}
 
@@ -955,16 +952,16 @@ function wppa_get_thumb_masonry( $id ) {
 				&& wppa_opt( 'thumb_linkpage' ) == 0								// same page/post
 				&& ! wppa_switch( 'thumb_blank' )									// not on a new tab
 				&& ! ( wppa_switch( 'thumb_overrule' ) && $thumb['linkurl'] )		// no ( ps overrule set AND link present )
-				&& ! wppa( 'is_topten' )													// no topten selection
-				&& ! wppa( 'is_lasten' )													// no lasten selection
-				&& ! wppa( 'is_comten' )													// no comten selection
-				&& ! wppa( 'is_featen' )
-				&& ! wppa( 'is_tag' )													// no tag selection
-				&& ! wppa( 'is_upldr' )													// not on uploader deisplay
-				&& ! wppa( 'src' )														// no search
-				&& ! wppa( 'supersearch' )													// no supersearch
-				&& ! wppa( 'is_potdhis' ) 													// not on potd history
-//				&& ( wppa_is_int( wppa( 'start_album' ) ) || wppa( 'start_album' ) == '' )	// no set of albums
+			//	&& ! wppa( 'is_topten' )													// no topten selection
+			//	&& ! wppa( 'is_lasten' )													// no lasten selection
+			//	&& ! wppa( 'is_comten' )													// no comten selection
+			//	&& ! wppa( 'is_featen' )
+			//	&& ! wppa( 'is_tag' )													// no tag selection
+			//	&& ! wppa( 'is_upldr' )													// not on uploader deisplay
+			//	&& ! wppa( 'src' )														// no search
+			//	&& ! wppa( 'supersearch' )													// no supersearch
+			//	&& ! wppa( 'is_potdhis' ) 													// not on potd history
+			//	&& ( wppa_is_int( wppa( 'start_album' ) ) || wppa( 'start_album' ) == '' )	// no set of albums
 				 )
 			{ 	// Ajax	possible
 
@@ -1385,7 +1382,7 @@ static $seqno;
 			$style = $style_a['style'];
 			$result .= 	'
 			<a href="' . get_permalink() . '">' .
-				wppa_html_tag( 'img', ['src' => $url, 'alt' => wppa_alt($id), 'title' => $thumbname, 'style' => $style] ) . '
+				wppa_html_tag( 'img', ['src' => $url, 'class' => 'nolazy', 'alt' => wppa_alt($id), 'title' => $thumbname, 'style' => $style] ) . '
 			</a>';
 		}
 	}
@@ -1472,7 +1469,7 @@ static $seqno;
 
 			// Photo with normal type filmthumbs
 			if ( $film_type == 'normal' ) {
-				$result .= wppa_html_tag( 'img', ['id' => 'wppa-'.$ambule.'-'.$idx.'-'.$mocc, 'class' => 'wppa-'.$ambule.'-'.$mocc, 'src' => $url, 'alt' => wppa_alt($thumb['id']),
+				$result .= wppa_html_tag( 'img', ['id' => 'wppa-'.$ambule.'-'.$idx.'-'.$mocc, 'class' => 'nolazy wppa-'.$ambule.'-'.$mocc, 'src' => $url, 'alt' => wppa_alt($thumb['id']),
 												  'style' => $imgstyle . $cursor, 'data-title' => ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ),
 												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout, 'onclick' => $onclick, 'ondblclick' => $ondblclick] );
 			}
@@ -1649,7 +1646,7 @@ function wppa_get_medal_html_a( $args ) {
 	if ( $medal ) {
 		$src = WPPA_UPLOAD_URL . '/icons/medal_' . $medal . '_' . $color .'.png';
 		$style = $sstyle . 'top:4px;position:absolute;border:none;margin:0;padding:0;box-shadow:none;height:'.$size.'px;top:'.$top.'px;';
-		$result .= wppa_html_tag( 'img', ['src' => $src, 'title' => $title, 'alt' => $title, 'style' => $style] );
+		$result .= wppa_html_tag( 'img', ['src' => $src, 'title' => $title, 'class' => 'nolazy', 'alt' => $title, 'style' => $style] );
 	}
 
 	// Is there a new or modified indicator to display?

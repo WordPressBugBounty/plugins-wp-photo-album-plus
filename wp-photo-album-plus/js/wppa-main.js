@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.0.10.001';
+wppaWppaVer = '9.1.00.003';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -1031,7 +1031,7 @@ function wppaSuperSearchSelect( mocc, go ) {
 					var i;
 					for ( i = 0; i < set.length; i++ ) {
 						if ( jQuery( set[i] ).prop('selected')) {
-							data += '.' + jQuery( set[i] ).val();
+							data += ';' + jQuery( set[i] ).val();
 						}
 					}
 					data = data.substr( 1 );
@@ -1084,7 +1084,7 @@ function wppaSuperSearchSelect( mocc, go ) {
 					var i;
 					for ( i=0; i<set.length; i++ ) {
 						if ( jQuery( set[i] ).prop('selected')) {
-							data += '.' + jQuery( set[i] ).val();
+							data += ';' + jQuery( set[i] ).val();
 						}
 					}
 					data = data.substr( 1 );
@@ -1157,6 +1157,7 @@ function wppaSuperSearchSelect( mocc, go ) {
 
 // Supersearch function set size of exif/iptc itemlist
 function wppaSetIptcExifSize( clas, selid ) {
+	return;
 	var t = jQuery( clas );
 	var n = t.length;
 	if ( n > 6 ) n = 6;

@@ -2,8 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.0.10.009
-*
+* Version: 9.1.07.007
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -159,9 +158,7 @@ global $wppa_current_shortcode_atts;
 		'is_topten'					=> false,
 		'topten_count'				=> 0,
 		'is_lasten'					=> false,
-		'lasten_count'				=> 0,
 		'is_featen'					=> false,
-		'featen_count'				=> 0,
 		'start_photo'				=> 0,
 		'is_single'					=> false,
 		'is_landing'				=> 0,
@@ -187,6 +184,8 @@ global $wppa_current_shortcode_atts;
 		'is_related'				=> false,
 		'related_count'				=> 0,
 		'is_owner'					=> '',
+		'is_parent' 				=> '',
+		'is_grandparent' 			=> '',
 		'is_upldr'					=> '',
 		'no_esc'					=> false,
 		'front_edit'				=> false,
@@ -268,6 +267,15 @@ global $wppa_current_shortcode_atts;
 		'targetmocc' 				=> false,
 		'rating_start' 				=> 0,
 		'rating_end'				=> 0,
+		'is_multi_virtual' 			=> false,
+		'random' 					=> '',
+		'get_photos_result' 		=> '',
+		'is_name' 					=> '',
+		'is_iptc' 					=> '',
+		'is_exif' 					=> '',
+		'is_intro' 					=> '',
+		'max' 						=> 0,
+		'bpprofile' 				=> '',
 	);
 
 	if ( false && is_array( $wppa_runtime_settings ) ) {
@@ -721,8 +729,8 @@ global $wppa;
 
     switch ( $order ) {
 
-		case 1: $result = 'p_order, id'; break;
-		case '-1': $result = 'p_order DESC, id'; break;
+		case '1': $result = 'p_order'; break;
+		case '-1': $result = 'p_order DESC'; break;
 		case '2': $result = 'name'; break;
 		case '-2': $result = 'name DESC'; break;
 		case '3': $result = 'RAND(' . wppa_get_randseed() . ')'; break;
@@ -739,6 +747,57 @@ global $wppa;
     }
 
     return $result;
+}
+
+// Album order
+function wppa_get_aoc( $id = 0, $no_random = false ) {
+
+	// Init
+	$order = '0';
+
+	// Random overrule?
+	if ( wppa( 'is_random' ) ) {
+		$result = 'RAND(' . wppa_get_randseed() . ')';
+		return $result;
+	}
+
+	// Album specified?
+	if ( wppa_is_int( $id ) && $id > 0 ) {
+		$order = wppa_get_album_item( $id, 'suba_order_by' );
+	}
+
+	// Default album setting or no album specified
+	if ( ! $order ) {
+		$order = wppa_opt( 'list_albums_by' );
+	}
+
+	switch ( $order ) {
+		case 1:
+			$result = 'a_order';
+			break;
+		case '-1':
+			$result = 'a_order DESC';
+			break;
+		case '2':
+			$result = 'name';
+			break;
+		case '-2':
+			$result = 'name DESC';
+			break;
+		case '3':
+			$result = 'RAND( '.wppa_get_randseed().' )';
+			break;
+		case '5':
+			$result = 'timestamp';
+			break;
+		case '-5':
+			$result = 'timestamp DESC';
+			break;
+		default:
+			$result = 'id';
+			break;
+	}
+	return $result;
 }
 
 // See if an album is another albums ancestor
@@ -1543,7 +1602,6 @@ function wppa_format_geo( $lat, $lon ) {
 
 function wppa_album_select_a( $args ) {
 global $wpdb;
-static $cache1, $cache2;
 
 	$args = wp_parse_args( $args, array( 	'void' 				=> '',
 											'selected' 			=> '',
@@ -1558,6 +1616,7 @@ static $cache1, $cache2;
 											'addselbox'			=> false,
 											'addowner' 			=> false,
 											'disableancestors' 	=> false,
+											'disablechildren' 	=> false,
 											'checkaccess' 		=> false,
 											'checkowner' 		=> false,
 											'checkupload' 		=> false,
@@ -1715,17 +1774,14 @@ static $cache1, $cache2;
 			// $albums = $args['array'];
 			$albums = array();
 
-			if ( ! $cache1 ) {
-				$temp = wppa_get_results( "SELECT id, name, max_children, crypt
+			$query = "SELECT id, name, max_children, crypt, owner
 											 FROM $wpdb->wppa_albums
 											 WHERE id IN (" . implode( ',', $args['array'] ) . ") " .
 											 ( $args['checkowner'] && ! wppa_user_is_admin() ? "AND owner IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
-											 wppa_get_album_order( $args['root'] ) );
-				$cache1 = $temp;
-			}
-			else {
-				$temp = $cache1;
-			}
+											 wppa_get_album_order( $args['root'] );
+
+			$temp = wppa_get_results( $query );
+
 
 			// To keep the preciously created sequence intact when an array is given, copy the data from $temp in the sequence of $args['array']
 			foreach( $args['array'] as $id ) {
@@ -1737,17 +1793,28 @@ static $cache1, $cache2;
 			}
 		}
 		else {
-
-			if ( ! $cache2 ) {
-				$albums = wppa_get_results( "SELECT id, name, max_children, crypt
+			$query = "SELECT id, name, max_children, crypt, owner
 											   FROM $wpdb->wppa_albums " .
 											   ( $args['checkowner'] && ! wppa_user_is_admin() ? "WHERE owner IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
-											   wppa_get_album_order( $args['root'] ) );
-				$cache2 = $albums;
+											   wppa_get_album_order( $args['root'] );
+
+			$albums = wppa_get_results( $query );
+
+		}
+
+		// Check for bp profile
+		if ( wppa( 'bpprofile' ) ) {
+			foreach( array_keys( $albums ) as $key ) {
+				if ( $albums[$key]['owner'] != wppa( 'bpprofile' ) ) {
+					unset( $albums[$key] );
+				}
 			}
-			else {
-				$albums = $cache2;
-			}
+		}
+
+		// Check for 'disablechildren'
+		$voidarr = array();
+		if ( $args['disablechildren'] ) {
+			$voidarr = explode( '.', wppa_alb_to_enum_children( $args['disablechildren'] ) );
 		}
 
 		if ( $albums ) {
@@ -1865,6 +1932,7 @@ static $cache1, $cache2;
 				 ( $args['disableancestors'] && wppa_is_ancestor( $args['void'], $album['id'] ) )
 				 ) $disabled = ' disabled'; else $disabled = '';
 			if ( in_array( $album['id'], $selarr ) && ! $disabled ) $selected = ' selected'; else $selected = '';
+			if ( in_array( $album['id'], $voidarr ) ) $disabled = ' disabled';
 
 			$ok = true; // Assume this will be in the list
 			if ( $args['checkaccess'] && ! wppa_have_access( $album['id'] ) ) {

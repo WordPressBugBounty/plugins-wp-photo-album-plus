@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 9.0.00.005
+* Version 9.1.04.006
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -100,7 +100,7 @@ class AlbumWidget extends WP_Widget {
 			$ids = implode( ',', $ids_arr );
 
 			// Do the new query
-			$order = wppa_get_album_order( $parent );
+			$order = wppa_get_album_order_a( $parent );
 			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN (%s) ORDER BY %s %s LIMIT %d", $ids, $order['order'], $order['desc'], $max );
 			$query = wppa_fix_query( $query );
 			$albums = wppa_get_results( $query );

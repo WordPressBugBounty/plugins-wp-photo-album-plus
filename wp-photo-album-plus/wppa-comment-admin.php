@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 9.0.00.005
+* Version: 9.1.00.003
 *
 */
 
@@ -132,11 +132,13 @@ class WPPA_Comment_table extends WPPA_List_Table {
 			'editsingle' 	=> $action,
 		);
 
-		$result =
+		$result = '<span id="nonce-'.$item['id'].'" style="display:none;">'.wp_create_nonce( 'wppa_photo_comment_'.$item['id'] ).'</span>';
+
+		$result .=
 		'<textarea' .
 			' id="commenttext-' . $item['id'] . '"' .
 			' style="width:98%;"' .
-			' onchange="wppaCommentAdminUpdateHref(\'' . $item['id'] . '\');jQuery(\'#di-' . $item['id'] . '\').trigger(\'click\');"' .
+			' onchange="wppaAjaxCommentUpdate( this, '.$item['id'].');"' .
 			' >' .
 			stripslashes( $item['comment'] ) .
 		'</textarea>' .

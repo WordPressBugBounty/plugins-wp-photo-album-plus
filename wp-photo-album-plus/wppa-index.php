@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version: 9.0.09.002
+* Version: 9.1.00.001
 *
 *
 */
@@ -358,7 +358,7 @@ function wppa_index_array_to_string( $array ) {
 
 	// Remove empty elements
 	foreach( array_keys( $array ) as $idx ) {
-		if ( ! $array[$idx] ) {
+		if ( ! wppa_is_posint($array[$idx]) ) {
 			unset( $array[$idx] );
 		}
 	}

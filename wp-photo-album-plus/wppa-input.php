@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.0.12.001
+* Version: 9.1.07.006
 *
 */
 
@@ -134,7 +134,6 @@ function wppa_get_get_filter( $name ) {
 		case 'potdhis':
 		case 'inv':
 		case 'vt':
-		case 'catbox':
 		case 'resp':
 		case 'quick':
 		case 'continue':
@@ -182,6 +181,7 @@ function wppa_get_get_filter( $name ) {
 		case 'tags':
 		case 'upn-tags':
 		case 'new-tags':
+		case 'catbox':
 			$result = 'tags';
 			break;
 
@@ -213,6 +213,7 @@ function wppa_get_get_filter( $name ) {
 		case 'album':
 		case 'album-id':
 		case 'upload-album':
+		case 'upn-album':
 			$result = 'acrypt';
 			break;
 
@@ -316,7 +317,10 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 
 		case 'html':
 		case 'custom':
-			return isset( $_REQUEST[$key] ) ? wppa_filter_html( $_REQUEST[$key] ) : $default;
+			$allowed = current_user_can( 'unfiltered_html' ) ? wppa_allowed_tags() : wppa_allowed_simple_tags();
+			return isset( $_REQUEST[$key] ) ? wp_kses( html_entity_decode( wp_unslash( $_REQUEST[$key] ) ), $allowed ) : $default;
+
+		//	return isset( $_REQUEST[$key] ) ? wppa_filter_html( wp_unslash( $_REQUEST[$key] ) ) : $default;
 			break;
 
 		case 'tag':
@@ -335,7 +339,7 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			break;
 
 		case 'acrypt':
-			return isset( $_REQUEST[$key] ) ? wppa_decrypt_album( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), ! is_admin() || $strict ) : '';
+			return isset( $_REQUEST[$key] ) ? wppa_decrypt_album( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), ! is_admin() || $strict ) : '0';
 			break;
 
 		case 'email':

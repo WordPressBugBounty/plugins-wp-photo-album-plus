@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * local js code for admin pages
-* Version 9.0.00.000
+* Version 9.1.04.002
 *
 */
 
@@ -507,31 +507,26 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 
 					xmlhttp.onreadystatechange = function() {
 						if ( xmlhttp.readyState == 4 && xmlhttp.status != 404 ) {
-							var ArrValues = xmlhttp.responseText.split( "||" );
-							if ( ArrValues[0] != "" ) {
-								alert( "The server returned unexpected output:\n" + ArrValues[0] );
+							var results = JSON.parse(xmlhttp.responseText);
+							if ( results["error"] == "0" ) {
+								var i = seqno - 1;
+								var descend = wppaAlbSeqnoDesc;
+								if ( descend ) {
+									i = wppaAlbumCount - seqno;
+								}
+								jQuery( "#wppa-album-seqno-" + album ).html( seqno );
+								if ( wppaRenumberPending ) {
+									jQuery( "#wppa-pb-"+i ).css({backgroundColor:"orange"});
+								}
+								else {
+									jQuery( "#wppa-pb-"+i ).css({backgroundColor:"green"});
+								}
+								if ( wppaLastAlbum = album ) {
+									wppaRenumberBusy = false;
+								}
 							}
-							switch ( ArrValues[1] ) {
-								case "0":	// No error
-									var i = seqno - 1;
-									var descend = wppaAlbSeqnoDesc;
-									if ( descend ) {
-										i = wppaAlbumCount - seqno;
-									}
-									jQuery( "#wppa-album-seqno-" + album ).html( seqno );
-									if ( wppaRenumberPending ) {
-										jQuery( "#wppa-pb-"+i ).css({backgroundColor:"orange"});
-									}
-									else {
-										jQuery( "#wppa-pb-"+i ).css({backgroundColor:"green"});
-									}
-									if ( wppaLastAlbum = album ) {
-										wppaRenumberBusy = false;
-									}
-									break;
-								default:	// Any error
-									jQuery( "#wppa-album-seqno-" + album ).html( "<span style=\'color:red\' >Err:" + ArrValues[1] + "</span>" );
-									break;
+							else {
+								jQuery( "#wppa-album-seqno-" + album ).html( "<span style=\'color:red\' >Err:" + results["remark"] + "</span>" );
 							}
 							wppaAjaxRequests--;
 							wppaConsoleLog("Pending ajax requests = "+wppaAjaxRequests);
@@ -1247,7 +1242,18 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 				},100)});' : ''
 				) .
 				( $arg1 == 'watermark' ? 'jQuery(document).ready(function(){wppaCheckFontPreview();});' : '' ) .
-				( $arg1 == 'photos' ? 'jQuery(document).ready(function(){setTimeout(function(){wppaUpdatePotdInfo()},2000);});' : '' );
+				( $arg1 == 'photos' ? 'jQuery(document).ready(function(){setTimeout(function(){wppaUpdatePotdInfo()},2000);});' : '' ) . '
+
+				jQuery(document).ready(wppaMeasureSizes());
+				jQuery(window).on("resize",function(){wppaMeasureSizes();});
+				function wppaMeasureSizes() {
+					jQuery("#wppa-sh").html(screen.height);
+					jQuery("#wppa-sw").html(screen.width);
+					jQuery("#wppa-wh").html(window.innerHeight);
+					jQuery("#wppa-ww").html(window.innerWidth);
+					jQuery("#wppa-wsh").html(wppaScreenHeight());
+					jQuery("#wppa-wsw").html(wppaScreenWidth());
+				}';
 			}
 			break;
 		default:

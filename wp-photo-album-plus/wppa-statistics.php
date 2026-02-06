@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.0.09.002
+* Version: 9.1.06.006
 *
 */
 
@@ -210,13 +210,15 @@ global $wppa_session;
 
 			case 'album':
 				$count = wppa_get_album_item( $id, 'views' );
-				$count++;
+				if ( ! $count ) $count = 1;
+				else $count++;
 				wppa_update_album( $id, ['views' => $count] );
 				break;
 
 			case 'photo':
 				$count = wppa_get_photo_item( $id, 'views' );
-				$count++;
+				if ( ! $count ) $count = 1;
+				else $count++;
 				wppa_update_photo( $id, ['views' => $count] );
 				break;
 
@@ -225,9 +227,9 @@ global $wppa_session;
 		}
 
 		// If 'wppa_owner_to_name'
-		if ( $type == 'photo' ) {
-			wppa_set_owner_to_name( $id );
-		}
+//		if ( $type == 'photo' ) {
+//			wppa_set_owner_to_name( $id );
+//		}
 
 		// Mark Treecounts need update
 		if ( $type == 'photo' ) {
@@ -621,12 +623,22 @@ static $login;
 		return false;
 	}
 
-	// Get usefull data
-	$status = wppa_get_album_item( $id, 'status' );
-	$owner  = wppa_get_album_item( $id, 'owner' );
 	if ( $user === NULL ) $user = wppa_get_user();
 	if ( $admin === NULL ) $admin = wppa_user_is_admin();
 	if ( $login === NULL ) $login = is_user_logged_in();
+
+	// Admin?
+	if ( $admin ) return true;
+
+	// Has the album a cap specified and do i have it not??
+	$cap = wppa_get_album_item( $id, 'capability' );
+	if ( $cap ) {
+		if ( ! current_user_can( $cap ) ) return false;
+	}
+
+	// Get usefull data
+	$status = wppa_get_album_item( $id, 'status' );
+	$owner  = wppa_get_album_item( $id, 'owner' );
 
 	// Always visible for admin and owner
 	if ( $admin || $user == $owner ) {
@@ -738,6 +750,21 @@ static $login;
 		return false;
 	}
 
+	if ( $user === NULL ) $user = wppa_get_user();
+	if ( $admin === NULL ) $admin = wppa_user_is_admin();
+	if ( $login === NULL ) $login = is_user_logged_in();
+
+	// Admin?
+	if ( $admin ) return true;
+
+	// Has the album a cap specified and do i have it not??
+	$cap = wppa_get_album_item( wppa_get_photo_item( $id, 'album' ), 'capability' );
+	if ( $cap ) {
+		if ( ! current_user_can( $cap ) ) {
+			return false;
+		}
+	}
+
 	// If no files available, return false
 	if ( ! wppa_is_file( wppa_get_source_path( $id ) ) &&
 		 ! wppa_is_file( wppa_get_photo_path( $id ) ) &&
@@ -750,11 +777,10 @@ static $login;
 	$status = wppa_get_photo_item( $id, 'status' );
 	$owner  = wppa_get_photo_item( $id, 'owner' );
 
-	if ( $status === false && $owner === false ) return false; // Photo does not exist
+	// My item?
+	if ( $owner == $user ) return true;
 
-	if ( $user === NULL ) $user = wppa_get_user();
-	if ( $admin === NULL ) $admin = wppa_user_is_admin();
-	if ( $login === NULL ) $login = is_user_logged_in();
+	if ( $status === false && $owner === false ) return false; // Photo does not exist
 
 	// Dispatch on photo status
 	switch( $status ) {

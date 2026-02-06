@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaDeclsVersion = '9.0.00.006';
+wppaDeclsVersion = '9.1.04.005';
 
 // Global declarations
 var	wppaFullValign = [],
@@ -161,3 +161,4 @@ var	wppaFullValign = [],
 	wppaOvlVideoLoading = false,
 	wppaOvlVideoPlaying = false,
 	wppaOvlAudioPlaying = false;
+	wppaIsIntro = false;

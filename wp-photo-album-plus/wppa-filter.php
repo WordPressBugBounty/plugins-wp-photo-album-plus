@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.0.09.002
+* Version: 9.1.07.008
 *
 */
 
@@ -40,7 +40,7 @@ global $wppa_current_shortcode_atts;
 
 	// Init
 	$wppa_current_shortcode_atts = $xatts;
-	$wppa_current_shortcode = wppa_get_shortcode( 'wppa_div', $xatts );
+	$wppa_current_shortcode = sanitize_text_field( stripslashes( wppa_get_shortcode( 'wppa_div', $xatts ) ) );
 
 	if ( ! $seqno ) $seqno = 0;
 	$seqno++;
@@ -144,8 +144,14 @@ global $wppa_runtime_settings;
 	$is_calendar 					= false;
 
 	// Save shortcode
-	$wppa_current_shortcode 			= wppa_get_shortcode( 'wppa', $xatts );
-	$wppa_current_shortcode_no_delay 	= wppa_get_shortcode( 'wppa', $xatts, true );
+	$wppa_current_shortcode 			= sanitize_text_field( stripslashes( wppa_get_shortcode( 'wppa', $xatts ) ) );
+	$wppa_current_shortcode_no_delay 	= sanitize_text_field( stripslashes( wppa_get_shortcode( 'wppa', $xatts, true ) ) );
+
+	// Check for #me while logged out
+	if ( isset( $xatts['album'] ) && strpos( $xatts['album'], '#me' ) !== false && ! is_user_logged_in() ) {
+		wppa_reset_occurrance();
+		return;
+	}
 
 	// Preprocess and completize atts
 	$atts = wppa_shortcode_atts( (array) $xatts );
@@ -164,6 +170,9 @@ global $wppa_runtime_settings;
 	$wppa['meonly'] 	= $atts['meonly'];
 	$wppa['container-wrapper-class'] = $atts['class'];
 	$wppa['targetmocc'] = $atts['targetmocc'];
+	$wppa['random']  	= $atts['random'];
+	$wppa['max'] 		= $atts['max'];
+	$wppa['bpprofile'] 	= $atts['bpprofile'];
 
 	// Interprete wppa_set settable runtime settings
 	if ( is_array( $wppa_runtime_settings ) ) {
@@ -192,9 +201,23 @@ global $wppa_runtime_settings;
 		$wppa['mocc'] = $atts['mocc'] - 1;
 	}
 
+	// Named album?
+	if ( substr( $atts['album'], 0, 1 ) == '$' ) {
+		$atts['album'] = wppa_album_name_to_number( $atts['album'] );
+	}
+
 	// If parent given, overwrite album by children
 	if ( $atts['parent'] !== '' ) {
+
 		$temp = explode( ',', $atts['parent'] );
+
+		// Convert possible $names tpo numbers
+		foreach( array_keys( $temp ) as $key ) {
+			if ( substr( $temp[$key], 0, 1 ) == '$' ) {
+				$temp[$key] = wppa_album_name_to_number( $temp[$key] );
+			}
+		}
+		$atts['parent'] = implode( ',', $temp );
 
 		// Test for virtual album
 		if ( is_array( $temp ) && count( $temp ) > 1 && wppa_is_enum( $temp[1] ) ) {
@@ -228,6 +251,7 @@ global $wppa_runtime_settings;
 							   'landing',
 							   'calendar',
 							   'notify',
+							   'intro',
 							   );
 	$void_delay_albums = array( '#me',
 								'#upldr',
@@ -508,10 +532,6 @@ global $wppa_runtime_settings;
 			if ( in_array( $atts['calendar'], array( 'exifdtm', 'timestamp', 'modified', 'realexifdtm', 'realtimestamp', 'realmodified' ) ) ) {
 				$wppa['calendar'] = $atts['calendar'];
 			}
-//			if ( $atts['delay'] && substr( $atts['calendar'], 0, 4 ) != 'real' ) {
-//				wppa_you_can_not( 'delay', $type . ' ' . $atts['calendar'] );
-//				$atts['delay'] = '';
-//			}
 			$wppa['reverse'] 		= $atts['reverse'];
 			$wppa['start_album'] 	= $atts['album'];
 			if ( $atts['parent'] ) {
@@ -648,6 +668,9 @@ global $wppa_runtime_settings;
 		case 'notify':
 			$wppa['is_notify'] = true;
 			break;
+		case 'intro':
+			$wppa['is_intro'] = $atts['id'];
+			break;
 
 		default:
 			wppa_log( 'Err', 'Invalid type: ' . htmlentities( $atts['type'] ) . ' in wppa shortcode ' . $wppa_current_shortcode );
@@ -779,36 +802,33 @@ global $wpdb;
 		'meonly' 	=> false,
 		'class' 	=> '',
 		'targetmocc'	=> '',
+		'album_raw' 	=> '',
+		'album_arr' 	=> [],
+		'random' 		=> '',
+		'id' 			=> '0',
+		'max' 			=> '0',
+		'bpprofile' 	=> '',
 	];
 
 	// Shortcode attributes that do not need a value. Convert them to 'attr => 1'
 	// To workaround a php bug this is complexer that it should need to be
 	$xatts_copy = $xatts;
-	$singles = ['landscape', 'portrait', 'cache', 'anon', 'meonly'];
+	$singles = ['landscape', 'portrait', 'cache', 'anon', 'meonly', 'random', 'bpprofile'];
 	$no_s = ['no', 'off'];
 	foreach ( $singles as $at ) {
 		$xatts_temp = $xatts_copy;
 		if ( in_array( $at, $xatts_temp ) ) {
-			$xatts[$at] = '1';
+			if ( $at == 'random' ) {
+				$xatts[$at] = wppa_get_randseed();
+			}
+			else {
+				$xatts[$at] = '1';
+			}
 		}
 		elseif ( isset( $xatts_temp[$at] ) && ! in_array( $xatts_temp[$at], $no_s ) ) {
 			$xatts[$at] = false;
 		}
 	}
-
-	/*
-	$no_s = ['no', 'off'];
-	if ( in_array( 'landscape', $xatts ) )	$xatts['landscape'] = true;
-	elseif ( isset( $xatts['landscape'] ) && in_array( $xatts['landscape'], $no_s ) ) $xatts['landscape'] = false;
-	if ( in_array( 'portrait', $xatts ) )	$xatts['portrait'] = true;
-	elseif ( isset( $xatts['portrait'] ) && in_array( $xatts['portrait'], $no_s ) ) $xatts['portrait'] = false;
-	if ( in_array( 'cache', $xatts ) )		$xatts['cache'] = true;
-	elseif ( isset( $xatts['cache'] ) && in_array( $xatts['cache'], $no_s ) ) $xatts['cache'] = false;
-	if ( in_array( 'anon', $xatts ) )		$xatts['anon'] = true;
-	elseif ( isset( $xatts['anon'] ) && in_array( $xatts['anon'], $no_s ) ) $xatts['anon'] = false;
-	if ( in_array( 'meonly', $xatts ) ) 	$xatts['meonly'] = true;
-	elseif ( isset( $xatts['meonly'] ) && in_array( $xatts['meonly'], $no_s ) ) $xatts['meonly'] = false;
-	*/
 
 	// Login requested?
 	if ( in_array( 'login', (array) $xatts ) ) {
@@ -840,6 +860,20 @@ global $wpdb;
 		$xatts['class'] = wppa_sanitize_text( $xatts['class'] );
 	}
 	$voidcache = false;
+	if ( isset( $xatts['album'] ) ) {
+
+		// Fix confusion between single and multy tags and cats
+		$xatts['album'] = str_replace( ['#cats,', '#tag,'], ['#cat,', '#tags,'], $xatts['album'] );
+
+		// For backward compat change | into &
+		$xatts['album'] = str_replace( '|', '&', $xatts['album'] );
+
+		// If tags in album, replace yy and mm
+
+		if ( strpos( $xatts['album'], '#tags,' ) !== false ) {
+			$xatts['album'] = wppa_translate_virtual_tags( $xatts['album'] );
+		}
+	}
 	foreach ( ['album', 'parent'] as $key ) {
 		if ( isset( $xatts[$key] ) ) {
 			$p = strpos($xatts[$key],'#me');
@@ -851,10 +885,22 @@ global $wpdb;
 		}
 	}
 
+	// Album multi virtual
+	if ( isset( $xatts['album'] ) ) {
+		$atts['album_raw'] = str_replace( '|', '&', $xatts['album'] );
+		$atts['album_arr'] = explode( '&', $atts['album_raw'] );
+	}
+
 	// If album is encrypted, decrypt it ( happens in cover preview )
 	if ( isset( $xatts['album'] ) ) {
-		$a = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $xatts['album'] ) );
-		if ( $a ) $xatts['album'] = $a;
+		foreach( array_keys( $atts['album_arr'] ) as $key ) {
+			$a = false;
+			if ( strlen( $atts['album_arr'][$key] ) == 16 && substr( $atts['album_arr'][$key], 0, 1 ) != '#' ) {
+				$a = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $atts['album_arr'][$key] ) );
+				if ( $a ) $atts['album_arr'][$key] = $a;
+			}
+		}
+		$xatts['album'] = implode( '&', $atts['album_arr'] );// ism
 	}
 
 	// Caching?
@@ -911,8 +957,10 @@ global $wpdb;
 		}
 	}
 	if ( isset( $xatts['album'] ) ) {
-		if ( wppa_is_enum( $xatts['album']  ) ) {
-			wppa_add_usedby( $xatts['album'], $page, 'album' );
+		foreach( $atts['album_arr'] as $a ) {
+			if ( wppa_is_enum( $a ) ) {
+				wppa_add_usedby( $a, $page, 'album' );
+			}
 		}
 	}
 
@@ -955,6 +1003,27 @@ global $wpdb;
 				$name = $t[0];
 				$value = $t[1];
 				wppa_proc_set( ['name' => $name, 'value' => $value] );
+			}
+		}
+	}
+
+	// max
+	if ( isset( $xatts['max'] ) ) {
+		if ( ! wppa_is_int( $xatts['max'] ) ) {
+			$xatts['max'] = '0';
+		}
+	}
+
+	// bpprofile?
+	if ( isset( $xatts['type'] ) && $xatts['type'] == 'upload' && isset( $xatts['bpprofile'] ) ) {
+		$xatts['bpprofile'] = '';
+		if ( function_exists( 'bp_displayed_user_id' ) ) {
+			$user_id = bp_displayed_user_id();
+			if ( $user_id ) {
+				$usr = get_user_by( 'ID', $user_id );
+				if ( $usr ) {
+					$xatts['bpprofile'] = $usr->user_login;
+				}
 			}
 		}
 	}
@@ -1068,7 +1137,7 @@ global $photos_used;
 	// Init
 	wppa_reset_occurrance();
 	$wppa_current_shortcode_atts = $xatts;
-	$wppa_current_shortcode = wppa_get_shortcode( 'photo', $xatts );
+	$wppa_current_shortcode = sanitize_text_field( stripslashes( wppa_get_shortcode( 'photo', $xatts ) ) );
 
 	// Get and validate photo id
 	if ( isset( $xatts[0] ) ) {
@@ -1100,8 +1169,12 @@ global $photos_used;
 		$wppa['mocc'] ++;
 	}
 
+	// Special cases
+	if ( $photo == 'last' ) $photo = '#last';
+	if ( $photo == 'random' ) $photo = '#random';
+
 	// Random photo?
-	if ( $wppa_postid && $photo == 'random' ) {
+	if ( $wppa_postid && $photo == '#random' ) {
 
 		if ( ! $seed ) {
 			$seed = time();
@@ -1110,13 +1183,14 @@ global $photos_used;
 
 		if ( wppa_opt( 'photo_shortcode_random_albums' ) != '-2' ) {
 			$albs  = str_replace( '.', ',', wppa_expand_enum( wppa_opt( 'photo_shortcode_random_albums' ) ) );
-			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN (%s) ORDER BY RAND(%d) LIMIT 1", $albs, $seed );
+			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN (%s) ORDER BY RAND(%d) LIMIT 1000", $albs, $seed );
 			$query = wppa_fix_query( $query );
-			$photo = wppa_get_var( $query );
+			$photo_arr = wppa_get_col( $query );
 		}
 		else {
-			$photo = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos ORDER BY RAND(%d) LIMIT 1", $seed ) );
+			$photo_arr = wppa_get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos ORDER BY RAND(%d) LIMIT 1000", $seed ) );
 		}
+		$photo = wppa_find_first_visible( $photo_arr );
 		if ( $photo ) {
 			if ( wppa_switch( 'photo_shortcode_random_fixed' ) ) {
 				$post_content = wppa_get_var( $wpdb->prepare( "SELECT post_content
@@ -1136,6 +1210,13 @@ global $photos_used;
 		else {
 			return __( 'No random photo found', 'wp-photo-album-plus' );
 		}
+	}
+	elseif ( $photo == '#last' ) {
+		$photo_arr = wppa_get_col( "SELECT id FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1000" );
+		$photo = wppa_find_first_visible( $photo_arr );
+	}
+	elseif ( ! wppa_is_posint( $photo ) ) {
+		return __( 'No photo found', 'wp-photo-album-plus' );
 	}
 
 	// Get configuration settings
@@ -1215,12 +1296,42 @@ function wppa_you_can_not( $xaction, $xtype, $useless = true ) {
 	/* translators: Example: You can not delay a single image shortcode display */
 	$result = sprintf( __( 'You can not %1$s a %2$s shortcode display.', 'wp-photo-album-plus' ), $action, $type ) .
 			  ( $useless ? ' ' . __( 'It is useless anyway.', 'wp-photo-album-plus' ) : '' );
-//	wppa_log( 'dbg', $result );
 	return $result;
 }
 
 // This function is no longer needed in 8.0
 function wppa_insert_shortcode_output( $result ) {
 	wppa_log( 'err', 'wppa_insert_shortcode_output() is deprecated and no longer needed' );
+	return $result;
+}
+
+// Trans;ate virtual tags
+function wppa_translate_virtual_tags( $album ) {
+
+	$result = $album;
+	if ( strpos( $album, '$y' ) !== false || strpos( $album, '$m' ) !== false ) {
+		$y = wp_date('y');
+		$y_ = strval( $y - 1 );
+		$Y = wp_date('Y');
+		$Y_ = strval( $Y - 1 );
+		$m = wp_date('m');
+		$m_ = strval( $m - 1 );
+		if ( strlen( $m_ ) == 1 ) {
+			$m_ = '0'.$m_;
+		}
+		if ( $m_ == '00' ) {
+			$m_ = '12';
+			$ym_ = $y_ . $m_;
+			$Ym_ = $Y_ . $m_;
+		}
+		else {
+			$ym_ = $y . $m_;
+			$Ym_ = $Y . $m_;
+		}
+		$from = ['$yyyymm-', '$yyyymm', '$yymm-', '$yymm', '$yyyy-', '$yyyy', '$yy-', '$yy'];
+		$to   = [ $Ym_,       $Y.$m,     $ym_,     $y.$m,   $Y_,      $Y,      $y_,    $y   ];
+
+		$result = str_replace( $from, $to, $result );
+	}
 	return $result;
 }

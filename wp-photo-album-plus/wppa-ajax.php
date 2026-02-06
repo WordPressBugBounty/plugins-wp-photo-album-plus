@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.0.11.002
+* Version: 9.1.07.008
 *
 */
 
@@ -59,9 +59,6 @@ global $wppa_supported_audio_extensions;
 	wppa( 'error', 0 );
 	wppa( 'out', '' );
 	if ( ! isset( $wppa_session['page'] ) ) {
-//		wppa_begin_session();
-	}
-	if ( ! isset( $wppa_session['page'] ) ) {
 		$wppa_session['page'] = 0;
 		$wppa_session['ajax'] = 0;
 	}
@@ -75,21 +72,6 @@ global $wppa_supported_audio_extensions;
 		wppa_log( 'ajax', 'Script = ' . basename( wppa_script_filename() ) ); // . ', Args = ' . var_export($_REQUEST,true) );
 	}
 
-/*
-	// Any runtime modifyable settings?
-	foreach( array_keys( $_GET ) as $key ) {
-		$value = isset( $_GET[$key] ) ? sanitize_text_field( wp_unslash( $_GET[$key] ) ) : '';
-		if ( ! substr( $key, 0, 5 ) == 'wppa_' ) {
-			if ( isset( $wppa[$key] ) ) {
-				$wppa[$key] = $value;
-wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
-			}
-			else {
-				$key = 'wppa_' . $key;
-			}
-		}
-	}
-*/
 	// Interprete encrypted wppa_set settings
 	wppa_decrypt_set();
 
@@ -450,7 +432,6 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 					// Do it
 					require_once 'wppa-photo-admin-autosave.php';
-
 					$txt = wppa_fe_edit_photo( $photo );
 				}
 
@@ -497,6 +478,12 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// If no error proceed
 			if ( ! $error ) {
+
+				// album
+				if ( wppa_get( 'upn-album' ) ) {
+					$album = wppa_get( 'upn-album' );
+					$fields['album'] = $album;
+				}
 
 				// Name
 				if ( wppa_get( 'upn-name' ) ) {
@@ -563,51 +550,83 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 			}
 
 			// Validate args
-			$mocc 		= wppa_get( 'occur' );
-			$nonce 		= $data['nonce']; //wppa_get( 'nonce' );
-			$photoid 	= wppa_get( 'photoid' );
-			$commentid 	= wppa_get( 'comid' );
+			if ( wppa_get( 'admin', 0, 'int' ) ) {
 
-			// Security check
-			if ( wppa_switch( 'direct_comment' ) ) {
-				if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
-					wppa_echo( wp_json_encode( ['txt' => esc_html__( 'Missing or invalid photo id' , 'wp-photo-album-plus' )] ) );
-					wppa_exit();
+				// Check role
+				if ( ! wppa_check_user_comment_role() ) {
+					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '73', true )] ) );
+					exit();
 				}
+
+				// Get comment id
+				$comid = wppa_get( 'comid', 0, 'int' );
+
+				// Check Nonce
+				$nonce = wppa_get( 'nonce', '', 'text' );
+				if ( ! wp_verify_nonce( $nonce, 'wppa_photo_comment_'.$comid ) ) {
+					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '74', true )] ) );
+					exit();
+				}
+
+				// Sanitize comment
+				$comment = wppa_get( 'comment', '', 'html' );
+
+				// Update comment in db
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET comment = %s WHERE id = %d", $comment, $comid );
+				wppa_log('misc', $query);
+				wppa_query( $query );
+
+				// Return sanitized text
+				wppa_echo( wp_json_encode( ['txt' => $comment] ) );
+				exit();
 			}
 			else {
-				if ( ! wp_verify_nonce( $nonce, 'wppa-check' ) ) {
-					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '70', true )] ) );
-					wppa_exit();
+				$mocc 		= wppa_get( 'occur' );
+				$nonce 		= $data['nonce']; //wppa_get( 'nonce' );
+				$photoid 	= wppa_get( 'photoid' );
+				$commentid 	= wppa_get( 'comid' );
+
+				// Security check
+				if ( wppa_switch( 'direct_comment' ) ) {
+					if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
+						wppa_echo( wp_json_encode( ['txt' => esc_html__( 'Missing or invalid photo id' , 'wp-photo-album-plus' )] ) );
+						wppa_exit();
+					}
 				}
-				if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
-					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '71', true )] ) );
-					wppa_exit();
+				else {
+					if ( ! wp_verify_nonce( $nonce, 'wppa-check' ) ) {
+						wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '70', true )] ) );
+						wppa_exit();
+					}
+					if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
+						wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '71', true )] ) );
+						wppa_exit();
+					}
 				}
-			}
 
-			// Check login
-			if ( ! is_user_logged_in() ) {
-				wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '72', true )] ) );
-			}
+				// Check login
+				if ( ! is_user_logged_in() ) {
+					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '72', true )] ) );
+				}
 
-			// Check role
-			if ( ! wppa_check_user_comment_role() ) {
-				wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '73', true )] ) );
-			}
+				// Check role
+				if ( ! wppa_check_user_comment_role() ) {
+					wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '73', true )] ) );
+				}
 
-			wppa( 'mocc', $mocc );
-			wppa( 'comment_photo', $photoid );
-			wppa( 'comment_id', $commentid );
+				wppa( 'mocc', $mocc );
+				wppa( 'comment_photo', $photoid );
+				wppa( 'comment_id', $commentid );
 
-			$comment_allowed = ! wppa_user_is_basic() && is_user_logged_in();
-			if ( wppa_switch( 'show_comments' ) && $comment_allowed ) {
-				wppa_do_comment( $photoid );		// Process the comment
-				if ( wppa_switch( 'search_comments' ) ) wppa_index_update( 'photo', $photoid );
+				$comment_allowed = ! wppa_user_is_basic() && is_user_logged_in();
+				if ( wppa_switch( 'show_comments' ) && $comment_allowed ) {
+					wppa_do_comment( $photoid );		// Process the comment
+					if ( wppa_switch( 'search_comments' ) ) wppa_index_update( 'photo', $photoid );
+				}
+				wppa( 'no_esc', true );
+				$result = wppa_comment_html( $photoid, $comment_allowed );
+				echo( wp_json_encode( ['txt' => $result.wppa_alert_html()] ) );	// Retrieve the new commentbox content
 			}
-			wppa( 'no_esc', true );
-			$result = wppa_comment_html( $photoid, $comment_allowed );
-			echo( wp_json_encode( ['txt' => $result.wppa_alert_html()] ) );	// Retrieve the new commentbox content
 			wppa_exit();
 			break;
 
@@ -758,7 +777,7 @@ wppa_log('war', 'Unexpected setting in ajax: $wppa['.$key.'] set to '.$value);
 
 			// Validate args
 			$alb = wppa_get( 'album-id' );
-wppa_log('misc', 'alb='.$alb);
+
 			// Get all items in the album
 			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d", $alb );
 			$photos = wppa_get_col( $query );
@@ -773,7 +792,6 @@ wppa_log('misc', 'alb='.$alb);
 			// Anything left?
 			if ( ! $photos || count( $photos ) == 0 ) {
 				wppa_echo( wp_json_encode( ['txt' => '||ER||' . __( 'The album is empty', 'wp-photo-album-plus' )] ) );
-wppa_log('misc', 'leeg');
 				wppa_exit();
 			}
 
@@ -1882,7 +1900,6 @@ wppa_log('misc', 'leeg');
 					}
 					if ( $photos && $iret !== false ) {
 						$fields['remark'] = __( 'Tags set to defaults' , 'wp-photo-album-plus' );
-						wppa_update_album( $album );
 					}
 					elseif ( $photos ) {
 						$fields['error'] = '1';
@@ -1891,6 +1908,7 @@ wppa_log('misc', 'leeg');
 					else {
 						$fields['remark'] = __( 'No photos in this album' , 'wp-photo-album-plus' );
 					}
+					wppa_clear_taglist();
 					$done = true;
 					break;
 				case 'add_deftags':
@@ -1906,7 +1924,6 @@ wppa_log('misc', 'leeg');
 						$iret = wppa_update_photo( $photo['id'], ['tags' => $tags] );
 					}
 					if ( $photos && $iret !== false ) {
-						wppa_update_album( $album );
 						$fields['remark'] = __( 'Tags added with defaults' , 'wp-photo-album-plus' );
 					}
 					elseif ( $photos ) {
@@ -2071,9 +2088,10 @@ wppa_log('misc', 'leeg');
 												  SET status = 'scheduled', scheduledtm = %s
 												  WHERE album = %d", $scheduledtm, $album );
 						$iret = wppa_query( $query );
-						wppa_echo( '||0||'.__( 'All photos set to scheduled per date', 'wp-photo-album-plus' ) . ' ' . wppa_format_scheduledtm( $scheduledtm ) );
+						$value = $scheduledtm;
+						$itemname = __( 'All photos set to scheduled per date', 'wp-photo-album-plus' );
+						$item = 'scheduledtm';
 					}
-					wppa_exit();
 					break;
 
 				case 'displayopt0':
@@ -2138,6 +2156,10 @@ wppa_log('misc', 'leeg');
 					$itemname = __( 'Watermark position', 'wp-photo-album-plus' );
 					break;
 
+				case 'capability':
+					$itemname = __( 'Capability', 'wp-photo-album-plus' );
+					break;
+
 				default:
 					$itemname = $item;
 			}
@@ -2146,6 +2168,7 @@ wppa_log('misc', 'leeg');
 			if ( ! $done ) {
 				$iret = wppa_update_album( $album, [$item => $value] );
 			}
+			else $iret = '0';
 
 			// Get the new data
 			wppa_cache_album( 'invalidate', $album );
@@ -2175,26 +2198,22 @@ wppa_log('misc', 'leeg');
 				$fields['indexdtm'] = $newalb['indexdtm'] ? wppa_local_date( '', $newalb['indexdtm'] ) : __( 'Needs re-indexing', 'wp-photo-album-plus' );
 			}
 
-			if ( $iret === 0 || $oldalb[$item] == $newalb[$item] ) {
+			if ( $fields['error'] != '0' && ( $iret === 0 || $oldalb[$item] == $newalb[$item] ) ) {
 				$fields['error'] = '2';
 				/* translators: itemname, album id */
 				$fields['remark'] = sprintf( __( '%1$s of album %2$d NOT updated', 'wp-photo-album-plus' ), $itemname, $album );
 			}
-			elseif ( $iret === false ) {
+			elseif ( $fields['error'] != '0' && $iret === false ) {
 				$fields['error'] = '1';
 				/* translators: itemname, album id */
 				$fields['remark'] = sprintf( __( 'An error occurred while trying to update %1$s of album %2$d' , 'wp-photo-album-plus' ), $itemname, $album );
 			}
+			elseif ( $fields['remark'] ) { // $itemname == 'set_deftags' || $itemname == 'add_deftags' ) {
+				// Remark already set
+			}
 			else {
 				/* translators: itemname, album id */
 				$fields['remark'] = sprintf( __( '%1$s of album %2$d updated', 'wp-photo-album-plus' ), $itemname, $album );
-				/*
-				if ( $item == 'upload_limit' ) {
-					$a = wppa_allow_uploads( $album );
-					if ( $a ) wppa_echo( '||notfull||' . $a );
-					else wppa_echo( '||full' );
-				}
-				*/
 			}
 			if ( ! empty( $fields ) ) {
 				if ( isset( $fields['description'] ) ) {
@@ -2297,6 +2316,7 @@ wppa_log('misc', 'leeg');
 
 			// Check validity
 			if ( ! wp_verify_nonce( $nonce, 'wppa-nonce_'.$photo ) ) {
+				wppa_log( 'err', 'Wrong nonce in edit photo (admin). Photo = ' . $photo );
 				$txt = __( 'Security check failure: wrong noncefield value' , 'wp-photo-album-plus' );
 				wppa_json_photo_update( $photo, $txt, 1 );															// Nonce check failed
 				wppa_exit();
@@ -3128,12 +3148,7 @@ wppa_log('misc', 'leeg');
 						else {
 
 							// Make new source filename
-			//				if ( wppa_has_audio( $photo ) || wppa_is_pdf( $photo ) || wppa_is_vdeo( $photo ) ) {
-								$filename = wppa_strip_ext( wppa_get_photo_item( $photo, 'filename' ) ) . '.' . $file_is_ok['ext'];
-			//				}
-			//				else {
-			//					$filename = wppa_fix_poster_ext( wppa_get_photo_item( $photo, 'filename' ), $photo );
-			//				}
+							$filename = wppa_strip_ext( wppa_get_photo_item( $photo, 'filename' ) ) . '.' . $file_is_ok['ext'];
 
 							// If very old, no filename, take new name
 							if ( ! $filename ) {
@@ -3329,7 +3344,7 @@ wppa_log('misc', 'leeg');
 					$txt = sprintf( __( '%1$s of %2$s %3$d updated' , 'wp-photo-album-plus' ), $itemname, wppa_get_type( $photo, true ), $photo );
 				}
 			}
-wppa_log('misc',$photo.' - '. $txt.' - '. $err.' - '.serialize($jsfields));
+
 			wppa_json_photo_update( $photo, $txt, $err, $jsfields );
 			wppa_exit();
 			break;
@@ -4256,12 +4271,18 @@ wppa_log('misc',$photo.' - '. $txt.' - '. $err.' - '.serialize($jsfields));
 				case 'wppa_image_magick':
 					$value = rtrim( $value, '/' );
 					if ( $value && $value != 'none' ) {
-						$out = array();
-						exec( escapeshellcmd( $value . '/convert' ), $out, $err );
-						$ok = ( count( $out ) != 0 );
-						if ( ! $ok ) {
-							wppa( 'error', '4713' );
-							$alert .= __( 'This path does not contain ImageMagick commands', 'wp-photo-album-plus' );
+						if ( ! function_exists( 'exec' ) ) {
+							wppa( 'error', '4714' );
+							$alert .= __( 'Required function exec() is not available on the server. You can not use ImageMagick', 'wp-photo-album-plus' );
+						}
+						else {
+							$out = array();
+							exec( escapeshellcmd( $value . '/convert' ), $out, $err );
+							$ok = ( count( $out ) != 0 );
+							if ( ! $ok ) {
+								wppa( 'error', '4713' );
+								$alert .= __( 'This path does not contain ImageMagick commands', 'wp-photo-album-plus' );
+							}
 						}
 					}
 					break;
@@ -4581,7 +4602,7 @@ function wppa_secfail( $id, $return = false ) {
 	$text = sprintf( __( 'Security check failure %d', 'wp-photo-album-plus' ), $id );
 	wppa_log( 'Misc', $text );
 	if ( $return ) {
-		return $txt;
+		return $text;
 	}
 	else {
 		wppa_echo( $text );

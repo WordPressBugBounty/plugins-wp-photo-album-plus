@@ -44,7 +44,7 @@ function wppa_number($xslug, $min, $max, $text = '', $onchange = '') {
 	$tit = __('Slug =', 'wp-photo-album-plus' ).' '.$xslug;
 	$title = wppa_switch( 'enable_shortcode_wppa_set' ) ? ' title="'.esc_attr( $tit ).'"' : '';
 	$val = isset ( $wppa_opt[ $xslug ] ) ? esc_attr( $wppa_opt[ $xslug ] ) : wppa_get_option( $xslug, '' );
-	$html = '<input'.$title.' style="float:left;height:20px;width:50px;padding:0 0 0 5px;';
+	$html = '<input'.$title.' style="float:left;height:20px;width:75px;padding:0 0 0 5px;';
 	$html .= 'font-size:11px;margin:0px;" type="number" id="'.$slug.'"';
 	if ($onchange != '') $html .= ' onchange="'. esc_attr( $onchange.';wppaAjaxUpdateOptionValue(\''.$slug.'\', this);').'"';
 	else $html .= ' onchange="wppaAjaxUpdateOptionValue(\''.$slug.'\', this)"';

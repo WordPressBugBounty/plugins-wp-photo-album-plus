@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.0.10.002
+* Version: 9.1.07.001
 *
 */
 
@@ -528,14 +528,14 @@ function _wppa_sanitze_files( $root, $from = '' ) {
 
 	$paths = $root.'/*';
 	$files = wppa_glob( $paths );
-
+	$mimes = wppa_get_mime_types( 'import' );
 	$count = 0;
 	if ( $files ) foreach ( $files as $file ) {
 
 		if ( wppa_is_file( $file ) ) { // && ! in_array( wppa_get_ext( $file ), ['bak', 'skin'] ) ) {
 
 			// Check extension and mimetype
-			$file_is_ok = wppa_check_filetype_and_ext( $file, basename( $file ), wppa_get_mime_types( 'import' ) );
+			$file_is_ok = wppa_check_filetype_and_ext( $file, basename( $file ), $mimes );
 			if ( ! $file_is_ok['ext'] || ! $file_is_ok['type'] ) {
 				if ( ! $file_is_ok['ext'] ) wppa_error_message( 'Illegal ext '.wppa_get_ext($file) );
 				if ( ! $file_is_ok['type'] ) wppa_error_message( 'Illegal type '.wppa_get_ext($file) );

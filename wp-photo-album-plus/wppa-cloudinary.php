@@ -1,7 +1,7 @@
 <?php
 /* Only loads when php version >= 5.3
 *
-* Version 9.0.09.002
+* Version 9.1.07.008
 *
 */
 
@@ -60,7 +60,6 @@ function wppa_upload_to_cloudinary( $id ) {
 	// Doit
 	if ( wppa_is_file ( $file ) ) {
 		\Cloudinary\Uploader::upload( $file, $args );
-//		wppa_log( 'Dbg', $file . ' uploaded to Cloudinary' );
 	}
 
 	return true;

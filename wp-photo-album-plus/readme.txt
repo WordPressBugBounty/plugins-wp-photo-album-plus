@@ -2,10 +2,10 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, video, audio, pdf, lightbox
-Requires at least: 6.0
-Tested up to: 6.8
+Requires at least: 6.6
+Tested up to: 6.9
 Requires PHP: 5.5
-Stable tag: 9.0.12.001
+Stable tag: 9.1.07.008
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,25 +17,25 @@ This plugin is more than just a photo album plugin, it is a complete, highly cus
 
 Features:
 
-* Any number of albums that contain any type of multimedia file as well as sub albums
-* Full control over the display sizes, responsive as well as static
-* Full control over links from any type of image
-* Full control over metadata: exif, iptc can be used by keywords in item descriptions
-* Up to 10 custom defined meta data fields, for albums and for media items
-* Front-end uploads
-* Bulk imports
-* Built-in lightbox overlay system
-* Built-in Google Maps to display maps based on the photo gpx exif data
-* Built-in search functions on a.o. keywords and tags
-* A customizable rating system
-* Commenting system
-* Moderate user uploads and comments
-* Configurable email notification system
-* 20 widgets a.o. upload, slideshow, photo of the day, top rated and commented items and many more
-* Supports Cloudinary cloud storage service
-* Supports Fotomoto print service
-* Required maintenace is fully executed by background processes (cron jobs)
-* Extended error/event logging system
+* Any number of albums that contain any type of multimedia file as well as sub albums.
+* Full control over the display sizes, responsive as well as static.
+* Full control over links from any type of image.
+* Full control over metadata: exif, iptc can be used by keywords in item descriptions.
+* Up to 10 custom defined meta data fields, for albums and for media items.
+* Front-end uploads.
+* Bulk imports.
+* Built-in lightbox overlay system.
+* Built-in Google Maps to display maps based on the photo gpx exif data.
+* Built-in search functions on a.o. keywords and tags.
+* A customizable rating system.
+* Commenting system.
+* Moderate user uploads and comments.
+* Configurable email notification system.
+* 20 widgets a.o. upload, slideshow, photo of the day, top rated and commented items and many more.
+* Supports Cloudinary cloud storage service.
+* Supports Fotomoto print service.
+* Required maintenace is fully executed by background processes (cron jobs).
+* Extended error/event logging system.
 * Extended documentation site: https://wppa.nl/
 
 Plugin Admin Features:

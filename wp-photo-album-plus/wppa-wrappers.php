@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.0.12.001
+* Version 9.1.07.008
 *
 */
 
@@ -849,6 +849,7 @@ function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => fal
 		'onscroll' => true,
 		'data-wppa' => true,
 		'data-alt' => true,
+		'data-type' => true,
 		'ontouchstart' => true,
 		'ontouchend' => true,
 		'onfocus' => true,
@@ -1072,7 +1073,7 @@ function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => fal
 	if ( $flags['needonerror'] ) {
 		$allowed_tags['img']['onerror'] = true;
 	}
-	
+
 	if ( $flags['needjs'] ) {
 		$allowed_tags['script'] = true;
 		$allowed_tags['style'] = true;
@@ -1190,47 +1191,134 @@ function wppa_optimize_image( $file ) {
 // These messages are false positive, because wp has no other way to create/maintain structure,
 // insert, write or read data to/from db tables that are specifically designed for this plugin.
 //
-function wppa_get_results( $query, $form = ARRAY_A ) {
+function wppa_get_results( $query = false, $form = ARRAY_A ) {
 global $wpdb;
+static $cache;
+global $wppa_query_cache_hit;
 
+	$wppa_query_cache_hit = false;
+	if ( !$query ) {
+		$cache = array();
+		return;
+	}
+	if ( !is_array( $cache ) ) $cache = array();
+	$idx = md5( $query );
+	if ( isset( $cache[$idx] ) ) {
+		$wppa_query_cache_hit = true;
+		return $cache[$idx];
+	}
 	wppa_log( 'db', $query );
-	return $wpdb->get_results( $query, $form );
+	$result = $wpdb->get_results( $query, $form );
+	$cache[$idx] = $result;
+	return $result;
 }
 
-function wppa_get_var( $query ) {
+function wppa_get_var( $query = false ) {
 global $wpdb;
+static $cache;
+global $wppa_query_cache_hit;
 
+	$wppa_query_cache_hit = false;
+	if ( !$query ) {
+		$cache = array();
+		return;
+	}
+	if ( !is_array( $cache ) ) $cache = array();
+	$idx = md5( $query );
+	if ( isset( $cache[$idx] ) ) {
+		$wppa_query_cache_hit = true;
+		return $cache[$idx];
+	}
 	wppa_log( 'db', $query );
-	return $wpdb->get_var( $query );
+	$result = $wpdb->get_var( $query );
+	$cache[$idx] = $result;
+	return $result;
 }
 
-function wppa_get_col( $query ) {
+function wppa_get_col( $query = false ) {
 global $wpdb;
+static $cache;
+global $wppa_query_cache_hit;
 
+	$wppa_query_cache_hit = false;
+
+	if ( !$query ) {
+		$cache = array();
+		return;
+	}
+	if ( !is_array( $cache ) ) $cache = array();
+	$idx = md5( $query );
+	if ( isset( $cache[$idx] ) ) {
+		$wppa_query_cache_hit = true;
+		return $cache[$idx];
+	}
 	wppa_log( 'db', $query );
-	return $wpdb->get_col( $query );
+	$result = $wpdb->get_col( $query );
+	$cache[$idx] = $result;
+	return $result;
 }
 
-function wppa_get_row( $query ) {
+function wppa_get_row( $query = false ) {
 global $wpdb;
+static $cache;
+global $wppa_query_cache_hit;
 
+	$wppa_query_cache_hit = false;
+	if ( !$query ) {
+		$cache = array();
+		return;
+	}
+	if ( !is_array( $cache ) ) $cache = array();
+	$idx = md5( $query );
+	if ( isset( $cache[$idx] ) ) {
+		$wppa_query_cache_hit = true;
+		return $cache[$idx];
+	}
 	wppa_log( 'db', $query );
-	return $wpdb->get_row( $query, ARRAY_A );
+	$result = $wpdb->get_row( $query, ARRAY_A );
+	$cache[$idx] = $result;
+	return $result;
 }
 
-function wppa_query( $query ) {
+function wppa_query( $query = false ) {
 global $wpdb;
+static $cache;
+global $wppa_query_cache_hit;
 
+	$wppa_query_cache_hit = false;
+	if ( !$query ) {
+		$cache = array();
+		return;
+	}
+	if ( !is_array( $cache ) ) $cache = array();
+	$idx = md5( $query );
+	if ( isset( $cache[$idx] ) ) {
+		return $cache[$idx];
+		$wppa_query_cache_hit = true;
+	}
 	wppa_log( 'db', $query );
-	return $wpdb->query( $query );
+	$result = $wpdb->query( $query );
+	$cache[$idx] = $result;
+	return $result;
 }
 
-function wppa_update( $table, $data, $where ) {
-global $wpdb;
+function wppa_clear_query_cache() {
+global $wppa_query_cache_hit;
 
-	wppa_log( 'db', "Update in table $table id = " . $where['id'] ); // . ": " . var_export( $data, true ) );
-	return $wpdb->update( $table, $data, $where );
+	$wppa_query_cache_hit = false;
+	wppa_get_results();
+	wppa_get_var();
+	wppa_get_row();
+	wppa_get_col();
+	wppa_query();
 }
+
+//function wppa_update( $table, $data, $where ) {
+//global $wpdb;
+
+//	wppa_log( 'db', "Update in table $table id = " . $where['id'] ); // . ": " . var_export( $data, true ) );
+//	return $wpdb->update( $table, $data, $where );
+//}
 
 function wppa_insert( $table, $data ) {
 global $wpdb;

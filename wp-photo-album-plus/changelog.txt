@@ -1,9 +1,105 @@
 WP Photo Album Plus Changelog
 
+= 9.1.07 =
+
+* Shortcode type intro did not work  properly for simple not zoomable and not panoramic photos. Fixed.
+* The alt atribute for images on the import page did generate error messages in the wppa log. Fixed.
+* On the import page, switching between local and remote initially lead to incorrect displays; a reload was needed. Fixed.
+* New virtual album argument: #bpuser. To be used on the buddypress profile page to display the albums/photos owned by the profiled user. 
+Examples: [wppa tye="covers" album="#owner,#bpuser"],  [wppa tye="covers" album="#owner,#bpuser,4711"], [wppa tye="thumbs" album="#upldr,#bpuser"]
+* Fixed a ransom issue.
+* The virtual album spec in a shgortcode can now have an additional album id as grandparent. Strictly 2nd gen albums are selected.
+Example: [wppa type="covers" album="#owner,#me,0,143"] gives grandchildren of album 143 created by current user
+* Added option to the upload shortcode to be used on Buddy Press profile page: [wppa type="upload" bpprofile]
+* Non admin users and non wppa superusers can no longer delete public albums but only their own albums when user destroy is enabled in Advanced settings -> Admin -> II -> Item 6: User delete albums.
+* Frontend created albums have no longer the spaces in the name replaced by dashes.
+* Added checkbox album for frontend user update photo, so the user can move his own photo from his own or public album to a different own or public album. 
+See Advanced settings -> Admin -> V -> Item 5.
+* Frontend edit album information now also has the status selection.
+* Frontend edit photo information did not work when Advanced settings -> Admin -> VI -> Item 14: Enable TinyMCE editor was checked. Fixed.
+
+= 9.1.06 =
+
+* Type slphoto stopped working. Fixed.
+* Admin can now Edit/Quick/Bulk edit all media items, sorted by descending timestamp, paginated. See the Album admin screen under the search bar.
+* The shortcode attribute 'random' now randomizes the correct selections in shrotcode album types '#lasten' and '#topten'.
+* New shortcode attribute 'max' Overrules or set a max number of media items. Example: [wppa type="thumbs" album="#tags,Test" max="10"]
+* Virtual tags implemented for year and month. Currently implemented:
+$yyyymm- -> 202511 Previous month in 2 digit year 4 digit month
+$yyyymm -> 202512 Current month in 2 digit year 4 digit month
+$yymm- -> 2511 Previous month in 2 digit year 2 digit month
+$yymm -> 2512 Current month in 2 digit year 2 digit month
+$yyyy- -> 2024 Previous year in 4 digits
+$yyyy -> 2025 Current year in 4 digits
+$yy- -> 24 Previous year in 2 digits
+$yy -> 25 Current year in 2 digits
+Example: [wppa type="..." album="#tags,$yymm-;$yymm" random max="10"] will give: Max 10 random selected items tagged 2511 or 2512
+* You can now limit frontend visibility of items on an album basis to users that have a specific role or capability. See Album Admin -> Edit -> Show the album settings -> Tab Display
+* Minor fixes to the album admin page -> Album settings
+* Security fix
+
+= 9.1.05 =
+
+* Include cats and tags while searching did not work. Fixed.
+* Tested up to 6.9
+
+= 9.1.04 =
+
+* New shortcode type: intro. Example: [wppa type="intro" id="4711"]. Opens the item with the supplied id in lightbox as soon as the page is loaded.
+Audio and viideo sound is initally off. This is an inavoidable limitation of browser behaviour.
+* Fixed errors when changing album sequence by drag-drop on the album admin page.
+* Old feature re-installed: When there are no pending items, the Moderate Uploads page gives a paginated list of all itemns by descemding timestamp to be quickly accessed for editing.
+This works for administrators only.
+* Fixed a bug in album widget.
+
+= 9.1.03 =
+
+* album="#all" stopped working. Fixed.
+* links from default thumbnails to a different page were dispayed at the same page. Fixed.
+* Links from masonry thumbnails of virtual albums now also can use ajax if theoretically possible.
+* Max frontend uploads is now properly checked.
+* Fixed a problem with create new album.
+
+= 9.1.02 =
+
+* Paginating of items selected by virtual albums by category did not work. Fixed
+* Selection of album covers by category did not work. Fixed.
+* Shortcodes [photo #last] and [photo #random] did not work properly. Fixed.
+* Fixed a proble, with virtual album #lasten.
+
+= 9.1.01 =
+
+Minor bug fixes.
+* Catbox in search did not work properly. Fixed.
+* Landscape/portrait was not maintained during thumbnail to slideshow links.
+* Photo crypt code to id conversion incidently failed. Fixed.
+* Certain links from album title and or cover image did not work. Fixed.
+
+= 9.1.00 =
+
+* Major code revisions to improve reliability, maintainability, functionality and performance.
+* Multi virtual photo selection implemented.
+Examples:
+[wppa type="thumbs" album="#upldr,#me&#tags,test"],
+[wppa type="thumbs" album="#upldr,kimmy&#tags,test"]
+[wppa type="thumbs" album="#upldr,kimmy&#tags,test&#owner,#me"]
+Example: To get thumbnails of items uploaded by 'kimmy' with tag 'test' in albums owned by the current user having cat 'bach':
+[wppa type="thumbs" album="#upldr,kimmy&#tags,test&#owner,#me&#cat,Bach"]
+* Last ten random order is no longer supported. But there is a new shortcode attribute: random. Neeeds no argument.
+Example: [wppa type="thumbs" album="#lasten&#upldr,kimmy" random]
+* Comment admin edit comments stopped working. Fixed.
+* All virtual album displays are now capable of ajax based links.
+* Added debugging tool that show queries and links at the frontend for administrators only.
+Enable extended logging, then tick the box on item 14: Enable debug messages on the Advanced mscellaneus settings page.
+* Layout on the photo admin page was damaged for non-admin users when re-upload was restricted. Fixed.
+* Query cacheing implemented to prevent duplicate queries.
+
 = 9.0.12 =
 
 * Non-admin users can now use the following tags in photo- and albumdescription: 'div', 'ul', 'ol', 'li', 'p', 'a', 'b', 'i', 'br', 'strong', 'table', 'thead', 'tr', 'th', 'td', 'tfoot',
-with limited attributes. This makes the default photo description (and alikes) usable again.
+with limited attributes, admin users can use more tags. This makes the default photo description (and alikes) usable again.
+* If albums have zoomable photos and the zoom feature is later switched off in the settings, they will no longer be displayed as zoomable.
+* Added Basic settings -> Photos -> I -> Item 5: No zoom in widgets, to disable zooming in widgets.
 
 = 9.0.11 =
 
@@ -44,7 +140,7 @@ and in the wppa-source dir to enable the use of source image files when the site
 * New link option: To the entire album on lightbox from the subalbums on the cover. See Settings -> Links -> V -> Item 12
 * Fixed helptext for Advanced settings -> System -> Item 5: Frontend ajax method.
 * Fixed links and titles on album covers.
-* When filmstrips are generally off in the slideshow settings and the shortcode type is slideonlyf the filmstrip did not show up. 
+* When filmstrips are generally off in the slideshow settings and the shortcode type is slideonlyf the filmstrip did not show up.
 This is not logical when it is specifically requested and has been fixed.
 * Improved algorithm to find keywords of featured items in the page header <meta> tag.
 * Creating subalbums on the Albums page did not work properly. Fixed.
@@ -172,7 +268,7 @@ To be used in combination with mocc="n" indicating the forced occurrance number 
 = 8.8.05 =
 
 * New setting: Basic settings -> Comments -> I -> Item 18: Admin edit link.
-Enables edit and delete links below each comment on the slide display for users that have wppa comment admin rights (e.g. administratrs); also for apporved comments.
+Enables edit and delete links below each comment on the slide display for users that have wppa comment admin rights (e.g. administrators); also for apporved comments.
 So, users with moderate rights can approve or delete pending comments;
 users with comment admin rights can approve, delete and edit pending comments, and edit apporoved comments only if the Admin Edit link is enabled.
 Editing comments is on the comment admin page and has also the possibilities to change status and delete comments.

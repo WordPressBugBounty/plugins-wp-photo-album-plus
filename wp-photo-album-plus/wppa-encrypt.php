@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 9.0.07.002
+* Version 9.1.05.002
 *
 */
 
@@ -48,73 +48,33 @@ function wppa_encrypt_photo( $id ) {
 }
 
 // Decode photo crypt to photo id
-function wppa_decrypt_photo( $photo, $strict = false ) {
+function wppa_decrypt_photo( $photo ) {
 global $wpdb;
-static $cache;
-static $hits;
 
-	// Check for not encryoted single item
-	if ( wppa_is_int( $photo ) ) {
-		if ( is_user_logged_in() ) wppa_log( 'err', "Unencrypted photo $photo found." );
-		/* translators: integer photo id */
-		wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Media item id must be encrypted, %d given', 'wp-photo-album-plus' ), $photo ) ) );
-		return null;
+	// Assume single encrypted
+	$result = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $photo ) );
+	if ( wppa_is_posint( $result ) ) {
+		return $result;
 	}
 
 	// Check for enum
 	if ( $photo && strpos( $photo, '.' ) !== false ) {
-
-		$result = '';
-		$parray = explode( '.', $photo );
-		foreach( $parray as $p ) {
-
-			if ( $p == '' ) {
-				$result .= '.';
-			}
-			else {
-				$id = wppa_decrypt_photo( $p );
-				if ( $id !== false ) {
-					$result .= $id . '.';
-				}
-			}
-		}
-
-		return trim( $result, '.' );
-	}
-
-	// Single item
-	else {
-
-		if ( wppa_is_int( $photo ) ) {
-			return $photo; // Already decrypted
-		}
-
-		// Init cache
-		if ( ! $cache ) {
-			$cache = array();
-		}
-
-		// Look in cache
-		if ( isset( $cache[$photo] ) ) {
-			$hits++;
-			return $cache[$photo];
-		}
-
-		// Find photo id on crypt code
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $photo );
-		$p = wppa_get_var( $query );
-		if ( $p ) {
-			$result = $p;
-			$cache[$photo] = $p;
-			return $result;
+		$photos = str_replace( '.', "','", $photo );
+		$ids = wppa_get_col( stripslashes( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt IN (%s)", $ids ) ) );
+		if ( is_array( $ids ) ) {
+			$result = implode( '.', $ids );
 		}
 		else {
-			return false;
+			$result = false;
 		}
+		return $result;
 	}
 
-	// Done
-	return false;
+	// Check for zero
+	if ( $photo == 0 ) return '';
+
+	/* translators: integer photo id */
+	wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Media item id must be encrypted, %d given', 'wp-photo-album-plus' ), $photo ) ) );
 }
 
 // Convert album id to crypt
@@ -172,83 +132,52 @@ function wppa_encrypt_album( $album ) {
 	$result = implode( '.', $album_crypts );
 
 	if ( ! $result ) {
-		wppa_log('misc', 'enc alb called with '.var_export($album,true));
+//		wppa_log('misc', 'enc alb called with '.var_export($album,true));
 		$result = 'xxxxxxxxxxxxxxxx';
 	}
 	return $result;
 }
 
 // Decode album crypt to album id
-function wppa_decrypt_album( $album, $strict = false ) {
+function wppa_decrypt_album( $album ) {
 global $wpdb;
-static $cache;
-static $hits;
 
-	if ( ! $album ) return 0;
-
-	// Check for not encryoted single item
-	if ( wppa_is_posint( $album ) ) {
-		if ( is_user_logged_in() ) wppa_log( 'err', "Unencrypted album $album found." );
-		/* translators: integer album id */
-		wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Album id must be encrypted, %d given', 'wp-photo-album-plus' ), $album ) ) );
-		return null;
+	// Assume single encrypted
+	$result = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $album ) );
+	if ( wppa_is_posint( $result ) ) {
+		return $result;
 	}
 
 	// Check for enum
 	if ( $album && strpos( $album, '.' ) !== false ) {
-
-		$result = '';
-		$aarray = explode( '.', $album );
-		foreach( $aarray as $a ) {
-
-			if ( $a == '' ) {
-				$result .= '.';
-			}
-			else {
-				$id = wppa_decrypt_album( $a );
-				if ( $id !== false ) {
-					$result .= $id . '.';
-				}
-			}
-		}
-
-		return trim( $result, '.' );
-	}
-
-	// Single item
-	else {
-
-		// Init cache
-		if ( ! $cache ) {
-			$cache = array();
-			$cache[wppa_get_option( 'wppa_album_crypt_9' )] = false;
-			$cache[wppa_get_option( 'wppa_album_crypt_0' )] = '0';
-			$cache[wppa_get_option( 'wppa_album_crypt_1' )] = '-1';
-			$cache[wppa_get_option( 'wppa_album_crypt_2' )] = '-2';
-			$cache[wppa_get_option( 'wppa_album_crypt_3' )] = '-3';
-		}
-
-		// Look in cache
-		if ( isset( $cache[$album] ) ) {
-			$hits++;
-			return $cache[$album];
-		}
-
-		// Find album id on crypt code
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $album );
-		$a = wppa_get_var( $query );
-		if ( $a ) {
-			$result = $a;
-			$cache[$album] = $a;
-			return $result;
+		$albums = str_replace( '.', "','", $album );
+		$ids = wppa_get_col( stripslashes( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt IN (%s)", $albums ) ) );
+		if ( is_array( $ids ) ) {
+			$result = implode( '.', $ids );
 		}
 		else {
-			return false;
+			$result = false;
 		}
+		return $result;
 	}
 
-	// Done
-	return false;
+	// Check for zero
+	if ( $album === 0 ) return '';
+
+	// Check for special cases
+	if ( $album == wppa_get_option( 'wppa_album_crypt_9' ) ) return false;
+	if ( $album == wppa_get_option( 'wppa_album_crypt_0' ) ) return '0';
+	if ( $album == wppa_get_option( 'wppa_album_crypt_1' ) ) return '-1';
+	if ( $album == wppa_get_option( 'wppa_album_crypt_2' ) ) return '-2';
+	if ( $album == wppa_get_option( 'wppa_album_crypt_3' ) ) return '-3';
+
+	
+	if ( wppa_is_posint( $album ) ) {
+		/* translators: integer album id */
+		wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Media item id must be encrypted, %d given', 'wp-photo-album-plus' ), $album ) ) );
+	}
+//	wppa_log('misc', 'album = '.$album);
+	return false; //$album;
 }
 
 // Encrypt a full url
@@ -381,4 +310,10 @@ global $wppa_opt;
 			$wppa_opt[$key] = $val;
 		}
 	}
+}
+
+function wppa_looks_encrypted( $str ) {
+	if ( strlen( $str ) != 16 ) return false;
+	if ( strpos( $str, '#', ) !== false ) return false;
+	return true;
 }

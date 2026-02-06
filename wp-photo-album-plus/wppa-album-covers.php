@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.0.10.009
+* Version: 9.1.01.001
 *
 */
 
@@ -1434,7 +1434,7 @@ function wppa_get_album_title_attr_a( $albumid, $linktype, $linkpage, $has_conte
 		}
 	}
 	$title_attr['href'] 	= wppa_encrypt_url( $href_title );
-	$title_attr['onclick'] 	= wppa_encrypt_url( $onclick_title );
+	$title_attr['onclick'] 	= $onclick_title;
 	$title_attr['title'] 	= $title_title;
 
 	return $title_attr;
@@ -2026,8 +2026,8 @@ global $wppa_no_lightbox;
 
 		// Open the anchor tag for lightbox
 		$result .= wppa_html_tag( 'a', ['data-id' => wppa_encrypt_photo( $tid ), 'href' => $link, 'class' => ($first?'first-'.$albumid:''),
-										'style' => 'border:0;color:transparent;', 
-										'data-videohtml' => $videohtml, 
+										'style' => 'border:0;color:transparent;',
+										'data-videohtml' => $videohtml,
 										'data-posterurl' => $posterurl, 'data-videonatwidth' => $videonatwidth, 'data-videonatheight' => $videonatheight,
 										'data-audiohtml' => $audiohtml, 'data-pdfhtml' => $pdfhtml,
 										'data-rel' => 'wppa[alw-'.$mocc.'-'.$albumid.']', 'data-lbtitle' => $title,
