@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 /* CHECK REDIRECTION */
 add_action( 'plugins_loaded', 'wppa_redirect', 1 );
 

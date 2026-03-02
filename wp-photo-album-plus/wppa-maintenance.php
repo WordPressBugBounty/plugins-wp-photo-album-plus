@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // For cron:
 require_once 'wppa-admin-functions.php';

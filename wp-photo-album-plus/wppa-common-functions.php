@@ -5,7 +5,7 @@
 * Version: 9.1.07.007
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Initialize globals and option settings
 function wppa_initialize_runtime( $force = false, $reset = true ) {

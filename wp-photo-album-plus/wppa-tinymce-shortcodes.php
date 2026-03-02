@@ -5,8 +5,7 @@
 * Version 9.0.00.000
 */
 
-if ( ! defined( 'ABSPATH' ) )
-    die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 add_action( 'admin_init', 'wppa_tinymce_gallery_action_init' );
 

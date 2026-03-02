@@ -6,7 +6,7 @@
 * Version 9.1.04.006
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 class AlbumWidget extends WP_Widget {
 

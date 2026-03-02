@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 
 	switch( $slug ) {

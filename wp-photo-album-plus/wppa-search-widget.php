@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class SearchPhotos extends WP_Widget {
 
     /** constructor */

@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 $version = md5( filemtime( dirname( __file__ ) . '/block.js' ) );
 
 $result = array(

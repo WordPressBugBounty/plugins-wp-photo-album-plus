@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 global $wppa_supported_photo_extensions;
 $wppa_supported_photo_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );

@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function _wppa_page_export() {
 global $wpdb;
 global $wppa_try_continue;

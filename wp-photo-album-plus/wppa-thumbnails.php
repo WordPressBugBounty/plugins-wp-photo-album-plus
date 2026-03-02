@@ -9,6 +9,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Display the standard thumbnail image
 function wppa_thumb_default( $id ) {
 

@@ -7,6 +7,8 @@
 * Version 9.1.04.005
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Place all wppa related js declarations in the header, both admin and frontend
 function wppa_initialize_javascript() {
 global $wppa_version;

@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.1.08 =
+
+* Set all to panorama now works. Aspect ratio must be >= 2.0
+* When remaking display file the saved sizes of the display file were not updated. Fixed.
+* Security fix
+
 = 9.1.07 =
 
 * Shortcode type intro did not work  properly for simple not zoomable and not panoramic photos. Fixed.

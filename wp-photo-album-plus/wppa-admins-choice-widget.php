@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class AdminsChoice extends WP_Widget {
 
     /** constructor */

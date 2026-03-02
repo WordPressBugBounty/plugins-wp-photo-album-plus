@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 function wppa_backup_settings() {
 global $wppa_opt;

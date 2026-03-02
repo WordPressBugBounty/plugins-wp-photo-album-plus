@@ -6,7 +6,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 function wppa_create_all_textual_watermark_files() {
 

@@ -7,6 +7,8 @@
 * Version: 9.1.00.011
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 /* LOAD SIDEBAR WIDGETS */
 require_once 'wppa-potd-widget.php';
 require_once 'wppa-search-widget.php';

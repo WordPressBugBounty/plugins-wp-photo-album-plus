@@ -9,6 +9,8 @@
  *
  * 8.8.08.001
  */
+ 
+ if ( ! defined( 'ABSPATH' ) ) exit();
 
 class wppa_mobile_detect {
 

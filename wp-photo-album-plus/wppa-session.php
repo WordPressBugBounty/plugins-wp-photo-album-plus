@@ -13,7 +13,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Generate a unique session id
 function wppa_get_session_id() {

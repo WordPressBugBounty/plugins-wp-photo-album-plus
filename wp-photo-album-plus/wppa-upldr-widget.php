@@ -6,7 +6,7 @@
 * Version 9.0.00.000
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 class UpldrWidget extends WP_Widget {
 

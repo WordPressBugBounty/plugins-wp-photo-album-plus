@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Upload a single item; an element form $_FILES
 // @1: Array( 'name'     => the original filename
 // 			  'tmp_name' => the path to the just uploaded file or a file somewhere else in the filesystem

@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Are we in a cron job?
 function wppa_is_cron() {
 

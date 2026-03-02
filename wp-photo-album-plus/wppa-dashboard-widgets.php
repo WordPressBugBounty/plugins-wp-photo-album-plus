@@ -8,6 +8,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Email subscription dashboard widget
 add_action( 'do_meta_boxes', 'wppa_email_subscription' );
 

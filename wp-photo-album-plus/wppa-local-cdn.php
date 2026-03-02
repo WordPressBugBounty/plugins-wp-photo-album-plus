@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Compute a pathname for a local cdn image
 function wppa_cdn_path( $id, $x, $y ) {
 

@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 add_action( 'init', 'wppa_init_tab_names' );
 
 function wppa_init_tab_names() {

@@ -6,6 +6,8 @@
 * Version 9.0.00.005
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class LasTenWidget extends WP_Widget {
 
     /** constructor */

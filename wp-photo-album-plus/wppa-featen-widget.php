@@ -6,7 +6,7 @@
 * Version 9.0.00.005
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 class FeaTenWidget extends WP_Widget {
 

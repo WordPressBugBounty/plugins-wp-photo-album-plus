@@ -7,7 +7,7 @@
 * Version: 9.1.06.004
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // get permalink plus ? or & and possible debug switch
 function wppa_get_permalink( $key = '', $plain = false ) {

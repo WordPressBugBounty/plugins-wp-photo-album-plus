@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Create .htaccess in the .../uploads/wppa folder to grant normal http access to photo files
 function wppa_create_wppa_htaccess() {

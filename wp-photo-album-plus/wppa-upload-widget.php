@@ -7,6 +7,8 @@
 * Version: 9.0.00.000
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class WppaUploadWidget extends WP_Widget {
 
 	function __construct() {

@@ -6,6 +6,8 @@
 * version 8.7.03.004
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function _wppa_page_help() {
 global $wppa_revno;
 

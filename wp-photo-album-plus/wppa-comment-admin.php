@@ -7,6 +7,7 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // LOAD THE BASE CLASS
 if ( ! class_exists( 'WP_List_Table' ) ) {

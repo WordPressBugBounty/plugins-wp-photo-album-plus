@@ -8,6 +8,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 /* The following mailing lists exist:
 'newalbumnotify',
 'feuploadnotify',

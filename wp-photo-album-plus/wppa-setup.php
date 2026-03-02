@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 /* SETUP */
 // It used to be: register_activation_hook(WPPA_FILE, 'wppa_setup');

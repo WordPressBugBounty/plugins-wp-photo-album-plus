@@ -8,7 +8,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 global $wppa_supported_camara_brands;
 $wppa_supported_camara_brands = array( 'CANON', 'NIKON', 'SAMSUNG' );

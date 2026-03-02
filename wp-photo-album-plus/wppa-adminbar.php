@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 add_action( 'admin_bar_menu', 'wppa_admin_bar_menu', 97 );
 
 function wppa_admin_bar_menu() {

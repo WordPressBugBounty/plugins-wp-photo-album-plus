@@ -6,6 +6,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_make_tinymce_photo_dialog( $front = false ) {
 global $wpdb;
 

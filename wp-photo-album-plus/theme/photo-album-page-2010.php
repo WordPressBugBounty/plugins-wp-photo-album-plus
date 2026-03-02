@@ -14,7 +14,7 @@
  * wppa version 8.7.03.006
  */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly (2010)" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 global $wppa_show_statistics;
 

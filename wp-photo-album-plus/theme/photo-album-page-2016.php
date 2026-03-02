@@ -12,7 +12,7 @@
  * @since Twenty Sixteen 1.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly (2016)" );
+if ( ! defined( 'ABSPATH' ) ) exit();
  
 get_header(); ?>
 

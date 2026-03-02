@@ -6,6 +6,8 @@
 * Version 9.1.06.001
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class TopTenWidget extends WP_Widget {
 
     /** constructor */

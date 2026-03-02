@@ -5,7 +5,7 @@
  * Version: 8.7.02.002
  */
 
-defined( 'ABSPATH' ) || exit;
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 add_action( 'admin_footer', 'wppa_block_js', 1 );
 

@@ -6,7 +6,7 @@
  * Version 8.5.01.002
  */
 
-defined( 'ABSPATH' ) || exit;
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 /**
  * Registers all block assets so that they can be enqueued through Gutenberg in

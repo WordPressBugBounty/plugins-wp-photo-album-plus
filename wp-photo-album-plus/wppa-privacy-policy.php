@@ -7,6 +7,8 @@
 * Version 9.0.00.000
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_comment_exporter( $email_address, $page = 1 ) {
 global $wpdb;
 

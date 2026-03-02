@@ -6,6 +6,8 @@
 * Version: 8.8.07.004
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class wppaStereoWidget extends WP_Widget {
 
     /** constructor */

@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // The command admin page
 function _wppa_edit_email( $page_1 = false ) {
 global $wpdb;

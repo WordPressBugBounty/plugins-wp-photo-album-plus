@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Get the albums by calling the theme module and do some parameter processing
 // This is the main entrypoint for the wppa+ invocation, either 'by hand' or through the filter.

@@ -5,6 +5,8 @@
 * Version 9.0.00.000
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_gutenberg_wppa_block() {
 global $wppa_version;
 

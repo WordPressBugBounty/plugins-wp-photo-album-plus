@@ -3,9 +3,11 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 9.1.05.002
+* Version 9.1.08.002
 *
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Find a unique crypt
 function wppa_get_unique_crypt() {
@@ -59,8 +61,14 @@ global $wpdb;
 
 	// Check for enum
 	if ( $photo && strpos( $photo, '.' ) !== false ) {
-		$photos = str_replace( '.', "','", $photo );
-		$ids = wppa_get_col( stripslashes( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt IN (%s)", $ids ) ) );
+		$crphoarr = explode( '.', $photo );
+		$ids = [];
+		foreach( $crphoarr as $crp ) {
+			$p = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $crp ) );
+			if ( $p ) {
+				$ids[] = $p;
+			}
+		}
 		if ( is_array( $ids ) ) {
 			$result = implode( '.', $ids );
 		}
@@ -74,7 +82,7 @@ global $wpdb;
 	if ( $photo == 0 ) return '';
 
 	/* translators: integer photo id */
-	wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Media item id must be encrypted, %d given', 'wp-photo-album-plus' ), $photo ) ) );
+	wp_die( esc_html( __( 'Invalid or outdated url. Media item id must be encrypted.', 'wp-photo-album-plus' ) ) );
 }
 
 // Convert album id to crypt
@@ -150,8 +158,14 @@ global $wpdb;
 
 	// Check for enum
 	if ( $album && strpos( $album, '.' ) !== false ) {
-		$albums = str_replace( '.', "','", $album );
-		$ids = wppa_get_col( stripslashes( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt IN (%s)", $albums ) ) );
+		$cralbarr = explode( '.', $album );
+		$ids = [];
+		foreach( $cralbarr as $cra ) {
+			$a = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $cra ) );
+			if ( $a ) {
+				$ids[] = $a;
+			}
+		}
 		if ( is_array( $ids ) ) {
 			$result = implode( '.', $ids );
 		}
@@ -174,7 +188,7 @@ global $wpdb;
 	
 	if ( wppa_is_posint( $album ) ) {
 		/* translators: integer album id */
-		wp_die( esc_html( sprintf( __( 'Invalid or outdated url. Media item id must be encrypted, %d given', 'wp-photo-album-plus' ), $album ) ) );
+		wp_die( esc_html( __( 'Invalid or outdated url. Media item id must be encrypted.', 'wp-photo-album-plus' ) ) );
 	}
 //	wppa_log('misc', 'album = '.$album);
 	return false; //$album;

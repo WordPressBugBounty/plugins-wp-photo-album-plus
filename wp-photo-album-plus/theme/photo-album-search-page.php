@@ -13,6 +13,9 @@
  *
  * 8.8.08.001
  */
+ 
+if ( ! defined( 'ABSPATH' ) ) exit();
+ 
 global $wppa_show_statistics;
 
 get_header(); ?>

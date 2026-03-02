@@ -6,6 +6,8 @@
 * Version 9.0.00.000
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class wppaNotifyWidget extends WP_Widget {
 
     /** constructor */

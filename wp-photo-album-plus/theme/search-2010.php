@@ -9,6 +9,8 @@
  * ver 8.7.03.006
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
  /* Rename this file to search.php and replace search.php from theme twentyten by this file */
 
 get_header(); ?>

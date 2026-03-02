@@ -8,6 +8,7 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 class WPPA_List_Table {
 

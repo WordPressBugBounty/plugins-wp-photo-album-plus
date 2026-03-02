@@ -7,6 +7,7 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // This function creates the html for the picture. May be photo, video, audio or photo with audio.
 // The size will always be set to 100% width, so the calling wrapper div should take care of sizing.

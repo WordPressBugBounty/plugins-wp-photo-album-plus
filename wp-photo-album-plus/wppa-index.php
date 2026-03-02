@@ -8,6 +8,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Add an item to the index
 //
 // @1: string. Type. Can be 'album' os 'photo'

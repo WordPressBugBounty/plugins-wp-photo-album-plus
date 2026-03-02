@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class MultitagPhotos extends WP_Widget {
 
     /** constructor */

@@ -6,7 +6,7 @@
 * Version: 9.0.10.006
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 /**
  * SlideshowWidget Class

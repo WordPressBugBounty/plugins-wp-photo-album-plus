@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_input( $xslug, $width = '90%', $minwidth = '', $text = '', $onchange = '', $placeholder = '' ) {
 global $wppa_opt;
 

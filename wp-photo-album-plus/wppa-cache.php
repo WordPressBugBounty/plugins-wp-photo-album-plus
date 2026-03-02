@@ -14,6 +14,9 @@
 //				  'cache_file'	=> STRING, pathname to the cache file
 //				  'cache_data' 	=> STRING, content of the cachefile
 //				 );
+
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_test_for_caching( $yes_no_only = false ) {
 global $wppa_lang;
 

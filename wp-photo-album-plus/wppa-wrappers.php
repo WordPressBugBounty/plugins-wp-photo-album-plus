@@ -9,6 +9,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Init wp filesystem
 require_once ( ABSPATH . '/wp-admin/includes/file.php' );
 global $wp_filesystem;

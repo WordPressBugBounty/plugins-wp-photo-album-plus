@@ -6,6 +6,9 @@
 * Version 8.8.08.001
 *
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class WppaStatsWidget extends WP_Widget {
 
     // Constructor

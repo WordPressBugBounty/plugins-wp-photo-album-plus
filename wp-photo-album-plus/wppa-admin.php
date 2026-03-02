@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly (2)" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 /* CHECK INSTALLATION */
 // Check setup
@@ -440,7 +440,7 @@ function wppa_edit_email() {
 require_once 'wppa-admin-functions.php';
 
 // Shortcode generators fdor editors
-add_action( 'init', 'wppa_add_scgens', 1 );
+add_action( 'admin_init', 'wppa_add_scgens', 1 );
 
 function wppa_add_scgens() {
 

@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 class wppaQRWidget extends WP_Widget {
 
     /** constructor */

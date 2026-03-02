@@ -7,7 +7,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Bring album into cache and return album data
 function wppa_cache_album( $id, $data = '' ) {
@@ -915,7 +915,7 @@ function wppa_get_thumby( $id, $force = false ) {
 		}
 	}
 	else {
-		$result = wppa_get_thumbphotoxy( $id, 'thumby' );//, $force );
+		$result = wppa_get_thumbphotoxy( $id, 'thumby', $force );
 	}
 	if ( ! $result && wppa_has_audio( $id ) ) {
 		$result = wppa_opt( 'thumbsize' );// * 1080 / 1920;
@@ -925,7 +925,7 @@ function wppa_get_thumby( $id, $force = false ) {
 	return intval( $result );
 }
 function wppa_get_photox( $id, $force = false ) {
-	$result = wppa_get_thumbphotoxy( $id, 'photox' );//, $force );
+	$result = wppa_get_thumbphotoxy( $id, 'photox', $force );
 	if ( wppa_is_stereo( $id ) ) {
 		return floor( intval( $result ) / 2 );
 	}
@@ -934,7 +934,7 @@ function wppa_get_photox( $id, $force = false ) {
 	}
 }
 function wppa_get_photoy( $id, $force = false ) {
-	return wppa_get_thumbphotoxy( $id, 'photoy' );//, $force );
+	return wppa_get_thumbphotoxy( $id, 'photoy', $force );
 }
 function wppa_get_thumbratioxy( $id ) {
 	if ( wppa_is_video( $id ) ) {

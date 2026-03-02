@@ -5,6 +5,9 @@
 * display the albums/photos/slideshow in a page or post
 * Version 9.1.06.008
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_theme() {
 
 global $wppa;

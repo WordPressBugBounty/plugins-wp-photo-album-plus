@@ -7,7 +7,7 @@
 /*
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Create dynamic css
 function wppa_create_wppa_dynamic_css() {

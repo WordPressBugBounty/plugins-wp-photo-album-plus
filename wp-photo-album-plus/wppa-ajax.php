@@ -6,7 +6,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Load admin-ajax.php if wppa_ajax is in query args
 function wppa_ajax_include() {

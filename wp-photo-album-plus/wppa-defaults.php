@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 // Set default option values in global $wppa_defaults
 // With $force = true, all non default options will be removed from wp_options table,
 // being the equivalent to resetting to default, except: revision, rating_max and filesystem

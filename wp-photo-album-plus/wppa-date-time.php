@@ -7,6 +7,8 @@
 *
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 function wppa_get_timestamp( $key = false ) {
 
 	$timnow = time();

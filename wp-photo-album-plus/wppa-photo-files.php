@@ -6,7 +6,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 // Unfortunately there is no php function to rotate or resize an image file while the exif data is preserved.
 // The origianal sourcefile is normally saved, to be available for download or hires uses e.g. in lightbox.

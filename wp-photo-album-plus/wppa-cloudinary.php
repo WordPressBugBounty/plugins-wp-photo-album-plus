@@ -5,7 +5,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 add_action('init', 'wppa_load_cloudinary');
 function wppa_load_cloudinary() {

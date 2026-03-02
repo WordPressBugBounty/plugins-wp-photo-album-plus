@@ -6,6 +6,8 @@
 /*
 */
 
+if ( ! defined( 'ABSPATH' ) ) exit();
+
 /*
 This file contans functions to get the photo of the day selection pool and to get THE photo of the day.
 This fila also contains functions for the use in the widget activation screens for all widgets.

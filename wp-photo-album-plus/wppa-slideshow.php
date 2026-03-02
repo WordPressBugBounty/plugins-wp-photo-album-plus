@@ -8,7 +8,7 @@
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
+if ( ! defined( 'ABSPATH' ) ) exit();
 
 function wppa_the_slideshow( $thumbs ) {
 
