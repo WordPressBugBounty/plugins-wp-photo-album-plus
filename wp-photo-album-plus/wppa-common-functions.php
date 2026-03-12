@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.1.07.007
+* Version: 9.1.09.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1527,9 +1527,9 @@ function wppa_check_memory_limit( $verbose = true, $x = 0, $y = 0 ) {
 		$maxyhd = sqrt( $maxpixels / 144 ) * 9;
 		if ( $verbose ) {		// Make it a string
 			/* translators: integer */
-			$result = '<br />'.sprintf(  __( 'Based on your server memory limit you should not upload images larger then <b>%2.1f</b> Mega pixels', 'wp-photo-album-plus' ), $maxpixels / ( 1024 * 1024 ) );
+			$result = '<br>'.sprintf(  __( 'Based on your server memory limit you should not upload images larger then <b>%2.1f</b> Mega pixels', 'wp-photo-album-plus' ), $maxpixels / ( 1024 * 1024 ) );
 			/* translators: 4 times integer */
-			$result .= '<br />'.sprintf( __( 'E.g. not bigger than approx %1$s x %2$s pixels (4:3) or %3$s x %4$s (16:9)', 'wp-photo-album-plus' ),
+			$result .= '<br>'.sprintf( __( 'E.g. not bigger than approx %1$s x %2$s pixels (4:3) or %3$s x %4$s (16:9)', 'wp-photo-album-plus' ),
 										'<b>' . ( round( $maxx / 25 ) * 25 ) . '</b>',
 										'<b>' . ( round( $maxy / 25 ) * 25 ) . '</b>',
 										'<b>' . ( round( $maxxhd / 25 ) * 25 ) . '</b>',

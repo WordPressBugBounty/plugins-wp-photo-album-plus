@@ -1,5 +1,16 @@
 WP Photo Album Plus Changelog
 
+= 9.1.09 =
+
+* Added two optional alrguments to shortcode [photo nn]: 
+- type, to overrule the type as set in Basic settings -> Photos -> II -> Item 1. Possible values: 'photo', 'mphoto', 'xphoto', 'slphoto'
+- subtext, to add a custom text under the photo. May contain simple html and keywords #name to be replaced by the photo name, and #owner to be replaced by the uploaders display name.
+You can also add exif and iptc tags ( E#... 2#... ) in the subtext.
+Example: [photo 567 type="photo" subtext="This is photo #name, uploaded by #owner<br>It shows you a brilliant solution"]
+Remark: The subtext does not work for type 'slphoto', the recommended type to use is 'photo'
+* Set all to panorama now also works for .png files.
+* Extended filesystem rights check/corrects.
+
 = 9.1.08 =
 
 * Set all to panorama now works. Aspect ratio must be >= 2.0

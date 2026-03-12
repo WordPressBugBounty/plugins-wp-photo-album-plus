@@ -2,7 +2,7 @@
 /* wppa-gutenberg-wppa.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 9.0.00.000
+* Version 9.1.09.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -235,7 +235,7 @@ global $wpdb;
 				if ( wppa_has_many_albums() ) {
 					$result .=
 					'<input id="wppagallery-album-real" style="max-width:400px;" name="album" value="" onchange="wppaGutenbergGalleryEvaluate(true)" />'.
-					'<br />'.
+					'<br>'.
 					__( 'Enter one or more album numbers, seperated by commas', 'wp-photo-album-plus' );
 				}
 				else {
@@ -269,7 +269,7 @@ global $wpdb;
 					'<th><label for="">' . __( 'Filter album:', 'wp-photo-album-plus' ) . '</label></th>'.
 					'<td>'.
 						'<input id="wppagallery-album-real-search" type="text" onkeyup="wppaGutenbergGalleryEvaluate(true)" />'.
-						'<br />'.
+						'<br>'.
 						'<small>'.
 							__( 'Enter a (part of) the album name to limit the options in the selection box above.', 'wp-photo-album-plus' ) . ' '.
 						'</small>'.
@@ -285,7 +285,7 @@ global $wpdb;
 				if ( wppa_has_many_albums() ) {
 					$result .=
 					'<input id="wppagallery-album-realopt" style="max-width:400px;" name="album" onchange="wppaGutenbergGalleryEvaluate(true)" value="0" />'.
-					'<br />'.
+					'<br>'.
 					__( 'Optinally enter one or more album numbers, seperated by commas, or 0 for all albums', 'wp-photo-album-plus' );
 				}
 				else {
@@ -460,11 +460,11 @@ global $wpdb;
 						}
 						$result .=
 					'</select>'.
-					'<br />'.
+					'<br>'.
 					'<small style="display:none;" class="wppagallery-photo">'.
-						__( 'Specify the photo to be used', 'wp-photo-album-plus' ) . '<br />'.
+						__( 'Specify the photo to be used', 'wp-photo-album-plus' ) . '<br>'.
 						/* translators: integer */
-						sprintf( __( 'You can select from a maximum of %d most recently added photos', 'wp-photo-album-plus' ), wppa_opt( 'generator_max' )) . '<br />'.
+						sprintf( __( 'You can select from a maximum of %d most recently added photos', 'wp-photo-album-plus' ), wppa_opt( 'generator_max' )) . '<br>'.
 					'</small>'.
 				'</td>'.
 			'</tr>'.
@@ -614,7 +614,7 @@ global $wpdb;
 					'<small>'.
 						__( 'Specify the horizontal size in pixels or <span style="color:blue">auto</span>.', 'wp-photo-album-plus' ) . ' '.
 						__( 'A value less than <span style="color:blue">100</span> will automatically be interpreted as a <span style="color:blue">percentage</span> of the available space.', 'wp-photo-album-plus' ) .
-						__( 'For responsive with a fixed maximum, add the max to auto e.g. <span style="color:blue">auto,550</span>', 'wp-photo-album-plus' ) . '<br />'.
+						__( 'For responsive with a fixed maximum, add the max to auto e.g. <span style="color:blue">auto,550</span>', 'wp-photo-album-plus' ) . '<br>'.
 						__( 'Leave this blank for default size', 'wp-photo-album-plus' ) .
 						'</small>'.
 				'</td>'.
@@ -630,7 +630,7 @@ global $wpdb;
 						'<option value="center">' . __( 'center', 'wp-photo-album-plus' ) . '</option>'.
 						'<option value="right">' . __( 'right', 'wp-photo-album-plus' ) . '</option>'.
 					'</select>'.
-					'<br />'.
+					'<br>'.
 					'<small>' . __( 'Specify the alignment to be used or --- none ---', 'wp-photo-album-plus' ) . '</small>'.
 				'</td>'.
 			'</tr>'.

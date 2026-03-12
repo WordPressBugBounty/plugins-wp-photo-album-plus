@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.1.07.008
+* Version 9.1.09.005
 *
 */
 
@@ -462,12 +462,24 @@ global $wp_filesystem;
 	return;
 }
 
-function wppa_chmod( $fso ) {
+function wppa_chmod( $fso, $rights = false, $recursive = false ) {
 global $wp_filesystem;
+
+	if ( ! wppa_is_file( $fso ) && ! wppa_is_dir( $fso ) ) return;
 
 	$fso = rtrim( $fso, '/' );
 
-	$wp_filesystem->chmod( $fso );
+	$wp_filesystem->chmod( $fso, $rights, $recursive );
+	wppa_log( 'fso', 'Set fs rights to '.$fso );
+
+	if ( wppa_is_file( $fso ) ) {
+		wppa_chmod( dirname( $fso ) );
+	}
+	if ( wppa_is_dir( $fso ) ) {
+		if ( strpos( $fso, '/wp-content/uploads/wppa' ) !== false ) {
+			wppa_chmod( dirname( $fso ) );
+		}
+	}
 
 	return;
 }

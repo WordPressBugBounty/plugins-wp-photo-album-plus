@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.1.07.008
+* Version: 9.1.09.005
 *
 */
 
@@ -136,6 +136,7 @@ global $albums_used;
 global $photos_used;
 global $other_deps;
 global $wppa_runtime_settings;
+global $wppa_after_smx;
 
 	// Init
 	wppa_reset_occurrance();
@@ -441,18 +442,21 @@ global $wppa_runtime_settings;
 			$wppa['single_photo'] = $atts['photo'];
 			$wppa['start_photo'] = $atts['photo'];
 			$wppa['start_album'] = $atts['album'];
+			wppa_make_after_smx( $xatts, $atts['photo'] );
 			break;
 		case 'mphoto':
 			$wppa['single_photo'] = $atts['photo'];
 			$wppa['start_photo'] = $atts['photo'];
 			$wppa['start_album'] = $atts['album'];
 			$wppa['is_mphoto'] = 1;
+			wppa_make_after_smx( $xatts, $atts['photo'] );
 			break;
 		case 'xphoto':
 			$wppa['single_photo'] = $atts['photo'];
 			$wppa['start_photo'] = $atts['photo'];
 			$wppa['start_album'] = $atts['album'];
 			$wppa['is_xphoto'] = 1;
+			wppa_make_after_smx( $xatts, $atts['photo'] );
 			break;
 		case 'slphoto':
 			$wppa['is_slide'] = 1;
@@ -1128,6 +1132,8 @@ static $seed;
 global $wppa_current_shortcode;
 global $wppa_current_shortcode_atts;
 global $photos_used;
+global $wppa_opt;
+global $wppa_after_smx;
 
 	if ( ! wppa_switch( 'photo_shortcode_enabled' ) ) {
 		wppa_log( 'war', 'Photo shortcode must be enabled before you can use it' );
@@ -1220,7 +1226,12 @@ global $photos_used;
 	}
 
 	// Get configuration settings
-	$type 	= wppa_opt( 'photo_shortcode_type' ); // 'xphoto';
+	$type 	= wppa_opt( 'photo_shortcode_type' );
+
+	// Type may be overruled by shortcode arg type="..."
+	if ( isset( $xatts['type'] ) && in_array( $xatts['type'], ['photo', 'mphoto', 'xphoto', 'slphoto'] ) ) {
+		$type = $xatts['type'];
+	}
 	$size 	= wppa_opt( 'photo_shortcode_size' ); // '350';
 	$align 	= wppa_opt( 'photo_shortcode_align' ); //'left';
 
@@ -1286,7 +1297,30 @@ global $photos_used;
 		wppa_add_usedby( $photo, get_the_ID(), 'photo' );
 	}
 
-	return wppa_albums();
+	wppa_make_after_smx( $xatts, $photo );
+
+	$result = wppa_albums();
+
+	// Reset
+	$wppa_after_smx = '';
+
+	return $result;
+}
+
+function wppa_make_after_smx( $xatts, $photo ) {
+global $wppa_after_smx;
+
+	if ( $photo > 0 && isset( $xatts['subtext'] ) ) {
+		$text = str_replace( '#owner', wppa_display_name( wppa_get_photo_item( $photo, 'owner' ) ), $xatts['subtext'] );
+		$text = str_replace( '#name', wppa_get_photo_item( $photo, 'name' ), $text );
+		$text = wppa_filter_iptc( $text, $photo, true );				// 2# tags
+		$text = wppa_filter_exif( $text, $photo, true );				// E# tags
+
+		$wppa_after_smx = $text; //'<div class="wp-caption-text" >' . wp_kses_post( $text ) . '</div>';
+	}
+	else {
+		$wppa_after_smx = '';
+	}
 }
 
 // Yuo can not cache/delay a type xxx shortocde

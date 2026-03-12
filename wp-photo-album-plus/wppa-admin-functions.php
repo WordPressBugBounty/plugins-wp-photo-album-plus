@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.1.07.001
+* Version: 9.1.09.003
 *
 */
 
@@ -1024,10 +1024,22 @@ function wppa_make_360( $id, $degs ) {
 	}
 
 	$img_tmp = null;
+	$ext = wppa_get_ext( $file );
+
+	if ( ! in_array( $ext, ['jpg', 'png'] ) ) {
+		return false;
+	}
 
 	// If $degs > 360, first trim to 360
 	if ( $degs > 360 ) {
-		$img_old = imagecreatefromjpeg( $file );
+		switch ( $ext ) {
+			case 'jpg':
+				$img_old = imagecreatefromjpeg( $file );
+				break;
+			case 'png':
+				$img_old = imagecreatefrompng( $file );
+				break;
+		}
 		$sizes = getimagesize( $file );
 		$w_old = $sizes[0];
 		$h_old = $sizes[1];
@@ -1064,7 +1076,15 @@ function wppa_make_360( $id, $degs ) {
 		$image_old = $img_tmp;
 	}
 	else {
-		$image_old = imagecreatefromjpeg( $file );
+		switch ( $ext ) {
+			case 'jpg':
+				$image_old = imagecreatefromjpeg( $file );
+				break;
+			case 'png':
+				$image_old = imagecreatefrompng( $file );
+				break;
+		}
+//		$image_old = imagecreatefromjpeg( $file );
 	}
 
 	// Create canvas
@@ -1089,9 +1109,19 @@ function wppa_make_360( $id, $degs ) {
 	// Save new image as o1 source
 	$dst_path = wppa_get_o1_source_path( $id );
 	$dst_path = wppa_strip_ext( $dst_path ) . '.' . wppa_get_photo_item( $id, 'ext' );
-	if ( ! wppa_imagejpeg( $canvas, $dst_path ) ) {
-		wppa_log('err', 'wppa_imagejpeg() failed to create pano o1 dst path = '.$dst_path);
-		return false;
+	switch ( $ext ) {
+		case 'jpg':
+			if ( ! wppa_imagejpeg( $canvas, $dst_path ) ) {
+				wppa_log('err', 'wppa_imagejpeg() failed to create pano o1 dst path = '.$dst_path);
+				return false;
+			}
+			break;
+		case 'png':
+			if ( ! wppa_imagepng( $canvas, $dst_path ) ) {
+				wppa_log('err', 'wppa_imagepng() failed to create pano o1 dst path = '.$dst_path);
+				return false;
+			}
+			break;
 	}
 
 	// Housekeeping

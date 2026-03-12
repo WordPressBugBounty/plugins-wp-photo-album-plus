@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.0.08.004
+* Version 9.1.09.004
 *
 */
 
@@ -510,7 +510,7 @@ function wppa_slide_frame( $thumbs ) {
 				onmouseover="wppaBbb(' . $mocc . ',\'l\',\'show\')"
 				onmouseout="wppaBbb(' . $mocc . ',\'l\',\'hide\')"
 				onclick="wppaBbb(' . $mocc . ',\'l\',\'click\')"
-			/>
+			>
 			<img
 				id="bbb-' . $mocc . '-r"
 				class="wppa-bbb wppa-bbb-r bbb-' . $mocc . '"
@@ -519,7 +519,7 @@ function wppa_slide_frame( $thumbs ) {
 				onmouseover="wppaBbb(' . $mocc . ',\'r\',\'show\')"
 				onmouseout="wppaBbb(' . $mocc . ',\'r\',\'hide\')"
 				onclick="wppaBbb(' . $mocc . ',\'r\',\'click\')"
-			/>' );
+			>' );
 		}
 
 		// Ugly browse buttons ?
@@ -1043,7 +1043,7 @@ static $cache;
 								' src="' . wppa_get_imgdir() . $icon . '"' .
 								' alt=" ' . $i . '"' .
 								' title="'.__('Average&nbsp;rating', 'wp-photo-album-plus' ).': '.$r[$i].'"' .
-							' />';
+							'>';
 				$i++;
 			}
 		}
@@ -1053,7 +1053,7 @@ static $cache;
 						' src="'.wppa_get_imgdir().'transp.png"' .
 						' alt="f"' .
 						' style="width:'.wppa_opt( 'ratspacing').'px; height:15px; box-shadow:none; padding:0; margin:0; border:none;"' .
-					' />';
+					'>';
 
 		// Display my rating
 		// Logged in
@@ -1097,7 +1097,7 @@ static $cache;
 										$result .= 'if (confirm(\'' . $confirm . '\')) { wppaRateIt( ' . wppa( 'mocc' ) . ', -1); }';
 									}
 				$result .= 		'"' .
-							' />';
+							'>';
 
 				if ( $idorlb ) {
 					$mylast = wppa_get_my_last_vote( $id );
@@ -1158,7 +1158,7 @@ static $cache;
 
 								( $idorlb ? ' onclick="wppaOvlRateIt(\''.wppa_encrypt_photo($id).'\', '.$i.', ' . ( $id ? wppa('mocc') : 0 ) . ', ' . $reload . ' )"' :
 										' onclick="wppaRateIt('.wppa( 'mocc' ).', '.$i.')"' ) .
-							' />';
+							'>';
 				$i++;
 			}
 
@@ -1229,7 +1229,7 @@ static $cache;
 											$result .= 'if (confirm(\'' . $confirm . '\')) { wppaRateIt( ' . wppa( 'mocc' ) . ', -1); }';
 										}
 				$result .= 			'"' .
-								' />';
+								'>';
 
 				$result .= 		'</div>';
 

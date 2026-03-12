@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.1.06.008
+* Version 9.1.09.002
 *
 */
 
@@ -369,95 +369,107 @@ global $wp_roles;
 			// Set all to pano
 			$timeup = false;
 			$pano = wppa_get( 'pano-val', '9' );
-			if ( in_array( $pano, array( 0, 1, '2' ) ) ) {
+			if ( in_array( $pano, array( '0', '1', '2' ) ) ) {
 
 				$done = 0;
 				$query = $wpdb->prepare( "SELECT id, photox, photoy, panorama, angle FROM $wpdb->wppa_photos
 										  WHERE album = %d
-										  AND ext = 'jpg'
+										  AND ext IN ('jpg', 'png')
 										  AND panorama <> %d
 										  ORDER BY id", $edit_id, $pano );
+
 				$todo = wppa_get_results( $query );
 				$tot = count( $todo );
 
+				if ( $tot ) {
+					/* Translators: integer number of items processed */
+					wppa_echo( sprintf( _n( 'Working, %d item to go please wait.', 'Working, %d items to go please wait.', $tot, 'wp-photo-album-plus' ), $tot ) );
+					wppa_echo( ' '.__( 'When the process stops prematurely, click the browsers reload button', 'wp-photo-album-plus' ) );
+				}
+
+				global $wppa_endtime;
+				$wppa_endtime = time() + 20; // margin 5 so max 15 seconds to prevent browser timeout
+
 				if ( $tot ) foreach( $todo as $item ) {
 
-					// Init this item is not panoramable
-					$doit = false;
+					if ( ! wppa_is_time_up() ) {
+						// Init this item is not panoramable
+						$doit = false;
 
-					// width must be > 1.99 * height
-					$id = $item['id'];
-					$x 	= $item['photox'];
-					$y 	= $item['photoy'];
-					if ( $x > 1.99 * $y ) $doit = true;
-					if ( ! $doit ) {
-						$x = wppa_get_photox( $id, true );
-						$y = wppa_get_photoy( $id, true );
+						// width must be > 1.99 * height
+						$id = $item['id'];
+						$x 	= $item['photox'];
+						$y 	= $item['photoy'];
 						if ( $x > 1.99 * $y ) $doit = true;
+						if ( ! $doit ) {
+							$x = wppa_get_photox( $id, true );
+							$y = wppa_get_photoy( $id, true );
+							if ( $x > 1.99 * $y ) $doit = true;
+						}
+
+						// Source must exist
+						$s = wppa_get_source_path( $id );
+						if ( ! wppa_is_file( $s ) ) {
+							wppa_echo( '<br>'.$id.' skipped: no sourcefile present' );
+							$doit = false;
+						}
+
+						// Process this item
+						if ( $doit ) {
+
+							wppa_echo( '<br>doing '.$id );
+
+							// Clear possible existing o1 file
+							$o1 = wppa_get_o1_source_path( $id );
+							if ( wppa_is_file( $o1 ) ) {
+								wppa_unlink( $o1 );
+							}
+
+							// Do pano type specific stuff
+							switch( $pano ) {
+
+								case 0: // No longer pano
+									wppa_update_photo( $id, ['panorama' => 0, 'angle' => 0] );
+									break;
+
+								case 1: // Spheric
+									wppa_update_photo( $id, ['panorama' => 1, 'angle' => '360'] );
+									wppa_make_360( $id, 360 );
+									break;
+
+								case '2': // Flat
+									wppa_update_photo( $id, ['panorama' => '2', 'angle' => 0] );
+									break;
+
+								default:
+
+									break;
+							}
+
+							// Housekeeping
+							wppa_remake_files( '', $id );
+							wppa_get_photox( $id, true );
+							wppa_get_photoy( $id, true );
+							$done++;
+
+							if ( ! in_array( $pano, array( '0', '1', '2' ) ) ) {
+								$remark = __( 'No items processed', 'wp-photo-album-plus' );
+							}
+							elseif ( $done == $tot ) {
+								$remark = __( 'All applicable items processed', 'wp-photo-album-plus' );
+							}
+							else {
+								/* translators: integer numbers */
+								$remark = sprintf( __( '%1$d items out of %2$d processed', 'wp-photo-album-plus' ), $done, $tot );
+							}
+						}
+
+						// Check for timeout and not done
+						$timeup = wppa_is_time_up() && ( $done != $tot );
+						if ( $timeup ) {
+							wppa_echo( __( 'No time left, reloading, please wait', 'wp-photo-album-plus' ) . '<img src="dummy" style="display:none;" onerror="document.location.reload()">' , ['needonerror' => true] );
+						}
 					}
-
-					// Source must exist
-					$s = wppa_get_source_path( $id );
-					if ( ! wppa_is_file( $s ) ) $doit = false;
-
-					// Process this item
-					if ( $doit ) {
-
-						// Clear possible existing o1 file
-						$o1 = wppa_get_o1_source_path( $id );
-						if ( wppa_is_file( $o1 ) ) {
-							wppa_unlink( $o1 );
-						}
-
-						// Do pano type specific stuff
-						switch( $pano ) {
-
-							case 0: // No longer pano
-								wppa_update_photo( $id, ['panorama' => 0, 'angle' => 0] );
-								break;
-
-							case 1: // Spheric
-								wppa_update_photo( $id, ['panorama' => 1, 'angle' => '360'] );
-								wppa_make_360( $id, 360 );
-								break;
-
-							case '2': // Flat
-								wppa_update_photo( $id, ['panorama' => '2', 'angle' => 0] );
-								break;
-
-							default:
-
-								break;
-						}
-
-						// Housekeeping
-						wppa_remake_files( '', $id );
-						wppa_get_photox( $id, true );
-						wppa_get_photoy( $id, true );
-						$done++;
-
-						if ( ! in_array( $pano, array( 0, 1, '2' ) ) ) {
-							$remark = __( 'No items processed', 'wp-photo-album-plus' );
-						}
-						elseif ( $done == $tot ) {
-							$remark = __( 'All applicable items processed', 'wp-photo-album-plus' );
-						}
-						else {
-							/* translators: integer numbers */
-							$remark = sprintf( __( '%1$d items out of %2$d processed', 'wp-photo-album-plus' ), $done, $tot );
-						}
-					}
-
-					// Check for timeout and not done
-					$timeup = wppa_is_time_up() && ( $done != $tot );
-					if ( $timeup ) break;
-				}
-				else {
-					$remark = __( 'No items to process', 'wp-photo-album-plus' );
-				}
-
-				if ( $timeup ) {
-					$remark .= ' ' . __( 'No time left, please reload the page to continue.', 'wp-photo-album-plus' );
 				}
 			}
 
@@ -2664,7 +2676,7 @@ global $wpdb;
 					$nm 	= $counts['pendselfphotos'];
 					$ns 	= $counts['scheduledselfphotos'];
 					$covid 	= max( $album['main_photo'], 0 );
-					$curl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=single&amp;photo=' . wppa_encrypt_photo( $covid ) . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&amp;just-edit=' . __( 'Edit cover image', 'wp-photo-album-plus' );
+					$curl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=single&amp;photo=' . wppa_encrypt_photo( $covid ) . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&amp;just-edit=' . __( 'Edit+cover+image', 'wp-photo-album-plus' );
 
 					if ( wppa_have_access( $album ) ) {
 						$pendcount 	= $counts['pendselfphotos'];
@@ -3047,7 +3059,7 @@ global $plugin_page;
 			__( 'Search for', 'wp-photo-album-plus' ) . '
 		</td>
 		<td colspan="4" >
-			<a id="wppa-edit-search-tag" />
+			<span id="wppa-edit-search-tag"></span>
 			<input
 				type="text"
 				id="wppa-edit-search"
@@ -3318,7 +3330,7 @@ global $wpdb;
 					$covid = max( $album['main_photo'], 0 );
 					if ( $covid ) {
 						$curl = get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=single&amp;photo=' . wppa_encrypt_photo( $covid ) .
-								'&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&amp;just-edit=' . __( 'Edit cover image', 'wp-photo-album-plus' );
+								'&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&amp;just-edit=' . __( 'Edit+cover+image', 'wp-photo-album-plus' );
 						$result .= '<td><a href="' . $curl . '" class="wppaedit">' . __( 'CovImg', 'wp-photo-album-plus' ) . '</a></td>';
 					}
 					else {
@@ -3814,7 +3826,7 @@ global $wpdb;
 					}
 					else {
 						$u = wppa_get_thumb_url( wppa_get_coverphoto_id( $album['id'] ) );
-						$result .= wppa_html_tag( 'img', ['class' => "wppa-cover-image", 'src' => $u, 'style' => "max-height:50px;margin: 5px;"] );
+						if ( $u ) $result .= wppa_html_tag( 'img', ['class' => "wppa-cover-image", 'src' => $u, 'style' => "max-height:50px;margin: 5px;"] );
 					}
 					$albid 		= $album['id'];
 					$albcrypt 	= $album['crypt'];

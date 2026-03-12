@@ -4,7 +4,7 @@
 *
 * Copy of wp version
 * Modified by OpaJaap
-* Version 9.1.03.004
+* Version 9.1.09.004
 *
 */
 
@@ -1363,6 +1363,6 @@ class WPPA_List_Table {
 			),
 		);
 
-		printf( "<script type='text/javascript'>list_args = %s;</script>\n", wp_json_encode( $args ) );
+		printf( "<script>list_args = %s;</script>\n", wp_json_encode( $args ) );
 	}
 }

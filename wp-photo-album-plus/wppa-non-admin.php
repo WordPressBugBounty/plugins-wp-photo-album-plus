@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version: 9.0.10.008
+* Version: 9.1.09.004
 *
 */
 
@@ -296,7 +296,7 @@ wppa_echo( '
 		}
 		if ( $imgurl ) {
 			wppa_echo( '
-<link rel="image_src" href="'.esc_url( $imgurl ).'" />' );
+<link rel="image_src" href="'.esc_url( $imgurl ).'">' );
 		}
 		wppa_echo( '
 <!-- WPPA+ END Facebook meta tags -->

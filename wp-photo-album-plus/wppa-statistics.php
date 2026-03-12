@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.1.06.006
+* Version: 9.1.09.004
 *
 */
 
@@ -761,6 +761,7 @@ static $login;
 	$cap = wppa_get_album_item( wppa_get_photo_item( $id, 'album' ), 'capability' );
 	if ( $cap ) {
 		if ( ! current_user_can( $cap ) ) {
+			wppa_log( 'dbg', 'Photo '.$id.' not visible because user can not '.$cap );
 			return false;
 		}
 	}
@@ -771,7 +772,10 @@ static $login;
 		 ! wppa_is_file( wppa_get_thumb_path( $id ) ) &&
 		 ! wppa_is_video( $id ) &&
 		 ! wppa_is_pdf( $id ) &&
-		 ! wppa_has_audio( $id ) ) return false;
+		 ! wppa_has_audio( $id ) ) {
+			wppa_log( 'dbg', 'Photo '.$id.' not visible because no files present');
+			return false;
+		 }
 
 	// Get usefull data
 	$status = wppa_get_photo_item( $id, 'status' );
@@ -780,7 +784,10 @@ static $login;
 	// My item?
 	if ( $owner == $user ) return true;
 
-	if ( $status === false && $owner === false ) return false; // Photo does not exist
+	if ( $status === false && $owner === false ) {
+		wppa_log( 'dbg', 'Photo '.$id.' not visible because no status and no owner');
+		return false; // Photo does not exist
+	}
 
 	// Dispatch on photo status
 	switch( $status ) {
@@ -795,17 +802,24 @@ static $login;
 			if ( $login ) { 	// A logged in user may see private photos
 				return true;
 			}
+			else {
+				wppa_log( 'dbg', 'Photo '.$id.' not visible because user not logged in and item is private');
+			}
 			break;
 		case 'pending': 					// Pending and scheduled may be seen by owner
 		case 'scheduled':
 			if ( $admin || $owner == $user ) {
 				return true;
 			}
+			else {
+				wppa_log( 'dbg', 'Photo '.$id.' not visible because user not admin or owner and status pending/scheduled');
+			}
 			break;
 		default:
 			break;
 	}
 
+	wppa_log( 'dbg', 'Photo '.$id.' not visible (99)');
 	return false; // This photo is not visible for the current user
 }
 

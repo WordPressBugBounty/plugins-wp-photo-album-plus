@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.1.07.008
+* Version: 9.1.09.005
 *
 */
 
@@ -6266,6 +6266,13 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 		$lazy = false;
 	}
 
+	// Make sure img has alt
+	if ( $tag == 'img' ) {
+		if ( $attribs['alt'] == '' ) {
+			$attribs['alt'] = basename( $attribs['src'] );
+		}
+	}
+
 	// If lazy, modify src into data-src, and add/completize onload event
 	if ( $lazy && $attribs['src'] ) {
 		$attribs['data-src'] 	= $attribs['src'];
@@ -6344,10 +6351,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
 
-	if ( in_array( $tag, $self_closing ) ) {
-		$result .= '/>';
-	}
-	elseif ( $content === false ) {
+	if ( in_array( $tag, $self_closing ) || $content === false ) {
 		$result .= '>';
 	}
 	else {
@@ -6510,4 +6514,11 @@ function wppa_is_valid_utf8( $string ) {
 	else {
 		return seems_utf8( $string );
 	}
+}
+
+function wppa_fix_rights( $id ) {
+
+	wppa_chmod( wppa_get_source_path( $id ) );
+	wppa_chmod( wppa_get_photo_path( $id ) );
+	wppa_chmod( wppa_get_thumb_path( $id ) );
 }

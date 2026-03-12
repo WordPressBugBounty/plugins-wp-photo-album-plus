@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.1.07.008
+* Version: 9.1.09.005
 *
 */
 
@@ -481,6 +481,9 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 	// Optimize optionally
 	wppa_optimize_image( wppa_get_photo_path( $id ) );
 
+	// Fix filesystem rights
+	wppa_fix_rights( $id );
+
 	return true;
 
 }
@@ -811,6 +814,10 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 	if ( $newtime == $thumbtime ) {
 		return false;
 	}
+
+	// Fix filesystem rights
+	wppa_fix_rights( $id );
+
 	return true;
 }
 
@@ -893,6 +900,9 @@ function wppa_convert_png_to_jpg( $arg ) {
 			foreach( $cdn_files as $file ) {
 				wppa_convert_png_to_jpg( $file );
 			}
+
+			// Fix filesystem rights
+			wppa_fix_rights( $id );
 
 			// Make new filename
 			if ( strpos( $photo['filename'], '.' ) ) {

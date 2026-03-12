@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains routines for local cdn implementation
-* Version 8.8.01.005
+* Version 9.1.09.005
 *
 */
 
@@ -195,6 +195,7 @@ function wppa_cdn_make( $id, $x, $y ) {
 		// Log what we did
 		if ( $bret ) {
 			wppa_log( 'fso', 'GD Created ' . $tpshort );
+			wppa_fix_rights( $topath );
 		}
 		else {
 			wppa_log( 'fso', 'GD failed to create ' . $tpshort );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.1.07.008
+* Version: 9.1.09.005
 *
 */
 
@@ -4134,6 +4134,7 @@ function wppa_force_balance_pee( $xtext ) {
 // The single image, s, m, or x.
 function wppa_smx_photo( $id, $stype ) {
 global $wppa_current_shortcode;
+global $wppa_after_smx;
 
 	if ( ! wppa_photo_exists( $id ) ) {
 		wppa_log( 'Err', 'Photo does not exist ( wppa_smx_photo() ), type = ' . $stype . ', single_photo = ' . $id . ' sc = ' . $wppa_current_shortcode );
@@ -4172,7 +4173,7 @@ global $wppa_current_shortcode;
 		<div
 			id="wppa-container-' . wppa( 'mocc' ) . '"
 			style="width:100%;"
-			class="wppa-container ' . ( wppa( 'align' ) ? 'align' . wppa( 'align' ) : '' ) . ( $stype == 'm' || $stype == 'x' ? ' wp-caption' : '' ) . '"
+			class="wppa-container ' . ( wppa( 'align' ) ? 'align' . wppa( 'align' ) : '' ) . ' wp-caption"
 			>' );
 
 		// The image html
@@ -4215,7 +4216,8 @@ global $wppa_current_shortcode;
 			elseif ( wppa_opt( 'wpautop_on_desc' ) == 'nl2br' ) {
 				$desc = nl2br( $desc );
 			}
-			wppa_out( '<p class="wp-caption-text">' . $desc . '</p>' );
+//			wppa_out( '<p class="wp-caption-text">' . $desc . '</p>' );
+			wppa_out( '<div class="wp-caption-text">' . $desc . $wppa_after_smx . '</div>' );
 
 			// The rating, only on xphoto when enabled in II-B7
 			if ( $stype == 'x' && wppa_switch( 'rating_on' ) ) {
@@ -4237,6 +4239,9 @@ global $wppa_current_shortcode;
 					wppa_js( 'jQuery(document).ready(function(){wppaOpenComments('.wppa('mocc').');});' );
 				}
 			}
+		}
+		else {
+			wppa_out( '<div class="wp-caption-text">' . $wppa_after_smx . '</div>' );
 		}
 
 	// The ajax Spinner

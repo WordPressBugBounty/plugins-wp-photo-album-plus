@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.0.10.014
+* Version 9.1.09.004
 *
 */
 
@@ -1148,8 +1148,8 @@ function wppa_get_zoom_pan_html( $args ) {
 			'<canvas
 				id="wppa-pan-canvas-' . $itemid . '"
 				style="' . ( $manual ? 'cursor:grab;' : '' ) . ';background-color:transparent; ' . ( $lightbox ? 'display:none;' : '' ) . '"
-			/>
-
+				>
+			</canvas>
 		</div>';
 
 		// The controlbar

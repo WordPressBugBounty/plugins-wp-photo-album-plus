@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.1.07.007
+* Version: 9.1.09.004
 *
 */
 
@@ -1445,8 +1445,6 @@ static $seqno;
 					style="' . $imgstyle . $cursor . '"
 					width="'.$max_size.'"
 					height="'.strval(intval($max_size / $aspect)).'"
-					mouseover="'.$onmouseover.'"
-					mouseout="'.$onmouseout.'"
 					data-title="' . ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ) . '"
 					>
 				</canvas>
@@ -1492,8 +1490,6 @@ static $seqno;
 					style="' . $imgstyle . $cursor . '"
 					width="'.$max_size.'"
 					height="'.strval(intval($max_size / $aspect)).'"
-					mouseover="'.$onmouseover.'"
-					mouseout="'.$onmouseout.'"
 					onclick="'.$onclick.'"
 					ondblclick="'.$ondblclick.'"
 					data-title="' . ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ) . '"
