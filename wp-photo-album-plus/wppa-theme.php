@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the albums/photos/slideshow in a page or post
-* Version 9.1.09.004
+* Version 9.1.10.009
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -66,17 +66,92 @@ global $wppa_empty_content;
 
 		// Process the albums
 		if ( ! wppa_switch( 'thumbs_first' ) ) {
-			if ( $albums ) {
-				$counter_albums = 0;
-				wppa_album_list( 'open' );												// Open Albums sub-container
-					foreach ( $albums as $album ) { 									// Loop the albums
-						$counter_albums++;
-						if ( wppa_onpage( 'albums', $counter_albums, $curpage ) ) {
-							wppa_album_cover( $album['id'] );							// Show the cover
-							$didsome = true;
-						} // End if on page
+			if ( is_array( $albums ) && count( $albums ) ) {
+
+				// See if sny slbum on this pahe
+				$go = false;
+				$i = 1;
+				while ( ! $go && $i <= count( $albums ) ) {
+					if ( wppa_onpage( 'albums', $i, $curpage ) ) {
+						$go = true;
 					}
-				wppa_album_list( 'close' );												// Close Albums sub-container
+					$i++;
+				}
+				if ( $go ) {
+					$counter_albums = 0;
+					wppa_album_list( 'open' );												// Open Albums sub-container
+
+						// Masonry ?
+						if ( wppa_opt( 'cover_type' ) == 'masonryplus' || wppa_opt( 'cover_type' ) == 'masonryplustitle' ) {
+
+							// Open masonry contatiner
+							$html = '
+							<div
+								id="grid-' . $mocc . '"
+								class="grid-' . $mocc . ' grid-masonryplus wppa-box"
+								style="padding-top:6px;padding-bottom:6px;padding-right:6px;line-height:0;"
+								>';
+
+								// Use nicescroller?
+								if ( wppa_is_nice() ) {
+									$html .= 	'<div class="wppa-nicewrap">';
+								}
+
+							// Add css
+							$html .= '
+							<style>
+								.grid-'. $mocc .' {
+									width: 100% !important;
+								}
+								.grid-item-' . $mocc . ' {
+									line-height: 0;
+									visibility: hidden;
+									text-align: center;
+								}
+								.grid-item-' . $mocc . ' img {
+									width: 100%;
+								}
+							</style>';
+
+							foreach ( $albums as $album ) { 									// Loop the albums
+								$counter_albums++;
+								if ( wppa_onpage( 'albums', $counter_albums, $curpage ) ) {
+
+									$html .= '
+									<div
+										style=""
+										id="grid-item-' . $mocc . '-' . $album['crypt'] . '"
+										class="grid-item grid-item-' . $mocc . '" >' .
+										wppa_album_cover_masonry( $album['id'] ) . '
+									</div>';
+									$didsome = true;
+
+								} // End if on page
+							}
+
+							// Use nicescroller?
+							if ( wppa_is_nice() ) {
+								$html .= '</div>';
+							}
+
+							// Close masonry container
+							$html .= '</div><div style="clear:both" ></div>';
+
+							wppa_out( $html );
+						}
+
+						// Standard
+						else {
+							foreach ( $albums as $album ) { 									// Loop the albums
+								$counter_albums++;
+								if ( wppa_onpage( 'albums', $counter_albums, $curpage ) ) {
+									wppa_album_cover( $album['id'] );							// Show the cover
+									$didsome = true;
+								} // End if on page
+							}
+						}
+					wppa_album_list( 'close' );												// Close Albums sub-container
+				}
 			}	// If albums
 		}
 
@@ -381,12 +456,71 @@ global $wppa_empty_content;
 			if ( $albums ) {
 				$counter_albums = 0;
 				wppa_album_list( 'open' );												// Open Albums sub-container
-					foreach ( $albums as $album ) { 									// Loop the albums
-						$counter_albums++;
-						if ( wppa_onpage( 'albums', $counter_albums, $curpage - $n_thumb_pages ) ) {
-							wppa_album_cover( $album['id'] );							// Show the cover
-							$didsome = true;
-						} // End if on page
+
+					// Masonry ?
+					if ( wppa_opt( 'cover_type' ) == 'masonryplus' || wppa_opt( 'cover_type' ) == 'masonryplustitle' ) {
+
+						// Open masonry contatiner
+						$html = '
+						<div
+							id="grid-' . $mocc . '"
+							class="grid-' . $mocc . ' grid-masonryplus wppa-box"
+							style="padding-top:6px;padding-bottom:6px;padding-right:6px;line-height:0;"
+							>';
+
+						// Use nicescroller?
+						if ( wppa_is_nice() ) {
+							$html .= '<div class="wppa-nicewrap">';
+						}
+
+						// Add css
+						$html .= '
+						<style>
+							.grid-item-' . $mocc . ' {
+								line-height: 0;
+								visibility: hidden;
+								text-align: center;
+							}
+							.grid-item-' . $mocc . ' img {
+								width: 100%;
+							}
+						</style>';
+
+						foreach ( $albums as $album ) { 									// Loop the albums
+							$counter_albums++;
+							if ( wppa_onpage( 'albums', $counter_albums, $curpage ) ) {
+
+								$html .= '
+								<div
+									style=""
+									id="grid-item-' . $mocc . '-' . $album['crypt'] . '"
+									class="grid-item grid-item-' . $mocc . '" >' .
+									wppa_album_cover_masonry( $album['id'] ) . '
+								</div>';
+								$didsome = true;
+
+							} // End if on page
+						}
+
+						// Use nicescroller?
+						if ( wppa_is_nice() ) {
+							$html .= '</div>';
+						}
+						// Close masonry container
+						$html .= '</div><div style="clear:both" ></div>';
+
+						wppa_out( $html );
+					}
+
+					// Standard
+					else {
+						foreach ( $albums as $album ) { 									// Loop the albums
+							$counter_albums++;
+							if ( wppa_onpage( 'albums', $counter_albums, $curpage - $n_thumb_pages ) ) {
+								wppa_album_cover( $album['id'] );							// Show the cover
+								$didsome = true;
+							} // End if on page
+						}
 					}
 				wppa_album_list( 'close' );												// Close Albums sub-container
 			}	// If albums

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.1.09.002
+* Version 9.1.10.007
 *
 */
 
@@ -3520,7 +3520,7 @@ global $wpdb;
 	$output .= '
 	<select
 		style="max-width:200px;"
-		name="wppa-main" onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'main_photo\', this)"
+		name="wppa-main" onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'main_photo\', this, \'\', ' . wppa_decrypt_album( $crid ) . ')"
 		title="' . esc_attr( $title ) . '"
 		>';
 

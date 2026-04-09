@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.1.07.007
+* Version: 9.1.10.009
 *
 */
 
@@ -1809,6 +1809,8 @@ global $wppa_hide_this;
 									__('Album title only', 'wp-photo-album-plus' ),
 									__('Album title only mcr', 'wp-photo-album-plus' ),
 									__('Album image only', 'wp-photo-album-plus' ),
+									__('Album image only masonry style', 'wp-photo-album-plus' ),
+									__('Album image only masonry style with title', 'wp-photo-album-plus' ),
 								);
 					$vals = array(	'default',
 									'longdesc',
@@ -1820,6 +1822,8 @@ global $wppa_hide_this;
 									'titleonly',
 									'titleonly-mcr',
 									'imageonly',
+									'masonryplus',
+									'masonryplustitle',
 								);
 					$html = wppa_select($slug, $opts, $vals);
 					wppa_setting_new($slug, '4', $name, $desc, $html, $help);
@@ -4530,14 +4534,14 @@ global $wppa_hide_this;
 						$slug = 'wppa_search_placeholder';
 						$html = wppa_input($slug, '150px;');
 						wppa_setting_new($slug, '32', $name, $desc, $html, $help);
-
+/*
 						$name = __('Search form method', 'wp-photo-album-plus' );
 						$desc = __('Either "get" or "post"', 'wp-photo-album-plus' );
 						$help = __('May be set to "get" to avoid conflicts with other plugins or certain php versions', 'wp-photo-album-plus' );
 						$slug = 'wppa_search_form_method';
 						$html = wppa_select($slug, array('post', 'get'), array('post', 'get'));
 						wppa_setting_new($slug, '33', $name, $desc, $html, $help);
-
+/*
 						$name = __('Use wppa search form', 'wp-photo-album-plus' );
 						$desc = __('Uses wppa specific form', 'wp-photo-album-plus' );
 						$help = __('You may need to enable this when other (search) plugins break the wppa search mechanism', 'wp-photo-album-plus' );
@@ -4545,7 +4549,7 @@ global $wppa_hide_this;
 						$onch = '';
 						$html = wppa_checkbox($slug, $onch);
 						wppa_setting_new($slug, '34', $name, $desc, $html, $help);
-
+*/
 						$name = __('List Index', 'wp-photo-album-plus' );
 						$desc = __('Show the content of the index table.', 'wp-photo-album-plus' );
 						$help = '';

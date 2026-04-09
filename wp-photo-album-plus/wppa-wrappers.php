@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.1.09.005
+* Version 9.1.10.008
 *
 */
 
@@ -470,7 +470,7 @@ global $wp_filesystem;
 	$fso = rtrim( $fso, '/' );
 
 	$wp_filesystem->chmod( $fso, $rights, $recursive );
-	wppa_log( 'fso', 'Set fs rights to '.$fso );
+//	wppa_log( 'fso', 'Set fs rights to '.$fso );
 
 	if ( wppa_is_file( $fso ) ) {
 		wppa_chmod( dirname( $fso ) );
@@ -1223,7 +1223,9 @@ global $wppa_query_cache_hit;
 	}
 	wppa_log( 'db', $query );
 	$result = $wpdb->get_results( $query, $form );
-	$cache[$idx] = $result;
+	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
+		$cache[$idx] = $result;
+	}
 	return $result;
 }
 
@@ -1245,7 +1247,9 @@ global $wppa_query_cache_hit;
 	}
 	wppa_log( 'db', $query );
 	$result = $wpdb->get_var( $query );
-	$cache[$idx] = $result;
+	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
+		$cache[$idx] = $result;
+	}
 	return $result;
 }
 
@@ -1268,7 +1272,9 @@ global $wppa_query_cache_hit;
 	}
 	wppa_log( 'db', $query );
 	$result = $wpdb->get_col( $query );
-	$cache[$idx] = $result;
+	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
+		$cache[$idx] = $result;
+	}
 	return $result;
 }
 
@@ -1290,7 +1296,9 @@ global $wppa_query_cache_hit;
 	}
 	wppa_log( 'db', $query );
 	$result = $wpdb->get_row( $query, ARRAY_A );
-	$cache[$idx] = $result;
+	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
+		$cache[$idx] = $result;
+	}
 	return $result;
 }
 
@@ -1307,12 +1315,14 @@ global $wppa_query_cache_hit;
 	if ( !is_array( $cache ) ) $cache = array();
 	$idx = md5( $query );
 	if ( isset( $cache[$idx] ) ) {
-		return $cache[$idx];
 		$wppa_query_cache_hit = true;
+		return $cache[$idx];
 	}
 	wppa_log( 'db', $query );
 	$result = $wpdb->query( $query );
-	$cache[$idx] = $result;
+	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
+		$cache[$idx] = $result;
+	}
 	return $result;
 }
 

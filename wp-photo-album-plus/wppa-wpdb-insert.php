@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.1.07.008
+* Version 9.1.10.005
 *
 */
 
@@ -12,20 +12,48 @@ if ( ! defined( 'ABSPATH' ) ) exit();
 // Session
 function wppa_create_session_entry() {
 global $wpdb;
+global $wppa_session;
+
+	$wppa_session = array(
+						'has_searchbox' 		=> false,
+						'rootbox' 				=> false,
+						'search_root' 			=> '',
+						'subbox' 				=> false,
+						'use_searchstring' 		=> '',
+						'display_searchstring' 	=> '',
+						'supersearch' 			=> '',
+						'superview' 			=> 'thumbs',
+						'superalbum' 			=> 0,
+						'page'					=> 0,
+						'ajax'					=> 0,
+						'user' 					=> wppa_get_user(),
+						'id' 					=> wppa_get_session_id(),
+						'uris' 					=> array(),
+						'isrobot' 				=> false,
+						'wfcart' 				=> null,
+						'is_wppa_tree' 			=> false,
+						'rem_url' 				=> array(),
+						'search_albums' 		=> '',
+						'search_photos' 		=> '',
+						);
 
 	$table 	= $wpdb->wppa_session;
+
+	$sid = md5( microtime( true ) );
+
 	$data 	= array(
-					'session' 			=> wppa_get_session_id(),
+					'session' 			=> $sid,
 					'timestamp' 		=> time(),
 					'user'				=> wppa_get_user(),
 					'ip'				=> wppa_get_user_ip(),
 					'status' 			=> 'valid',
-					'data'				=> false,
+					'data'				=> serialize($wppa_session),
 					'count' 			=> 1,
 	);
 
 	$bret = wppa_insert( $table, $data );
 	if ( $bret ) {
+		setcookie( 'wppa_session_id', $sid, time() + 3600 );
 		return $wpdb->insert_id;
 	}
 

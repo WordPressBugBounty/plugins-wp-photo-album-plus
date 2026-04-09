@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.1.06.004
+* Version: 9.1.10.006
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -550,6 +550,9 @@ function wppa_convert_from_pretty( $uri ) {
 				case 'cc':
 					$deltauri = 'wppa-cat=';
 					break;
+				case 'ur':
+					$deltauri = 'wppa-usr=';
+					break;
 
 				default:
 					$deltauri = '';
@@ -649,7 +652,7 @@ global $wppa_url_set_extension;
 					'potdhis',
 					'photos',
 					'set',
-					'landscape', 'portrait',
+					'landscape', 'portrait', 'usr',
 					);
 
 	$uri = $parts[0] . '?';
@@ -741,6 +744,7 @@ global $wppa_url_set_extension;
 						'lbstart',
 						'landscape',
 						'portrait',
+						'usr',
 					);
 	if ( count($args) > 0 ) {
 		foreach ( $args as $arg ) {
@@ -788,6 +792,7 @@ global $wppa_url_set_extension;
 					case 'lbstart': 		$newuri .= 'ls'; break;
 					case 'landscape': 		$newuri .= 'la'; break;
 					case 'portrait': 		$newuri .= 'pr'; break;
+					case 'usr': 			$newuri .= 'ur'; break;
 					default: wppa_log( 'err', sprintf( 'err', 'Unimplemented code %s encountered in wppa_convert_to_pretty()', $code ) );
 				}
 				if ( $val !== false ) {
@@ -1005,16 +1010,18 @@ global $previous_page_last_id;
 	$ref_occur = wppa( 'targetmocc' );
 
 	// album
-	if ( ( $occur == $ref_occur || wppa( 'ajax' ) ) && wppa_get('album') ) {
-			$alb = wppa_get( 'album' );
+	if ( ! wppa_get( 'forceroot' ) ) {
+		if ( ( $occur == $ref_occur || wppa( 'ajax' ) ) && wppa_get('album') ) {
+				$alb = wppa_get( 'album' );
+		}
+		elseif ( wppa( 'start_album' ) ) {
+			$alb = wppa( 'start_album' );
+		}
+		else {
+			$alb = 0;
+		}
+		$extra_url .= '&amp;wppa-album='.$alb;
 	}
-	elseif ( wppa( 'start_album' ) ) {
-		$alb = wppa( 'start_album' );
-	}
-	else {
-		$alb = 0;
-	}
-	$extra_url .= '&amp;wppa-album='.$alb;
 
 	// slide or photo
 	if ( $slide ) {
@@ -1060,7 +1067,7 @@ global $previous_page_last_id;
 	if ( wppa( 'is_tag' ) && ! wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-tag='.wppa( 'is_tag' );
 
 	// Search?
-	if ( wppa( 'src' ) && ! wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-searchstring='.urlencode( wppa( 'searchstring' ) );
+//	if ( wppa( 'src' ) && ! wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-usr=1';					//'&amp;wppa-searchstring='.urlencode( wppa( 'searchstring' ) );
 
 	// Supersearch?
 	if ( wppa( 'supersearch' ) ) $extra_url .= '&amp;wppa-supersearch=' . str_replace( '/', '%2F', urlencode( wppa( 'supersearch' ) ) );
@@ -1082,6 +1089,21 @@ global $previous_page_last_id;
 
 	// Inverse?
 	if ( wppa( 'is_inverse' ) ) $extra_url .= '&amp;wppa-inv=1';
+
+	// Paginated subsearch?
+//	if ( wppa( 'usr' ) ) $extra_url .= '&amp;wppa-usr=1';
+
+	if ( wppa_get( 'forceroot' ) ) {
+		$extra_url .= '&amp;wppa-forceroot=' . wppa_get( 'forceroot' );
+	}
+//	if ( wppa_get( 'searchsubmit' ) && wppa_get( 'searchstring' ) ) {
+//		$extra_url .= '&amp;wppa-searchstring=' . urlencode( wppa_get( 'searchstring' ) ) . ';' . urlencode( wppa_get( 'searchsubmit' ) );
+//	}
+	$searchstring = wppa_get_searchstring();
+// wppa_log('dbg', 'Searchstring = '.$searchstring);
+	if ( $searchstring ) {
+		$extra_url .= '&amp;wppa-src=1&amp;wppa-searchstring='.$searchstring;
+	}
 
 	// Almost ready
 	$link_url .= $extra_url;

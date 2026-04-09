@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.1.07.006';
+var wppaJsAjaxVersion = '9.1.10.011';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -930,6 +930,11 @@ function _bumpViewCount( photo ) {
 
 	// Already bumped?
 	if ( wppaPhotoView[photo] ) {
+		return;
+	}
+
+	// No photo?
+	if ( photo == 0 ) {
 		return;
 	}
 

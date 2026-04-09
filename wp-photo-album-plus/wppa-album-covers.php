@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.1.01.001
+* Version: 9.1.10.009
 *
 */
 
@@ -938,6 +938,7 @@ global $wppa_no_lightbox;
 		wppa_close_tag( 'div' );
 
 		// Viewcount on coverphoto?
+		if ( wppa_opt( 'cover_type' ) != 'masonryplus' )
 		if ( wppa_opt( 'viewcount_on_cover' ) != '-none-' ) {
 			$treecounts = wppa_get_treecounts_a( $albumid, true );
 			if ( wppa_opt( 'viewcount_on_cover' ) == 'self' || $treecounts['selfphotoviews'] == $treecounts['treephotoviews'] ) {
@@ -2050,6 +2051,140 @@ global $wppa_no_lightbox;
 		$result .= wppa_close_tag( 'a', false, true );
 		$first = false;
 	}
+
+	return $result;
+}
+
+// Get the masonry album cover image html
+function wppa_album_cover_masonry( $id ) {
+global $cover_count_key;
+
+	// Init
+	$album 	= wppa_cache_album( $id );
+	$mocc 	= wppa( 'mocc' );
+
+	// Find album details
+	$coverphoto = wppa_get_coverphoto_id( $id );
+	$image 		= wppa_cache_photo( $coverphoto );
+	$photocount = wppa_get_visible_photo_count( $id );
+	$albumcount = wppa_get_visible_album_count( $id );
+	$photo = wppa_cache_photo( $coverphoto );
+	if ( $coverphoto ) {
+		$thumbx = $photo['thumbx'];
+		$thumby = $photo['thumbx'];
+	}
+	else {
+		$thunbx = 734;
+		$thumby = 550;
+	}
+
+	// Init links
+	$title 				= '';
+	$linkpage 			= '';
+	$href_title 		= '';
+	$onclick_title 		= '';
+
+	// See if there is substantial content to the album
+	$has_content = $albumcount || $photocount;
+
+	// What is the albums title linktype
+	$linktype = $album['cover_linktype'];
+
+	// If not specified, use default
+	if ( ! $linktype ) {
+		$linktype = 'content';
+	}
+
+	// What is the albums title linkpage
+	$linkpage = $album['cover_linkpage'];
+
+	// Fix backward compatibility issue
+	if ( $linkpage == '-1' ) {
+		$linktype = 'none';
+	}
+
+	// Find the cover title href, onclick and title
+	$title_attr 	= wppa_get_album_title_attr_a( 	$id,
+													$linktype,
+													$linkpage,
+													$has_content,
+													$coverphoto,
+													$photocount
+												);
+	$href_title 	= $title_attr['href'];
+	$onclick_title 	= $title_attr['onclick'];
+	$title 			= $title_attr['title'];
+
+	// Find the coverphoto link
+	if ( $coverphoto ) {
+		$photolink = wppa_get_imglnk_a( 	'coverimg',
+											$coverphoto,
+											$href_title,
+											$title,
+											$onclick_title,
+											'',
+											$id
+										);
+	}
+	else {
+		$photolink = false;
+	}
+
+	// Find the coverphoto details
+	$path 		= wppa_get_photo_path( $coverphoto );
+	$imgattr_a 	= wppa_get_imgstyle_a( 	$coverphoto,
+										$path,
+										wppa_opt( 'smallsize' ),
+										'',
+										'thumb'
+									);
+
+	if ( file_exists( wppa_get_thumb_path( $coverphoto ) ) ) {
+		$src = wppa_get_thumb_url( $coverphoto, true, '', $imgattr_a['width'], $imgattr_a['height'], false );
+	}
+	else {
+		$src = wppa_get_imgdir( 'album.jpg' );
+	}
+
+	$onmouseover  = wppa_mouseover( 'cover' );
+	$onmouseout   = wppa_mouseout( 'cover' );
+
+	// Image style
+	$imgstyle = 'width: 100%; height: auto; margin: 0px; position: relative; box-sizing: border-box; float: left; padding: '.(wppa_opt('tn_margin')/2).'px; cursor: pointer;';
+
+	// Mouseover effect?
+	if ( wppa_switch( 'use_thumb_opacity' ) ) {
+		$opac = wppa_opt( 'thumb_opacity' );
+		$imgstyle .= 'opacity:' . $opac/100 . ';filter:alpha(opacity=' . $opac . ');';
+	}
+
+	// Title over image ?
+	$titimage = wppa_opt( 'cover_type' ) == 'masonryplustitle';
+
+	$result = '
+	<div id="thumbnail_frame_masonry_'.$album['crypt'].'_'.$mocc.'" style="width:100%;position:static;font-size:12px;line-height:8px;overflow:hidden;box-sizing:content-box;text-align:center;">
+		<a
+			style="position:static;"
+			class="thumb-img"
+			id="x-'.$album['id'].'-'.$mocc.'" '.
+			'onclick="'.$onclick_title.'">' .
+			( wppa_is_video( $coverphoto ) ?
+				wppa_get_video_html( ['id' => $coverphoto,
+									  'title' => $title, 'style' => $imgstyle,
+									  'use_thumb' => true,
+									  'controls' => false,
+									  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] ) : '
+			<img
+				decoding="async" id="i-'.$coverphoto.'-'.$mocc.'"
+				title="' . $title . '"
+				style="' . $imgstyle . '"
+				onmouseover="' . $onmouseover . '"
+				onmouseout="' . $onmouseout . '"
+				src="' . $src . '" > ' ) .
+				( $titimage ? '
+		<div class="wppa-centered-overlay-text" style="cursor:pointer;" title="'.$title.'" >'.wppa_get_album_name($album['id']).'</div>' : '' ) . '
+		</a>
+	</div>';
 
 	return $result;
 }

@@ -1,8 +1,20 @@
 WP Photo Album Plus Changelog
 
+= 9.1.10 =
+
+* Exclude separate on the search settins page caused a fatal error at the frontend. Fixed.
+* Rootsearch did not work. Fixed.
+* Subsearch did not work. Fixed.
+* Search results are now paginated if applicable.
+* Fixed a problem in sesion registration.
+* New album cover type: Album image only masonry style. This is a global setting and overrules other album types as selected on the album admin page.
+The album name will show up as text over the center of the cover image. The style can be changed by custom css using class wppa-centered-overlay-text.
+* To reduce cpu load cause by bots, the search form code has been reviewed and a 2 seconds delay added after clicking the search button.
+* shortcode typt intro did not work for photos (with or without audio). Fixed.
+
 = 9.1.09 =
 
-* Added two optional alrguments to shortcode [photo nn]: 
+* Added two optional alrguments to shortcode [photo nn]:
 - type, to overrule the type as set in Basic settings -> Photos -> II -> Item 1. Possible values: 'photo', 'mphoto', 'xphoto', 'slphoto'
 - subtext, to add a custom text under the photo. May contain simple html and keywords #name to be replaced by the photo name, and #owner to be replaced by the uploaders display name.
 You can also add exif and iptc tags ( E#... 2#... ) in the subtext.
@@ -22,7 +34,7 @@ Remark: The subtext does not work for type 'slphoto', the recommended type to us
 * Shortcode type intro did not work  properly for simple not zoomable and not panoramic photos. Fixed.
 * The alt atribute for images on the import page did generate error messages in the wppa log. Fixed.
 * On the import page, switching between local and remote initially lead to incorrect displays; a reload was needed. Fixed.
-* New virtual album argument: #bpuser. To be used on the buddypress profile page to display the albums/photos owned by the profiled user. 
+* New virtual album argument: #bpuser. To be used on the buddypress profile page to display the albums/photos owned by the profiled user.
 Examples: [wppa tye="covers" album="#owner,#bpuser"],  [wppa tye="covers" album="#owner,#bpuser,4711"], [wppa tye="thumbs" album="#upldr,#bpuser"]
 * Fixed a ransom issue.
 * The virtual album spec in a shgortcode can now have an additional album id as grandparent. Strictly 2nd gen albums are selected.
@@ -30,7 +42,7 @@ Example: [wppa type="covers" album="#owner,#me,0,143"] gives grandchildren of al
 * Added option to the upload shortcode to be used on Buddy Press profile page: [wppa type="upload" bpprofile]
 * Non admin users and non wppa superusers can no longer delete public albums but only their own albums when user destroy is enabled in Advanced settings -> Admin -> II -> Item 6: User delete albums.
 * Frontend created albums have no longer the spaces in the name replaced by dashes.
-* Added checkbox album for frontend user update photo, so the user can move his own photo from his own or public album to a different own or public album. 
+* Added checkbox album for frontend user update photo, so the user can move his own photo from his own or public album to a different own or public album.
 See Advanced settings -> Admin -> V -> Item 5.
 * Frontend edit album information now also has the status selection.
 * Frontend edit photo information did not work when Advanced settings -> Admin -> VI -> Item 14: Enable TinyMCE editor was checked. Fixed.

@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.1.09.004
+* Version: 9.1.10.008
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -276,6 +276,8 @@ global $wppa_current_shortcode_atts;
 		'is_intro' 					=> '',
 		'max' 						=> 0,
 		'bpprofile' 				=> '',
+		'usr' 						=> '', // Use search results, for paginated search
+		'photo_count' 				=> '',
 	);
 
 	if ( false && is_array( $wppa_runtime_settings ) ) {
@@ -292,7 +294,7 @@ global $wppa_randseed_modified;
 
 		// This randseed survives pageloads up to the duration of the session ( usually 1 hour )
 		case 'session':
-			$result = $wppa_session['id'];
+			$result = $wppa_session['randseed'];
 			break;
 
 		// This randseed is for one pageload only
@@ -1078,7 +1080,7 @@ global $wppa_session;
 	}
 
 	// Sanitize
-	$ignore = array( '"', "'", '\\', '>', '<', ':', ';', '?', '=', '_', '[', ']', '(', ')', '{', '}' );
+	$ignore = array( '"', "'", '\\', '>', '<', ':', '?', '=', '_', '[', ']', '(', ')', '{', '}' );
 	$str = wppa_decode_uri_component( $str );
 	$str = str_replace( $ignore, ' ', $str );
 	$str = wp_strip_all_tags( $str );
@@ -1117,10 +1119,17 @@ global $wppa_session;
 		}
 	}
 
-	$wppa_session['use_searchstring'] = $str;
+	// Save search data in session
+	if ( ! $wppa['src'] ) {
+		return '';
+	}
+	if ( wppa_get( 'subsearch' ) ) {
+		$wppa_session['use_searchstring'] .= ';' . $str;
+	}
+	else {
+		$wppa_session['use_searchstring'] = $str;
+	}
 	$wppa_session['display_searchstring'] = str_replace ( ',', ' &#8746 ', str_replace ( ' ', ' &#8745 ', $wppa_session['use_searchstring'] ) );
-//	wppa_save_session();
-
 
 	if ( $wppa['src'] ) {
 		switch ( wppa_opt( 'search_display_type' ) ) {

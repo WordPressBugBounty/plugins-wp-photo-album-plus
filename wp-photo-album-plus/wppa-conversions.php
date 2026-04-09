@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various conversion functions
-* Version: 9.1.07.003
+* Version: 9.1.10.003
 *
 */
 
@@ -430,6 +430,8 @@ global $wpdb;
 		$wppa['searchstring'] = str_replace( ';', ',', wppa_get_related_data() );
 		$wppa['photos_only'] = true;
 	}
+
+	$wppa['usr'] = wppa_get( 'usr', '' );
 
 	$wppa['page'] = wppa_get( 'paged', 1 );
 

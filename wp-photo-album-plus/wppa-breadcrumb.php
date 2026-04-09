@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.1.06.008
+* Version 9.1.10.006
 *
 */
 
@@ -255,16 +255,16 @@ static $post_type_value;
 			'';
 
 		// Make the searchstring text
-		$value = __( 'Searchstring:', 'wp-photo-album-plus' ) . ' ';
-		if ( isset ( $wppa_session['display_searchstring'] ) && $wppa_session['display_searchstring'] ) {
-			$value .= $wppa_session['display_searchstring'];
-		}
-		elseif ( wppa( 'searchstring' ) ) {
-			$value .= stripslashes( wppa( 'searchstring' ) );
-		}
-		else {
-			$value .= wppa_get( 'searchstring' );
-		}
+		$value = __( 'Searchstring:', 'wp-photo-album-plus' ) . ' ' . wppa_get_searchstring( true );
+//		if ( isset ( $wppa_session['display_searchstring'] ) && $wppa_session['display_searchstring'] ) {
+//			$value .= $wppa_session['display_searchstring'];
+//		}
+//		elseif ( wppa( 'searchstring' ) ) {
+//			$value .= stripslashes( wppa( 'searchstring' ) );
+//		}
+//		else {
+//			$value .= wppa_get( 'searchstring' );
+//		}
 		if ( wppa( 'catbox' ) ) {
 			$value .= ', ' . __( 'in category:', 'wp-photo-album-plus' ) . ' ' . trim( wppa( 'catbox' ), ',' );
 		}

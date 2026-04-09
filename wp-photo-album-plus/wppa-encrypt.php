@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 9.1.09.001
+* Version 9.1.10.011
 *
 */
 
@@ -183,7 +183,7 @@ global $wpdb;
 	if ( $album == wppa_get_option( 'wppa_album_crypt_1' ) ) return '-1';
 	if ( $album == wppa_get_option( 'wppa_album_crypt_2' ) ) return '-2';
 	if ( $album == wppa_get_option( 'wppa_album_crypt_3' ) ) return '-3';
-	
+
 	if ( wppa_is_posint( $album ) ) {
 		wp_die( esc_html( __( 'Invalid or outdated url. Media item id must be encrypted.', 'wp-photo-album-plus' ) ) );
 	}

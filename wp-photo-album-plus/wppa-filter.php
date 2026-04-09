@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.1.09.005
+* Version: 9.1.10.001
 *
 */
 
@@ -523,6 +523,7 @@ global $wppa_after_smx;
 				else {
 					$wppa['may_root'] = $atts['root'];
 				}
+				$wppa['start_album'] = wppa_alb_to_enum_children( $wppa['forceroot'] );
 			}
 			$wppa['landingpage'] = $atts['landing'];
 			break;

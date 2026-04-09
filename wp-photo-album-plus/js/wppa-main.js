@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.1.00.003';
+wppaWppaVer = '9.1.10.009';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -1546,3 +1546,38 @@ function wppaAlbLb(event,albumid) {
 	jQuery('.first-'+albumid).trigger('click');
 	return false;
 };
+
+// Delayed Search
+function wppaDelayedSearch( url, mocc, n ) {
+
+	jQuery( '#wppa-ajax-spin-'+mocc ).fadeIn();
+
+	// Make the url
+	url += '?';
+	if ( jQuery( '#wppa-searchstring-'+mocc ).length == 1 ) url += "wppa-searchstring=" + jQuery( '#wppa-searchstring-'+mocc ).val() + '&';
+	if ( jQuery( '#wppa-searchroot-'+mocc ).length == 1 ) url += "wppa-searchroot=" + jQuery( '#wppa-searchroot-'+mocc ).val() + '&';
+	if ( jQuery( '#wppa-forceroot-'+mocc ).length == 1 ) url += "wppa-forceroot=" + jQuery( '#wppa-forceroot-'+mocc ).val() + '&';
+	if ( jQuery( '#wppa-subsearch-'+mocc).prop('checked' ) ) url +="wppa-subsearch=on" + '&';
+	if ( jQuery( '#wppa-rootsearch-'+mocc).prop('checked' ) ) url +="wppa-rootsearch=on" + '&';
+	if ( jQuery( '#wppa-catbox-'+mocc ).length == 1 ) url += "wppa-catbox=" + jQuery( '#wppa-catbox-'+mocc ).val() + '&';
+	if ( jQuery( '#wppa-rootbox-'+mocc ).prop('checked') ) url += "wppa-rootbox=on" + '&';
+
+	if ( n > 0 ) {
+		var i;
+		for ( i = 0; i< n; i++ ) {
+			if ( jQuery( '#wppa-searchselbox-' + i + '-' + mocc ).val() ) {
+				url += 'wppa-searchselbox-' + i + '=' + jQuery('#wppa-searchselbox-' + i + '-' + mocc ).val() + '&';
+			}
+		}
+	}
+
+	url = url.slice(0,-1);
+
+	// Go to it after a few second
+//	console.log(url);
+
+	setTimeout( function() { document.location.href = url }, 2000 );
+
+}
+
+

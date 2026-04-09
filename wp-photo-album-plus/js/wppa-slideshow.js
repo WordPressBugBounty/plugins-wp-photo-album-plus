@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '9.1.07.007';
+var wppaJsSlideshowVersion = '9.1.10.011';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -1360,6 +1360,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 						( isPdf ? ' data-pdfhtml="src=\''+hrUrl+'\'"' : '' ) +
 						( ( _wppaAudioHtml[mocc][i] != '' ) ?
 							' data-audiohtml="'+encodeURI( _wppaAudioHtml[mocc][i] )+'"' : '' ) +
+							' data-id="'+_wppaId[mocc][i]+'"' +
 						' '+theTitle+'="'+_wppaLbTitle[mocc][i]+'"' +
 						' '+wppaRel+'="'+wppaLightBox[mocc]+set+'"></a>';
 				i++;
@@ -1390,6 +1391,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 					( isPdf ? ' data-pdfhtml="src=\''+hrUrl+'\'"' : '' ) +
 					( ( _wppaAudioHtml[mocc][i] != '' ) ?
 						' data-audiohtml="'+encodeURI( _wppaAudioHtml[mocc][idx] )+'"' : '' ) +
+						' data-id="'+_wppaId[mocc][idx]+'"' +
 					' '+theTitle+'="'+_wppaLbTitle[mocc][idx]+'"' +
 					' '+wppaRel+'="'+wppaLightBox[mocc]+set+'"' + '>' +
 						( isPdf ?
@@ -1421,6 +1423,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 							( isPdf ? ' data-pdfhtml="src=\''+hrUrl+'\'"' : '' ) +
 						( ( _wppaAudioHtml[mocc][i] != '' ) ?
 							' data-audiohtml="'+encodeURI( _wppaAudioHtml[mocc][i] )+'"' : '' ) +
+							' data-id="'+_wppaId[mocc][i]+'"' +
 						' '+theTitle+'="'+_wppaLbTitle[mocc][i]+'"' +
 						' '+wppaRel+'="'+wppaLightBox[mocc]+set+'"' + '></a>';
 				i++;

@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.1.06.008
+/* Version 9.1.10.007
 /* Various js routines used in admin pages
 */
 
@@ -753,7 +753,7 @@ function wppaChangeScheduleDelAlbum(album, elem) {
 var _wppaRefreshAfter = false;
 
 // Do the actual ajax update request
-function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
+function wppaAjaxUpdateAlbum( album, actionslug, value, refresh, alb ) {
 
 	if ( typeof( value ) == 'object' ) value = jQuery( value ).val();
 
@@ -825,7 +825,7 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh ) {
 												break;
 											case 'cover_type':
 											case 'main_photo':
-												wppaGetCoverPreview( album, 'cover-preview-'+album );
+												wppaGetCoverPreview( alb, 'cover-preview-'+album );
 												break;
 											default:
 												jQuery('#wppa-'+item).html( value );

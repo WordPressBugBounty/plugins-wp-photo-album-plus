@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.1.07.008
+* Version 9.1.10.009
 *
 */
 
@@ -501,12 +501,9 @@ global $wppa_session;
 
 	// Open the form
 	$result = '
-	<form
+	<div
 		id="wppa_searchform_' . $mocc . '"
-		action="' . $pagelink.'"
-		method="' . wppa_opt( 'search_form_method' ) . '"
 		class="widget_search search-form"
-		role="search"
 		>';
 
 		// Catbox
@@ -574,6 +571,7 @@ global $wppa_session;
 					// Selbox
 					$result .= '
 					<select
+						id="wppa-searchselbox-' . $sb . '-' . $mocc . '"
 						name="wppa-searchselbox-' . $sb . '"
 						class="wppa-searchselbox"
 						style="clear:both;width:100%;"
@@ -596,116 +594,31 @@ global $wppa_session;
 		$result .= '
 		<div
 			class="wppa-searchsel-item wppa-searchsel-item-' . $mocc . '"
-			style="width:' . $w . '%;float:left"
+			style="width:' . $w . '%;float:left;margin-top:6px;"
 			>';
 
 			// Toptext
 			$result .=
 			wppa_opt( 'search_toptext' ) . ( $any_caption ? '&nbsp;' : '' ) . '
-			<div style="position:relative">';
-
-				// form core
-				$form_core = '';
-
-				// Use own form as requested
-				if ( wppa_switch( 'use_wppa_search_form' ) ) {
-
-					if ( wppa_browser_can_html5() ) {
-						$form_core = '<!-- wppa form html5 -->
-						<label>
-							<span class="screen-reader-text" >' . esc_html__( 'Search for:', 'wp-photo-album-plus' ) . '</span>
-							<input
-								type="search"
-								class="search-field"
-								placeholder="' . esc_attr( wppa_opt( 'search_placeholder' ) ) . '"
-								value="' . esc_attr( wppa_get( 'searchstring' ) ) . '"
-								name="wppa-searchstring"
-							/>
-						</label>
-						<input
-							type="submit"
-							class="search-submit"
-							value="'. esc_attr__( 'Search', 'wp-photo-album-plus' ) .'"
-						/>';
-					} else {
-						$form_core = '<!-- wppa form html4 -->
-						<div>
-							<label
-								class="screen-reader-text"
-								for="wppa_s-'.$mocc.'"
-								>' .
-								esc_html__( 'Search for:', 'wp-photo-album-plus' ) . '
-							</label>
-							<input
-								type="text"
-								value="' . esc_attr( wppa_get( 'searchstring' ) ) . '"
-								name="wppa-searchstring"
-								id="wppa_s-' . $mocc . '"
-							/>
-							<input
-								type="submit"
-								id="searchsubmit"
-								value="' . esc_attr__( 'Search', 'wp-photo-album-plus' ) . '"
-							/>
-						</div>';
-					}
-				}
-
-				// Use theme or modified form
-				else {
-					$form_core = get_search_form( ['echo' => false] );
-
-					// If still no luck, use wp default
-					if ( ! $form_core ) {
-
-						$format = current_theme_supports( 'html5', 'search-form' ) ? 'html5' : 'xhtml';
-						$format = apply_filters( 'search_form_format', $format );
-
-						if ( 'html5' == $format ) {
-							$form_core = '<form role="search" method="get" class="search-form" action="' . esc_url( home_url( '/' ) ) . '">
-								<label>
-									<span class="screen-reader-text">' . esc_html__( 'Search for:', 'wp-photo-album-plus' ) . '</span>
-									<input type="search" class="search-field" placeholder="' . esc_attr( wppa_opt( 'search_placeholder' ) ) . '" value="' . get_search_query() . '" name="s" />
-								</label>
-								<input type="submit" class="search-submit" value="' . esc_attr__( 'Search', 'wp-photo-album-plus' ) .'" />
-							</form>';
-						} else {
-							$form_core = '<form role="search" method="get" id="searchform" class="searchform" action="' . esc_url( home_url( '/' ) ) . '">
-								<div>
-									<label class="screen-reader-text" for="s">' . esc_html__( 'Search for:', 'wp-photo-album-plus' ) . '</label>
-									<input type="text" value="' . get_search_query() . '" name="s" id="s" />
-									<input type="submit" id="searchsubmit" value="'. esc_attr__( 'Search', 'wp-photo-album-plus' ) .'" />
-								</div>
-							</form>';
-						}
-					}
-
-					// Remove form tag, we are already in a form
-					$form_core = preg_replace( array( '/<form[^>]*>/siu', '/<\/form[^>]*>/siu' ), '', $form_core );
-
-					// Fix id and name
-					$form_core = str_replace( 'for="s"', 'for="wppa_s-'.$mocc.'"', $form_core );
-					$form_core = str_replace( 'id="s"', 'id="wppa_s-'.$mocc.'"', $form_core );
-					$form_core = str_replace( 'name="s"', 'name="wppa-searchstring"', $form_core );
-
-					// If no placeholder in form_core, add it
-					if ( strpos( $form_core, 'placeholder' ) === false ) {
-						if ( strpos( $form_core, 'name="wppa-searchstring"' ) !== false ) {
-							$form_core = str_replace( 'name="wppa-searchstring"', 'name="wppa-searchstring" placeholder="' . esc_attr( wppa_opt( 'search_placeholder' ) ) . '" ', $form_core );
-						}
-					}
-
-					// Fix previous input
-					$form_core = str_replace( 'value=""', 'value="' . esc_attr( wppa_get( 'searchstring' ) ) . '"', $form_core );
-
-					// Fix placeholder
-					$form_core = preg_replace( '/placeholder=\"[^\"]*/', 'placeholder="' . esc_attr( wppa_opt( 'search_placeholder' ) ), $form_core );
-				}
-
-				// Insert
-				$result .= $form_core;
-
-			$result .= '
+			<div style="position:relative">
+				<label>
+					<span class="screen-reader-text" >' . esc_html__( 'Search for:', 'wp-photo-album-plus' ) . '</span>
+					<input
+						id="wppa-searchstring-'.$mocc.'"
+						type="search"
+						class="search-field"
+						placeholder="' . esc_attr( wppa_opt( 'search_placeholder' ) ) . '"
+						value="' . esc_attr( wppa_get( 'searchstring' ) ) . '"
+						name="wppa-searchstring"
+						style="position: relative;top: -14px;"
+					/>
+				</label>
+				<img
+					src="' . wppa_get_imgdir() . 'magnifier-large.png"
+					class="search-submit"
+					style="margin-left:6px;"
+					onclick="wppaDelayedSearch(\''. $pagelink .'\', '.$mocc.', '.$selboxes.' )"
+				/>
 			</div>';
 
 		// Close item wrapper
@@ -719,48 +632,56 @@ global $wppa_session;
 		if ( $force_root ) {
 			$result .= '
 			<input
+				id="wppa-forceroot-'.$mocc.'"
 				type="hidden"
 				name="wppa-forceroot"
 				value="' . $force_root . '"
-				/>';
+			/>';
 		}
 		$result .= '
 		<input
+			id="wppa-searchroot-'.$mocc.'"
 			type="hidden"
 			name="wppa-searchroot"
 			class="wppa-search-root-id"
 			value="' . $root . '"
-			/>';
-			if ( $rt && ! $force_root ) {
-				$result .= '
-				<div style="clear:both" ></div>
-				<small class="wppa-search-root" style="margin:0;padding:4px 0 0">' .
-					wppa_display_root( $root ) . '
-				</small>
-				<div style="clear:both;' . $fontsize . '" >
-					<input type="checkbox" name="wppa-rootsearch" class="wppa-rootbox" ' . $rootboxset . ' /> ' .
-					wppa_opt( 'search_in_section' ) . '
-				</div>';
-			}
-			if ( $sub ) {
-				$result .= '
-				<div style="clear:both" ></div>
-				<small class="wppa-display-searchstring" style="margin:0;padding:4px 0 0">' .
-					$wppa_session['display_searchstring'] . '
-				</small>
-				<div style="clear:both;' . $fontsize . '" >
-					<input
-						type="checkbox"
-						name="wppa-subsearch"
-						class="wppa-search-sub-box"' .
-						( empty( $wppa_session['display_searchstring'] ) ? ' disabled' : '' ) . '
-						onchange="wppaSubboxChange(this)"
-					/> ' .
-					wppa_opt( 'search_in_results' ) . '
-				</div>';
-			}
+		/>';
+		if ( $rt && ! $force_root ) {
 			$result .= '
-	</form>';
+			<div style="clear:both" ></div>
+			<small class="wppa-search-root" style="margin:0;padding:4px 0 0">' .
+				wppa_display_root( $root ) . '
+			</small>
+			<div style="clear:both;' . $fontsize . '" >
+				<input
+					id="wppa-rootsearch-'.$mocc.'"
+					type="checkbox"
+					name="wppa-rootsearch"
+					class="wppa-rootbox" ' . $rootboxset . '
+				/> ' .
+				wppa_opt( 'search_in_section' ) . '
+			</div>';
+		}
+		if ( $sub ) {
+			$result .= '
+			<div style="clear:both" ></div>
+			<small class="wppa-display-searchstring" style="margin:0;padding:4px 0 0">' .
+				wppa_get_searchstring( true ) . '
+			</small>
+			<div style="clear:both;' . $fontsize . '" >
+				<input
+					id="wppa-subsearch-'.$mocc.'"
+					type="checkbox"
+					name="wppa-subsearch"
+					class="wppa-search-sub-box"' .
+					( ! wppa_get_searchstring() ? ' disabled' : '' ) . '
+					onchange="wppaSubboxChange(this)"
+				/> ' .
+				wppa_opt( 'search_in_results' ) . '
+			</div>';
+		}
+		$result .= '
+	</div>';
 
 	return $result;
 }

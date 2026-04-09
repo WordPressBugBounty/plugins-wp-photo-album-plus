@@ -390,6 +390,12 @@ global $wppa_cron_maintenance_slugs;
 				update_option( 'wppa_show_empty_thumblist', 'always' );
 			}
 		}
+		
+		if ( $old_rev <= '9110008' ) {
+			$from 		= WPPA_PATH . '/img/album.jpg';
+			$to 		= WPPA_UPLOAD_PATH . '/icons/album.jpg';
+			wppa_copy( $from, $to );
+		}
 	}
 
 	// Sanitize nicescroll opts

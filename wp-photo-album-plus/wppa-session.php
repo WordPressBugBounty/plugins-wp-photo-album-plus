@@ -3,13 +3,28 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.0.09.002
+* Version 9.1.10.010
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
 * The use of $_SESSION data is therefor no longer reliable
 * This file contains routines to obtain the same functionality, but more secure.
 * In the application use the global $wppa_session instead of $_SESSION['wppa_session']
+
+* DB structure:
+
+"CREATE TABLE " . WPPA_SESSION . " (
+					id bigint(20) NOT NULL AUTO_INCREMENT,
+					session tinytext NOT NULL,
+					timestamp tinytext NOT NULL,
+					user tinytext NOT NULL,
+					ip tinytext NOT NULL,
+					status tinytext NOT NULL,
+					data text NOT NULL,
+					count bigint(20) NOT NULL default 0,
+					PRIMARY KEY  (id),
+					KEY sessionkey (session(20))
+					) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci";
 *
 */
 
@@ -18,6 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) exit();
 // Generate a unique session id
 function wppa_get_session_id() {
 global $wppa_version;
+global $wpdb;
 static $session_id;
 
 	// Found already?
@@ -27,24 +43,11 @@ static $session_id;
 
 	// Look for a cookie
 	if ( isset( $_COOKIE['wppa_session_id'] ) ) {
-		$t = rest_is_ip_address( sanitize_text_field( wp_unslash( $_COOKIE['wppa_session_id'] ) ) );
-		if ( $t ) {
-			$session_id = $t;
+		$session_id = wp_unslash( $_COOKIE['wppa_session_id'] );
+		if ( $session_id ) {
 			return $session_id;
 		}
 	}
-
-	// Try to find clients ip
-	$ip = wppa_get_user_ip();
-	if ( $ip ) {
-		$session_id = ( $ip );
-		return $session_id;
-	}
-
-	// No ip found, create random
-	$session_id = ( microtime( true ) );
-	setcookie( 'wppa_session_id', $session_id, time() + 3600 );
-	return $session_id;
 }
 
 // Dummy for wfcart
@@ -68,80 +71,72 @@ global $wppa_session;
 		}
 	}
 
+	// First destroy expired sessions older than 24 hrs
+	$n = wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
+	if ( $n ) wppa_log( 'dbg', $n . ' old sessions removed while opening a new one' );
+
+	// Anonimize all expired sessions, except robots (for the statistics widget)
+	wppa_query( "UPDATE $wpdb->wppa_session
+			   SET ip = '', user = '', data = ''
+			   WHERE status = 'expired'
+			   AND data NOT LIKE '%\"isrobot\";b:1;%'" );
+
+	// Init
 	$lifetime 	= 3600;			// Sessions expire after one hour
 	$expire 	= time() - $lifetime;
+	$session_id = wppa_get_session_id();
 
 	// Is session already started?
-	$session = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_session
+	$session = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_session
 												WHERE session = %s
 												AND status = 'valid'
-												LIMIT 1", wppa_get_session_id() ) );
+												ORDER BY id DESC
+												LIMIT 1", $session_id ), ARRAY_A );
 
 	// Started but expired?
 	if ( $session ) {
+
+		$wppa_session = wppa_unserialize( $session['data'], true );
+
 		if ( $session['timestamp'] < $expire ) {
 
 			wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
 										   SET status = 'expired'
-										   WHERE id = %d", $session['id'] ) );
+										   WHERE session = %s", $session_id ) );
 			$session = false;
-
-			// Anonimize all expired sessions, except robots (for the statistics widget)
-			wppa_query( "UPDATE $wpdb->wppa_session
-						   SET ip = '', user = '', data = ''
-						   WHERE status = 'expired'
-						   AND data NOT LIKE '%\"isrobot\";b:1;%'" );
 		}
+
+		// Not expired
+		$wppa_session = unserialize( $session['data'] );
+//		return;
 	}
 
-	// Get data if valid session exists
-	$data = $session ? $session['data'] : false;
-	if ( strlen( $data ) > 65000 ) { // data overflow, reset
-		$data = false;
-	}
-
-	// No valid session exists, start new
-	if ( $data === false ) {
-
-		// First destroy expired sessions older than 24 hrs
-		$n = wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
-		if ( $n ) wppa_log( 'misc', $n . ' old sessions removed while opening a new one' );
+	// Now create new session
+	if ( ! $session ) {
 
 		$iret = wppa_create_session_entry();
 
 		if ( ! $iret ) {
+			wppa_log( 'Err', 'Unable to create session for user ' . wppa_get_user() );
 
-			// Failed, retry after 1 sec.
-			sleep(1);
-			$iret = wppa_create_session_entry();
-			if ( ! $iret ) {
-				wppa_log( 'Err', 'Unable to create session for user ' . wppa_get_user() );
-
-				// Give up
-				return false;
-			}
+			// Give up
+			return false;
 		}
 
-		$wppa_session = array();
-		$wppa_session['page'] 		= 0;
-		$wppa_session['ajax'] 		= 0;
-		$wppa_session['id']   		= $iret;
-		$wppa_session['user'] 		= wppa_get_user();
-		$wppa_session['wfcart'] 	= null;
-		$wppa_session['photo'] 		= array();
-		$wppa_session['rem_url'] 	= array();
-		$wppa_session['uris'] 		= array();
+		else { // get the session
+			wppa_read_session();
+		}
 	}
 
 	// Session exists, Update counter
 	else {
-		$wppa_session = wppa_unserialize( $data, true );
-
-		wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
-									   SET count = %d WHERE id = %d", $session['count'] + 1, $session['id'] ) );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT `count` FROM $wpdb->wppa_session WHERE session = %s", $session_id ) );
+		$query = $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %d WHERE session = %s", $count + 1, $session_id );
+		wppa_query( $query );
 	}
 
 	// Get info for root and sub search
+	/*
 	if ( wppa_get( 'search-submit' ) ) {
 		$wppa_session['rootbox'] = wppa_get( 'rootsearch' );
 		$wppa_session['subbox']  = wppa_get( 'subsearch' );
@@ -168,35 +163,11 @@ global $wppa_session;
 			$wppa_session['display_searchstring'] = str_replace ( ',', ' &#8746 ', str_replace ( ' ', ' &#8745 ', $wppa_session['use_searchstring'] ) );
 		}
 	}
+	*/
 
-	// Add missing defaults
-	$defaults = array(
-						'has_searchbox' 		=> false,
-						'rootbox' 				=> false,
-						'search_root' 			=> '',
-						'subbox' 				=> false,
-						'use_searchstring' 		=> '',
-						'display_searchstring' 	=> '',
-						'supersearch' 			=> '',
-						'superview' 			=> 'thumbs',
-						'superalbum' 			=> 0,
-						'page'					=> 0,
-						'ajax'					=> 0,
-						'user' 					=> '',
-						'id' 					=> 0,
-						'uris' 					=> array(),
-						'isrobot' 				=> false,
-						'wfcart' 				=> null,
-						'is_wppa_tree' 			=> false,
-						'rem_url' 				=> array(),
-						'search_albums' 		=> '',
-						'search_photos' 		=> '',
-						);
-
-	$wppa_session = wp_parse_args( $wppa_session, $defaults );
-	ksort( $wppa_session );
-
+	if ( ! isset( $wppa_session['page'] ) ) $wppa_session['page'] = 0;
 	$wppa_session['page']++;
+	if ( ! isset( $wppa_session['uris'] ) ) $wppa_session['uris'] = [];
 	if ( wppa_request_uri() ) {
 		$new_item = date_i18n("g:i") . ' ' . wppa_request_uri();
 		if ( ! in_array( $new_item, (array) $wppa_session['uris'] ) ) {
@@ -207,10 +178,9 @@ global $wppa_session;
 		}
 	}
 
+// wppa_log('dbg', 'read sesion sstr: '.$wppa_session['use_searchstring']);
 	// Reset default randseed conditionally (if wp page id changed)
 	wppa_get_randseed();
-
-//	wppa_save_session();
 
 	return true;
 }
@@ -228,48 +198,23 @@ global $wppa_session;
 function wppa_save_session() {
 global $wpdb;
 global $wppa_session;
-static $last_query;
 
 	// If no id can be found, give up
-	if ( ! wppa_get_session_id() ) return false;
-
-//	setcookie( 'wppa_session_id', wppa_get_session_id(), 3600 );
-
-	// If no id present, give up
-	if ( ! isset( $wppa_session['id'] ) ) return false;
+	$session_id = wppa_get_session_id();
+	if ( ! $session_id ) return false;
 
 	// To prevent data overflow, only save the most recent 100 urls
 	$c = isset( $wppa_session['uris'] ) && is_array( $wppa_session['uris'] ) ? count( $wppa_session['uris'] ) : 0;
 	if ( $c > 100 ) {
 		array_shift( $wppa_session['uris'] );
 	}
-
+// wppa_log('dbg', 'up to save '.$wppa_session['use_searchstring']);
 	// Compose the query
-	$query = $wpdb->prepare( "UPDATE $wpdb->wppa_session
-							  SET data = %s
-							  WHERE id = %d", serialize( $wppa_session ), $wppa_session['id'] );
-
-	// Only update if data differs from previous update
-	if ( $query != $last_query ) {
-
-		// Do the query
-		$iret = wppa_query( $query );
-
-		// Remember last successfull query
-		if ( $iret !== false ) {
-			$last_query = $query;
-			return true;
-		}
-
-		// No luck, maybe attempt to save a session that never started.
-		// Mostly robots that modify their own ip.
-		// Just ignore is the best way
-//		wppa_log( 'Dbg', 'Could not save session '.$wppa_session['id']);
-		return false;
-	}
-
-	// No error return
-	return true;
+	$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
+											SET data = %s
+											WHERE session = %s", serialize( $wppa_session ), $session_id ) );
+	// Rreturn result
+	return $iret;
 }
 
 // Extends session for admin maintenance procedures, to report the right totals
@@ -280,4 +225,18 @@ global $wpdb;
 	wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
 								   SET timestamp = %d
 								   WHERE session = %s", time(), $sessionid ) );
+}
+
+// Read session data to be used inside code to make sure you have it
+function wppa_read_session() {
+global $wppa_session;
+global $wpdb;
+
+	$sessionid = wppa_get_session_id();
+	if ( ! $wppa_session ) {
+		wppa_begin_session();
+	}
+
+	$data = $wpdb->get_var( $wpdb->prepare( "SELECT data from $wpdb->wppa_session WHERE session = %s ORDER BY id DESC LIMIT 1", $sessionid ) );
+	if ( $data ) $wppa_session = unserialize( $data );
 }

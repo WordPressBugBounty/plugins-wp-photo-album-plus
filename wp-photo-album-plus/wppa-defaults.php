@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 9.1.07.007
+* Version: 9.1.10.009
 *
 */
 
@@ -1161,8 +1161,8 @@ horizrailenabled:false,";
 						'wppa_search_selbox_2' 			=> '',
 						'wppa_extended_duplicate_remove' => 'no',
 						'wppa_search_placeholder' 		=> __( 'Search photos &hellip;', 'wp-photo-album-plus' ),
-						'wppa_search_form_method' 		=> 'post',
-						'wppa_use_wppa_search_form' 	=> 'no',
+	//					'wppa_search_form_method' 		=> 'post',
+	//					'wppa_use_wppa_search_form' 	=> 'no',
 
 						// F Watermark
 						'wppa_watermark_on'				=> 'no',

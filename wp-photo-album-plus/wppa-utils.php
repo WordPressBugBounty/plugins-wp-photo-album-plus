@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.1.09.005
+* Version: 9.1.10.009
 *
 */
 
@@ -3589,7 +3589,7 @@ global $wppa;
 
 function wppa_exit() {
 	wppa_session_end();
-	exit;
+	exit();
 }
 
 function wppa_sanitize_custom_field( $txt ) {
@@ -6521,4 +6521,45 @@ function wppa_fix_rights( $id ) {
 	wppa_chmod( wppa_get_source_path( $id ) );
 	wppa_chmod( wppa_get_photo_path( $id ) );
 	wppa_chmod( wppa_get_thumb_path( $id ) );
+}
+
+function wppa_get_searchstring( $display = false ) {
+global $wppa_session;
+
+	// Init
+	$result = '';
+	if ( wppa_get( 'subsearch' ) ) {
+		$result = trim( wppa_get( 'searchsubmit' ) ) . ';' . $wppa_session['use_searchstring'];
+	}
+
+	// Raw
+	$result .= ';' . trim( wppa_get( 'searchstring' ) );
+	for ( $i = 0; $i<3; $i++ ) {
+		if ( wppa_get( 'searchselbox-'.$i ) ) {
+			$result .= ';' . wppa_get( 'searchselbox-'.$i );
+		}
+	}
+	$result = trim( $result, ';' );
+	$tokens = explode( ';', $result );
+	$new_tokens = [];
+	foreach( $tokens as $t ) {
+		$t = trim($t);
+		if ( $t && ! in_array( $t, $new_tokens ) ) {
+			$new_tokens[] = $t;
+		}
+	}
+	$result = implode( ';', $new_tokens );
+
+	// If subsearch and new input, save result in session data
+	if ( wppa_get( 'subsearch' ) && ( wppa_get( 'searchstring' ) || wppa_get( 'searchsubmit' ) ) ) {
+		$wppa_session['use_searchstring'] = $result;
+		wppa_save_session();
+	}
+
+	// For display
+	if ( $display ) {
+		$result = str_replace ( [',', ';'], [' &#8746 ', ' &#8745 '], $result );
+	}
+
+	return $result;
 }
