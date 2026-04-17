@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.1.10.009
+* Version: 9.1.11.001
 *
 */
 
@@ -9214,7 +9214,7 @@ global $wppa_hide_this;
 						$help = '';
 						$slug1 = '';
 						$slug2 = 'wppa_list_session';
-						$html1 = '';
+						$html1 = __( 'Filter user', 'wp-photo-album-plus' ) . ' ' . wppa_input( 'wppa_list_session_username' );
 						$html2 = wppa_popup_button( $slug2 );
 						$html3 = '';
 						$html4 = '';

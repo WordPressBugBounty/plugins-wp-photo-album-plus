@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.1.10.008
+* Version 9.1.11.001
 *
 */
 
@@ -865,6 +865,7 @@ function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => fal
 		'data-alt' => true,
 		'data-type' => true,
 		'ontouchstart' => true,
+		'ontouchmove' => true,
 		'ontouchend' => true,
 		'onfocus' => true,
 		'onblur' => true,

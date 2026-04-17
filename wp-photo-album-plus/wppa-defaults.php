@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 9.1.10.009
+* Version: 9.1.11.001
 *
 */
 
@@ -1324,6 +1324,8 @@ horizrailenabled:false,";
 						'wppa_opt_menu_edit_tags'		=> 'yes',
 						'wppa_opt_menu_edit_sequence' 	=> 'yes',
 						'wppa_opt_menu_edit_email' 		=> 'yes',
+						
+						'wppa_list_session_username' 	=> '',
 
 						);
 

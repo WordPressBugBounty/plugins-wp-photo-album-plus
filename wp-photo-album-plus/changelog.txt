@@ -1,5 +1,9 @@
 WP Photo Album Plus Changelog
 
+= 9.1.11 =
+
+* Security fix
+
 = 9.1.10 =
 
 * Exclude separate on the search settins page caused a fatal error at the frontend. Fixed.

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 9.0.08.003
+* Version 9.1.11.001
 *
 */
 
@@ -483,7 +483,7 @@ function wppa_popup_button( $slug, $height = '18' ) {
 		class="wppa-doit-button"
 		style="height: ' . $height . 'px;"
 		value="' . esc_attr($label) . '"
-		onclick="wppaAjaxPopupWindow(\''.$slug.'\')"
+		onclick="setTimeout(function(){wppaAjaxPopupWindow(\''.$slug.'\')},1000)"
 	/>';
 
 	return $result;

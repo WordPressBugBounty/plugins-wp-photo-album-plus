@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.1.10.010
+* Version: 9.1.11.001
 *
 */
 
@@ -1234,14 +1234,15 @@ global $wppa;
 			// Name
 			case 'n':
 				wppa( 'is_name', wppa_name_slug( $data ) );
-				$query = "SELECT id FROM $wpdb->wppa_photos WHERE sname = '" . wppa_name_slug( $data ) . "' AND album > 0  ORDER BY $order";
+				$sname = wppa_name_slug( $data );
+				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE sname = %s AND album > 0", $sname );
 				$total_ids = wppa_combine_virtual( $query, 16 );
 				break;
 
 			// Owner
 			case 'o':
 				wppa( 'is_upldr', $data );
-				$query = "SELECT id FROM $wpdb->wppa_photos WHERE owner = '" . $data . "' AND album > 0 ORDER BY $order";
+				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0", $data );
 				$total_ids = wppa_combine_virtual( $query, 17 );
 				break;
 
@@ -1251,7 +1252,7 @@ global $wppa;
 				wppa( 'is_tag', str_replace( '.', ',', $data ) );
 				foreach( $data_arr as $d ) {
 					$d = wppa_sanitize_tags( $d );
-					$query = "SELECT id FROM $wpdb->wppa_photos WHERE tags LIKE '%".$d."%' AND album > 0 ORDER BY $order";
+					$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE tags LIKE %s AND album > 0", "%".$wpdb->esc_like($d)."%" );
 					$total_ids = wppa_combine_virtual( $query, 18 );
 				}
 				break;
@@ -1266,7 +1267,7 @@ global $wppa;
 					wppa_show_query('18: '.$query, 1 );
 					if ( ! $index ) return [];
 					$ids = str_replace( '.', ',', wppa_expand_enum( $index ) );
-					$query = "SELECT id FROM $wpdb->wppa_photos WHERE album > 0 AND id IN (".$ids.") ORDER BY $order";
+					$query = "SELECT id FROM $wpdb->wppa_photos WHERE album > 0 AND id IN (".$ids.")";
 					$total_ids = wppa_combine_virtual( $query, 19 );
 				}
 				break;
@@ -1297,7 +1298,8 @@ global $wppa;
 
 	// Name (from supersearch)
 	if ( wppa( 'is_name' ) ) {
-		$query = "SELECT id FROM $wpdb->wppa_photos WHERE sname = '" . wppa_name_slug( wppa( 'is_name' ) ) . "' AND album > 0  ORDER BY $order";
+		$sname = wppa_name_slug( wppa( 'is_name' ) );
+		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE sname = %s AND album > 0", $sname );
 		$total_ids = wppa_combine_virtual( $query, 22 );
 	}
 
@@ -1339,7 +1341,7 @@ global $wppa;
 			$root_albs = wppa_expand_enum( wppa_alb_to_enum_children( $root ) );
 			$root_albs = str_replace( '.', ',', $root_albs );
 			$order = 'id';
-			$query = "SELECT id FROM $wpdb->wppa_photos WHERE album IN (" . $root_albs . ") ORDER BY $order";
+			$query = "SELECT id FROM $wpdb->wppa_photos WHERE album IN (" . $root_albs . ")";
 			$total_ids = wppa_combine_virtual( $query, 26 );
 			wppa_show_query('12b: ', count($total_ids));
 		}
@@ -1351,28 +1353,29 @@ global $wppa;
 	// Calendar
 	if ( wppa( 'calendar' ) ) {
 		if ( wppa( 'start_album' ) ) {
-			$alb_clause = " AND album IN ( ". str_replace( '.', ',', wppa_expand_enum( wppa( 'start_album' ) ) ) ." ) ORDER BY $order";
+			$alb_clause = " AND album IN ( ". str_replace( '.', ',', wppa_expand_enum( wppa( 'start_album' ) ) ) ." )";
 		}
 		else {
-			$alb_clause = " AND album > 0 ORDER BY $order";
+			$alb_clause = " AND album > 0";
 		}
 		switch ( wppa( 'calendar' ) ) {
 			case 'exifdtm':
-				$query = "SELECT id FROM $wpdb->wppa_photos WHERE exifdtm LIKE '" . wp_strip_all_tags( wppa( 'caldate' ) ) . "% " . $alb_clause;
+				$d = wp_strip_all_tags( wppa( 'caldate' ) );
+				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE exifdtm LIKE %s", $wpdb->esc_like($d)."% " ) . $alb_clause;
 				$total_ids 	= wppa_combine_virtual( $query, 27 );
 				break;
 
 			case 'timestamp':
 				$t1 = strval( intval( wppa( 'caldate' ) * 24*60*60 ) );
 				$t2 = $t1 + 24*60*60;
-				$query = "SELECT id FROM $wpdb->wppa_photos WHERE timestamp >= $t1 AND timestamp < $t2 " . $alb_clause;
+				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE timestamp >= %s AND timestamp < %s ", $t1, $t2 ) . $alb_clause;
 				$total_ids 	= wppa_combine_virtual( $query, 28 );
 				break;
 
 			case 'modified':
 				$t1 = strval( intval( wppa( 'caldate' ) * 24*60*60 ) );
 				$t2 = $t1 + 24*60*60;
-				$query = "SELECT id FROM $wpdb->wppa_photos WHERE modified >= $t1 AND modified < $t2 " . $alb_clause;
+				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE modified >= %s AND modified < %s ", $t1, $t2 ) . $alb_clause;
 				$total_ids 	= wppa_combine_virtual( $query, 29 );
 				break;
 
@@ -3419,6 +3422,7 @@ global $blog_id;
 					class="wppa-modal-container"
 					style="position:relative;z-index:100000;"
 					data-wppa="yes"
+					ontouchmove="event.stopPropagation();"
 					>
 				</div>'
 			);

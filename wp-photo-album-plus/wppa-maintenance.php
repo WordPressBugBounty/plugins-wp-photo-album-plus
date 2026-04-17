@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 9.1.02.003
+* Version: 9.1.11.001
 *
 */
 
@@ -1603,7 +1603,7 @@ global $wppa_log_file;
 	'<div' .
 		' id="wppa-maintenance-list"' .
 		( strpos( wppa_request_uri(), 'page=wppa_log' ) !== false || wppa_get( 'raw' ) ? '' : ' style="max-height:500px; overflow:auto;width:100%;"' ) .
-		' onscroll="wppaStopProp(event);" omwheel="wppaStopProp(event);" >';
+		' onscroll="wppaStopProp(event);" onwheel="wppaStopProp(event);" ontouchmove="wppaStopProp(event);">';
 
 	// Open nicescroller wrapper
 	$result .= '<div class="wppa-nicewrap" >';
@@ -1775,10 +1775,19 @@ global $wppa_log_file;
 
 		case 'wppa_list_session':
 			$total = wppa_get_count( WPPA_SESSION );
-			$sessions = wppa_get_results( "SELECT * FROM $wpdb->wppa_session ORDER BY id DESC LIMIT 1000" );
+			$filter = sanitize_text_field( wppa_opt( 'list_session_username' ) );
+			if ( $filter ) {
+				$xfilter = '"user";s:'.strlen($filter).':"'.$filter.'";';
+				$sessions = wppa_get_results( "SELECT * FROM $wpdb->wppa_session WHERE data LIKE '%$xfilter%' ORDER BY id DESC LIMIT 1000" );
+				/* translators: usename*/
+				$header = sprintf( __( 'Session data for user <b>%s</b>', 'wp-photo-album-plus' ), $filter );
+			}
+			else {
+				$sessions = wppa_get_results( "SELECT * FROM $wpdb->wppa_session ORDER BY id DESC LIMIT 1000" );
+				/* translators: intreger count */
+				$header = sprintf( __( 'List of sessions <small>( Max 1000 entries of total %d )</small>', 'wp-photo-album-plus' ), $total );
+			}
 
-			/* translators: intreger count */
-			$header = sprintf( __( 'List of sessions <small>( Max 1000 entries of total %d )</small>', 'wp-photo-album-plus' ), $total );
 
 			$result .= '
 			<div
