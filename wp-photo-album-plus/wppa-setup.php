@@ -113,6 +113,8 @@ global $wppa_cron_maintenance_slugs;
 					thumby smallint(5) NOT NULL default 0,
 					photox smallint(5) NOT NULL default 0,
 					photoy smallint(5) NOT NULL default 0,
+					sourcex smallint(5) NOT NULL default 0,
+					sourcey smallint(5) NOT NULL default 0,
 					scheduledtm tinytext NOT NULL,
 					scheduledel tinytext NOT NULL,
 					custom text NOT NULL,

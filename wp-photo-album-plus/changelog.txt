@@ -1,5 +1,18 @@
 WP Photo Album Plus Changelog
 
+= 9.1.12 =
+
+* Performance and seo optimizing release. 
+You can now convert .jpg and .png files to .webp files, possibly leading to substantial smaller filesizes to improve pageload speed.
+Relatred settings:
+Advanced settings -> New -> I -> Item 42: Convert new .jpg and .png files to .webp right after upload
+Advanced settings -> Maintenance -> III -> Item 8: Convert all .jpg and .png imagfe files to .webp files
+On the photo admin page on each photo there is a button under the Files tab to convert all files to .webm if there are applicable files present.
+Note: As opposed to other procedures, also the sourcefiles, the filename and the photoname if it is equal to the original filename will be converted.
+The jpg quality setting in Advanced settings -> Misc -> I -> Item 1 also applies to .webp files
+Re-implemented lazy load. Much faster less js overhead.
+Various code changes for search engine optimization.
+
 = 9.1.11 =
 
 * Security fix

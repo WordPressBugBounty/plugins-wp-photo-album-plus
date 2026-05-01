@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.1.07.008
+* Version: 9.1.12.005
 *
 */
 
@@ -331,7 +331,7 @@ global $wpdb;
 	// Columns are
 	$cols = ['id',  'album', 'ext', 'name', 'description', 'p_order', 'mean_rating', 'linkurl', 'linktitle', 'linktarget', 'owner', 'timestamp',
 					'status', 'rating_count', 'tags', 'alt', 'filename', 'modified', 'location', 'views', 'clicks', 'page_id', 'exifdtm',
-					'videox', 'videoy', 'thumbx', 'thumby', 'photox', 'photoy', 'scheduledtm', 'scheduledel', 'custom', 'stereo', 'crypt',
+					'videox', 'videoy', 'thumbx', 'thumby', 'photox', 'photoy', 'sourcex', 'sourcey', 'scheduledtm', 'scheduledel', 'custom', 'stereo', 'crypt',
 					'magickstack', 'indexdtm', 'panorama', 'angle', 'sname', 'dlcount', 'thumblock', 'duration', 'rml_id', 'usedby', 'misc'];
 
 	// Fields to update are
@@ -538,6 +538,22 @@ global $wpdb;
 		$n = $args['photoy'];
 		if ( wppa_is_notnegint( $n ) ) {
 			$fields['photoy'] = $n;
+		}
+	}
+
+	// Sourcex
+	if ( isset( $args['sourcex'] ) ) {
+		$n = $args['sourcex'];
+		if ( wppa_is_notnegint( $n ) ) {
+			$fields['sourcex'] = $n;
+		}
+	}
+
+	// Sourcey
+	if ( isset( $args['sourcey'] ) ) {
+		$n = $args['sourcey'];
+		if ( wppa_is_notnegint( $n ) ) {
+			$fields['sourcey'] = $n;
 		}
 	}
 

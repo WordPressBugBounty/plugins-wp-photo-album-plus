@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.1.10.005
+* Version 9.1.12.005
 *
 */
 
@@ -53,7 +53,7 @@ global $wppa_session;
 
 	$bret = wppa_insert( $table, $data );
 	if ( $bret ) {
-		setcookie( 'wppa_session_id', $sid, time() + 3600 );
+		if ( ! defined( 'DOING_CRON' ) ) setcookie( 'wppa_session_id', $sid, time() + 3600 );
 		return $wpdb->insert_id;
 	}
 
@@ -280,6 +280,8 @@ global $wpdb;
 					'thumby' 			=> 0,
 					'photox' 			=> 0,
 					'photoy' 			=> 0,
+					'sourcex'  			=> 0,
+					'sourcey' 			=> 0,
 					'scheduledtm' 		=> '',
 					'scheduledel' 		=> '',
 					'custom'			=> '',

@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.1.11.001
+* Version 9.1.12.006
 *
 */
 
@@ -142,7 +142,7 @@ global $wp_filesystem;
 function wppa_imagewebp( $image, $file ) {
 global $wp_filesystem;
 
-	$bret = imagewebp( $image, $file );
+	$bret = imagewebp( $image, $file, wppa_opt( 'jpeg_quality' ) );
 	$wp_filesystem->chmod( $file );
 	return $bret;
 }
@@ -924,6 +924,8 @@ function wppa_allowed_tags( $flags = ['return' => false, 'keeplinebreaks' => fal
 			'srcset' => true,
 			'onload' => true,
 			'decoding' => true,
+			'width' => true,
+			'height' => true,
 			) ),
 		'input' => array_merge( $sa, array(
 			'type' => true,
@@ -1242,10 +1244,10 @@ global $wppa_query_cache_hit;
 	}
 	if ( !is_array( $cache ) ) $cache = array();
 	$idx = md5( $query );
-	if ( isset( $cache[$idx] ) ) {
-		$wppa_query_cache_hit = true;
-		return $cache[$idx];
-	}
+//	if ( isset( $cache[$idx] ) ) {
+//		$wppa_query_cache_hit = true;
+//		return $cache[$idx];
+//	}
 	wppa_log( 'db', $query );
 	$result = $wpdb->get_var( $query );
 	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries

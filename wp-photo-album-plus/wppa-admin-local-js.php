@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * local js code for admin pages
-* Version 9.1.04.002
+* Version 9.1.12.001
 *
 */
 
@@ -130,9 +130,19 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 
 					var query = '" . esc_js( __( 'Are you sure you want to magically process this photo?', 'wp-photo-album-plus' ) ) .  "';
 
-					if ( true || confirm( query ) ) {
+					if ( confirm( query ) ) {
 						jQuery( '#wppa-admin-spinner' ).css( 'display', 'inline' );
 						wppaAjaxUpdatePhoto( id, slug, value );
+					}
+				}
+
+				function wppaTryConvertWebP( id ) {
+
+					var query = '" . esc_js( __( 'Are you sure you want to convert the filetype to webp?', 'wp-photo-album-plus' ) ) .  "';
+
+					if ( confirm( query ) ) {
+						jQuery( '#wppa-admin-spinner' ).css( 'display', 'inline' );
+						wppaAjaxUpdatePhoto( id, 'towebp', '' );
 					}
 				}
 

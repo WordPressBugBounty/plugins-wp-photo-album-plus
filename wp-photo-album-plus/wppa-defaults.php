@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* Version: 9.1.11.001
+* version 9.1.12.005
 *
 */
 
@@ -954,6 +954,9 @@ horizrailenabled:false,";
 						'wppa_fix_userids' 			=> '',
 						'wppa_fix_custom_tags' 		=> '',
 						'wppa_covert_usertags'		=> '',
+						'wppa_convert_to_webp' 		=> '',
+						'wppa_fix_sizes' 			=> '',
+						'wppa_new_to_webp' 			=> 'no',
 
 
 
@@ -976,7 +979,7 @@ horizrailenabled:false,";
 						'wppa_meta_void_custom' 		=> '',
 						'wppa_alt_type'					=> 'fullname',
 						'wppa_photo_admin_max_albums' 	=> '0',
-						'wppa_jpeg_quality'				=> '95',
+						'wppa_jpeg_quality'				=> '85',
 						'wppa_geo_edit' 				=> 'no',
 						'wppa_adminbarmenu_admin'		=> 'yes',
 						'wppa_adminbarmenu_frontend'	=> 'yes',
@@ -1324,7 +1327,7 @@ horizrailenabled:false,";
 						'wppa_opt_menu_edit_tags'		=> 'yes',
 						'wppa_opt_menu_edit_sequence' 	=> 'yes',
 						'wppa_opt_menu_edit_email' 		=> 'yes',
-						
+
 						'wppa_list_session_username' 	=> '',
 
 						);

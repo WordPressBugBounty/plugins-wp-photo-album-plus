@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various conversion functions
-* Version: 9.1.10.003
+* Version: 9.1.12.001
 *
 */
 
@@ -638,4 +638,99 @@ global $wpdb;
 	}
 
 	return $result;
+}
+
+function wppa_convert_to_webp( $id ) {
+
+	$files = wppa_can_convert_to_webp( $id );
+	if ( ! $files ) {
+		return 0; 	// Nothing to convert
+	}
+
+	foreach( $files as $file ) {
+
+		$thisext = wppa_get_ext( $file );
+		$newfile = wppa_strip_ext( $file ) . '.webp';
+
+		// ImageMagick
+		if ( wppa_can_magick() ) {
+			$iret = 1;
+			$i = wppa_image_magick( 'convert ' . $file . ' -quality ' . wppa_opt( 'jpeg_quality' )  . ' ' . $newfile );
+			if ( $i ) {
+				return sprintf( __( 'Could not magick convert photo %d', 'wp-photo-album-plus' ), $id ); // Error
+			}
+			wppa_log( 'fso', str_replace( ABSPATH, '.../', $file.' converted to '.$newfile ) );
+			wppa_chmod( $newfile );
+			wppa_unlink( $file );
+		}
+
+		// Classic
+		else {
+			if ( $thisext == 'jpg' ) {
+				$image = wppa_imagecreatefromjpeg( $file );
+			}
+			if ( $thisext == 'png' ) {
+				$image = wppa_imagecreatefrompng( $file );
+			}
+			if ( $image ) {
+				$bret = wppa_imagewebp( $image, $newfile );
+				if ( $bret ) {
+					$iret = 1;
+					wppa_log( 'fso', str_replace( ABSPATH, '.../', $file.' converted to '.$newfile ) );
+				}
+				else {
+					return sprintf( __( 'Could not convert photo %d', 'wp-photo-album-plus' ), $id ); // Error
+				}
+				wppa_unlink( $file );
+				@ imagedestroy( $image );
+			}
+		}
+	}
+
+	// Succes
+	if ( $iret && ! in_array( wppa_get_photo_item( $id, 'ext' ), ['xxx', 'pdf'] ) ) {
+		$name 			= wppa_get_photo_item( $id, 'name' );
+		$filename 		= wppa_get_photo_item( $id, 'filename' );
+		$nameisfilename = $name == $filename;
+		$filename 		= wppa_strip_ext( $filename ) . '.webp';
+		$name = ( $nameisfilename ? $filename : $name );
+		wppa_update_photo( $id, ['ext' => 'webp', 'filename' => $filename, 'name' => $name] );
+	}
+
+	return $iret;
+}
+
+// See if a media item can be converted to .webp files
+// If so, returns an array of convertable files
+// If not: return false
+function wppa_can_convert_to_webp( $id ) {
+
+	$ext = wppa_get_photo_item( $id, 'ext' );
+	if ( $ext == 'webp' ) {
+		return false; // Already converted
+	}
+
+	$extstoconvert = ['jpg', 'png'];
+	$files = [wppa_get_source_path( $id ), wppa_get_o1_source_path( $id ), wppa_get_photo_path( $id ), wppa_get_thumb_path( $id )];
+	$files = array_merge( $files, wppa_cdn_files( $id ) );
+
+	$result = array();
+	foreach( $files as $file ) {
+		if ( wppa_is_file( $file ) ) {
+			$thisext = wppa_get_ext( $file );
+			if ( in_array( $thisext, $extstoconvert ) ) {
+				$basename = basename( $file );
+				if ( ! in_array( $basename, ['audiostub.jpg', 'documentstub.jpg'] ) ) {
+					$result[] = $file;
+				}
+			}
+		}
+	}
+
+	if ( ! count( $result ) ) {
+		return false; 	// Nothing to do
+	}
+
+	return $result;
+
 }

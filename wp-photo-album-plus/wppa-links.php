@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.1.10.006
+* Version: 9.1.12.003
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1090,17 +1090,11 @@ global $previous_page_last_id;
 	// Inverse?
 	if ( wppa( 'is_inverse' ) ) $extra_url .= '&amp;wppa-inv=1';
 
-	// Paginated subsearch?
-//	if ( wppa( 'usr' ) ) $extra_url .= '&amp;wppa-usr=1';
-
+	// Rootsearch?
 	if ( wppa_get( 'forceroot' ) ) {
 		$extra_url .= '&amp;wppa-forceroot=' . wppa_get( 'forceroot' );
 	}
-//	if ( wppa_get( 'searchsubmit' ) && wppa_get( 'searchstring' ) ) {
-//		$extra_url .= '&amp;wppa-searchstring=' . urlencode( wppa_get( 'searchstring' ) ) . ';' . urlencode( wppa_get( 'searchsubmit' ) );
-//	}
 	$searchstring = wppa_get_searchstring();
-// wppa_log('dbg', 'Searchstring = '.$searchstring);
 	if ( $searchstring ) {
 		$extra_url .= '&amp;wppa-src=1&amp;wppa-searchstring='.$searchstring;
 	}
@@ -1112,10 +1106,6 @@ global $previous_page_last_id;
 	// Compress etc
 	$link_url = wppa_roundup_url( $link_url );
 	$ajax_url = wppa_roundup_url( $ajax_url );
-
-	// Encrypt
-//	$link_url = wppa_encrypt_url( $link_url );
-//	$ajax_url = wppa_encrypt_url( $ajax_url );
 
 	// Adjust display range
 	$from = 1;
@@ -1135,182 +1125,101 @@ global $previous_page_last_id;
 	}
 
 	// Doit
+	$navtype = wppa_get_navigation_type();
+	$iconsize = wppa_icon_size( '1.5em' );
 
-	// Icons
-	if ( wppa_get_navigation_type() == 'icons' ) {
-		$iconsize = wppa_icon_size( '1.5em' );
-		$result = "\n" .
-		'<div' .
-			' class="wppa-nav-text wppa-box wppa-nav"' .
-			' style="clear:both;text-align:center;"' .
-			' >';
+	// Wrapper for pagelinks
+	$result = '
+	<div class="wppa-nav-text wppa-box wppa-nav" style="clear:both;text-align:center;">';
 
-			$vis = $curpage == 1 ? 'visibility: hidden;' : '';
-			$result .=
-			'<div' .
-				' style="float:left;text-align:left;'.$vis.'"' .
-				' >
-				<a' .
-					' style="cursor:pointer"' .
-					' title="' . esc_attr( __( 'Previous page', 'wp-photo-album-plus' ) ) . '"' .
-					' onclick="wppaDoAjaxRender(event, ' . wppa( 'targetmocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage - 1 ) . '\', \'' . wppa_convert_to_pretty ( $link_url . '&amp;wppa-paged=' . ( $curpage - 1 ) ) . '\' )"' .
-					' >' .
-					wppa_get_svghtml( 'Prev-Button', $iconsize ) .
-				'</a>
-			</div><!-- #prev-page -->';
+		$vis = $curpage == 1 ? 'visibility: hidden;' : '';
+		$the_ajaxurl = $ajax_url . '&amp;wppa-paged=' . ( $curpage - 1 );
+		$the_linkurl = wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage - 1 ) );
+		$result .= '
+		<div
+			style="float:left;text-align:left;' . $vis . '"
+			onclick="wppaDoAjaxRender(event, ' . wppa( 'targetmocc' ) . ', \'' . $the_ajaxurl . '\', \'' . $the_linkurl . '\');return false;"
+			>' .
+			( $navtype == 'text' ? '<span class="wppa-arrow" style="cursor:default">&laquo;</span>' : '' ) . '
+			<a
+				id="wppa-prev-pagelink-' . $mocc . '"
+				href="' . $the_linkurl . '"
+				style="cursor:pointer"
+				title="' . esc_attr( __( 'Previous page', 'wp-photo-album-plus' ) ) . '"
+				onclick="return false;"
+				>' .
+				( $navtype == 'icons' ? wppa_get_svghtml( 'Prev-Button', $iconsize ) : __( 'Previous page', 'wp-photo-album-plus' ) ) . '
+			</a>
+		</div><!-- #prev-page -->';
 
-			$vis = $curpage == $npages ? 'visibility: hidden;' : '';
-			$result .=
-			'<div
-				style="float:right;text-align:right;' . $vis . '"
-				>
-				<a' .
-					' id="wppa-next-pagelink-' . $mocc . '"' .
-					' style="cursor:pointer"' .
-					' title="' . esc_attr( __( 'Next page', 'wp-photo-album-plus' ) ) . '"' .
-					' onclick="wppaDoAjaxRender(event, ' . wppa( 'targetmocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage + 1 ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage + 1 ) ) . '\')"' .
-					' >' .
-					wppa_get_svghtml( 'Next-Button', $iconsize ) .
-				'</a>
-			</div><!-- #next-page -->';
+		$vis = $curpage == $npages ? 'visibility: hidden;' : '';
+		$the_ajaxurl = $ajax_url . '&amp;wppa-paged=' . ( $curpage + 1 );
+		$the_linkurl = wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage + 1 ) );
+		$result .=
+		'<div
+			style="float:right;text-align:right;' . $vis . '"
+			onclick="wppaDoAjaxRender(event, ' . wppa( 'targetmocc' ) . ', \'' . $the_ajaxurl . '\', \'' . $the_linkurl . '\');return false;"
+			>
+			<a
+				id="wppa-next-pagelink-' . $mocc . '"
+				href="' . $the_linkurl . '"
+				style="cursor:pointer"
+				title="' . esc_attr( __( 'Next page', 'wp-photo-album-plus' ) ) . '"
+				onclick="return false;"
+				>' .
+				( $navtype == 'icons' ? wppa_get_svghtml( 'Next-Button', $iconsize ) : __( 'Next page', 'wp-photo-album-plus' ) ) . '
+			</a>' .
+			( $navtype == 'text' ? '<span class="wppa-arrow" style="cursor:default">&raquo;</span>' : '' ) . '
+		</div><!-- #next-page -->';
 
-			// The numbered pagelinks ?
-			if ( wppa_opt( 'pagelinks_max' ) ) {
-				if ( $from > 1 ) {
-					$result .= '.&nbsp;.&nbsp;.&nbsp;';
-				}
-				for ( $i = $from; $i <= $to; $i++ ) {
-					if ( $curpage == $i ) {
-						$result .=
-						'<div' .
-							' class="wppa-mini-box wppa-alt wppa-black wppa-active-pagelink"' .
-							' style="display:inline;text-align:center;text-decoration:none;cursor:default;"' .
-							' >' .
-							'&nbsp;' . $i . '&nbsp;' .
-						'</div>';
-					}
-					else {
-						$result .=
-						'<div' .
-							' class="wppa-mini-box wppa-even"' .
-							' style="display:inline;text-align:center;"' .
-							' >' .
-
-							'<a' .
-								' id="wppa-pagelink-' . $mocc . '-' . $i . '"' .
-								' style="cursor:pointer"' .
-								' onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . $i . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . $i ) . '\')"' .
-								' >' .
-								'&nbsp;' . $i . '&nbsp;' .
-							'</a>';
-
-						$result .=
-						'</div>';
-					}
-				}
-				if ( $to < $npages ) {
+		// The numbered pagelinks ?
+		if ( wppa_opt( 'pagelinks_max' ) ) {
+			if ( $from > 1 ) {
+				$result .= '.&nbsp;.&nbsp;.&nbsp;';
+			}
+			for ( $i = $from; $i <= $to; $i++ ) {
+				if ( $curpage == $i ) {
 					$result .=
-					'&nbsp;.&nbsp;.&nbsp;.';
+					'<div
+						class="wppa-mini-box wppa-alt wppa-black wppa-active-pagelink"
+						style="display:inline;text-align:center;text-decoration:none;cursor:default;"
+						>
+						&nbsp;' . $i . '&nbsp;
+					</div>';
 				}
-			}
-
-			// The 3/17 indicator
-			else {
-				$result .= $curpage . ' / ' . $npages;
-			}
-
-		$result .= '<div style="clear:both"></div>';
-		wppa_out( $result );
-	}
-
-	// Text
-	else {
-
-		$result = "\n" . '
-			<div
-				class="wppa-nav-text wppa-box wppa-nav"
-				style="clear:both; text-align:center;"
-				>';
-
-			$vis = $curpage == 1 ? 'visibility: hidden;' : '';
-			$result .= '
-				<div
-					style="float:left; text-align:left; ' . $vis . '"
-					>
-					<span
-						class="wppa-arrow"
-						style="cursor:default">&laquo;
-					</span>
-					<a
-						style="cursor:pointer"
-						title="' . esc_attr( __('Previous page', 'wp-photo-album-plus') ) . '"
-						onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage - 1 ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage - 1 ) ) . '\')"
-						>' .
-						__( 'Previous page', 'wp-photo-album-plus' ) . '
-					</a>
-				</div><!-- #prev-page -->';
-
-			$vis = $curpage == $npages ? 'visibility: hidden;' : '';
-			$result .= '
-				<div
-					style="float:right; text-align:right; ' . $vis . '"
-					>
-					<a
-						id="wppa-next-pagelink-' . $mocc . '"
-						style="cursor:pointer"
-						title="' . esc_attr( __('Next page', 'wp-photo-album-plus') ) . '"
-						onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . ( $curpage + 1 ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . ( $curpage + 1 ) ) . '\')"
-						>' .
-						__( 'Next page', 'wp-photo-album-plus' ) . '
-					</a>
-					<span
-						class="wppa-arrow"
-						style="cursor:default">&raquo;</span
-					>
-				</div><!-- #next-page -->';
-
-			// The numbered pagelinks ?
-			if ( wppa_opt( 'pagelinks_max' ) ) {
-				if ( $from > 1 ) {
-					$result .= '.&nbsp;.&nbsp;.&nbsp;';
-				}
-				for ( $i = $from; $i <= $to; $i++ ) {
-					if ( $curpage == $i ) {
-						$result .= '
-						<div
-							class="wppa-mini-box wppa-alt wppa-black wppa-active-pagelink"
-							style="display:inline; text-align:center; text-decoration: none; cursor: default;"
-							>&nbsp;' . $i . '&nbsp;</div
-						>';
-					}
-					else {
-						$result .= '
-						<div
-							class="wppa-mini-box wppa-even"
-							style="display:inline; text-align:center;"
+				else {
+					$the_ajaxurl = $ajax_url . '&amp;wppa-paged=' . $i;
+					$the_linkurl = wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . $i );
+					$result .=
+					'<div
+						class="wppa-mini-box wppa-even"
+						style="display:inline;text-align:center;"
+						onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $the_ajaxurl . '\', \'' . $the_linkurl . '\');return false;"
+						>
+						<a
+							id="wppa-pagelink-' . $mocc . '-' . $i . '"
+							href="' . $the_linkurl . '"
+							style="cursor:pointer"
+							onclick="return false"
 							>
-							<a
-								id="wppa-pagelink-' . $mocc . '-' . $i . '"
-								style="cursor:pointer"
-								onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=' . $i . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=' . $i ) . '\')"
-								>&nbsp;'.$i.'&nbsp;</a
-							>
-						</div>';
-					}
-				}
-				if ( $to < $npages ) {
-					$result .= '&nbsp;.&nbsp;.&nbsp;.';
+							&nbsp;' . $i . '&nbsp;
+						</a>
+					</div>';
 				}
 			}
-
-			// The 3/17 indicator
-			else {
-				$result .= $curpage . ' / ' . $npages;
+			if ( $to < $npages ) {
+				$result .=
+				'&nbsp;.&nbsp;.&nbsp;.';
 			}
+		}
 
-		$result .= '<div style="clear:both"></div>';
-		wppa_out( $result );
-	}
+		// The 3/17 indicator
+		else {
+			$result .= $curpage . ' / ' . $npages;
+		}
+
+	$result .= '<div style="clear:both"></div>';
+	wppa_out( $result );
 
 	$result = '';
 
@@ -1320,12 +1229,12 @@ global $previous_page_last_id;
 		$result .= '
 		<a
 			id="wppa-first-pagelink-' . $mocc . '"
-			onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=1\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=1' ) . '\')"
+			onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-paged=1\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-paged=1' ) . '\');return false;"
 			>
 		</a>
 		<a
 			id="wppa-prev-page-last-item-' . $mocc . '"
-			onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-photo=' . wppa_encrypt_photo( $previous_page_last_id ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-photo=' . wppa_encrypt_photo( $previous_page_last_id ) ) . '\')"
+			onclick="wppaDoAjaxRender(event, ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-photo=' . wppa_encrypt_photo( $previous_page_last_id ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-photo=' . wppa_encrypt_photo( $previous_page_last_id ) ) . '\');return false;"
 			>
 		</a>';
 	}

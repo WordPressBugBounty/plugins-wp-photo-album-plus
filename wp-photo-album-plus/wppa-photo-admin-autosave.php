@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.1.07.008
+* Version: 9.1.12.005
 *
 */
 
@@ -402,6 +402,8 @@ global $wpdb;
 			$linktitle 		= stripslashes( $photo['linktitle'] );
 			$alt 			= stripslashes( $photo['alt'] );
 			$filename 		= $photo['filename'];
+			$thumbx 		= $photo['thumbx'];
+			$thumby 		= $photo['thumby'];
 			$photox 		= wppa_get_photox( $id );
 			$photoy 		= wppa_get_photoy( $id );
 			$videox 		= wppa_get_videox( $id, 'admin' );
@@ -440,6 +442,8 @@ global $wpdb;
 				}
 			}
 			$misc 			= $photo['misc'];
+			$sourcex = wppa_get_sourcex( $id );
+			$sourcey = wppa_get_sourcey( $id );
 
 			// See if item is a multimedia item
 			$is_multi 		= wppa_is_multi( $id );
@@ -469,6 +473,10 @@ global $wpdb;
 				$delete = __( 'Delete photo', 'wp-photo-album-plus' );
 				$undel 	= __( 'Undelete photo', 'wp-photo-album-plus' );
 				$copy 	= __( 'Copy photo', 'wp-photo-album-plus' );
+			}
+			$convert = '';
+			if ( wppa_can_convert_to_webp( $id ) ) {
+				$convert = __( 'Convert to webp', 'wp-photo-album-plus' );
 			}
 
 			// Various usefull vars
@@ -625,7 +633,8 @@ global $wpdb;
 							}
 							wppa_echo(
 								wppa_html_tag( 'img', ['id' => 'thumburl-'.$crid, 'src' => $src, 'alt' => wppa_alt($id),
-													   'style' => 'max-width:160px;vertical-align:middle;'.($has_audio?'':'margin-bottom:6px;')] ) );
+													   'style' => 'max-width:160px;height:auto;vertical-align:middle;'.($has_audio?'':'margin-bottom:6px;'),
+													   'width' => $thumbx, 'height' => $thumby] ) );
 
 							if ( $is_photo || $has_poster ) {
 								wppa_echo( '</a>' );
@@ -2091,11 +2100,20 @@ global $wpdb;
 									$files 	= [];
 									if ( wppa_is_file( $sp ) || wppa_is_file( $o1sp ) ) {
 
+
 										if ( wppa_is_file( $sp ) ) {
-											$ima 		= getimagesize( $sp );
+									//		$ima 		= getimagesize( $sp );
+											if ( wppa_is_file( $o1sp ) ) {
+												$sx = $sourcey;
+												$sy = $sourcex;
+											}
+											else {
+												$sx = $sourcex;
+												$sy = $sourcey;
+											}
 
 											/* Translators: integer width (W:) and height (H:) */
-											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $ima[0], $ima[1] ) .
+											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $sx, $sy ) .
 														  ' (' . wppa_get_filesize( $sp ) . ')';
 											$files[0] 	= ['name' => $s_name,
 														   'path' => str_replace( WPPA_UPLOAD_PATH, '.../wppa', $sp ),
@@ -2109,7 +2127,7 @@ global $wpdb;
 											$ima 		= getimagesize( $o1sp );
 
 											/* Translators: integer width (W:) and height (H:) */
-											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $ima[0], $ima[1] ) .
+											$txt 		= sprintf( __( 'W: %1$d px, H: %2$d px', 'wp-photo-album-plus' ), $sourcex, $sourcey ) .
 														  ' (' . wppa_get_filesize( $o1sp ) . ')';
 
 											$files[1] 	= ['name' => $o1_name,
@@ -2355,6 +2373,7 @@ global $wpdb;
 
 								wppa_echo( '</fieldset>' );
 
+
 								if ( wppa_is_video( $id ) || wppa_has_audio( $id ) || wppa_is_pdf( $id ) ) {
 									wppa_echo( '
 									<fieldset class="wppa-fieldset" style="margin-right:12px;">
@@ -2419,6 +2438,32 @@ global $wpdb;
 										</div>' );
 									wppa_echo( '</fieldset>' );
 								}
+
+								// Convert to webp
+								if ( wppa_user_is_admin() || wppa_get_photo_item( $id, 'owner' ) == wppa_get_user() ) {
+									if ( ! wppa( 'front_edit' ) && $convert ) {
+										wppa_echo( '
+										<fieldset class="wppa-fieldset" style="margin-right:12px;">
+											<legend class="wppa-legend">' .
+												__( 'File conversion', 'wp-photo-album-plus' ) . '
+											</legend>' );
+
+											wppa_echo( '
+											<div class="left">
+												<label>
+												</label>
+												<input
+													type="button"
+													class="wppa-admin-button button"
+													onclick="wppaTryConvertWebP(\'' . $crid . '\')"
+													value="' . esc_attr( $convert ) . '"
+												/>
+											</div>' );
+										wppa_echo( '</fieldset>' );
+
+									}
+								}
+
 								wppa_echo( '</div>' );
 							}
 
@@ -2426,7 +2471,7 @@ global $wpdb;
 							if ( ! $is_video || $has_poster ) {
 								wppa_echo( '
 
-									<fieldset class="wppa-fieldset" style="margin-right:12px;">
+									<fieldset class="wppa-fieldset">
 										<legend class="wppa-legend">' .
 											__( 'Display file actions', 'wp-photo-album-plus' ) . '
 										</legend>' );
@@ -2840,7 +2885,8 @@ global $wpdb;
 									wppa( 'for_sm', true );
 									wppa_echo(
 										wppa_html_tag( 'div', ['class' => "wppa-cropper-container-wrapper"],
-											wppa_html_tag( 'img', ['id' => 'fs-img-'.$crid, 'src' => wppa_get_photo_url($id), 'style' => "float:left;max-width:100%"] ) ) );
+											wppa_html_tag( 'img', ['id' => 'fs-img-'.$crid, 'src' => wppa_get_photo_url($id), 'style' => "float:left;max-width:100%;height:auto;",
+																   'width' => $photox, 'height' => $photoy] ) ) );
 
 									// Reset switch
 									wppa( 'for_sm', false );
@@ -3938,36 +3984,47 @@ global $wpdb;
 						$imgs[0] = wppa_get_thumbx( $id );
 						$imgs[1] = wppa_get_thumby( $id );
 					}
+
+					// Available space: w 160, h 120
+
 					if ( ! $imgs[0] ) {	// missing thuimbnail, prevent division by zero
-						$imgs[0] = 200;
-						$imgs[1] = 150;
+						$imgs[0] = 160;
+						$imgs[1] = 120;
 					}
-					$mw = $size - '20';
-					$mh = $mw * '3' / '4';
+					$mw = 160;
+					$mh = 120;
 					if ( $imgs[1]/$imgs[0] > $mh/$mw ) {	// more portrait than 200x150, y is limit
-						$mt = 15;
+						$mt = 10;
+						$h = 120;
+						$w = 120 * $imgs[0]/$imgs[1];
 					}
 					else {	// x is limit
-						$mt = ( $mh - ( $imgs[1]/$imgs[0] * $mw ) ) / '2' + 15;
+						$w = 160;
+						$h = 160 * $imgs[1]/$imgs[0];
+						$mt = ( 120 - $h ) / 2 + 10;
 					}
 
 					$result .= '
 					<li
 						id="photoitem-' . $id . '"
 						class="ui-state-default-photos wppa-' . $photo['status'] . '"
-						style="background-image:none; text-align:center; cursor:move"
+						style="background-image:none; text-align:center; cursor:move; overflow:hidden;"
 						>';
+						$imgstyle = 'width:'.$w.'px;height:'.$h.'px;margin-top:'.$mt.'px;';
 						if ( wppa_is_video( $id ) ) {
-							$imgstyle = 'max-width:'.$mw.'px;max-height:'.$mh.'px;margin-top:'.$mt.'px;';
 							$result .= wppa_get_video_html( ['id' => $id, 'controls' => false, 'tagid' => 'pa-id-'.$id, 'class' => 'wppa-bulk-thumb', 'style' => $imgstyle, 'use_thumb' => true] );
 						}
 						else {
 							$result .=
-							wppa_html_tag( 'img', ['class' => "wppa-bulk-thumb", 'src' => wppa_get_thumb_url($id), 'style' => 'max-width:'.$mw.'px;max-height:'.$mh.'px;margin-top:'.$mt.'px'] );
+							'<div style="width:160px;height:120px;text-align:center;position:relative;left:10px;">' .
+							wppa_html_tag( 'img', ['class' => "wppa-bulk-thumb", 'src' => wppa_get_thumb_url($id),
+												   'style' => $imgstyle,
+												   'width' => wppa_get_thumbx( $id ), 'height' => wppa_get_thumby( $id )] ) .
+							'</div>';
 						}
 						$result .= '
 						<div
-							style="font-size:9px;position:absolute;bottom:24px;text-align:center;width:' . $size . 'px">' .
+							style="font-size:9px;position:absolute;bottom:24px;text-align:center;width:' . $size . 'px;height:18px;overflow:hidden;">' .
 							wppa_get_photo_name( $id ) . '
 						</div>
 						<div

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version: 9.1.11.001
+* version 9.1.12.005
 *
 */
 
@@ -7497,6 +7497,13 @@ global $wppa_hide_this;
 							$html = '<input type="checkbox" checked disabled>';
 							wppa_setting_new($slug, '41', $name, $desc, $html, $help);
 						}
+						
+						$name = __('Convert new to .webp', 'wp-photo-album-plus');
+						$desc = __('Convert new .jpg and .png files to .webp right after upload');
+						$help = '';
+						$slug = 'wppa_new_to_webp';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '42', $name, $desc, $html, $help);
 
 						wppa_setting_box_footer_new();
 					}
@@ -9339,6 +9346,28 @@ global $wppa_hide_this;
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
 						wppa_setting_new(false, '7', $name, $desc, $html, $help);
+						
+						$name = __('Convert to .webp', 'wp-photo-album-plus');
+						$desc = __('Convert all .jpg and .png imagfe files to .webp files', 'wp-photo-album-plus');
+						$help = __('This can dramatically reduce filesizes without noticable image quality degeneration', 'wp-photo-album-plus');
+						$slug2 = 'wppa_convert_to_webp';
+						$html1 = wppa_cronjob_button( $slug2 );
+						$html2 = wppa_maintenance_button( $slug2 );
+						$html3 = wppa_status_field( $slug2 );
+						$html4 = wppa_togo_field( $slug2 );
+						$html = array($html1, $html2, $html3, $html4);
+						wppa_setting_new(false, '8', $name, $desc, $html, $help);
+						
+						$name = __('Recalculate image sizes', 'wp-photo-album-plus');
+						$desc = __('Put right image dimensions into photo db table', 'wp-photo-album-plus');
+						$help = '';
+						$slug2 = 'wppa_fix_sizes';
+						$html1 = wppa_cronjob_button( $slug2 );
+						$html2 = wppa_maintenance_button( $slug2 );
+						$html3 = wppa_status_field( $slug2 );
+						$html4 = wppa_togo_field( $slug2 );
+						$html = array($html1, $html2, $html3, $html4);
+						wppa_setting_new(false, '9', $name, $desc, $html, $help);
 
 						wppa_setting_box_footer_new();
 					}
@@ -10293,8 +10322,8 @@ global $wppa_hide_this;
 						wppa_setting_tab_description($desc);
 						wppa_setting_box_header_new($tab);
 
-						$name = __('JPG image quality', 'wp-photo-album-plus' );
-						$desc = __('The jpg quality when photos are downsized', 'wp-photo-album-plus' );
+						$name = __('JPG/WEBP image quality', 'wp-photo-album-plus' );
+						$desc = __('The jpg/webp quality when photos are downsized', 'wp-photo-album-plus' );
 						$help = __('The higher the number the better the quality but the larger the file', 'wp-photo-album-plus' );
 						$help .= '<br>'.__('Possible values 20..100', 'wp-photo-album-plus' );
 						$slug = 'wppa_jpeg_quality';

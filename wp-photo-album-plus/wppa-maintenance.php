@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version: 9.1.11.001
+* version 9.1.12.005
 *
 */
 
@@ -69,6 +69,8 @@ $wppa_all_maintenance_slugs = array( 	'wppa_remake_index_albums',
 										'wppa_renew_slugs_albums',
 										'wppa_renew_slugs_photos',
 										'wppa_fix_datatypes',
+										'wppa_convert_to_webp',
+										'wppa_fix_sizes',
 									);
 
 global $wppa_cron_maintenance_slugs;
@@ -99,6 +101,8 @@ $wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
 										'wppa_renew_slugs_albums',
 										'wppa_renew_slugs_photos',
 										'wppa_fix_datatypes',
+										'wppa_convert_to_webp',
+										'wppa_fix_sizes',
 									);
 
 // Main maintenace module
@@ -185,6 +189,7 @@ global $is_reschedule;
 	$reload 	= '';
 	$to_delete_from_cloudinary = array();
 	$aborted 	= false;
+	$togo 		= 0;
 
 	if ( ! isset( $wppa_session ) ) $wppa_session = array();
 	if ( ! isset( $wppa_session[$slug.'_fixed'] ) )   $wppa_session[$slug.'_fixed'] = 0;
@@ -485,6 +490,8 @@ global $is_reschedule;
 		case 'wppa_fix_userids':
 		case 'wppa_covert_usertags':
 		case 'wppa_renew_slugs_photos':
+		case 'wppa_convert_to_webp':
+		case 'wppa_fix_sizes':
 
 			// Process photos
 			$table 		= WPPA_PHOTOS;
@@ -1048,6 +1055,19 @@ global $is_reschedule;
 						case 'wppa_renew_slugs_photos':
 							$sname = wppa_name_slug( wppa_get_photo_item( $id, 'name' ) );
 							wppa_update_photo( $id, ['sname' => $sname] );
+							break;
+
+						case 'wppa_convert_to_webp':
+							wppa_convert_to_webp( $id );
+							break;
+
+						case 'wppa_fix_sizes':
+							wppa_get_thumbx( $id, true );
+							wppa_get_thumby( $id, true );
+							wppa_get_photox( $id, true );
+							wppa_get_photoy( $id, true );
+							wppa_get_sourcex( $id, true );
+							wppa_get_sourcey( $id, true );
 							break;
 
 						default:

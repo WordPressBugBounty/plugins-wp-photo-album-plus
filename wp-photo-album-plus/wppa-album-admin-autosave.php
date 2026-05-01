@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.1.10.007
+* Version 9.1.12.005
 *
 */
 
@@ -2506,7 +2506,9 @@ global $wp_roles;
 			wppa_echo( '<hr style="background-color:#777;height:3px;margin:20px 0;">' );
 
 			// The drag-drop sequence editor for toplevel albums
-			wppa_album_sequence( 0 );
+			if ( wppa_opt( 'list_albums_by' ) == '1' || wppa_opt( 'list_albums_by' ) == '-1' ) {
+				wppa_album_sequence( 0 );
+			}
 
 		wppa_echo( '</div>' );
 		/* The album admin table of albums page end */
@@ -3825,8 +3827,14 @@ global $wpdb;
 						wppa_get_video_html( ['id' => $cover_photo_id, 'class' => "wppa-cover-image", 'style' => 'height:50px;margin-top:5px;margin-bottom:5px;', 'controls' => false] );
 					}
 					else {
-						$u = wppa_get_thumb_url( wppa_get_coverphoto_id( $album['id'] ) );
-						if ( $u ) $result .= wppa_html_tag( 'img', ['class' => "wppa-cover-image", 'src' => $u, 'style' => "max-height:50px;margin: 5px;"] );
+						$cpid = wppa_get_coverphoto_id( $album['id'] );
+						if ( $cpid ) {
+							$u = wppa_get_thumb_url( $cpid );
+							$w = wppa_get_photo_item( $cpid, 'thumbx' );
+							$h = wppa_get_photo_item( $cpid, 'thumby' );
+							$result .= wppa_html_tag( 'img', ['class' => "wppa-cover-image", 'src' => $u, 'style' => "max-height:50px;margin: 5px;",
+															  'width' => $w, 'height' => $h] );
+						}
 					}
 					$albid 		= $album['id'];
 					$albcrypt 	= $album['crypt'];

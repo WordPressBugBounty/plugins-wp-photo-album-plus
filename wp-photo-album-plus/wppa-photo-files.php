@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.1.09.005
+* Version: 9.1.12.001
 *
 */
 
@@ -139,7 +139,7 @@ function wppa_orientate_image_file( $file, $ori ) {
 	wppa_bump_version( 'photo' );
 
 	// Free the memory
-	imagedestroy( $source );
+	@ imagedestroy( $source );
 	@ imagedestroy( $orientate );
 
 	// Done
@@ -480,6 +480,11 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 
 	// Optimize optionally
 	wppa_optimize_image( wppa_get_photo_path( $id ) );
+
+	// Convert to .webp optionaly
+	if ( wppa_switch( 'new_to_webp' ) ) {
+		wppa_convert_to_webp( $id );
+	}
 
 	// Fix filesystem rights
 	wppa_fix_rights( $id );

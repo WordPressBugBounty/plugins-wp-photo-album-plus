@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.1.09.004
+* Version 9.1.12.005
 *
 */
 
@@ -39,6 +39,9 @@ function wppa_get_picture_html( $args ) {
 	$args 		= wp_parse_args( $args, $defaults );
 
 	$id 		= strval( intval( $args['id'] ) );
+	$thumb 		= wppa_cache_photo( $id );
+	$filex 		= '0';
+	$filey 		= '0';
 
 	// Does the photo exist?
 	if ( ! wppa_photo_exists( $id ) ) {
@@ -119,9 +122,32 @@ function wppa_get_picture_html( $args ) {
 	if ( $args['width'] && $args['height'] ) {
 		$href 	= $isthumb ? wppa_get_thumb_url( $id, true, '', $args['width'], $args['height'] ) :
 		wppa_get_photo_url( $id, true, '', $args['width'], $args['height'] );
+		if ( wppa_opt( 'cdn_service' ) == 'local' ) {
+			$filex = $args['width'];
+			$filey = $args['height'];
+		}
+		else {
+			if ( $isthumb ) {
+				$filex = $thumb['thumbx'];
+				$filey = $thumb['thumby'];
+			}
+			else {
+				$filex = $thumb['photox'];
+				$filey = $thumb['photoy'];
+			}
+		}
 	}
 	else {
-		$href 	= $isthumb ? wppa_get_thumb_url( $id ) : wppa_get_photo_url( $id );
+		if ( $isthumb ) {
+				$href  = wppa_get_thumb_url( $id );
+				$filex = $thumb['thumbx'];
+				$filey = $thumb['thumby'];
+		}
+		else {
+			$href  = wppa_get_photo_url( $id );
+			$filex = $thumb['photox'];
+			$filey = $thumb['photoy'];
+		}
 	}
 	if ( $is_pdf || ( wppa_is_zoomable( $id ) && ! $isthumb ) ) {
 		$href = wppa_get_hires_url( $id );
@@ -134,7 +160,7 @@ function wppa_get_picture_html( $args ) {
 	// Find image style
 	switch ( $type ) {
 		case 'sphoto':
-			$style = 'width:100%;margin:0;';
+			$style = 'width:100%;margin:0;height:auto;';
 			if ( ! wppa_in_widget() ) {
 				switch ( wppa_opt( 'fullimage_border_width' ) ) {
 					case '':
@@ -254,7 +280,8 @@ function wppa_get_picture_html( $args ) {
 
 	// Video?
 	elseif ( wppa_is_video( $id ) ) {
-		$result .= wppa_get_video_html( ['id' => $id, 'controls' => ! $link, 'style' => $style, 'class' => $class] );
+		$result .= wppa_get_video_html( ['id' => $id, 'controls' => ! $link, 'style' => $style, 'class' => $class,
+										 'width' => $filex, 'height' => $filey] );
 	}
 
 	// Pdf?
@@ -293,7 +320,8 @@ function wppa_get_picture_html( $args ) {
 			$imgid = 'ph-'.$id.'-'.$mocc;
 
 			$result .=
-			wppa_html_tag( 'img', ['id' => $imgid, 'src' => $href, 'alt' => wppa_alt($id), 'class' => $class, 'title' => $title, 'style' => $style] );
+			wppa_html_tag( 'img', ['id' => $imgid, 'src' => $href, 'alt' => wppa_alt($id), 'class' => $class, 'title' => $title, 'style' => $style,
+								   'width' => $filex, 'height' => $filey] );
 		}
 	}
 
@@ -484,10 +512,14 @@ function wppa_get_spheric_pan_html( $args ) {
 	if ( wppa_is_mobile() ) {
 		$url = esc_url( wppa_get_photo_url( $id ) );
 		$ratio = wppa_get_photox( $id ) / wppa_get_photoy( $id );
+		$filex = wppa_get_photox( $id );
+		$filey = wppa_get_photoy( $id );
 	}
 	else {
 		$url = esc_url( wppa_get_hires_url( $id ) );
 		$ratio = wppa_get_source_ratio( $id );
+		$filex = wppa_get_hiresx( $id );
+		$filey = wppa_get_hiresy( $id );
 	}
 	if ( ! $ratio ) $ratio = 2;
 
@@ -740,7 +772,7 @@ function wppa_get_spheric_pan_html( $args ) {
 		wppaDoSphericPan(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
 
 	if ( $haslink ) {
 		$result .= '<a>';
@@ -776,6 +808,8 @@ function wppa_get_flat_pan_html( $args ) {
 	$itemid 			= $mocc . '-' . $id;
 	$width 				= $args['width'] ? $args['width'] : wppa_get_container_width();
 	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
+	$filex 				= wppa_is_mobile() ? wppa_get_photox( $id ) : wppa_get_hiresx( $id );
+	$filey 				= wppa_is_mobile() ? wppa_get_photoy( $id ) : wppa_get_hiresy( $id );
 	$haslink 			= $args['haslink'];
 	$lightbox 			= $args['lightbox'];
 	if ( $lightbox ) $mocc = 0;
@@ -1050,7 +1084,7 @@ function wppa_get_flat_pan_html( $args ) {
 		wppaDoFlatPanorama(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
 
 	// wppa-ovl-flatpan-container
 	if ( $lightbox ) {
@@ -1096,6 +1130,8 @@ function wppa_get_zoom_pan_html( $args ) {
 	$controls 			= $args['controls'];
 	$zoomsensitivity 	= $args['zoomsensitivity'];
 	$url 				= esc_url( wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id ) );
+	$filex 				= wppa_is_mobile() ? wppa_get_photox( $id ) : wppa_get_hiresx( $id );
+	$filey 				= wppa_is_mobile() ? wppa_get_photoy( $id ) : wppa_get_hiresy( $id );
 	$manual 			= $args['manual'];
 	$slide 				= $args['slide'];
 
@@ -1364,7 +1400,8 @@ function wppa_get_zoom_pan_html( $args ) {
 			wppaDoZoomPan(' . $mocc . ', data' . $mocc . ');';
 
 		$result .=
-		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
+		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
+if ( ! $filex || ! $filey ) wppa_log('err', $id.' hase no filex or y');
 
 	// wppa-ovl-zoom-container
 	if ( $lightbox ) {

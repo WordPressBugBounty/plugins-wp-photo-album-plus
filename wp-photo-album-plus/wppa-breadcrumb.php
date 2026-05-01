@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.1.10.006
+* Version 9.1.12.003
 *
 */
 
@@ -623,7 +623,7 @@ static $post_type_value;
 							' title="' . __( 'Thumbnail view', 'wp-photo-album-plus' ) . '"' .
 							' class="wppa-nav-text"' .
 							' style="float:right; cursor:pointer"' .
-							' onclick="wppaDoAjaxRender(event,'.wppa('mocc').', \''.$ajax_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.$href_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true)"' .
+							' onclick="wppaDoAjaxRender(event,'.wppa('mocc').', \''.$ajax_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.$href_url.$s.'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true);return false;"' .
 							' >' .
 							wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, 10, 10, 10, 10 ) .
 						'</span>' );
@@ -687,9 +687,8 @@ global $wppa_lang;
 
 	if ( $href ) {
 		wppa_out( 	'<a' .
-						( $ajax ?
-						' onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax . '\', \'' . $href . '\' );"' :
-						' href="' . $href . '"' ) .
+						( $ajax ? ' onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax . '\', \'' . $href . '\' );return false;"' : '' ) .
+						' href="' . $href . '"' .
 						' class="wppa-nav-text ' . $class . '"' .
 						' style="cursor:pointer"' .
 						' title="' . esc_attr( $title ) . '" >' .

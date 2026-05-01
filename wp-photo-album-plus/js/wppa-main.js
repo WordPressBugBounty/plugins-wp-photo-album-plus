@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.1.10.009';
+wppaWppaVer = '9.1.12.002';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -85,14 +85,6 @@ function wppaDoInit() {
 	// Size scrollable areas
 	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange',wppaSizeArea);
 
-	// Make Lazy load images visible
-	jQuery(window).on('DOMContentLoaded load resize scroll orientationchange', function(){wppaMakeLazyVisible('DOM')});
-	jQuery('.wppa-divnicewrap').on('DOMContentLoaded load resize orientationchange', function(){wppaMakeLazyVisible('resize')});
-	jQuery('.wppa-divnicewrap').on('scroll wheel', function(){wppaMakeLazyVisible('scroll')});
-	jQuery('.wppa-box').on('scroll wheel resize', function(){wppaMakeLazyVisible('scroll')});
-	jQuery('.albumlist').on('scroll wheel resize', function(){wppaMakeLazyVisible('scroll')});
-	jQuery('.grid-masonryplus').on('scroll wheel resize', function(){wppaMakeLazyVisible('scroll')});
-
 	// Init masonryplus
 	jQuery(window).on('DOMContentLoaded load resize scroll wheel orientationchange', wppaInitMasonryPlus);
 
@@ -129,7 +121,6 @@ function wppaDoInit() {
 			wppaDoAllAutocols();
 			jQuery(window).trigger("resize");
 			jQuery("#wppa-ovl-spin").hide();
-			wppaMakeLazyVisible('tabbychange');
 		},1500);
 	});
 
@@ -143,15 +134,11 @@ function wppaDoInit() {
 				if ( ext == 'jpg' || ext == 'jpeg' || ext == 'png' ) {	// If its an image
 					if ( ! jQuery(this).attr("data-rel") ) { 			// should not already have attr data-rel
 						jQuery(this).attr("data-rel",wppaOvlGlobal); 	// Add: 'data-rel="wppa"' or: 'data-rel="wppa[single]"'
-						jQuery(this).css("cursor","wait"); 				// will be set to url wppaMagnifierCursor by lightbox js
 					}
 				}
 			}
 		});
 	}
-
-	// Lazy on mobile extra:
-	jQuery("div").on("touchmove", function(){wppaMakeLazyVisible('scroll');});
 
 	// Align ajax spinner
 	jQuery(".wppa-ajax-spin").css({top:wppaWindowHeight()/2,left:wppaWindowWidth()/2});
@@ -169,11 +156,8 @@ function wppaResizeNice(from) {
 function _wppaResizeNice(from) {
 
 	// Body?
-	if ( from != 'wppaMakeLazyVisible' ) {
-		if ( typeof jQuery("body").getNiceScroll == "function" ) {
-			jQuery("body").getNiceScroll().resize();
-//			console.log('Nice resized body after '+(Date.now() - wppaResizeNiceTimestamp)+' millisec');
-		}
+	if ( typeof jQuery("body").getNiceScroll == "function" ) {
+		jQuery("body").getNiceScroll().resize();
 	}
 
 	// Areas
@@ -202,11 +186,6 @@ jQuery(document).ready(function(){
 			jQuery(window).trigger('wppascrollend');
 		}, wppaScrollEndDelay );
 	});
-});
-
-
-jQuery(document).ready(function(){
-	jQuery(window).on( 'scroll wheel touchmove', function(){wppaMakeLazyVisible('scroll');});
 });
 
 // Install auto div sizer

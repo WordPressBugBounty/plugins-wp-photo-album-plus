@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.1.09.004
+* Version: 9.1.12.004
 *
 */
 
@@ -124,7 +124,8 @@ global $wpdb;
 		$imgattr_a 	= wppa_get_imgstyle_a( $id, $imgsrc, 100, '4', 'thumb' );
 		$style 		= $imgattr_a['style'];
 		$result 	.= 	wppa_html_tag( 'a', ['href' => get_permalink()],
-							wppa_html_tag( 'img', ['src' => $imgurl, 'title' => $title, 'alt' => wppa_alt($id), 'style' => $style] ) );
+							wppa_html_tag( 'img', ['src' => $imgurl, 'title' => $title, 'alt' => wppa_alt($id), 'style' => $style,
+										   'width' => $thumb['thumbx'], 'height' => $thumb['thumby']] ) );
 		return $result;
 	}
 
@@ -218,6 +219,7 @@ global $wpdb;
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle.'cursor:pointer', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				$result .= '</a>';
@@ -231,6 +233,7 @@ global $wpdb;
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle.'cursor:pointer;', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				$result .= '</a>';
@@ -280,8 +283,9 @@ global $wpdb;
 												 'controls' => wppa_switch('thumb_video'), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 			else {
-				$result .= 	wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle,
-												   'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
+												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 
 			// Close the a img
@@ -297,8 +301,9 @@ global $wpdb;
 			else {
 				if ( wppa_opt( 'thumb_linktype' ) == 'fullpopup' && wppa_is_photo( $id ) && wppa_switch( 'art_monkey_on' ) && ( strpos( wppa_opt( 'art_monkey_types' ), 'photo' ) !== false ) ) $pointer = 'pointer;';
 				else $pointer = 'default;';
-				$result .= 	wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:'.$pointer,
-												   'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:'.$pointer,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
+												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 			$result .= wppa_close_tag( 'div', false, true );
 		}
@@ -312,6 +317,7 @@ global $wpdb;
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle,
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 			$result .= wppa_close_tag( 'div', false, true );
@@ -323,6 +329,7 @@ global $wpdb;
 			}
 			else {
 				$result .= wppa_html_tag( 'img', ['src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 		}
@@ -761,7 +768,9 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 												 'controls' => false, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 			else {
-				$result .= wppa_html_tag( 'img', ['src' => $src, 'class' => "image wppa-img", 'title' => $title, 'style' => $imgattr.$cursor, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+				$result .= wppa_html_tag( 'img', ['src' => $src, 'class' => "image wppa-img", 'title' => $title, 'style' => $imgattr.$cursor,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
+												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 		$result .= '</a>';
 	}
@@ -777,7 +786,9 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 												 'controls' => false, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 			else {
-				$result .= wppa_html_tag( 'img', ['src' => $src, 'class' => "image wppa-img", 'style' => $imgattr, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+				$result .= wppa_html_tag( 'img', ['src' => $src, 'class' => "image wppa-img", 'style' => $imgattr,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
+												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 		$result .= 	'</a>';
 	}
@@ -787,7 +798,9 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 												 'controls' => false, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout, 'onclick' => $href] );
 		}
 		else {
-			$result .= wppa_html_tag( 'img', ['src' => $src, 'alt' => wppa_alt($id), 'class' => "image wppa-img", 'style' => $imgattr, 'onclick' => $href, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+			$result .= wppa_html_tag( 'img', ['src' => $src, 'alt' => wppa_alt($id), 'class' => "image wppa-img", 'style' => $imgattr, 'onclick' => $href,
+											  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
+											  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 		}
 	}
 	$result .= '</div>';
@@ -864,10 +877,6 @@ function wppa_get_thumb_masonry( $id ) {
 		$imgheight 		= wppa_get_thumby( $id );
 		$imgstyle  		= 'width:100%;height:auto;margin:0;position:relative;box-sizing:border-box;float:left;padding:' . ( wppa_opt( 'tn_margin' ) / 2 ) . 'px;';
 		$frame_h 		= '';
-	}
-
-	if ( wppa_lazy() ) {
-		$frame_h .= 'min-height:100px;';
 	}
 
 	// Mouseover effect?
@@ -992,6 +1001,7 @@ function wppa_get_thumb_masonry( $id ) {
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle.'cursor:pointer', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				$result .= '</a>';
@@ -1005,6 +1015,7 @@ function wppa_get_thumb_masonry( $id ) {
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle.'cursor:pointer;', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				$result .= '</a>';
@@ -1044,6 +1055,7 @@ function wppa_get_thumb_masonry( $id ) {
 			// Image
 			else {
 				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'src' => $imgurl, 'title' => $title,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 												  'style' => $imgstyle.'cursor:'.$cursor, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 			$result .= '</a>';
@@ -1064,6 +1076,7 @@ function wppa_get_thumb_masonry( $id ) {
 			// Image
 			else {
 				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 												  'style' => $imgstyle.'cursor:pointer;', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 
@@ -1081,6 +1094,7 @@ function wppa_get_thumb_masonry( $id ) {
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 			$result .= '</div>';
@@ -1092,6 +1106,7 @@ function wppa_get_thumb_masonry( $id ) {
 			}
 			else {
 				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 												  'style' => $imgstyle, 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 		}
@@ -1184,9 +1199,13 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 
 	// Get the id
 	$id = $image ? $image['id'] : 0;
+	if ( ! $id ) return;
+
+	// Get thumb data
+	$thumb = wppa_cache_photo( $id );
 
 	// Encrypted photo id
-	$xid = wppa_encrypt_photo( $id );
+	$xid = $thumb['crypt']; // wppa_encrypt_photo( $id );
 
 	// Fix url if audio
 	if ( wppa_has_audio( $id ) ) {
@@ -1226,6 +1245,7 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 					}
 					else {
 						$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'src' => $imgurl, 'style' => $imgstyle_a['style'].'cursor:pointer;',
+														  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 														  'alt' => wppa_alt($id), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 					}
 				}
@@ -1262,6 +1282,7 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 					}
 					else {
 						$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'src' => $imgurl,
+														  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 														  'style' => $imgstyle_a['style'], 'alt' => wppa_alt($id), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 					}
 				}
@@ -1279,16 +1300,12 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 				}
 				else {
 					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'src' => $imgurl, 'style' => $imgstyle_a['style'] . 'cursor:pointer;',
+													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'onclick' => $link['url'], 'alt' => wppa_alt($id), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 			}
 			else {
-				$result .= 	'<a' .
-								' style="cursor:pointer"' .
-								' onclick="' . $link['url'] . '"' .
-								' >' . $name .
-							'</a>';
-
+				$result .= wppa_html_tag( 'a', ['style' => "cursor:pointer", 'href' => $link['url']], $name );
 			}
 		}
 	}
@@ -1300,6 +1317,7 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 			}
 			else {
 				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'src' => $imgurl,
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 												  'style' => $imgstyle_a['style'], 'alt' => wppa_alt($id), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 		}
@@ -1384,7 +1402,8 @@ static $seqno;
 			$style = $style_a['style'];
 			$result .= 	'
 			<a href="' . get_permalink() . '">' .
-				wppa_html_tag( 'img', ['src' => $url, 'class' => 'nolazy', 'alt' => wppa_alt($id), 'title' => $thumbname, 'style' => $style] ) . '
+				wppa_html_tag( 'img', ['src' => $url, 'class' => 'nolazy', 'alt' => wppa_alt($id), 'title' => $thumbname, 'style' => $style,
+									   'width' => $thumb['thumbx'], 'height' => $thumb['thumby']] ) . '
 			</a>';
 		}
 	}
@@ -1471,6 +1490,7 @@ static $seqno;
 			if ( $film_type == 'normal' ) {
 				$result .= wppa_html_tag( 'img', ['id' => 'wppa-'.$ambule.'-'.$idx.'-'.$mocc, 'class' => 'nolazy wppa-'.$ambule.'-'.$mocc, 'src' => $url, 'alt' => wppa_alt($thumb['id']),
 												  'style' => $imgstyle . $cursor, 'data-title' => ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ),
+												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 												  'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout, 'onclick' => $onclick, 'ondblclick' => $ondblclick] );
 			}
 
@@ -1495,7 +1515,9 @@ static $seqno;
 					data-title="' . ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ) . '"
 					>
 				</canvas>' .
-				wppa_html_tag( 'img', ['id' => $tagid, 'src' => $url, 'class' => 'nolazy', 'style' => 'position:fixed;width:'.$thumbx.'px;height:'.$thumby.'px;display:none;', 'onload' => $the_js] );
+				wppa_html_tag( 'img', ['id' => $tagid, 'src' => $url, 'class' => 'nolazy',
+									   'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
+									   'style' => 'position:fixed;width:'.$thumbx.'px;height:'.$thumby.'px;display:none;', 'onload' => $the_js] );
 			}
 		}
 

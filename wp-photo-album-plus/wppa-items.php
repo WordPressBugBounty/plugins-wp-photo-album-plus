@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version: 9.1.07.008
+* vrsion: 9.1.12.005
 *
 */
 
@@ -1038,6 +1038,50 @@ function wppa_get_imagey( $id, $key = 'photo' ) {
 		$result = wppa_get_photoy( $id );
 	}
 	return $result;
+}
+
+function wppa_get_sourcex( $id, $force = false ) {
+
+	$result = 0;
+	if ( ! $id ) return $result;
+
+	$thumb = wppa_cache_photo( $id );
+	if ( $thumb['sourcex'] && ! $force ) return $thumb['sourcex'];
+
+	$alb = $thumb['album'];
+	$path = wppa_get_source_album_dir( $alb ).'/'.$thumb['filename'];
+	if ( wppa_is_file( $path ) ) {
+		$sizes = getimagesize( $path );
+		$result = $sizes[0];
+		wppa_update_photo( $id, ['sourcex' => $result] );
+	}
+	return $result;
+}
+
+function wppa_get_sourcey( $id, $force = false ) {
+
+	$result = 0;
+	if ( ! $id ) return $result;
+
+	$thumb = wppa_cache_photo( $id );
+	if ( $thumb['sourcey'] && ! $force ) return $thumb['sourcey'];
+
+	$alb = $thumb['album'];
+	$path = wppa_get_source_album_dir( $alb ).'/'.$thumb['filename'];
+	if ( wppa_is_file( $path ) ) {
+		$sizes = getimagesize( $path );
+		$result = $sizes[1];
+		wppa_update_photo( $id, ['sourcey' => $result] );
+	}
+	return $result;
+}
+
+function wppa_get_hiresx( $id ) {
+	return max( wppa_get_sourcex( $id ), wppa_get_photox( $id ) );
+}
+
+function wppa_get_hiresy( $id ) {
+	return max( wppa_get_sourcey( $id ), wppa_get_photoy( $id ) );
 }
 
 // See if a photo item should be displayed for a given album (enumeration)

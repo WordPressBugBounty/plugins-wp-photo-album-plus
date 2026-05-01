@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.1.11.001
+* Version: 9.1.12.003
 *
 */
 
@@ -3847,6 +3847,7 @@ function wppa_run_slidecontainer( $thumbs ) {
 
 	$c = is_array( $thumbs ) ? count( $thumbs ) : 0;
 	$mocc = wppa( 'mocc' );
+	$js = '';
 
 	if ( wppa( 'is_single' ) && is_feed() ) {	// process feed for single image slideshow here, normal slideshow uses filmthumbs
 		$style_a = wppa_get_fullimgstyle_a( wppa( 'start_photo' ) );
@@ -3892,7 +3893,6 @@ function wppa_run_slidecontainer( $thumbs ) {
 		$index = 0;
 		if ( $thumbs ) {
 
-			$js = '';
 			foreach ( $thumbs as $thumb ) {
 				if ( wppa_switch( 'next_on_callback' ) ) {
 					$js .= 'wppaStoreSlideInfo( ' . wppa_get_slide_info( $index, strval( intval( $thumb['id'] ) ), strval( intval( $thumb['next_id'] ) ) ) . ' );';
@@ -5897,6 +5897,12 @@ global $wppa_intro_seen;
 	if ( $wppa_intro_seen ) {
 		wppa_log('err', 'Duplicate intro shortcode seen');
 		return ''; 		// Been here before
+	}
+
+	// Item exists?
+	if ( ! wppa_photo_exists( $id ) ) {
+		wppa_echo(sprintf(__('Intro item %d does not exist', 'wp-photo-album-plus'), $id ) );
+		return '';
 	}
 
 	$is_video 		= wppa_is_video( $id );

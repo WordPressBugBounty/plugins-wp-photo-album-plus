@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.1.10.011
+* Version: 9.1.12.001
 *
 */
 
@@ -2339,6 +2339,19 @@ global $wppa_supported_audio_extensions;
 
 			// Dispatch on photo item
 			switch ( $item ) {
+				case 'towebp':
+					$res = wppa_convert_to_webp( $photo );
+					switch( $res ) {
+						case 0:
+							$txt = __( 'Not converted', 'wp-photo-album-plus' );
+							break;
+						case 1:
+							$txt = __( 'Converted. Reload the page to show', 'wp-photo-album-plus' );
+							break;
+						default:
+							$txt = $res;
+					}
+					break;
 				case 'exifdtm':
 					$itemname 	= __( 'Exif date/time', 'wp-photo-album-plus' );
 					$format 	= '0000:00:00 00:00:00';

@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '9.1.10.011';
+var wppaJsSlideshowVersion = '9.1.12.002';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -1565,9 +1565,6 @@ function _wppaAdjustFilmstrip( mocc, easing ) {
 	else {
 		_wppaFilmNoMove[mocc] = false; // reset
 	}
-
-	// Make lazy filmthumbs visible
-//	wppaMakeLazyVisible('filmstrip');
 
 	// Fix titles
 	if ( ! isFilmOnly && _wppaCurIdx[mocc] != -1 ) {

@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.1.09.004
+* Version: 9.1.12.004
 *
 */
 
@@ -761,7 +761,7 @@ static $login;
 	$cap = wppa_get_album_item( wppa_get_photo_item( $id, 'album' ), 'capability' );
 	if ( $cap ) {
 		if ( ! current_user_can( $cap ) ) {
-			wppa_log( 'dbg', 'Photo '.$id.' not visible because user can not '.$cap );
+//			wppa_log( 'dbg', 'Photo '.$id.' not visible because user can not '.$cap );
 			return false;
 		}
 	}
@@ -773,7 +773,7 @@ static $login;
 		 ! wppa_is_video( $id ) &&
 		 ! wppa_is_pdf( $id ) &&
 		 ! wppa_has_audio( $id ) ) {
-			wppa_log( 'dbg', 'Photo '.$id.' not visible because no files present');
+//			wppa_log( 'dbg', 'Photo '.$id.' not visible because no files present');
 			return false;
 		 }
 
@@ -785,7 +785,7 @@ static $login;
 	if ( $owner == $user ) return true;
 
 	if ( $status === false && $owner === false ) {
-		wppa_log( 'dbg', 'Photo '.$id.' not visible because no status and no owner');
+//		wppa_log( 'dbg', 'Photo '.$id.' not visible because no status and no owner');
 		return false; // Photo does not exist
 	}
 
@@ -803,7 +803,7 @@ static $login;
 				return true;
 			}
 			else {
-				wppa_log( 'dbg', 'Photo '.$id.' not visible because user not logged in and item is private');
+//				wppa_log( 'dbg', 'Photo '.$id.' not visible because user not logged in and item is private');
 			}
 			break;
 		case 'pending': 					// Pending and scheduled may be seen by owner
@@ -812,14 +812,14 @@ static $login;
 				return true;
 			}
 			else {
-				wppa_log( 'dbg', 'Photo '.$id.' not visible because user not admin or owner and status pending/scheduled');
+//				wppa_log( 'dbg', 'Photo '.$id.' not visible because user not admin or owner and status pending/scheduled');
 			}
 			break;
 		default:
 			break;
 	}
 
-	wppa_log( 'dbg', 'Photo '.$id.' not visible (99)');
+//	wppa_log( 'dbg', 'Photo '.$id.' not visible (99)');
 	return false; // This photo is not visible for the current user
 }
 

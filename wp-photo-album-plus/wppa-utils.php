@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.1.10.009
+* Version: 9.1.12.004
 *
 */
 
@@ -3327,6 +3327,10 @@ function wppa_fix_poster_ext( $fileorurl, $id ) {
 			if ( wppa_is_file( $source_poster ) ) {
 				return $source_poster;
 			}
+			$source_poster = str_replace( '.pdf', '.webp', $fileorurl );
+			if ( wppa_is_file( $source_poster ) ) {
+				return $source_poster;
+			}
 			else {
 				return WPPA_UPLOAD_PATH . '/' . 'documentstub.png';
 			}
@@ -6203,6 +6207,8 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'name' 		=> '',
 				 'title' 		=> '',
 				 'style'		=> '',
+				 'width' 		=> '',
+				 'height' 		=> '',
 				 'src' 	 		=> '',
 				 'href' 	 	=> '',
 				 'alt' 	 		=> '',
@@ -6224,6 +6230,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'onerror' 		=> '',
 				 'decoding' 	=> '',
 				 'placeholder' 	=> '',
+				 'loading' 		=> '',
 				 'data-id' 		=> '',
 				 'data-title' 	=> '',
 				 'data-day' 	=> '',
@@ -6273,13 +6280,22 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 		}
 	}
 
+	// Make sure img has width and height
+	if ( $tag == 'img' && ! ( $attribs['width'] && $attribs['width'] ) ) {
+		if ( strpos( $attribs['src'], '/wppa/icons/' ) === false ) {
+wppa_log('dbg', $attribs['src'] );
+			list( $width, $height, $type, $attr) = getimagesize( $attribs['src'] );
+			if ( $width && $height ) {
+				$attribs['width'] = $width;
+				$attribs['height'] = $height;
+			}
+		}
+	}
+
 	// If lazy, modify src into data-src, and add/completize onload event
 	if ( $lazy && $attribs['src'] ) {
-		$attribs['data-src'] 	= $attribs['src'];
-		$attribs['src'] 		= '';
-		$attribs['onload'] 		= 'wppaLazyLoaded++;wppaMakeLazyVisible(\'onload\');' . $attribs['onload'];
-		$attribs['onerror'] 	= 'wppaLazyLoaded++;' . $attribs['onerror'];
 		$attribs['decoding'] 	= 'async';
+		$attribs['loading'] 	= 'lazy';
 	}
 
 	// Find vaild tags
@@ -6294,9 +6310,9 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	$result = '<' . $tag;
 
-	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'type', 'value', 'preload', 'poster',
+	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'type', 'value', 'preload', 'poster', 'width', 'height',
 					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding', 'placeholder',
-					  'disabled', 'selected', 'autoplay', 'controls',
+					  'disabled', 'selected', 'autoplay', 'controls', 'loading',
 					  'data-id', 'data-title', 'data-day', 'data-from', 'data-src', 'data-videohtml', 'data-posterurl', 'data-videonatwidth', 'data-videonatheight', 'data-audiohtml',
 					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama', 'data-type',
 					  ];

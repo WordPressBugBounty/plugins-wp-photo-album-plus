@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-wppaJsUtilsVersion = '9.1.00.014';
+wppaJsUtilsVersion = '9.1.12.002';
 
 // Handle animation dependant of setting for mobile
 function wppaAnimate( selector, properties, duration, easing, complete ) {
@@ -383,143 +383,6 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 	return result;
 }
 
-// Make lazy load images visible
-var wppaLazyDone = false;
-var wppaLazyLoaded = 0;
-var wppaLazyRequested = 0;
-var wppaLazyStartTime = 0;
-var wppaLazyTimer;
-var wppaLazyBusy = false;
-var wppaLazyProcTime = 0;
-var wppaCheckViewport = true;
-
-function wppaMakeLazyVisible(from) {
-
-	wppaLazyProcTime -= Date.now();
-
-//	wppaConsoleLog('wppaMakeLazyVisible() called from '+from);
-
-	// Feature enabled?
-	if ( ! wppaLazyLoad ) {
-		wppaLazyProcTime += Date.now();
-		return; // No, quit
-	}
-
-	// Done alraedy?
-//	if ( wppaLazyDone ) return; // && !wppaCheckViewport ) return;
-
-	if ( from == 'scroll' ) {
-		clearTimeout(wppaLazyTimer);
-		wppaLazyTimer = setTimeout( wppaMakeLazyVisible, wppaScrollEndDelay, 'delayed' );
-		wppaLazyBusy = true;
-		wppaLazyProcTime += Date.now();
-		return;
-	}
-
-	if ( from == 'resize' ) {
-		clearTimeout(wppaLazyTimer);
-		wppaLazyTimer = setTimeout( wppaMakeLazyVisible, wppaResizeEndDelay, 'delayed' );
-		wppaLazyBusy = true;
-		wppaLazyProcTime += Date.now();
-		return;
-	}
-
-	if ( from == 'DOM' ) {
-		clearTimeout(wppaLazyTimer);
-		wppaLazyTimer = setTimeout( wppaMakeLazyVisible, 100, 'delayed' );
-		wppaLazyBusy = true;
-		wppaLazyProcTime += Date.now();
-		return;
-	}
-
-	// wait for zero connections
-	if ( wppaLazyRequested != wppaLazyLoaded ) {
-		wppaLazyProcTime += Date.now();
-		return;
-	}
-
-	if ( from == 'delayed' ) wppaLazyBusy = false;
-
-	if ( wppaLazyBusy ) {
-		wppaLazyProcTime += Date.now();
-		return;
-	}
-	wppaLazyBusy = true;
-
-	if ( wppaLazyStartTime == 0 ) wppaLazyStartTime = Date.now();
-
-	// Init
-	var start = Date.now();
-	var src;
-
-	// Init masonryplus
-	wppaInitMasonryPlus();
-
-	// Find potential imgs
-	var potential = jQuery( "*[data-src]" );
-	var todo = [];
-	var i = 0;
-	while (i<potential.length) {
-		if (!wppaCheckViewport || wppaIsElementInViewport(potential[i])) {
-			todo[i] = potential[i];
-		}
-		i++;
-	}
-
-	if ( wppaCheckViewport)  {
-		wppaConsoleLog('lazy potential from '+from+' in viewport: '+todo.length);
-	}
-	else {
-		wppaConsoleLog('lazy potential from '+from+' out of view: '+todo.length);
-		if ( todo.length == 0 ) wppaLazyDone = true;
-	}
-
-	// Process them
-	if ( todo.length > 0 ) {
-		jQuery( todo ).each( function() {
-			if ( wppaLazyRequested < 5+wppaLazyLoaded ) {
-				src = jQuery(this).attr('data-src');
-				if (src) {
-					jQuery(this).attr('src', src);
-					jQuery(this).removeAttr('data-src');
-					jQuery(this).parent().css({'min-height':0});
-					jQuery(this).parent().parent().css({'min-height':0});
-					wppaLazyRequested++;
-//					wppaLazyDone = true;
-				}
-			}
-		});
-	}
-	else if ( wppaCheckViewport ) {
-		wppaCheckViewport = false;
-		wppaMakeLazyVisible('DOM');
-	}
-
-	// If anything done...
-	if ( wppaLazyDone ) {
-
-		// Init masonryplus
-		wppaInitMasonryPlus();
-
-		// Resize nicescroller
-		wppaResizeNice('wppaMakeLazyVisible');
-
-		// Do autocols
-		wppaDoAllAutocols();
-
-	}
-	// Reset
-//	wppaLazyDone = false;
-	wppaLazyBusy = false;
-	wppaLazyProcTime += Date.now();
-
-	if ( potential.length == 0 && wppaLazyStartTime > 0 ) {
-//		wppaConsoleLog('Lazy total proc time: '+ wppaLazyProcTime +' msec');
-//		wppaConsoleLog('Lazy total elapsed time: '+ (Date.now() - wppaLazyStartTime));
-		wppaLazyStartTime = -1;
-	}
-}
-
 // Determines whether (a part of) element elm (an image) is inside browser window
 function wppaIsElementInViewport( elm ) {
 
@@ -598,9 +461,6 @@ function wppaSizeArea() {
 
 	// Nice scroller
 	wppaResizeNice('wppaSizeArea');
-
-	// Lazy loader
-	wppaMakeLazyVisible('sizearea');
 
 }
 

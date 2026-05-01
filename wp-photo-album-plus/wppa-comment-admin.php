@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 9.1.00.003
+* version 9.1.12.005
 *
 */
 
@@ -99,7 +99,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 			__( 'Video', 'wp-photo-album-plus' ) . ': ' . $item['photo'];
 		}
 		else {
-			$result = wppa_html_tag( 'img', ['src' => $src, 'style' => 'width:170px;', 'title' => $title] );
+			$result = wppa_html_tag( 'img', ['src' => $src, 'style' => 'width:170px;height:auto;', 'title' => $title, 'width' => wppa_get_thumbx( $photo ), 'height' => wppa_get_thumby( $photo )] );
 			$result .= '
 			<br>' .
 			$item['id'] . ' ' .
