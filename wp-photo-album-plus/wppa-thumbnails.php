@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.1.12.004
+* Version: 9.1.12.007
 *
 */
 
@@ -142,7 +142,7 @@ global $wpdb;
 	}
 	if ( $com_alt ) $framewidth = $imgwidth + '4';
 	$result .= wppa_html_tag( 'div', ['class' => 'wppa-tn-img-container',
-									  'style' => 'height:'.$imgcontheight.'px;width:'.$framewidth.'px;'.( $com_alt ? 'float:left;' : '' ).'overflow:visible;'], false );
+									  'style' => 'height:'.$imgcontheight.'px;width:'.$framewidth.'px;'.( $com_alt ? 'float:left;' : '' ).'overflow:visible;text-align:center;'], false );
 
 	// The medals if at the top
 	$medalsize = $com_alt ? 'S' : wppa_opt( 'icon_size_multimedia' );
@@ -195,48 +195,34 @@ global $wpdb;
 			{ 	// Ajax	possible
 
 				// The a img ajax
-				$p =  wppa( 'calendar') ? '' : $xid;
-
-				$ajax_url = wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ),
-																'photo' => $p ) );
-
-				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ),
-														   'photo' => $p ) );
-
+				$p =  wppa( 'calendar' ) ? '' : $xid;
+				$ajax_url = wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) );
+				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) );
 				$onclick = "wppaDoAjaxRender(event,$tmocc,'$ajax_url','$href_url'); return false;";
-
-				$result .= '
-				<a
-					style="position:static;"
-					class="thumb-img"
-					id="x-'.$id.'-'.$mocc.'"
-					href="' . $href_url . '"
-					onclick="' . $onclick . '" >';
-
 				if ( $is_video ) {
-					$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
-													 'controls' => wppa_switch('thumb_video'), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
+					$the_abody = wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
+													   'controls' => wppa_switch('thumb_video'), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				else {
-					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+					$the_abody = wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
 													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle.'cursor:pointer', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
-				$result .= '</a>';
+				$result .= wppa_html_tag( 'a', ['id' => 'x-'.$id.'-'.$mocc, 'href' => $href_url, 'onclick' => $onclick, 'style' => 'position:static;', 'class' => 'thumb-img'], $the_abody );
 			}
 			else { 	// non ajax
+
 				// The a img non ajax
-				$result .= '<a style="position:static;" href="'.$link['url'].'" target="'.$link['target'].'" class="thumb-img" id="x-'.$xid.'-'.$mocc.'">';
 				if ( $is_video ) {
-					$result .= wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
+					$the_abody = wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
 													 'controls' => wppa_switch('thumb_video'), 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 				else {
-					$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
+					$the_abody = wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title,
 													  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],
 													  'style' => $imgstyle.'cursor:pointer;', 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
-				$result .= '</a>';
+				$result .= wppa_html_tag( 'a', ['id' => 'x-'.$xid.'-'.$mocc, 'href' => $link['url'], 'style' => 'position:static;', 'target' => $link['target'], 'class' => 'thumb-img'], $the_abody );
 			}
 		}
 

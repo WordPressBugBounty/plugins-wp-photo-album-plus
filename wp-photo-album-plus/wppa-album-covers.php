@@ -2173,7 +2173,7 @@ global $cover_count_key;
 										   'onclick' => $onclick_title] );
 	}
 	else {
-		$the_image = wppa_html_tag( 'img', ['id' => 'i-' . $coverphoto . '-' . $mocc, 'src' => $src, 'title' => $title, 'style=' => $imgstyle,
+		$the_image = wppa_html_tag( 'img', ['id' => 'i-' . $coverphoto . '-' . $mocc, 'src' => $src, 'title' => $title, 'style' => $imgstyle,
 											'width' => wppa_get_photo_item( $coverphoto , 'thumbx' ), 'height' => wppa_get_photo_item( $coverphoto, 'thumby' ),
 											'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout, 'onclick' => $onclick_title] );
 	}

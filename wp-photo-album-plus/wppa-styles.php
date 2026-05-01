@@ -251,7 +251,12 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			else {
 				$result['style'] .= 'border-width:0px;';
 			}
-			$result['style'] .= 'width:' . $width . 'px;height:' . $height . 'px;';
+			if ( $width > $height ) {
+				$result['style'] .= 'width:100%;height:auto;';
+			}
+			else {
+				$result['style'] .= 'width:auto;height:100%;';
+			}
 			if ( $xvalign == 'optional' ) $valign = wppa_opt( 'valign' );
 			else $valign = $xvalign;
 			if ( $valign != 'default' ) {	// Center horizontally
@@ -261,7 +266,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 					$delta = 0;
 				}
 				if ( $delta > 0 ) {
-					$result['style'] .= 'margin-left:' . $delta . 'px;margin-right:' . $delta . 'px;';
+					$result['style'] .= ''; //'margin-left:' . $delta . 'px;margin-right:' . $delta . 'px;';
 				}
 			}
 

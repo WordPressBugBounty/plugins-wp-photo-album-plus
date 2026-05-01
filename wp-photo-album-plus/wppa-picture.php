@@ -772,7 +772,7 @@ function wppa_get_spheric_pan_html( $args ) {
 		wppaDoSphericPan(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
 
 	if ( $haslink ) {
 		$result .= '<a>';
@@ -1084,7 +1084,7 @@ function wppa_get_flat_pan_html( $args ) {
 		wppaDoFlatPanorama(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
 
 	// wppa-ovl-flatpan-container
 	if ( $lightbox ) {
@@ -1400,8 +1400,7 @@ function wppa_get_zoom_pan_html( $args ) {
 			wppaDoZoomPan(' . $mocc . ', data' . $mocc . ');';
 
 		$result .=
-		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
-if ( ! $filex || ! $filey ) wppa_log('err', $id.' hase no filex or y');
+		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
 
 	// wppa-ovl-zoom-container
 	if ( $lightbox ) {
