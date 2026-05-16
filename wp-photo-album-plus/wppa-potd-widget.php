@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the photo of the day widget
-* Version 9.0.00.005
+* Version 9.1.13.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -112,7 +112,8 @@ class PhotoOfTheDay extends WP_Widget {
 					$widget_content .= wppa_get_video_html( ['id' => $id, 'title' => $title, 'controls' => (wppa_opt('potd_linktype')=='none'), 'style' => 'cursor:'.$cursor,';width:100%;'] );
 				}
 				else {
-					$widget_content .= wppa_html_tag( 'img', ['src' => $imgurl, 'style' => 'width:100%;'.$cursor, 'alt' => wppa_alt($id), 'title' => $title] );
+					$widget_content .= wppa_html_tag( 'img', ['src' => $imgurl, 'style' => 'width:100%;height:auto;'.$cursor, 'alt' => wppa_alt($id), 'title' => $title,
+															  'width' => wppa_get_thumbx( $id ) , 'height' => wppa_get_thumby( $id )] );
 				}
 
 			// Close the link

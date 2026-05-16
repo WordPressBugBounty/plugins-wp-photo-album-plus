@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.1.12.005
+* Version 9.1.13.001
 *
 */
 
@@ -3832,7 +3832,7 @@ global $wpdb;
 							$u = wppa_get_thumb_url( $cpid );
 							$w = wppa_get_photo_item( $cpid, 'thumbx' );
 							$h = wppa_get_photo_item( $cpid, 'thumby' );
-							$result .= wppa_html_tag( 'img', ['class' => "wppa-cover-image", 'src' => $u, 'style' => "max-height:50px;margin: 5px;",
+							$result .= wppa_html_tag( 'img', ['class' => "wppa-cover-image", 'src' => $u, 'style' => "max-height:50px;margin:5px;width:auto;",
 															  'width' => $w, 'height' => $h] );
 						}
 					}

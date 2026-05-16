@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 9.0.00.000
+/* Version 9.1.13.002
 /*
 */
 
@@ -109,7 +109,7 @@ function wppa_get_fullimgstyle_a( $id ) {
 }
 
 // Image style array output
-function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' ) {
+function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '', $alt = false ) {
 
 	$result = Array(
 					'style' 		=> '',
@@ -244,7 +244,10 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 		case 'twthumb':		// Thumbnail widget
 		case 'ltthumb':		// Lasten widget
 		case 'albthumb':	// Album widget
-			$hl = wppa_get( 'hilite', '', 'pcrypt' );
+			$hl  = wppa_get( 'hilite', '', 'pcrypt' );
+			$alt = wppa_get_album_item( wppa_get_photo_item( $id, 'album' ), 'alt_thumbsize' ) == 'yes';
+			$ts  = wppa_opt( 'thumbsize' . ( $alt ? '_alt': '' ) );
+
 			if ( $type == 'thumb' && $hl == $id ) {
 				$result['style'] .= 'border:3px solid orange;box-sizing:border-box;';
 			}
@@ -252,10 +255,10 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 				$result['style'] .= 'border-width:0px;';
 			}
 			if ( $width > $height ) {
-				$result['style'] .= 'width:100%;height:auto;';
+				$result['style'] .= 'width:'.$ts.'px;height:auto;';
 			}
 			else {
-				$result['style'] .= 'width:auto;height:100%;';
+				$result['style'] .= 'width:auto;height:'.$ts.'px;';
 			}
 			if ( $xvalign == 'optional' ) $valign = wppa_opt( 'valign' );
 			else $valign = $xvalign;

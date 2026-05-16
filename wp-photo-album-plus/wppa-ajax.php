@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.1.12.001
+* Version: 9.1.13.004
 *
 */
 
@@ -60,6 +60,8 @@ global $wppa_supported_audio_extensions;
 	wppa( 'out', '' );
 	if ( ! isset( $wppa_session['page'] ) ) {
 		$wppa_session['page'] = 0;
+	}
+	if ( ! isset( $wppa_session['ajax'] ) ) {
 		$wppa_session['ajax'] = 0;
 	}
 	$wppa_session['page']--;
@@ -1103,35 +1105,45 @@ global $wppa_supported_audio_extensions;
 			break;
 
 		case 'tinymcedialog':
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				wppa_echo( __( 'No rights', 'wp-photo-album-plus' ) );
+				wppa_exit();
+			}
 			$result = wppa_make_tinymce_dialog();
 			wppa_echo( $result );
 			wppa_exit();
 			break;
 
 		case 'tinymcephotodialog':
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				wppa_echo( __( 'No rights', 'wp-photo-album-plus' ) );
+				wppa_exit();
+			}
 			$result = wppa_make_tinymce_photo_dialog();
 			wppa_echo( $result );
 			wppa_exit();
 			break;
-
-		case 'tinymcephotodialogfront':
-			$result = wppa_make_tinymce_photo_dialog( 'front' );
-			wppa_echo( $result );
-			wppa_exit();
-			break;
-
+/*
 		case 'gutenbergphotodialog':
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				wppa_echo( __( 'No rights', 'wp-photo-album-plus' ) );
+				wppa_exit();
+			}
 			$result = wppa_make_gutenberg_photo_dialog();
 			wppa_echo( $result );
 			wppa_exit();
 			break;
 
 		case 'gutenbergwppadialog':
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				wppa_echo( __( 'No rights', 'wp-photo-album-plus' ) );
+				wppa_exit();
+			}
 			$result = wppa_make_gutenberg_wppa_dialog();
 			wppa_echo( $result );
 			wppa_exit();
 			break;
-
+*/
 		case 'getshortcodedrendered':
 
 			// Used by gutenberg and cover preview in album admin
@@ -1218,7 +1230,10 @@ global $wppa_supported_audio_extensions;
 				}
 
 				.wppa-container-wrapper {
-					max-width: 840px;
+					width: 100% !important;
+					margin-left:0 !important;
+					margin-right:0 !important;
+					text-align:center;
 				}
 
 				.wppa-container-wrapper img {

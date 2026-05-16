@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.1.12.005
+* vrsion: 9.1.13.005
 *
 */
 
@@ -81,7 +81,7 @@ static $cache;
 	}
 
 	// Not in cache, do query
-	$cache[$id] = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id = %s", $id ) );
+	$cache[$id] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id = %s", $id ), ARRAY_A );
 
 	// Found one?
 	if ( isset( $cache[$id] ) ) {
@@ -165,7 +165,7 @@ static $cache;
 	}
 
 	// Not in cache, do query
-	$cache[$id] = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $id ) );
+	$cache[$id] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $id ), ARRAY_A );
 	if ( $cache[$id] ) {
 		wppa( 'current_photo', $cache[$id] );
 		return $cache[$id];
@@ -896,7 +896,7 @@ function wppa_get_thumbx( $id, $force = false ) {
 		}
 	}
 	else {
-		$result = wppa_get_thumbphotoxy( $id, 'thumbx' );//, $force );
+		$result = wppa_get_thumbphotoxy( $id, 'thumbx', $force );
 	}
 	if ( ! $result && wppa_has_audio( $id ) ) {
 		$result = wppa_opt( 'thumbsize' );
@@ -1050,6 +1050,9 @@ function wppa_get_sourcex( $id, $force = false ) {
 
 	$alb = $thumb['album'];
 	$path = wppa_get_source_album_dir( $alb ).'/'.$thumb['filename'];
+	if ( wppa_is_file( wppa_get_o1_source_path( $id ) ) ) {
+		$path = wppa_get_o1_source_path( $id );
+	}
 	if ( wppa_is_file( $path ) ) {
 		$sizes = getimagesize( $path );
 		$result = $sizes[0];
@@ -1068,6 +1071,9 @@ function wppa_get_sourcey( $id, $force = false ) {
 
 	$alb = $thumb['album'];
 	$path = wppa_get_source_album_dir( $alb ).'/'.$thumb['filename'];
+	if ( wppa_is_file( wppa_get_o1_source_path( $id ) ) ) {
+		$path = wppa_get_o1_source_path( $id );
+	}
 	if ( wppa_is_file( $path ) ) {
 		$sizes = getimagesize( $path );
 		$result = $sizes[1];
@@ -1077,11 +1083,11 @@ function wppa_get_sourcey( $id, $force = false ) {
 }
 
 function wppa_get_hiresx( $id ) {
-	return max( wppa_get_sourcex( $id ), wppa_get_photox( $id ) );
+	return ( wppa_get_sourcex( $id ) ? wppa_get_sourcex( $id ) : wppa_get_photox( $id ) );
 }
 
 function wppa_get_hiresy( $id ) {
-	return max( wppa_get_sourcey( $id ), wppa_get_photoy( $id ) );
+	return ( wppa_get_sourcey( $id ) ? wppa_get_sourcey( $id ) : wppa_get_photoy( $id ) );
 }
 
 // See if a photo item should be displayed for a given album (enumeration)

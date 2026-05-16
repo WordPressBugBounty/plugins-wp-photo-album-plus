@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version: 9.1.09.004
+* Version: 9.1.13.003
 *
 */
 
@@ -14,9 +14,6 @@ require_once 'wppa-filter.php';
 require_once 'wppa-breadcrumb.php';
 require_once 'wppa-album-covers.php';
 require_once 'wppa-cart.php';
-if ( ! is_admin() ) {
-	require_once 'wppa-tinymce-photo-front.php';
-}
 
 /* LOAD STYLESHEET */
 add_action('wp_enqueue_scripts', 'wppa_add_style');

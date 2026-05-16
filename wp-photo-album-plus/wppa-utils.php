@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.1.12.004
+* Version: 9.1.13.005
 *
 */
 
@@ -873,34 +873,38 @@ global $all_wppa_options;
 	}
 }
 
-function wppa_album_exists( $id ) {
+function wppa_album_exists( $alb ) {
 global $wpdb;
 static $cache;
 
-	if ( ! $cache ) {
-		$cache = array();
+	if ( ! $cache ) $cache = [];
+	if ( ! isset( $cache[$alb] ) ) {
+		$cache[$alb] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $alb ) );
 	}
-
-	if ( ! isset( $cache[$id] ) ) {
-		$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $id );
-		$cache[$id] = wppa_get_var( $query );
-	}
-
-	return $cache[$id];
+	return $cache[$alb];
 }
 
 function wppa_photo_exists( $id ) {
 global $wpdb;
+static $cache;
 
-	$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE id = %s", $id );
-	return wppa_get_var( $query );
+	if ( ! $cache ) $cache = [];
+	if ( ! isset( $cache[$id] ) ) {
+		$cache[$id] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE id = %s", $id ) );
+	}
+	return $cache[$id];
 }
 
-function wppa_albumphoto_exists($alb, $photo) {
+function wppa_albumphoto_exists( $alb, $id ) {
 global $wpdb;
+static $cache;
 
-	$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s AND filename = %s", $alb, $photo );
-	return wppa_get_var( $query );
+	if ( ! $cache ) $cache = [];
+	if ( ! $cache[$alb] ) $cache[$alb] = [];
+	if ( ! isset( $cache[$alb][$id] ) ) {
+		$cache[$alb][$id] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photosWHERE album = %s AND filename = %s", $alb, $id ) );
+	}
+	return $cache[$alb][$id];
 }
 
 function wppa_dislike_check($photo) {

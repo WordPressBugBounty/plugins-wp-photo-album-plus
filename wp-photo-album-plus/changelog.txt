@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.1.13 =
+
+* Fixed a layout issue on album sort in the album admin.
+* Fixed a layout issue in default thumbnails display where thumbnail size differs from frame width.
+* Security fix.
+
 = 9.1.12 =
 
 * Performance and seo optimizing release. 

@@ -4,7 +4,7 @@
 *
 * Contains dashboard widgets code
 *
-* Version 9.0.04.003
+* Version 9.1.13.002
 *
 */
 
@@ -98,12 +98,13 @@ global $wpdb;
 							if ( wppa_is_video( $id ) ) {
 								$url = WPPA_UPLOAD_URL . '/icons/' . wppa_opt( 'video_icon' );
 								wppa_echo( wppa_html_tag( 'div', ['style' => "position:relative"],
-									wppa_get_video_html( ['id' => $id, 'style' => 'width:100px;', 'controls' => false, 'use_thumb' => true] ) .
+									wppa_get_video_html( ['id' => $id, 'style' => 'width:100px;height:auto', 'controls' => false, 'use_thumb' => true] ) .
 									wppa_html_tag( 'img', ['src' => $url, 'style' => "width:16px;height:16px;position:absolute;right:0;bottom:0;z-index:100;"] )
 								) );
 							}
 							else {
-								wppa_echo( wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ), 'style' => "max-width:100px;"] ) );
+								wppa_echo( wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ), 'style' => "max-width:100px;height:auto;",
+																  'width' => wppa_get_photo_item( $id, 'thumbx' ), 'height' => wppa_get_photo_item( $id, 'thumby' ) ] ) );
 							}
 
 						wppa_echo( '
@@ -159,7 +160,8 @@ global $wpdb;
 				<tr>
 					<td>' .
 						wppa_html_tag( 'a', ['href' => $href, 'target' => "_blank"],
-							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "max-width:100px;"] ) ) . '
+							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "max-width:100px;height:auto",
+												   'width' => wppa_get_photo_item( $id, 'thumbx' ), 'height' => wppa_get_photo_item( $id, 'thumby' )] ) ) . '
 					</td>
 					<td>
 						<i>' . sanitize_text_field( $comment['comment'] ) . '</i>
@@ -224,7 +226,8 @@ function wppa_show_potd_log() {
 					<td>' .
 						wppa_html_tag( 'a', ['href' => $href, 'target' => "_blank"],
 							wppa_is_video( $id ) ? wppa_get_video_html( ['id' => $id, 'tagid' => 'video-'.$id, 'use_thumb' => true, 'controls' => false, 'style' => "max-width:100px;"] ) :
-							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ), 'style' => "max-width:100px;"] ) ) . '
+							wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ), 'style' => "max-width:100px;height:auto;",
+												   'width' => wppa_get_photo_item( $id, 'thumbx' ), 'height' => wppa_get_photo_item( $id, 'thumby' )] ) ) . '
 					</td>
 					<td>' .
 						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $time ) . '<br>' .

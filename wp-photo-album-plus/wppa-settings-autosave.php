@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.1.12.005
+* version 9.1.13.003
 *
 */
 
@@ -329,7 +329,9 @@ global $wppa_hide_this;
 
 	// Make sure there is a .htaccess
 	if ( ! wppa_is_file( wppa_opt( 'source_dir' ) . '/.htaccess' ) ) {
-		wppa_copy( WPPA_PATH . '/img/.htaccess', wppa_opt( 'source_dir' ) . '/.htaccess' );
+		if ( wppa_is_file( WPPA_UPLOAD_PATH . '/.htaccess' ) ) {
+			wppa_copy( WPPA_UPLOAD_PATH . '/.htaccess', wppa_opt( 'source_dir' ) . '/.htaccess' );
+		}
 	}
 
 	// Spinner image
@@ -7497,9 +7499,9 @@ global $wppa_hide_this;
 							$html = '<input type="checkbox" checked disabled>';
 							wppa_setting_new($slug, '41', $name, $desc, $html, $help);
 						}
-						
+
 						$name = __('Convert new to .webp', 'wp-photo-album-plus');
-						$desc = __('Convert new .jpg and .png files to .webp right after upload');
+						$desc = __('Convert new .jpg and .png files to .webp right after upload', 'wp-photo-album-plus');
 						$help = '';
 						$slug = 'wppa_new_to_webp';
 						$html = wppa_checkbox($slug);
@@ -9346,7 +9348,7 @@ global $wppa_hide_this;
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
 						wppa_setting_new(false, '7', $name, $desc, $html, $help);
-						
+
 						$name = __('Convert to .webp', 'wp-photo-album-plus');
 						$desc = __('Convert all .jpg and .png imagfe files to .webp files', 'wp-photo-album-plus');
 						$help = __('This can dramatically reduce filesizes without noticable image quality degeneration', 'wp-photo-album-plus');
@@ -9357,7 +9359,7 @@ global $wppa_hide_this;
 						$html4 = wppa_togo_field( $slug2 );
 						$html = array($html1, $html2, $html3, $html4);
 						wppa_setting_new(false, '8', $name, $desc, $html, $help);
-						
+
 						$name = __('Recalculate image sizes', 'wp-photo-album-plus');
 						$desc = __('Put right image dimensions into photo db table', 'wp-photo-album-plus');
 						$help = '';

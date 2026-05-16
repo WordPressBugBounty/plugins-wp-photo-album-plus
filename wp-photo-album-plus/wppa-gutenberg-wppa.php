@@ -2,7 +2,7 @@
 /* wppa-gutenberg-wppa.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 9.1.09.004
+* Version 9.1.13.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -23,6 +23,7 @@ global $wppa_version;
 }
 add_action( 'init', 'wppa_gutenberg_wppa_block' );
 
+/*
 function wppa_make_gutenberg_wppa_dialog( $front = false ) {
 global $wpdb;
 
@@ -464,7 +465,7 @@ global $wpdb;
 					'<small style="display:none;" class="wppagallery-photo">'.
 						__( 'Specify the photo to be used', 'wp-photo-album-plus' ) . '<br>'.
 						/* translators: integer */
-						sprintf( __( 'You can select from a maximum of %d most recently added photos', 'wp-photo-album-plus' ), wppa_opt( 'generator_max' )) . '<br>'.
+/*						sprintf( __( 'You can select from a maximum of %d most recently added photos', 'wp-photo-album-plus' ), wppa_opt( 'generator_max' )) . '<br>'.
 					'</small>'.
 				'</td>'.
 			'</tr>'.
@@ -680,3 +681,4 @@ global $wpdb;
 
 	return $result;
 }
+*/

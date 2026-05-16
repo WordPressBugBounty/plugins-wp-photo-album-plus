@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.1.12.005
+* Version: 9.1.13.003
 *
 */
 
@@ -4309,7 +4309,7 @@ global $wpdb;
 					overflow:auto;"
 			class="wppa-edit-area wppa-modal">
 			<h1>' .
-				wppa_html_tag( 'img', ['style' => "height:50px", 'src' => wppa_get_thumb_url($photo), 'alt' => wppa_alt($photo)] ) . '
+				wppa_html_tag( 'img', ['style' => "height:100px;width:auto;", 'src' => wppa_get_thumb_url($photo), 'alt' => wppa_alt($photo)] ) . '
 				&nbsp;&nbsp;' .
 				wppa_opt( 'fe_edit_caption' ) . '
 			</h1>';
@@ -4391,40 +4391,14 @@ global $wpdb;
 
 			// Or a multiline text item
 			if ( $types[$idx] == 'textarea' ) {
-
-				// Visual editor, see Advanced settings -> Admin -> VI -> Item 14. Does not work here
-				if ( false && wppa_switch( 'use_wp_editor' ) ) {
-
-					$result .= bc_get_wp_editor(  $value,
-								$items[$idx],
-								array( 	'wpautop' 		=> true,
-										'media_buttons' => false,
-										'textarea_rows' => '6',
-										'tinymce' 		=> true
-								)
-							);
-					static $been_here;
-					if ( ! $been_here ) {
-						global $wp_scripts;
-						$wp_scripts->reset();
-						\_WP_Editors::enqueue_scripts(true);
-						print_footer_scripts();
-						$been_here = true;
-					}
-					\_WP_Editors::editor_js();
-				}
-
-				// Simple textarea
-				else {
-					$result .= '
-						<textarea
-							style="width:100%;box-sizing:border-box;"
-							id="' . $items[$idx] . '"
-							name="' . $items[$idx] . '"
-							>' .
-							esc_textarea( stripslashes( $value ) ) . '
-						</textarea>';
-				}
+				$result .= '
+					<textarea
+						style="width:100%;box-sizing:border-box;"
+						id="' . $items[$idx] . '"
+						name="' . $items[$idx] . '"
+						>' .
+						esc_textarea( stripslashes( $value ) ) . '
+					</textarea>';
 			}
 		}
 	}

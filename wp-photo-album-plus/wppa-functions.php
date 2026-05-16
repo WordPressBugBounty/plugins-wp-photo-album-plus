@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.1.12.003
+* Version: 9.1.13.004
 *
 */
 
@@ -5800,7 +5800,7 @@ global $wpdb;
 		$result = '.' . implode( '.', $value_a ) . '.';
 
 		// If modified: save
-		if ( $result != $value ) {
+		if ( trim( $result, '.') != trim( $value, '.' ) ) {
 			$query = $wpdb->prepare( "UPDATE %s SET usedby = `%s` WHERE id = %d", $table, $result, $id );
 			$query = wppa_fix_query( $query );
 			$bret = wppa_query( $query );
@@ -5901,6 +5901,7 @@ global $wppa_intro_seen;
 
 	// Item exists?
 	if ( ! wppa_photo_exists( $id ) ) {
+		/* Translators: media item id */
 		wppa_echo(sprintf(__('Intro item %d does not exist', 'wp-photo-album-plus'), $id ) );
 		return '';
 	}
@@ -5969,65 +5970,3 @@ global $wppa_intro_seen;
 	return $result;
 }
 
-function wppa_get_editor( $value, $name, $id ) {
-global $wp_scripts;
-static $been_here;
-
-	// Visual editor, see Advanced settings -> Admin -> VI -> Item 14
-	if ( false && wppa_switch( 'use_wp_editor' ) ) {
-
-		ob_start();
-		wp_editor(  $value,
-					$id,
-					array(
-						'wpautop'             => true,
-						'media_buttons'       => false,
-						'default_editor'      => '',
-						'drag_drop_upload'    => false,
-						'textarea_name'       => $name,
-						'textarea_rows'       => 6,
-						'tabindex'            => '',
-						'tabfocus_elements'   => ':prev,:next',
-						'editor_css'          => '',
-						'editor_class'        => '',
-						'teeny'               => true,
-						'_content_editor_dfw' => false,
-						'tinymce'             => true,
-						'quicktags'           => true,
-					)
-
-			/*
-					array( 	'wpautop' 		=> true,
-							'media_buttons' => false,
-							'textarea_rows' => '6',
-							'tinymce' 		=> true
-					)
-			*/
-				);
-
-		if ( ! $been_here ) {
-			$been_here = true;
-			$wp_scripts->reset();
-			\_WP_Editors::enqueue_scripts(true);
-			print_footer_scripts();
-		}
-		\_WP_Editors::editor_js();
-
-		$result = ob_get_contents();
-		ob_end_clean();
-	}
-
-	// Simple textarea
-	else {
-		$result = '
-			<textarea
-				style="width:100%;box-sizing:border-box;"
-				id="' . esc_attr( $id ) . '"
-				name="' . esc_attr( $name ) . '"
-				>' .
-				esc_textarea( stripslashes( $value ) ) . '
-			</textarea>';
-	}
-
-	return $result;
-}

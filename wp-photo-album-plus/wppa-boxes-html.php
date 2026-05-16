@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.1.12.006
+* Version 9.1.13.002
 *
 */
 
@@ -608,9 +608,10 @@ global $wppa_session;
 						value="' . esc_attr( wppa_get( 'searchstring' ) ) . '"
 						name="wppa-searchstring"
 						style="position: relative;top: -14px;"
+						onclick="jQuery(\'#wppa-search-submit-'.$mocc.'\').css(\'visibility\',\'visible\');"
 					/>
 				</label>' .
-				wppa_html_tag( 'img', ['src' => wppa_get_imgdir( 'magnifier-large.png' ), 'class' => 'search-submit', 'style' => 'margin-left:6px;', 'width' => '32', 'height' => '32',
+				wppa_html_tag( 'img', ['src' => wppa_get_imgdir( 'magnifier-large.png' ), 'id' => 'wppa-search-submit-'.$mocc,'class' => 'search-submit', 'style' => 'margin-left:6px;display:inline;visibility:hidden;', 'width' => '32', 'height' => '32',
 									   'onclick' => 'wppaDelayedSearch(\''. $pagelink .'\', '.$mocc.', '.$selboxes.' );'] ) . '
 			</div>';
 

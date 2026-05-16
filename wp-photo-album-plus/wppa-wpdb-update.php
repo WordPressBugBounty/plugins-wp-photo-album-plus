@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.1.12.005
+* Version: 9.1.13.002
 *
 */
 
@@ -684,6 +684,19 @@ global $wpdb;
 		wppa_cache_photo( 'invalidate', $id );
 		if ( isset( $fields['album'] ) ) {
 			wppa_fix_seq_nums( 'media', $id );
+		}
+
+		// Log changed sizes
+		$kf = array_keys( $fields );
+		$s_arr = ['thumbx', 'thumby', 'photox', 'photoy', 'sourcex', 'sourcey'];
+		$did = [];
+		foreach ( $s_arr as $s ) {
+			if ( in_array( $s, $kf ) ) {
+				$did[] = $s;
+			}
+		}
+		if ( count( $did ) ) {
+			wppa_log( ( defined( 'DOING_CRON' ) ? 'cron' : 'dbg' ), 'Did fix sizes '.implode( ', ', $did ).' for '.$id );
 		}
 	}
 

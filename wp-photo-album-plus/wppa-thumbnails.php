@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.1.12.007
+* Version: 9.1.13.001
 *
 */
 
@@ -77,7 +77,7 @@ global $wpdb;
 		wppa_create_thumbnail( $id );
 	}
 	$alt 				= $album['alt_thumbsize'] == 'yes' ? '_alt' : '';
-	$imgattr_a 			= wppa_get_imgstyle_a( $id, $imgsrc, wppa_opt( 'thumbsize'.$alt ), 'optional', 'thumb' );
+	$imgattr_a 			= wppa_get_imgstyle_a( $id, $imgsrc, wppa_opt( 'thumbsize'.$alt ), 'optional', 'thumb', $alt );
 	$imgstyle  			= $imgattr_a['style'];
 	$imgwidth  			= $imgattr_a['width'];
 	$imgheight 			= $imgattr_a['height'];
@@ -121,7 +121,7 @@ global $wpdb;
 
 	// Feed ?
 	if ( is_feed() ) {
-		$imgattr_a 	= wppa_get_imgstyle_a( $id, $imgsrc, 100, '4', 'thumb' );
+		$imgattr_a 	= wppa_get_imgstyle_a( $id, $imgsrc, 100, '4', 'thumb', $alt );
 		$style 		= $imgattr_a['style'];
 		$result 	.= 	wppa_html_tag( 'a', ['href' => get_permalink()],
 							wppa_html_tag( 'img', ['src' => $imgurl, 'title' => $title, 'alt' => wppa_alt($id), 'style' => $style,
@@ -839,7 +839,7 @@ function wppa_get_thumb_masonry( $id ) {
 	$imgsrc 		= wppa_get_thumb_path( $id );
 	$is_pdf 		= wppa_is_pdf( $id );
 	$alt 			= $album['alt_thumbsize'] == 'yes' ? '_alt' : '';
-	$imgattr_a 		= wppa_get_imgstyle_a( $id, $imgsrc, wppa_opt( 'thumbsize'.$alt ), 'optional', 'thumb' );
+	$imgattr_a 		= wppa_get_imgstyle_a( $id, $imgsrc, wppa_opt( 'thumbsize'.$alt ), 'optional', 'thumb', $alt );
 
 	// Verical style ?
 	if ( $vert ) {
@@ -904,7 +904,7 @@ function wppa_get_thumb_masonry( $id ) {
 
 	// Feed ?
 	if ( is_feed() ) {
-		$imgattr_a = wppa_get_imgstyle_a( $id, $imgsrc, 100, '4', 'thumb' );
+		$imgattr_a = wppa_get_imgstyle_a( $id, $imgsrc, 100, '4', 'thumb', $alt );
 		$style = $imgattr_a['style'];
 		$result .= '<a href="' . get_permalink() . '">' .
 						wppa_html_tag( 'img', ['src' => $imgurl, 'alt' => $alt, 'title' => $title, 'style' => $style] ) .

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.1.12.006
+* Version: 9.1.13.001
 *
 */
 
@@ -902,6 +902,7 @@ global $wppa_no_lightbox;
 
 						wppa_out(
 							wppa_html_tag( 'img', ['src' => $src, 'alt' => wppa_get_imgalt( $id, false, true ), 'class' => "pietje image wppa-img", 'style' => $imgattr,
+												   'width' => $image['thumbx'], 'height' => $image['thumby'],
 												   'onmouseover' => $uco ? "jQuery(this).fadeTo(400, 1.0)" : '', 'onmouseout' => $uco ? "jQuery(this).fadeTo(400," . $perc/100 . ")" : '',
 												   'onclick' => $photolink['onclick'] . ';return false;'] ) );
 					}
@@ -1086,6 +1087,7 @@ function wppa_the_coverphotos( $albumid, $images, $srcs, $photo_pos, $photolinks
 
 						wppa_out(
 							wppa_html_tag( 'img', ['src' => $src, 'alt' => wppa_get_imgalt( $id, false, true ), 'class' => "image wppa-img", 'style' => $imgattr,
+												   'width' => $image['thumbx'], 'height' => $image['thumby'],
 												   'onmouseover' => $uco ? "jQuery(this).fadeTo(400, 1.0)" : '', 'onmouseout' => $uco ? "jQuery(this).fadeTo(400," . $perc/100 . ")" : ''] ) );
 					}
 					wppa_close_tag( 'a' );
@@ -1104,6 +1106,7 @@ function wppa_the_coverphotos( $albumid, $images, $srcs, $photo_pos, $photolinks
 				// A photo
 				else {
 					wppa_html_out( 'img', ['title' => ' ', 'src' => $src, 'alt' => wppa_get_imgalt( $id, false, true ), 'class' => "image wppa-img", 'style' => $imgattr.'cursor:default;',
+										   'width' => $image['thumbx'], 'height' => $image['thumby'],
 										   'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 				}
 			}

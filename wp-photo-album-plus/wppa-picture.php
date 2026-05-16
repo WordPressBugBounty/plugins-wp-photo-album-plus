@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.1.12.005
+* Version 9.1.13.005
 *
 */
 
@@ -772,7 +772,7 @@ function wppa_get_spheric_pan_html( $args ) {
 		wppaDoSphericPan(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$mocc.'-'.$id, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
 
 	if ( $haslink ) {
 		$result .= '<a>';
@@ -808,8 +808,8 @@ function wppa_get_flat_pan_html( $args ) {
 	$itemid 			= $mocc . '-' . $id;
 	$width 				= $args['width'] ? $args['width'] : wppa_get_container_width();
 	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
-	$filex 				= wppa_is_mobile() ? wppa_get_photox( $id ) : wppa_get_hiresx( $id );
-	$filey 				= wppa_is_mobile() ? wppa_get_photoy( $id ) : wppa_get_hiresy( $id );
+	$filex 				= wppa_get_hiresx( $id );
+	$filey 				= wppa_get_hiresy( $id );
 	$haslink 			= $args['haslink'];
 	$lightbox 			= $args['lightbox'];
 	if ( $lightbox ) $mocc = 0;
@@ -1084,7 +1084,7 @@ function wppa_get_flat_pan_html( $args ) {
 		wppaDoFlatPanorama(' . $mocc . ', data' . $mocc . ');';
 
 	$result .=
-	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
+	wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy', 'width' => $filex, 'height' => $filey] );
 
 	// wppa-ovl-flatpan-container
 	if ( $lightbox ) {
@@ -1123,15 +1123,15 @@ function wppa_get_zoom_pan_html( $args ) {
 	$mocc 				= $args['mocc'] ? $args['mocc'] : wppa( 'mocc' );
 	$itemid 			= $mocc . '-' . $id;
 	$width 				= $args['width'] ? $args['width'] : wppa_get_container_width();
-	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
+	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_hiresy( $id ) / wppa_get_hiresx( $id ) );
 	$haslink 			= $args['haslink'];
 	$lightbox 			= $args['lightbox'];
 	$iconsize 			= ( $lightbox ? wppa_nav_icon_size( 'lightbox' ) : wppa_nav_icon_size( 'panorama' ) ) . 'px;';
 	$controls 			= $args['controls'];
 	$zoomsensitivity 	= $args['zoomsensitivity'];
 	$url 				= esc_url( wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id ) );
-	$filex 				= wppa_is_mobile() ? wppa_get_photox( $id ) : wppa_get_hiresx( $id );
-	$filey 				= wppa_is_mobile() ? wppa_get_photoy( $id ) : wppa_get_hiresy( $id );
+	$filex 				= wppa_get_hiresx( $id );
+	$filey 				= wppa_get_hiresy( $id );
 	$manual 			= $args['manual'];
 	$slide 				= $args['slide'];
 
@@ -1386,7 +1386,7 @@ function wppa_get_zoom_pan_html( $args ) {
 				zoomsensitivity		:' . $zoomsensitivity . ',
 				borderWidth			:0,
 				controls			:' . ( $controls ? 'true' : 'false' ) . ',
-				height				:wppaGetContainerWidth(' . $mocc . ') * '.$height.' / '.$width.',
+				height				:wppaGetContainerWidth(' . $mocc . ') * '.$filey.' / '.$filex.',
 				width				:wppaGetContainerWidth(' . $mocc . '),
 				initialized			:false,
 				icsize				:' . ( $lightbox ? wppa_nav_icon_size( 'lightbox' ) : wppa_nav_icon_size( 'panorama' ) ) . ',
@@ -1400,7 +1400,7 @@ function wppa_get_zoom_pan_html( $args ) {
 			wppaDoZoomPan(' . $mocc . ', data' . $mocc . ');';
 
 		$result .=
-		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy'] );
+		wppa_html_tag( 'img', ['id' => 'wppa-'.$itemid, 'src' => $url, 'style' => "display:none", 'onload' => $onload, 'class' => 'nolazy',  'width' => $filex, 'height' => $filey] );
 
 	// wppa-ovl-zoom-container
 	if ( $lightbox ) {

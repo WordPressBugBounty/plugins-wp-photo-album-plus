@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.1.10.010
+* Version 9.1.13.003
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -43,7 +43,7 @@ static $session_id;
 
 	// Look for a cookie
 	if ( isset( $_COOKIE['wppa_session_id'] ) ) {
-		$session_id = wp_unslash( $_COOKIE['wppa_session_id'] );
+		$session_id = sanitize_text_field( $_COOKIE['wppa_session_id'] );
 		if ( $session_id ) {
 			return $session_id;
 		}

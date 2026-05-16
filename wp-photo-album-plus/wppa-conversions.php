@@ -657,6 +657,7 @@ function wppa_convert_to_webp( $id ) {
 			$iret = 1;
 			$i = wppa_image_magick( 'convert ' . $file . ' -quality ' . wppa_opt( 'jpeg_quality' )  . ' ' . $newfile );
 			if ( $i ) {
+				/* Translators: media item id */
 				return sprintf( __( 'Could not magick convert photo %d', 'wp-photo-album-plus' ), $id ); // Error
 			}
 			wppa_log( 'fso', str_replace( ABSPATH, '.../', $file.' converted to '.$newfile ) );
@@ -679,6 +680,7 @@ function wppa_convert_to_webp( $id ) {
 					wppa_log( 'fso', str_replace( ABSPATH, '.../', $file.' converted to '.$newfile ) );
 				}
 				else {
+					/* Translators: media item id */
 					return sprintf( __( 'Could not convert photo %d', 'wp-photo-album-plus' ), $id ); // Error
 				}
 				wppa_unlink( $file );
