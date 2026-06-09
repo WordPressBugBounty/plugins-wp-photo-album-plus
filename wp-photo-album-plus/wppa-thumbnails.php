@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.1.13.001
+* Version: 9.2.01.001
 *
 */
 
@@ -334,10 +334,10 @@ global $wpdb;
 										   'onscroll' => 'wppaStopProp(event);', 'onwheel' => 'wppaStopProp(event);',
 										   'style' => 'height:'.$imgheight.'px;overflow:auto;margin: 0 0 8px 10px;border:1px solid '.wppa_opt('bcolor_alt').';width:'.$comaltwidth.'px;'], false );
 
-			$comments = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments
+			$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments
 															 WHERE photo = %d
 															 AND status = 'approved'
-															 ORDER BY timestamp DESC", $id ) );
+															 ORDER BY timestamp DESC", $id ), ARRAY_A );
 			$first = true;
 			if ( $comments ) foreach ( $comments as $com ) {
 				$result .= 	wppa_html_tag( 'h6', ['style' => 'font-size:10px;line-height:12px;font-weight:bold;padding:'.( $first ? 0 : '6px' ).' 0 0 6px;margin:0;float:left;'],
@@ -363,11 +363,11 @@ global $wpdb;
 
 		// Single button voting system
 		if ( wppa_opt( 'rating_max' ) == 1 && wppa_switch( 'vote_thumb' ) ) {
-			$mylast = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating
+			$mylast = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating
 													   WHERE photo = %s
 													   AND user = %s
 													   ORDER BY id DESC
-													   LIMIT 1", $id, wppa_get_user() ) );
+													   LIMIT 1", $id, wppa_get_user() ), ARRAY_A );
 
 			// Likes
 			if ( wppa_opt( 'rating_display_type' ) == 'likes' ) {
@@ -499,7 +499,7 @@ global $wpdb;
 		// Comcount
 		if ( wppa_is_item_displayable( $alb, 'comments', 'thumb_text_comcount' ) ) {
 			$comcount_role = 0;
-			$comcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_comments
+			$comcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_comments
 														 WHERE photo = %d", $id ) );
 
 			// Note special role?
@@ -514,7 +514,7 @@ global $wpdb;
 					$role_name = translate_user_role( $roles[$role]['name'] );
 
 					// Get the comments users
-					$com_user_ids = wppa_get_col( $wpdb->prepare( "SELECT userid FROM $wpdb->wppa_comments
+					$com_user_ids = $wpdb->get_col( $wpdb->prepare( "SELECT userid FROM $wpdb->wppa_comments
 																  WHERE photo = %d", $id ) );
 
 					// Count the comments given by users with the specified role

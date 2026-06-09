@@ -1321,6 +1321,7 @@ horizrailenabled:false,";
 						'wppa_pre_cache_photos' 	=> 100,
 						'wppa_show_scgens' 			=> '',
 						'wppa_enable_debug' 		=> 'no',
+						'wppa_seo_optimize' 		=> 'yes',
 
 						'wppa_opt_menu_search' 			=> 'yes',
 						'wppa_opt_menu_doc'				=> 'yes',

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* version 9.1.12.005
+* version 9.2.01.001
 *
 */
 
@@ -264,7 +264,7 @@ global $is_reschedule;
 			case 'wppa_cleanup_a':
 			case 'wppa_cleanup_b':
 				$orphan_album = wppa_get_option( 'wppa_orphan_album', 0 );
-				$album_exists = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $orphan_album ) );
+				$album_exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $orphan_album ) );
 				if ( ! $album_exists ) $orphan_album = false;
 				if ( ! $orphan_album ) {
 					$orphan_album = wppa_create_album_entry( ['name' 		=> __('Orphan photos', 'wp-photo-album-plus' ),
@@ -348,18 +348,14 @@ global $is_reschedule;
 			$table 		= WPPA_ALBUMS;
 
 			if ( $slug == 'wppa_remake_index_albums' ) {
-				$topid 		= wppa_get_var( "SELECT id FROM $wpdb->wppa_albums ORDER BY id DESC LIMIT 1" );
-				$albums 	= wppa_get_results( 	"SELECT * FROM $wpdb->wppa_albums " .
-													"WHERE id > " . $lastid . " " .
-													"AND indexdtm < modified " .
-													"ORDER BY id " .
-													"LIMIT $chunksize" );
+				$topid 		= $wpdb->get_var( "SELECT id FROM $wpdb->wppa_albums ORDER BY id DESC LIMIT 1" );
+				$albums 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id > %d AND indexdtm < modified ORDER BY id LIMIT %d", $lastid, $chunksize ), ARRAY_A );
 			}
 			else {
-				$topid 		= wppa_get_var( "SELECT id FROM $wpdb->wppa_albums ORDER BY id DESC LIMIT 1" );
-				$albums 	= wppa_get_results( "SELECT * FROM $wpdb->wppa_albums WHERE id > ".$lastid." ORDER BY id LIMIT 100" );
+				$topid 		= $wpdb->get_var( "SELECT id FROM $wpdb->wppa_albums ORDER BY id DESC LIMIT 1" );
+				$albums 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id > %d ORDER BY id LIMIT 100", $lastid ), ARRAY_A );
 			}
-			$togo = wppa_get_count( $table, ['id' => $lastid], ['>'] );
+			$togo = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE id > %d", $table, $lastid ) );
 
 			wppa_cache_album( 'add', $albums );
 
@@ -504,22 +500,18 @@ global $is_reschedule;
 			}
 
 			if ( $slug == 'wppa_cleanup_b' ) {
-				$all_existing_albums = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums" );
+				$all_existing_albums = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums" );
 			}
 
 			if ( $slug == 'wppa_remake_index_photos' ) {
-				$topid 		= wppa_get_var( "SELECT id FROM $wpdb->wppa_photos ORDER BY id DESC LIMIT 1" );
-				$photos 	= wppa_get_results( 	"SELECT * FROM $wpdb->wppa_photos " .
-													"WHERE id > " . $lastid . " " .
-													"AND indexdtm < modified " .
-													"ORDER BY id " .
-													"LIMIT $chunksize" );
+				$topid 		= $wpdb->get_var( "SELECT id FROM $wpdb->wppa_photos ORDER BY id DESC LIMIT 1" );
+				$photos 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id > %d AND indexdtm < modified ORDER BY id LIMIT %d", $lastid, $chunksize ), ARRAY_A );
 			}
 			else {
-				$topid 		= wppa_get_var( "SELECT id FROM $wpdb->wppa_photos ORDER BY id DESC LIMIT 1" );
-				$photos 	= wppa_get_results( "SELECT * FROM $wpdb->wppa_photos WHERE id > ".$lastid." ORDER BY id LIMIT ".$chunksize );
+				$topid 		= $wpdb->get_var( "SELECT id FROM $wpdb->wppa_photos ORDER BY id DESC LIMIT 1" );
+				$photos 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id > %d ORDER BY id LIMIT %d", $lastid, $chunksize ), ARRAY_A );
 			}
-			$togo = wppa_get_count( $table, ['id' => $lastid], ['>'] );
+			$togo = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE id > %d", $table, $lastid ) );
 
 			if ( $slug == 'wppa_edit_tag' ) {
 				$edit_tag 	= wppa_get_option( 'wppa_tag_to_edit' );
@@ -711,7 +703,7 @@ global $is_reschedule;
 							if ( $photo_files ) foreach( $photo_files as $photo_file ) {
 								$basename 	= basename( $photo_file );
 								$ext 		= substr( $basename, strpos( $basename, '.' ) + 1);
-								if ( ! wppa_get_count( WPPA_PHOTOS, ['id' => $id] ) ) { // no db entry for this photo
+								if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNY(*) FROM $wpdb->wppa_photos WHERE id = %d", $id ) ) ) { // no db entry for this photo
 									if ( wppa_is_id_free( WPPA_PHOTOS, $id ) ) {
 										if ( wppa_create_photo_entry( array( 'id' => $id, 'album' => get_option( 'wppa_orphan_album' ), 'ext' => $ext, 'filename' => $basename ) ) ) { 	// Can create entry
 											$wppa_session[$slug.'_fixed']++;	// Bump counter
@@ -957,17 +949,12 @@ global $is_reschedule;
 							break;
 
 						case 'wppa_fix_userids':
-							$ratings = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating
-																			WHERE photo = %d", $id ) );
+							$ratings = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating WHERE photo = %d", $id ), ARRAY_A );
 							foreach ( $ratings as $rating ) {
 								$username 	= $rating['user'];
-								$userid 	= wppa_get_var( $wpdb->prepare(  "SELECT ID
-																				FROM $wpdb->users
-																				WHERE user_login = %s", $username ) );	// try login name
+								$userid 	= $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE user_login = %s", $username ) );	// try login name
 								if ( ! $userid ) {
-									$usrs = wppa_get_col( $wpdb->prepare(    "SELECT ID
-																				FROM $wpdb->users
-																				WHERE display_name = %s", $username ) ); // try display name
+									$usrs = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE display_name = %s", $username ) ); // try display name
 									if ( count( $usrs ) == 1 ) {
 										$userid = $usrs[0];
 									}
@@ -980,25 +967,19 @@ global $is_reschedule;
 								wppa_update_rating( $rid, ['userid' => $userid] );
 							}
 
-							$comments = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE photo = %s", $id ) );
+							$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE photo = %s", $id ), ARRAY_A );
 							foreach ( $comments as $comment ) {
 								$username 	= $comment['user'];
 								$useremail 	= $comment['email'];
-								$userid 	= wppa_get_var( $wpdb->prepare(  "SELECT ID
-																				FROM $wpdb->users
-																				WHERE user_login = %s", $username ) );	// try login name
+								$userid 	= $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE user_login = %s", $username ) );	// try login name
 								if ( ! $userid ) {
-									$usrs = wppa_get_col( $wpdb->prepare(    "SELECT ID
-																				FROM $wpdb->users
-																				WHERE user_email = %s", $useremail ) ); // try email address
+									$usrs = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE user_email = %s", $useremail ) ); // try email address
 									if ( count( $usrs ) == 1 ) {
 										$userid = $usrs[0];
 									}
 								}
 								if ( ! $userid ) {
-									$usrs = wppa_get_col( $wpdb->prepare(    "SELECT ID
-																				FROM $wpdb->users
-																				WHERE display_name = %s", $username ) ); // try display name
+									$usrs = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE display_name = %s", $username ) ); // try display name
 									if ( count( $usrs ) == 1 ) {
 										$userid = $usrs[0];
 									}
@@ -1095,12 +1076,10 @@ global $is_reschedule;
 			// Process index
 			$table 		= WPPA_INDEX;
 
-			$topid 		= wppa_get_var( "SELECT id FROM $wpdb->wppa_index ORDER BY id DESC LIMIT 1" );
-			$indexes 	= wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index
-															   WHERE id > %d
-															   ORDER BY id LIMIT %d", $lastid, $chunksize ) );
+			$topid 		= $wpdb->get_var( "SELECT id FROM $wpdb->wppa_index ORDER BY id DESC LIMIT 1" );
+			$indexes 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE id > %d ORDER BY id LIMIT %d", $lastid, $chunksize ), ARRAY_A );
 
-			$togo 		= wppa_get_count( $table, ['id' => $lastid], ['>'] );
+			$togo = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE id > %d", $table, $lastid ) );
 			$didsome 	= false;
 
 			if ( $indexes ) foreach ( array_keys( $indexes ) as $idx ) {
@@ -1388,20 +1367,19 @@ global $is_reschedule;
 
 			);
 
-			$id = $lastid;
+			$id = 0;//$lastid;
 			while( isset( $tasks[$id] ) ) {
-
 				$table = $tasks[$id][0];
 				$field = $tasks[$id][1];
 				$dtype = $tasks[$id][2];
 
 				if ( strpos( $dtype, 'INT' ) ) {
-					$query = "ALTER TABLE $table CHANGE `$field` `$field` $dtype default 0";
+					$iret = $wpdb->query( "ALTER TABLE $table CHANGE `$field` `$field` $dtype default 0" );
 				}
 				else {
-					$query = "ALTER TABLE $table CHANGE `$field` `$field` $dtype CHARACTER SET utf8mb4 NOT NULL;";
+					$iret = $wpdb->query( "ALTER TABLE $table CHANGE `$field` `$field` $dtype CHARACTER SET utf8mb4 NOT NULL;" );
 				}
-				if ( wppa_query( $query ) ) {
+				if ( $iret ) {
 					wppa_log( 'obs', "Field ".substr($table,strpos($table,'>'))."->$field updated to $dtype" );
 				}
 				else {
@@ -1503,7 +1481,7 @@ global $is_reschedule;
 			case 'wppa_remake_index_albums':
 
 				// If not done, reschedule
-				$na = wppa_get_count( WPPA_ALBUMS, ['indexdtm' => ''] );
+				$na = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE indexdtm = ''" );
 
 				if ( $na ) {
 					wppa_log( $logtype, 'Found '.$na.' new album items to re-index' );
@@ -1518,7 +1496,7 @@ global $is_reschedule;
 			case 'wppa_remake_index_photos':
 
 				// If not done, reschedule
-				$np = wppa_get_count( WPPA_PHOTOS, ['indexdtm' => ''] );
+				$np = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE indexdtm = ''" );
 				if ( $np ) {
 					wppa_log( $logtype, 'Found '.$np.' new photo items to re-index' );
 					wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
@@ -1530,8 +1508,8 @@ global $is_reschedule;
 				}
 				break;
 			case 'wppa_cleanup_index':
-				$items_to_delete = wppa_get_col( "SELECT slug FROM $wpdb->wppa_index WHERE albums = '' AND photos = ''" );
-				wppa_query( "DELETE FROM $wpdb->wppa_index WHERE albums = '' AND photos = ''" );	// Remove empty entries
+				$items_to_delete = $wpdb->get_col( "SELECT slug FROM $wpdb->wppa_index WHERE albums = '' AND photos = ''" );
+				$wpdb->query( "DELETE FROM $wpdb->wppa_index WHERE albums = '' AND photos = ''" );	// Remove empty entries
 				wppa_log( $logtype, 'Words deleted from index: ' . implode( ',', $items_to_delete ) );
 				delete_option( 'wppa_index_need_remake' );
 				break;
@@ -1633,9 +1611,8 @@ global $wppa_log_file;
 		// List the search index table
 		case 'wppa_list_index':
 			$start = wppa_get_option( 'wppa_list_index_display_start', '' );
-			$total = wppa_get_count( WPPA_INDEX );
-			$indexes = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index
-															WHERE slug >= %s ORDER BY slug LIMIT 1000", $start ) );
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_index" );
+			$indexes = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug >= %s ORDER BY slug LIMIT 1000", $start ), ARRAY_A );
 
 			/* translators: intreger count */
 			$header = sprintf( __( 'List of Searcheable words <small>( Max 1000 entries of total %d )</small>', 'wp-photo-album-plus' ), $total );
@@ -1729,8 +1706,8 @@ global $wppa_log_file;
 			break;
 
 		case 'wppa_list_rating':
-			$total = wppa_get_count( WPPA_RATING );
-			$ratings = wppa_get_results( "SELECT * FROM $wpdb->wppa_rating ORDER BY timestamp DESC LIMIT 1000" );
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_rating" );
+			$ratings = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_rating ORDER BY timestamp DESC LIMIT 1000", ARRAY_A );
 
 			/* translators: integer count */
 			$header = sprintf( __( 'List of recent ratings <small>( Max 1000 entries of total %d )</small>', 'wp-photo-album-plus' ), $total );
@@ -1794,16 +1771,17 @@ global $wppa_log_file;
 			break;
 
 		case 'wppa_list_session':
-			$total = wppa_get_count( WPPA_SESSION );
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_session" );
 			$filter = sanitize_text_field( wppa_opt( 'list_session_username' ) );
 			if ( $filter ) {
+				$wild = '%';
 				$xfilter = '"user";s:'.strlen($filter).':"'.$filter.'";';
-				$sessions = wppa_get_results( "SELECT * FROM $wpdb->wppa_session WHERE data LIKE '%$xfilter%' ORDER BY id DESC LIMIT 1000" );
+				$sessions = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_session WHERE data LIKE %s ORDER BY id DESC LIMIT 1000", $wild.$wpdb->esc_like($xfilter).$wild ), ARRAY_A );
 				/* translators: usename*/
 				$header = sprintf( __( 'Session data for user <b>%s</b>', 'wp-photo-album-plus' ), $filter );
 			}
 			else {
-				$sessions = wppa_get_results( "SELECT * FROM $wpdb->wppa_session ORDER BY id DESC LIMIT 1000" );
+				$sessions = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_session ORDER BY id DESC LIMIT 1000", ARRAY_A );
 				/* translators: intreger count */
 				$header = sprintf( __( 'List of sessions <small>( Max 1000 entries of total %d )</small>', 'wp-photo-album-plus' ), $total );
 			}
@@ -1891,13 +1869,15 @@ global $wppa_log_file;
 			break;
 
 		case 'wppa_list_comments':
-			$total = wppa_get_count( WPPA_COMMENTS );
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments" );
 			$order = wppa_opt( 'list_comments_by' );
-			if ( $order == 'timestamp' ) $order .= ' DESC';
 			if ( $order == 'name' ) $order = 'user';
-			$query = "SELECT * FROM $wpdb->wppa_comments ORDER BY $order LIMIT 1000";
-
-			$comments = wppa_get_results( $query );
+			if ( $order == 'timestamp' ) { // $order .= ' DESC';
+				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments ORDER BY %i DESC LIMIT 1000",$order ), ARRAY_A );
+			}
+			else {
+				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments ORDER BY %i LIMIT 1000",$order ), ARRAY_A );
+			}
 
 			/* translators: intreger count */
 			$header = sprintf( __( 'List of comments <small>( Max 1000 entries of total %d )</small>', 'wp-photo-album-plus' ), $total );

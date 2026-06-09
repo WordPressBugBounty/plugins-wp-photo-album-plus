@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
- Version: 9.0.09.003
+ Version: 9.2.01.001
 *
 */
 
@@ -170,9 +170,9 @@ global $wppa_endtime;
 	}
 
 	// Cleanup obsolete settings
-	if ( wppa_get_var( "SELECT COUNT(*) FROM $wpdb->options
+	if ( $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->options
 						  WHERE option_name LIKE 'wppa_last_album_used-%'" ) > 100 ) {
-		$iret = wppa_query( "DELETE FROM $wpdb->options
+		$iret = $wpdb->query( "DELETE FROM $wpdb->options
 							   WHERE option_name LIKE 'wppa_last_album_used-%'" );
 		wppa_log( 'Cron', sprintf( '%s last album used settings removed.', $iret ) );
 	}
@@ -202,8 +202,8 @@ global $wppa_endtime;
 	$savetime 	= 86400;		// Save session data for 24 hour
 	$expire 	= time() - $lifetime;
 	$purge 		= time() - $savetime;
-	wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE timestamp < %s", $expire ) );
-	wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", $purge ) );
+	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE timestamp < %s", $expire ) );
+	$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", $purge ) );
 
 	// Delete obsolete spam
 	$spammaxage = wppa_opt( 'spam_maxage' );
@@ -211,7 +211,7 @@ global $wppa_endtime;
 		wppa_log( 'Cron', '{b}wppa_cleanup{/b} cleanup spam.' );
 		$time = time();
 		$obsolete = $time - $spammaxage;
-		$iret = wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_comments WHERE status = 'spam' AND timestamp < %s", $obsolete ) );
+		$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_comments WHERE status = 'spam' AND timestamp < %s", $obsolete ) );
 		if ( $iret ) wppa_update_option( 'wppa_spam_auto_delcount', wppa_get_option( 'wppa_spam_auto_delcount', 0 ) + $iret );
 	}
 
@@ -220,7 +220,7 @@ global $wppa_endtime;
 	wppa_re_animate_cron();
 
 	// Remove 'deleted' photos from system
-	$dels = wppa_get_col( "SELECT id FROM $wpdb->wppa_photos WHERE album <= '-9' AND modified < " . ( time() - 3600 ) );
+	$dels = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album <= '-9' AND modified < %d", time() - 3600 ) );
 	if ( !empty( $dels ) ) foreach( $dels as $del ) {
 		wppa_delete_photo( $del );
 		wppa_log( 'Cron', 'Removed photo {b}' . $del . '{/b} from system' );
@@ -278,7 +278,7 @@ global $wppa_endtime;
 	}
 
 	// Add url-sanitized names to new albums
-	$albs = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums WHERE sname = ''" );
+	$albs = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums WHERE sname = ''", ARRAY_A );
 	if ( ! empty( $albs ) ) {
 		foreach( $albs as $alb ) {
 			wppa_update_album( $alb['id'], ['sname' => wppa_name_slug( $alb['name'] )] );
@@ -291,7 +291,7 @@ global $wppa_endtime;
 	}
 
 	// Add url-sanitized names to new photos
-	$photos = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_photos WHERE sname = '' AND name <> '' LIMIT 10000" );
+	$photos = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_photos WHERE sname = '' AND name <> '' LIMIT 10000", ARRAY_A );
 	if ( ! empty( $photos ) ) {
 		foreach( $photos as $photo ) {
 			wppa_update_photo( $photo['id'], ['sname' => wppa_sanitize_album_photo_name( $photo['name'] ) ] );
@@ -331,11 +331,11 @@ global $wppa_endtime;
 		wppa_rmdir( $dir, true ); // when empty
 	}
 
-	$a_need_index = wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE indexdtm = ''" );
+	$a_need_index = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE indexdtm = ''" );
 	if ( $a_need_index ) {
 		wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
 	}
-	$p_need_index = wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE indexdtm = ''" );
+	$p_need_index = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE indexdtm = ''" );
 	if ( $p_need_index ) {
 		wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 	}
@@ -377,7 +377,7 @@ global $wpdb;
 
 	$start = time();
 
-	$albs = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent < 1 ORDER BY id" );
+	$albs = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent < 1 ORDER BY id" );
 
 	foreach( $albs as $alb ) {
 		$treecounts = wppa_get_treecounts_a( $alb );

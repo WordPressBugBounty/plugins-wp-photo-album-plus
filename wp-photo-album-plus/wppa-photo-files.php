@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.1.12.001
+* Version: 9.2.01.001
 *
 */
 
@@ -1051,10 +1051,8 @@ global $wpdb;
 		$jpgfilename = basename( wppa_strip_ext( wppa_get_source_path( $id ) ) . "-page-$bookpage.jpg" );
 
 		// See if photo entry exists in one or more potemtial albums
-		$pot 	= implode( ',', $potentialbs );
-		$query 	= $wpdb->prepare( "SELECT album FROM $wpdb->wppa_photos WHERE filename = `%s` AND album IN (%s)", $jpgfilename, $pot );
-		$query 	= wppa_fix_query( $query );
-		$inalbs = wppa_get_col( $query );
+		$placeholders = implode( ',', array_fill( 0, count( $potentialbs ), '%d' ) );
+		$inalbs = $wpdb->get_col( $wpdb->prepare( "SELECT album FROM $wpdb->wppa_photos WHERE filename = %s AND album IN ($placeholders)", $jpgfilename, $potentialbs ) );
 
 		// If not present yet, do it in the major target album only
 		if ( empty( $inalbs ) ) {
@@ -1122,7 +1120,7 @@ global $wpdb;
 				}
 
 				// See if entry already exists
-				$pho = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d AND filename = %s", $targetalb, $jpgfilename ) );
+				$pho = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d AND filename = %s", $targetalb, $jpgfilename ) );
 
 				// Update db entry
 				if ( $pho ) {

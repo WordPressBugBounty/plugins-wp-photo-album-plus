@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.1.13.004
+* Version: 9.2.01.001
 *
 */
 
@@ -263,8 +263,7 @@ global $wppa_supported_audio_extensions;
 					}
 				}
 			}
-			$query 		= $wpdb->prepare( "SELECT DISTINCT description FROM $wpdb->wppa_iptc WHERE photo > 0 AND tag = %s ORDER BY description", $tag );
-			$iptcdata 	= wppa_get_results( $query );
+			$iptcdata 	= $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT description FROM $wpdb->wppa_iptc WHERE photo > 0 AND tag = %s ORDER BY description", $tag ), ARRAY_A );
 			$last 		= '';
 			$any 		= false;
 			$result 	= '';
@@ -288,8 +287,7 @@ global $wppa_supported_audio_extensions;
 				}
 			}
 			if ( ! $any ) {
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = 'hide' WHERE photo = 0 AND tag = %s", $tag );
-				wppa_query( $query );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = 'hide' WHERE photo = 0 AND tag = %s", $tag ) );
 			}
 			wppa_echo( wp_json_encode( ['txt' => $result] ) );
 			wppa_exit();
@@ -330,23 +328,12 @@ global $wppa_supported_audio_extensions;
 			}
 
 			if ( $brand ) {
-				$query = $wpdb->prepare( "SELECT DISTINCT f_description
-										 FROM $wpdb->wppa_exif
-										 WHERE photo > 0
-										 AND tag = %s
-										 AND brand = %s
-										 AND f_description <> ''
-										 ORDER BY f_description", $tag, $brand );
-				$exifdata = wppa_get_results( $query );
+				$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT f_description FROM $wpdb->wppa_exif WHERE photo > 0 AND tag = %s 
+					AND brand = %s AND f_description <> '' ORDER BY f_description", $tag, $brand ), ARRAY_A );
 			}
 			else {
-				$query = $wpdb->prepare( "SELECT DISTINCT f_description
-										 FROM $wpdb->wppa_exif
-										 WHERE photo > 0
-										 AND tag = %s
-										 AND f_description <> ''
-										 ORDER BY f_description", $tag );
-				$exifdata = wppa_get_results( $query );
+				$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT f_description FROM $wpdb->wppa_exif WHERE photo > 0 AND tag = %s 
+					AND f_description <> '' ORDER BY f_description", $tag ), ARRAY_A );
 			}
 
 			// Make the data sortable.
@@ -408,11 +395,7 @@ global $wppa_supported_audio_extensions;
 
 			// Cleanup possible unused label
 			if ( ! $any ) {
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif
-										  SET status = 'hide'
-										  WHERE photo = 0
-										  AND tag = %s", $tag );
-				wppa_query( $query );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET status = 'hide' WHERE photo = 0 AND tag = %s", $tag ) );
 			}
 			wppa_echo( wp_json_encode( ['txt' => $result] ) );
 			wppa_exit();
@@ -574,9 +557,7 @@ global $wppa_supported_audio_extensions;
 				$comment = wppa_get( 'comment', '', 'html' );
 
 				// Update comment in db
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET comment = %s WHERE id = %d", $comment, $comid );
-				wppa_log('misc', $query);
-				wppa_query( $query );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET comment = %s WHERE id = %d", $comment, $comid ) );
 
 				// Return sanitized text
 				wppa_echo( wp_json_encode( ['txt' => $comment] ) );
@@ -669,8 +650,7 @@ global $wppa_supported_audio_extensions;
 				$iret = wppa_update_photo( $pid, ['status' => 'publish'] );
 				if ( $iret ) {
 					wppa_flush_upldr_cache( 'photoid', $pid );
-					$query = $wpdb->prepare( "SELECT album FROM $wpdb->wppa_photos WHERE id = %d", $pid );
-					$alb = wppa_get_var( $query );
+					$alb = $wpdb->get_var( $wpdb->prepare( "SELECT album FROM $wpdb->wppa_photos WHERE id = %d", $pid ) );
 					wppa_clear_taglist();
 					wppa_invalidate_treecounts( $alb );
 					wppa_schedule_mailinglist( 'photoapproved', $alb, $pid );
@@ -738,8 +718,7 @@ global $wppa_supported_audio_extensions;
 				}
 
 				else {
-					$query = $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $cid );
-					$photo = wppa_get_var( $query );
+					$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $cid ) );
 
 					$iret = wppa_del_row( WPPA_COMMENTS, 'id', $cid );
 
@@ -781,8 +760,7 @@ global $wppa_supported_audio_extensions;
 			$alb = wppa_get( 'album-id' );
 
 			// Get all items in the album
-			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d", $alb );
-			$photos = wppa_get_col( $query );
+			$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d", $alb ) );
 
 			// Only visible photos are downloadable
 			if ( is_array( $photos ) ) foreach( array_keys( $photos ) as $i ) {
@@ -939,8 +917,7 @@ global $wppa_supported_audio_extensions;
 							$zipfile = $zipsdir.wppa_get_user().'.zip';
 
 							// Find the photo data
-							$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $photo );
-							$data = wppa_get_row( $query );
+							$data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $photo ), ARRAY_A );
 
 							// Find the photo file
 							if ( wppa_is_file ( wppa_get_source_path( $photo ) ) ) {
@@ -1007,8 +984,7 @@ global $wppa_supported_audio_extensions;
 				$zipfile = $zipsdir.wppa_get_user().'.zip';
 
 				// Find the photo data
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $photo );
-				$data = wppa_get_row( $query );
+				$data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $photo ), ARRAY_A );
 
 				// Remove photo from zip
 				$wppa_zip = new ZipArchive;
@@ -1044,8 +1020,7 @@ global $wppa_supported_audio_extensions;
 
 			// Remove all User displayname tags
 			$tag = wppa_get_user( 'display' );
-			$query = "SELECT id, tags FROM $wpdb->wppa_photos WHERE tags LIKE '%" . str_replace( "'", "\'", ',' . $wpdb->esc_like( $tag ) . ',' ) . "%'";
-			$items = wppa_get_results( $query );
+			$items = $wpdb->get_results( $wpdb->prepare( "SELECT id, tags FROM $wpdb->wppa_photos WHERE tags LIKE %s", '%' . $wpdb->esc_like( $tag ) . "%'" ) );
 			foreach( $items as $item ) {
 				$id = $item['id'];
 				$tags = preg_replace( '/,'.$tag.',/siu', ',', $item['tags'] );
@@ -1123,27 +1098,7 @@ global $wppa_supported_audio_extensions;
 			wppa_echo( $result );
 			wppa_exit();
 			break;
-/*
-		case 'gutenbergphotodialog':
-			if ( ! current_user_can( 'edit_posts' ) ) {
-				wppa_echo( __( 'No rights', 'wp-photo-album-plus' ) );
-				wppa_exit();
-			}
-			$result = wppa_make_gutenberg_photo_dialog();
-			wppa_echo( $result );
-			wppa_exit();
-			break;
 
-		case 'gutenbergwppadialog':
-			if ( ! current_user_can( 'edit_posts' ) ) {
-				wppa_echo( __( 'No rights', 'wp-photo-album-plus' ) );
-				wppa_exit();
-			}
-			$result = wppa_make_gutenberg_wppa_dialog();
-			wppa_echo( $result );
-			wppa_exit();
-			break;
-*/
 		case 'getshortcodedrendered':
 
 			// Used by gutenberg and cover preview in album admin
@@ -1435,28 +1390,17 @@ global $wppa_supported_audio_extensions;
 			}
 
 			// Already a pending one?
-			$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating
-									  WHERE photo = %d
-									  AND user = %s
-									  AND status = 'pending'", $photo, $user );
-			$pending = wppa_get_var( $query );
+			$pending = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND user = %s AND status = 'pending'", $photo, $user ) );
 
 			// Has user motivated his vote?
 			$hascommented = wppa_has_user_commented( $photo );
 
 			// If the user has commented and comment needs vote is active, publish his comment
 			if ( $hascommented && wppa_switch( 'comment_need_vote' ) ) {
-				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments
-										  WHERE photo = %d
-										  AND user = %s", $photo, wppa_get_user( 'display' ) );
-				$comments_to_approve = wppa_get_col( $query );
+				$comments_to_approve = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments WHERE photo = %d AND user = %s", $photo, wppa_get_user( 'display' ) ) );
 
 				// Set the statusses to approved
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_comments
-										  SET status = 'approved'
-										  WHERE photo = %d
-										  AND user = %s", $photo, wppa_get_user( 'display' ) );
-				wppa_query( $query );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET status = 'approved' WHERE photo = %d AND user = %s", $photo, wppa_get_user( 'display' ) ) );
 
 				// Do the points and do the mailing
 				$photo_owner = wppa_get_photo_item( $photo, 'owner' );
@@ -1489,11 +1433,7 @@ global $wppa_supported_audio_extensions;
 					wppa_exit();
 				}
 				else {
-					$query = $wpdb->prepare( "UPDATE $wpdb->wppa_rating
-										     SET status = 'publish'
-										     WHERE photo = %d
-										     AND user = %s", $photo, $user );
-					wppa_query( $query );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_rating SET status = 'publish' WHERE photo = %d AND user = %s", $photo, $user ) );
 				}
 			}
 
@@ -1516,10 +1456,7 @@ global $wppa_supported_audio_extensions;
 				if ( $mylast ) {
 
 					// Remove my like
-					$query = $wpdb->prepare( "DELETE FROM $wpdb->wppa_rating
-											  WHERE photo = %d
-											  AND user = %s", $photo, $user );
-					wppa_query( $query );
+					$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_rating WHERE photo = %d AND user = %s", $photo, $user ) );
 					$myavgrat = 0;
 				}
 				else {
@@ -1602,12 +1539,7 @@ global $wppa_supported_audio_extensions;
 
 			// Case 3: I will change my previously given vote
 			elseif ( wppa_switch( 'rating_change' ) ) {					// Votechanging is allowed
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_rating
-										  SET value = %s
-										  WHERE photo = %d
-										  AND user = %s
-										  LIMIT 1", $rating, $photo, $user );
-				$iret = wppa_query( $query );
+				$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_rating SET value = %s WHERE photo = %d AND user = %s LIMIT 1", $rating, $photo, $user ) );
 
 				wppa_clear_cache( ['photo' => $photo, 'other' => 'R'] );
 
@@ -1632,11 +1564,7 @@ global $wppa_supported_audio_extensions;
 			}
 
 			// Compute my avg rating
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating
-									  WHERE photo = %d
-									  AND user = %s
-									  AND status = 'publish'", $photo, $user );
-			$myrats = wppa_get_results( $query );
+			$myrats = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating WHERE photo = %d AND user = %s AND status = 'publish'", $photo, $user ) );
 
 			if ( $myrats ) {
 				$sum = 0;
@@ -1660,10 +1588,7 @@ global $wppa_supported_audio_extensions;
 			}
 
 			// Compute new allavgrat
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating
-									  WHERE photo = %d
-									  AND status = %s", $photo, 'publish' );
-			$ratings = wppa_get_results( $query );
+			$ratings = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating WHERE photo = %d AND status = 'publish'", $photo ), ARRAY_A );
 			if ( $ratings ) {
 				$sum = 0;
 				$cnt = 0;
@@ -1689,10 +1614,7 @@ global $wppa_supported_audio_extensions;
 			}
 
 			// Compute rating_count and store in the photo info
-			$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating
-									  WHERE photo = %d
-									  AND status = 'publish'", $photo );
-			$ratcount = wppa_get_var( $query );
+			$ratcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND status = 'publish'", $photo ) );
 			if ( $ratcount !== false ) {
 				$iret = wppa_update_photo( $photo, ['rating_count' => $ratcount] );
 				if ( $iret === false ) {
@@ -1705,11 +1627,7 @@ global $wppa_supported_audio_extensions;
 			$allavgratcombi = $allavgrat.'|'.$ratcount;
 
 			// Compute dsilike count
-			$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating
-									  WHERE photo = %d
-									  AND value = -1
-									  AND status = 'publish'", $photo );
-			$discount = wppa_get_var( $query );
+			$discount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND value = -1 AND status = 'publish'", $photo ) );
 			if ( $discount === false ) {
 				wppa_echo( wp_json_encode( ['txt' => '0||108||'.$wartxt] ) );
 				wppa_exit();																// Fail on save
@@ -1881,8 +1799,7 @@ global $wppa_supported_audio_extensions;
 
 			if ( ! $done ) switch ( $item ) {
 				case 'clear_ratings':
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album );
-					$photos = wppa_get_results( $query );
+					$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album ), ARRAY_A );
 					if ( $photos ) foreach ( $photos as $photo ) {
 						$iret1 = wppa_del_row( WPPA_RATING, 'photo', $photo['id'] );
 						$iret2 = wppa_update_photo( $photo['id'], ['mean_rating' => ''] );
@@ -1902,11 +1819,8 @@ global $wppa_supported_audio_extensions;
 					}
 					break;
 				case 'set_deftags':	// to be changed for large albums
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album );
-					$photos = wppa_get_results( $query );
-
-					$query = $wpdb->prepare( "SELECT default_tags FROM $wpdb->wppa_albums WHERE id = %d", $album );
-					$deftag = wppa_get_var( $query );
+					$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album ), ARRAY_A );
+					$deftag = $wpdb->get_var( $wpdb->prepare( "SELECT default_tags FROM $wpdb->wppa_albums WHERE id = %d", $album ) );
 
 					if ( is_array( $photos ) ) foreach ( $photos as $photo ) {
 
@@ -1927,11 +1841,8 @@ global $wppa_supported_audio_extensions;
 					$done = true;
 					break;
 				case 'add_deftags':
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album );
-					$photos = wppa_get_results( $query );
-
-					$query = $wpdb->prepare( "SELECT default_tags FROM $wpdb->wppa_albums WHERE id = %d", $album );
-					$deftag = wppa_get_var( $query );
+					$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d", $album ), ARRAY_A );
+					$deftag = $wpdb->get_var( $wpdb->prepare( "SELECT default_tags FROM $wpdb->wppa_albums WHERE id = %d", $album ) );
 
 					if ( is_array( $photos ) ) foreach ( $photos as $photo ) {
 
@@ -2099,10 +2010,7 @@ global $wppa_supported_audio_extensions;
 				case 'setallscheduled':
 					$scheduledtm = wppa_get_album_item( $album, 'scheduledtm' );
 					if ( $scheduledtm ) {
-						$query = $wpdb->prepare( "UPDATE $wpdb->wppa_photos
-												  SET status = 'scheduled', scheduledtm = %s
-												  WHERE album = %d", $scheduledtm, $album );
-						$iret = wppa_query( $query );
+						$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET status = 'scheduled', scheduledtm = %s WHERE album = %d", $scheduledtm, $album ) );
 						$value = $scheduledtm;
 						$itemname = __( 'All photos set to scheduled per date', 'wp-photo-album-plus' );
 						$item = 'scheduledtm';
@@ -2187,7 +2095,7 @@ global $wppa_supported_audio_extensions;
 
 			// Get the new data
 			wppa_cache_album( 'invalidate', $album );
-			$newalb = wppa_cache_album( $album ); // wppa_get_row( "SELECT * FROM $wpdb->wppa_albums WHERE id = $album" );
+			$newalb = wppa_cache_album( $album ); // $wpdb->get_row( "SELECT * FROM $wpdb->wppa_albums WHERE id = $album", ARRAY_A );
 			if ( $item == 'name' ) {
 				$fields['name'] = $newalb['name'];
 				$fields['sname'] = $newalb['sname'];
@@ -3446,8 +3354,7 @@ global $wppa_supported_audio_extensions;
 
 			// Valid update request
 			else {
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET description = %s WHERE id = %d", $value, $item );
-				$iret = wppa_query( $query );
+				$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET description = %s WHERE id = %d", $value, $item ) );
 
 				/* translators: tagname */
 				$txt = sprintf( __( 'IPTC Tag %s updated', 'wp-photo-album-plus' ), $tag );
@@ -3590,8 +3497,7 @@ global $wppa_supported_audio_extensions;
 
 			if ( substr( $option, 0, 16 ) == 'wppa_iptc_label_' ) {
 				$tag   = substr( $option, 16 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET description = %s WHERE tag = %s AND photo = 0", $value, $tag );
-				$bret  = wppa_query( $query );
+				$bret  = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET description = %s WHERE tag = %s AND photo = 0", $value, $tag ) );
 				// Produce the response text
 				if ( $bret ) {
 					$output = '||0||'.$tag.' updated to '.$value.'||';
@@ -3604,8 +3510,7 @@ global $wppa_supported_audio_extensions;
 			}
 			elseif ( substr( $option, 0, 17 ) == 'wppa_iptc_status_' ) {
 				$tag   = substr( $option, 17 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = %s WHERE tag = %s AND photo = 0", $value, $tag );
-				$bret  = wppa_query( $query );
+				$bret  = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = %s WHERE tag = %s AND photo = 0", $value, $tag ) );
 				// Produce the response text
 				if ( $bret ) {
 					$output = '||0||'.$tag.' updated to '.$value.'||';
@@ -3618,8 +3523,7 @@ global $wppa_supported_audio_extensions;
 			}
 			elseif ( substr( $option, 0, 16 ) == 'wppa_exif_label_' ) {
 				$tag   = substr( $option, 16 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET description = %s WHERE tag = %s AND photo = 0", $value, $tag );
-				$bret  = wppa_query( $query );
+				$bret  = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET description = %s WHERE tag = %s AND photo = 0", $value, $tag ) );
 				// Produce the response text
 				if ( $bret ) {
 					$output = '||0||'.$tag.' updated to '.$value.'||';
@@ -3632,8 +3536,7 @@ global $wppa_supported_audio_extensions;
 			}
 			elseif ( substr( $option, 0, 17 ) == 'wppa_exif_status_' ) {
 				$tag   = substr( $option, 17 );
-				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET status = %s WHERE tag = %s AND photo = 0", $value, $tag );
-				$bret  = wppa_query( $query );
+				$bret  = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET status = %s WHERE tag = %s AND photo = 0", $value, $tag ) );
 				// Produce the response text
 				if ( $bret ) {
 					$output = '||0||'.$tag.' updated to '.$value.'||';
@@ -3980,8 +3883,7 @@ global $wppa_supported_audio_extensions;
 
 				case 'wppa_rating_max':
 					if ( $value == 5 && wppa_opt( 'rating_max' ) == 10 ) {
-						$query = "SELECT id, value FROM $wpdb->wppa_rating";
-						$rats  = wppa_get_results( $query );
+						$rats = $wpdb->get_results( "SELECT id, value FROM $wpdb->wppa_rating", ARRAY_A );
 						if ( $rats ) {
 							foreach ( $rats as $rat ) {
 								wppa_update_rating( $rat['id'], ['value' => $rat['value'] / 2] );
@@ -3989,8 +3891,7 @@ global $wppa_supported_audio_extensions;
 						}
 					}
 					if ( $value == 10 && wppa_opt( 'rating_max' ) == 5 ) {
-						$query = "SELECT id, value FROM $wpdb->wppa_rating";
-						$rats  = wppa_get_results( $query );
+						$rats  = $wpdb->get_results( "SELECT id, value FROM $wpdb->wppa_rating", ARRAY_A );
 						if ( $rats ) {
 							foreach ( $rats as $rat ) {
 								wppa_update_rating( $rat['id'], ['value' => $rat['value'] * 2] );
@@ -4078,8 +3979,7 @@ global $wppa_supported_audio_extensions;
 							$alert = esc_js( __( 'An administrator can not be blacklisted', 'wp-photo-album-plus' ) );
 						}
 						else {
-							$query = $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET status = 'pending' WHERE owner = %s", $value );
-							wppa_query( $query );
+							$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET status = 'pending' WHERE owner = %s", $value ) );
 							$black_listed_users = wppa_get_option( 'wppa_black_listed_users', array() );
 							if ( ! in_array( $value, $black_listed_users ) ) {
 								$black_listed_users[] = $value;
@@ -4097,8 +3997,7 @@ global $wppa_supported_audio_extensions;
 					break;
 
 				case 'wppa_un_blacklist_user':
-					$query = $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET status = 'publish' WHERE owner = %s", $value );
-					wppa_query( $query );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET status = 'publish' WHERE owner = %s", $value ) );
 					$black_listed_users = wppa_get_option( 'wppa_black_listed_users', array() );
 					if ( in_array( $value, $black_listed_users ) ) {
 						foreach ( array_keys( $black_listed_users ) as $usr ) {
@@ -4568,7 +4467,6 @@ global $wppa_supported_audio_extensions;
 			$photo 		= $potd_a['potddata'];
 			$preview 	= wppa_get_potd_preview_html( $photo );
 			$pool 		= wppa_get_potd_pool_html();
-
 			echo wp_json_encode( ['offset' => $offset, 'seqno' => $seqno, 'preview' => $preview, 'pool' => $pool] );
 			break;
 

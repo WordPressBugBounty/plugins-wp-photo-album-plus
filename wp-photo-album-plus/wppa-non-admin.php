@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version: 9.1.13.003
+* Version: 9.2.01.001
 *
 */
 
@@ -64,9 +64,12 @@ add_action('wp_head', 'wppa_add_metatags', 5);
 function wppa_add_metatags() {
 global $wpdb;
 
+	// Enabled?
+	if ( ! wppa_switch( 'seo_optimize' ) ) return;
+	
 	// Share info for sm that uses og
 	$id = wppa_get( 'photo' );
-	if ( ! wppa_photo_exists( $id ) ) {
+	if ( $id && ! wppa_photo_exists( $id ) ) {
 		$id = false;
 	}
 	if ( $id ) {
@@ -251,21 +254,20 @@ wppa_echo( '
 		$where = 'page';
 		if ( $the_album ) {
 			if ( wppa_is_posint( $the_album ) ) {
-				$query 	 = "SELECT id FROM $wpdb->wppa_photos WHERE album = $the_album AND status = 'featured'";
+				$the_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d AND status = 'featured'", $the_album ) );
 			}
 			elseif ( wppa_is_enum( $the_album ) ) {
-				$the_album = str_replace( '.', ',', wppa_expand_enum( $the_album ) );
-				$query 	= "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($the_album) AND status = 'featured'";
+				$the_albs = explode( '.', wppa_expand_enum( $the_album ) );
+				$placeholders = implode( ',', array_fill( 0, count( $the_albs ), '%d' ) );
+				$the_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND status = 'featured'", $the_albs ) );
 			}
 			elseif ( 'all' == $the_album ) {
 				$where = 'site';
-				$query 	= "SELECT id FROM $wpdb->wppa_photos WHERE status = 'featured'";
+				$the_ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE status = 'featured'" );
 			}
 			else {
-				$query 	= "SELECT id FROM $wpdb->wppa_photos WHERE album = 0 AND status = 'featured'";
+				$the_ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE album = 0 AND status = 'featured'" );
 			}
-
-			$the_ids = wppa_get_col( $query );
 		}
 
 		// Photos used need not to be featured

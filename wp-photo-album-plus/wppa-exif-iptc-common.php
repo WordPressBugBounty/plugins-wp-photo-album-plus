@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* Version: 9.1.07.008
+* Version: 9.2.01.001
 *
 *
 */
@@ -24,7 +24,7 @@ global $wppa_iptc_cache;
 
 	// Get te labels if not yet present
 	if ( ! is_array( $wppa_iptc_labels ) ) {
-		$wppa_iptc_labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = 0 ORDER BY tag" );
+		$wppa_iptc_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = 0 ORDER BY tag", ARRAY_A );
 	}
 
 	// If in cache, use it
@@ -37,7 +37,7 @@ global $wppa_iptc_cache;
 
 	// Get the photo data
 	if ( $iptcdata === false ) {
-		$iptcdata = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE photo=%s ORDER BY tag", $photo ) );
+		$iptcdata = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = %s ORDER BY tag", $photo ), ARRAY_A );
 
 		// Save in cache, even when empty
 		$wppa_iptc_cache[$photo] = $iptcdata;
@@ -117,7 +117,7 @@ global $wppa_exif_cache;
 
 	// Get the labels if not yet present
 	if ( ! is_array( $wppa_exif_labels ) ) {
-		$wppa_exif_labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag" );
+		$wppa_exif_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag", ARRAY_A );
 	}
 
 	// If in cache, use it
@@ -130,7 +130,7 @@ global $wppa_exif_cache;
 
 	// Get the photo data
 	if ( $exifdata === false ) {
-		$exifdata = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo=%s ORDER BY tag", $photo ) );
+		$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo = %s ORDER BY tag", $photo ), ARRAY_A );
 
 		// Save in cache, even when empty
 		$wppa_exif_cache[$photo] = $exifdata;
@@ -2885,12 +2885,12 @@ function wppa_iptc_clean_garbage() {
 global $wpdb;
 
 	// Remove labels that are no longer used
-	$labels = wppa_get_results( "SELECT DISTINCT tag FROM $wpdb->wppa_iptc WHERE photo = 0" );
+	$labels = $wpdb->get_col( "SELECT DISTINCT tag FROM $wpdb->wppa_iptc WHERE photo = 0" );
 	if ( ! empty( $labels ) ) {
 		foreach( $labels as $label ) {
-			$used = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_iptc WHERE tag = %s AND photo <> 0", $label['tag'] ) );
+			$used = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_iptc WHERE tag = %s AND photo <> 0", $label['tag'] ) );
 			if ( $used == 0 ) {
-				wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", $label['tag'] ) );
+				$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", $label['tag'] ) );
 			}
 		}
 	}
@@ -2900,12 +2900,12 @@ function wppa_exif_clean_garbage() {
 global $wpdb;
 
 	// Remove labels that are no longer used
-	$labels = wppa_get_results( "SELECT DISTINCT tag FROM $wpdb->wppa_exif WHERE photo = 0" );
+	$labels = $wpdb->get_col( "SELECT DISTINCT tag FROM $wpdb->wppa_exif WHERE photo = 0" );
 	if ( ! empty( $labels ) ) {
 		foreach( $labels as $label ) {
-			$used = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_exif WHERE tag = %s AND photo <> 0", $label['tag'] ) );
+			$used = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_exif WHERE tag = %s AND photo <> 0", $label['tag'] ) );
 			if ( $used == 0 ) {
-				wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_exif WHERE tag = %s AND photo = 0", $label['tag'] ) );
+				$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_exif WHERE tag = %s AND photo = 0", $label['tag'] ) );
 			}
 		}
 	}
@@ -2920,7 +2920,7 @@ global $wpdb;
 		return false;
 	}
 
-	$exifs = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = $photo" );
+	$exifs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo = %d", $photo ), ARRAY_A );
 
 	if ( ! empty( $exifs ) ) {
 
@@ -2934,7 +2934,7 @@ global $wpdb;
 			// If f_description or thabrand changed: update
 			if ( $f_description != $exif['f_description'] || $tagbrand != $exif['brand'] ) {
 				$id = $exif['id'];
-				wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET f_description = %s, brand = %s WHERE id = %s", $f_description, $tagbrand, $id ) );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET f_description = %s, brand = %s WHERE id = %s", $f_description, $tagbrand, $id ) );
 				$photodata = wppa_cache_photo( $photo );
 
 				// If the format changed and the exif tag is used in the description, the photo must be re-indexed
@@ -2991,7 +2991,7 @@ static $labels;
 
 	// Find defined labels
 	if ( ! is_array( $labels ) ) {
-		$labels = wppa_get_col( "SELECT tag FROM $wpdb->wppa_iptc WHERE photo = 0 ORDER BY tag", ARRAY_N );
+		$labels = $wpdb->get_col( "SELECT tag FROM $wpdb->wppa_iptc WHERE photo = 0 ORDER BY tag", ARRAY_N );
 	}
 
 	// Now process the phots iptc entries
@@ -3084,8 +3084,7 @@ static $labels;
 				if ( $desc ) {
 
 					// Make sure not another process just added this one
-					$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", $tag );
-					if ( ! wppa_get_var( $query ) ) {
+					if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", $tag ) ) ) {
 
 						// Does not exist yet, add it
 						$bret = wppa_create_iptc_entry( array( 'photo' => 0, 'tag' => $tag, 'description' => $desc, 'status' => 'display' ) );
@@ -3109,8 +3108,7 @@ static $labels;
 			if ( $doit ) {
 
 				// Make sure not another process just added this one
-				$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = %d", $tag, $id );
-				if ( ! wppa_get_var( $query ) ) {
+				if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = %d", $tag, $id ) ) ) {
 
 					$bret = wppa_create_iptc_entry( array( 'photo' => $id, 'tag' => $tag, 'description' => $value, 'status' => 'default' ) );
 					if ( ! $bret ) wppa_log( 'War', 'Could not add IPTC tag '.$tag.' for photo '.$id );
@@ -3203,7 +3201,7 @@ global $wppa;
 
 	// Find defined labels
 	if ( ! is_array( $labels ) ) {
-		$result = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag" );
+		$result = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag", ARRAY_A );
 
 		if ( ! is_array( $result ) ) $result = array();
 		$labels = array();
@@ -3252,8 +3250,7 @@ global $wppa;
 			}
 
 			// Make sure not another process just added this one
-			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_exif WHERE tag = %s AND photo = 0", $tag );
-			if ( ! wppa_get_var( $query ) ) {
+			if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_exif WHERE tag = %s AND photo = 0", $tag ) ) ) {
 				$bret = wppa_create_exif_entry( array( 'photo' => $photo, 'tag' => $tag, 'description' => $desc, 'status' => $status ) );
 				if ( ! $bret ) wppa_log( 'War', 'Could not add EXIF tag label '.$tag.' for photo '.$photo );
 			}
@@ -3636,7 +3633,7 @@ if ( strlen($tag) != 6 ) {
 
 	// Fill $editabletags
 	if ( empty( $editabletags ) ) {
-		$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0" );
+		$temp = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0", ARRAY_A );
 		$editabletags = array();
 		if ( is_array( $temp ) ) foreach ( $temp as $item ) {
 			$editabletags[ hexdec( substr( $item['tag'], 2, 4 ) ) ] = trim( $item['description'], ': ' );
@@ -4239,9 +4236,7 @@ static $labels;
 
 	// Get all labels
 	if ( ! $labels ) {
-		$labels = wppa_get_results( "SELECT tag, description
-									   FROM $wpdb->wppa_iptc
-									   WHERE photo = 0" );
+		$labels = $wpdb->get_results( "SELECT tag, description FROM $wpdb->wppa_iptc WHERE photo = 0", ARRAY_A );
 	}
 
 	// Find it
@@ -4324,7 +4319,7 @@ function wppa_get_camera_brand( $id ) {
 global $wpdb;
 
 	// Try stored exif data
-	$E010F = wppa_get_var( $wpdb->prepare( "SELECT description FROM $wpdb->wppa_exif WHERE photo = %s AND tag = 'E#010F' ", $id ) );
+	$E010F = $wpdb->get_var( $wpdb->prepare( "SELECT description FROM $wpdb->wppa_exif WHERE photo = %s AND tag = 'E#010F' ", $id ) );
 	if ( $E010F ) {
 		$E010F = strtolower( $E010F );
 		if ( strpos( $E010F, 'canon' ) !== false ) {

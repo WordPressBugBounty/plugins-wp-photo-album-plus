@@ -4,7 +4,7 @@
 *
 * This file contains all procedures related to the privacy policy.
 *
-* Version 9.0.00.000
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -18,12 +18,7 @@ global $wpdb;
 	$export_items 	= array();
 	$group_id 		= 'wppa-comments';
 	$group_label 	= __( 'Comments on photos', 'wp-photo-album-plus' );
-	$comments 		= wppa_get_results( $wpdb->prepare(
-									"SELECT * FROM $wpdb->wppa_comments " .
-									"WHERE email = %s " .
-									"ORDER BY id " .
-									"LIMIT %d,%d", $email_address, ( $page - 1 ) * $number, $number
-									) );
+	$comments 		= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE email = %s ORDER BY id LIMIT %d,%d", $email_address, ( $page - 1 ) * $number, $number ), ARRAY_A );
 
 	foreach ( (array) $comments as $comment ) {
 
@@ -77,11 +72,11 @@ add_filter(
 function wppa_comment_eraser( $email_address, $page = 1 ) {
 global $wpdb;
 
-	$count = wppa_get_var( $wpdb->prepare(
+	$count = $wpdb->get_var( $wpdb->prepare(
 						"SELECT COUNT(*) FROM $wpdb->wppa_comments " .
 						"WHERE email = %s ", $email_address ) );
 
-	wppa_query( $wpdb->prepare(
+	$wpdb->query( $wpdb->prepare(
 					"DELETE FROM $wpdb->wppa_comments " .
 					"WHERE email = %s ", $email_address ) );
 
@@ -123,12 +118,7 @@ global $wpdb;
 	$user 			= get_user_by( 'email', $email_address );
 	$owner 			= $user->user_login;
 	$owner_display	= $user->display_name;
-	$ratings 		= wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating
-														   WHERE user = %s
-														   OR user = %s
-														   ORDER BY id
-														   LIMIT %d,%d", $owner, $owner_display, ( $page - 1 ) * $number, $number
-									) );
+	$ratings 		= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating WHERE user = %s OR user = %s ORDER BY id LIMIT %d,%d", $owner, $owner_display, ( $page - 1 ) * $number, $number ), ARRAY_A );
 
 	foreach ( (array) $ratings as $rating ) {
 
@@ -185,11 +175,11 @@ global $wpdb;
 	$user 			= get_user_by( 'email', $email_address );
 	$owner 			= $user->user_login;
 	$owner_display 	= $user->display_name;
-	$count = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating
+	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating
 											  WHERE user = %s
 											  OR user = %s", $owner, $owner_display ) );
 
-	wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_rating
+	$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_rating
 								   WHERE user = %s
 								   OR user = %s", $owner, $owner_display ) );
 
@@ -235,12 +225,7 @@ global $wpdb;
 	$group_label 	= __( 'Uploaded media items', 'wp-photo-album-plus' );
 	$user 			= get_user_by( 'email', $email_address );
 	$owner 			= $user->user_login;
-	$media_items 	= wppa_get_results( $wpdb->prepare(
-									"SELECT * FROM $wpdb->wppa_photos " .
-									"WHERE owner = %s " .
-									"AND album > 0 " .
-									"LIMIT %d,%d", $owner, ( $page - 1 ) * $number, $number
-									) );
+	$media_items 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0 LIMIT %d,%d", $owner, ( $page - 1 ) * $number, $number ), ARRAY_A );
 
 	$media_export_ids = wppa_get_option( 'wppa-media-export-ids', array() );
 
@@ -345,9 +330,7 @@ global $wpdb;
 		}
 
 		// Generic exif
-		$exifs = wppa_get_results( 	"SELECT * FROM $wpdb->wppa_exif " .
-										"WHERE photo = " . $id . " " .
-										"ORDER BY tag" );
+		$exifs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo = %d ORDER BY tag", $id ), ARRAY_A );
 
 		if ( is_array( $exifs ) && count( $exifs ) > 0 ) {
 			$exif_html = '<small><table><tbody>';
@@ -370,9 +353,7 @@ global $wpdb;
 		}
 
 		// Generic iptc
-		$iptcs 	= wppa_get_results( 	"SELECT * FROM $wpdb->wppa_iptc " .
-										"WHERE photo = " . $id . " " .
-										"ORDER BY tag" );
+		$iptcs 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = %d ORDER BY tag", $id ), ARRAY_A );
 
 		if ( is_array( $iptcs ) && count( $iptcs ) > 0 ) {
 			$iptc_html = '<small><table><tbody>';
@@ -380,8 +361,7 @@ global $wpdb;
 				$iptc_html .=
 				'<tr>' .
 					'<th>' .
-						wppa_get_var( "SELECT description FROM $wpdb->wppa_iptc " .
-										"WHERE photo = 0 AND tag = '" . $iptc['tag'] . "'" ) .
+						$wpdb->get_var( $wpdb->prepare( "SELECT description FROM $wpdb->wppa_iptc WHERE photo = 0 AND tag = %s", $iptc['tag'] ) ) .
 					'</th>' .
 					'<td>' .
 						$iptc['description'] .
@@ -558,12 +538,7 @@ global $wpdb;
 	$number 		= 500; // Limit us to avoid timing out
 	$page 			= (int) $page;
 	$user 			= get_user_by( 'email', $email_address );
-	$media_items 	= wppa_get_results( $wpdb->prepare(
-									"SELECT * FROM $wpdb->wppa_photos " .
-									"WHERE owner = %s " .
-									"AND album > 0 " .
-									"LIMIT %d,%d", $user->user_login, ( $page - 1 ) * $number, $number
-									) );
+	$media_items 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0 LIMIT %d,%d", $user->user_login, ( $page - 1 ) * $number, $number ), ARRAY_A );
 	$count 			= is_countable( $media_items ) ? count( $media_items ) : 0;
 	$items_removed 	= false;
 
@@ -572,7 +547,7 @@ global $wpdb;
 		$items_removed = true;
 	}
 
-	$left_items 	= wppa_get_var( $wpdb->prepare(
+	$left_items 	= $wpdb->get_var( $wpdb->prepare(
 									"SELECT COUNT(*) FROM $wpdb->wppa_photos " .
 									"WHERE owner = %s " .
 									"AND album > 0 ",

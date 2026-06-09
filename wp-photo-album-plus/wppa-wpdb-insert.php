@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.1.12.005
+* Version 9.2.01.001
 *
 */
 
@@ -116,8 +116,7 @@ static $last;
 	}
 
 	// Skip if already exits
-	$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_exif WHERE photo = %d AND tag = %s", $data['photo'], $data['tag'] );
-	$exists = wppa_get_var( $query );
+	$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_exif WHERE photo = %d AND tag = %s", $data['photo'], $data['tag'] ) );
 	if ( $exists ) return true;
 
 	// Save last
@@ -161,8 +160,7 @@ static $last;
 	}
 
 	// Skip if already exits
-	$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_iptc WHERE photo = %d AND tag = %s", $data['photo'], $data['tag'] );
-	$exists = wppa_get_var( $query );
+	$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_iptc WHERE photo = %d AND tag = %s", $data['photo'], $data['tag'] ) );
 	if ( $exists ) return true;
 
 	// Save last
@@ -307,7 +305,7 @@ global $wpdb;
 	$data['description'] 	= strip_shortcodes( wppa_filter_html( $data['description'] ) );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['tags'] 			= str_replace( '-none-,', '', $data['tags'] );
-	$sdtm = wppa_get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %s", $data['album'] ) );
+	$sdtm = $wpdb->get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %s", $data['album'] ) );
 	if ( $sdtm ) {
 		$data['scheduledtm'] = $sdtm;
 	}
@@ -461,9 +459,7 @@ global $wpdb;
 	$lastkey = wppa_get_option( $name, 'nil' );
 
 	if ( $lastkey == 'nil' ) {	// Init option
-		$query = $wpdb->prepare( "SELECT id FROM %s WHERE id < `9223372036854775806` ORDER BY id DESC LIMIT 1", $table );
-		$query = wppa_fix_query( $query );
-		$lastkey = wppa_get_var( $query );
+		$lastkey = $wpdb->prepare( "SELECT id FROM %i WHERE id < '9223372036854775806' ORDER BY id DESC LIMIT 1", $table );
 		if ( ! is_numeric( $lastkey ) || $lastkey <= 0 ) {
 			$lastkey = 0;
 		}
@@ -486,9 +482,7 @@ global $wpdb;
 	if ( ! wppa_is_int( $id ) ) return false;
 	if ( $id <= 0 ) return false;
 
-	$query = $wpdb->prepare( "SELECT * FROM %s WHERE id = %s", $table, $id );
-	$query = wppa_fix_query( $query );
-	$exists = wppa_get_row( $query );
+	$exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM %i WHERE id = %d", $table, $id ), ARRAY_A );
 	if ( $exists ) return false;
 	return true;
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.1.13.003
+* Version 9.2.01.003
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -58,25 +58,12 @@ function wppa_begin_session() {
 global $wpdb;
 global $wppa_session;
 
-	// If the session table does not yet exist on activation the first time
-	if ( is_admin() ) {
-		$tables = wppa_get_results( "SHOW TABLES FROM `" . DB_NAME . "`" );
-		$found = false;
-		foreach( $tables as $table ) {
-			if ( in_array( WPPA_SESSION, $table ) ) $found = true;
-		}
-		if ( ! $found ) {
-			$wppa_session['id'] = 0;
-			return false;
-		}
-	}
-
 	// First destroy expired sessions older than 24 hrs
-	$n = wppa_query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
+	$n = $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
 	if ( $n ) wppa_log( 'dbg', $n . ' old sessions removed while opening a new one' );
 
 	// Anonimize all expired sessions, except robots (for the statistics widget)
-	wppa_query( "UPDATE $wpdb->wppa_session
+	$wpdb->query( "UPDATE $wpdb->wppa_session
 			   SET ip = '', user = '', data = ''
 			   WHERE status = 'expired'
 			   AND data NOT LIKE '%\"isrobot\";b:1;%'" );
@@ -100,15 +87,14 @@ global $wppa_session;
 
 		if ( $session['timestamp'] < $expire ) {
 
-			wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
-										   SET status = 'expired'
-										   WHERE session = %s", $session_id ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE session = %s", $session_id ) );
 			$session = false;
 		}
 
 		// Not expired
-		$wppa_session = unserialize( $session['data'] );
-//		return;
+		if ( is_array( $session ) && isset( $session['data'] ) ) {
+			$wppa_session = unserialize( $session['data'] );
+		}
 	}
 
 	// Now create new session
@@ -131,8 +117,7 @@ global $wppa_session;
 	// Session exists, Update counter
 	else {
 		$count = $wpdb->get_var( $wpdb->prepare( "SELECT `count` FROM $wpdb->wppa_session WHERE session = %s", $session_id ) );
-		$query = $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %d WHERE session = %s", $count + 1, $session_id );
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %d WHERE session = %s", $count + 1, $session_id ) );
 	}
 
 	// Get info for root and sub search
@@ -222,7 +207,7 @@ function wppa_extend_session() {
 global $wpdb;
 
 	$sessionid = wppa_get_session_id();
-	wppa_query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
+	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
 								   SET timestamp = %d
 								   WHERE session = %s", time(), $sessionid ) );
 }

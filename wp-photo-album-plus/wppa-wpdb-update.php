@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.1.13.002
+* Version: 9.2.01.001
 *
 */
 
@@ -304,7 +304,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	wppa_clear_query_cache();
+	
 	wppa_cache_album( 'invalidate' );
 	return $iret;
 }
@@ -700,7 +700,7 @@ global $wpdb;
 		}
 	}
 
-	wppa_clear_query_cache();
+	
 	wppa_cache_photo( 'invalidate' );
 	return $iret;
 }
@@ -772,7 +772,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	wppa_clear_query_cache();
+	
 	return $iret;
 }
 
@@ -844,7 +844,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	wppa_clear_query_cache();
+	
 	return $iret;
 }
 
@@ -890,7 +890,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	wppa_clear_query_cache();
+	
 	return $iret;
 }
 
@@ -901,17 +901,9 @@ global $wpdb;
 	if ( $val !== '' ) {
 		$val = 0;
 	}
-	$query = $wpdb->prepare( "UPDATE %s SET %s = `%s`", $table, $col, $val );
-	$query = wppa_fix_query( $query );
-	try {
-		wppa_query( $query );
-	}
-	catch( Exception $e ) {
-		wppa_log( 'err', 'wppa_clear_col() caught exception: ' .  $e->getMessage() );
-		return false;
-	}
+	$wpdb->query( $wpdb->prepare( "UPDATE %i SET %i = %s", $table, $col, $val ) );
 
-	wppa_clear_query_cache();
+	
 	return true;
 }
 
@@ -919,15 +911,9 @@ global $wpdb;
 function wppa_clear_table( $table ) {
 global $wpdb;
 
-	$query = "TRUNCATE TABLE $table";
-	try {
-		wppa_query( $query );
-	}
-	catch( Exception $e ) {
-		wppa_log( 'err', 'wppa_clear_table() caught exception: ' .  $e->getMessage() );
-		return false;
-	}
-	wppa_clear_query_cache();
+	$wpdb->query( $wpdb->prepare( "TRUNCATE TABLE %i", $table ) );
+	
+	
 	return true;
 }
 
@@ -935,52 +921,7 @@ global $wpdb;
 function wppa_del_row( $table, $col, $value ) {
 global $wpdb;
 
-	$query = $wpdb->prepare( "DELETE FROM %s WHERE %s = `%s`", $table, $col, $value );
-	$query = wppa_fix_query( $query );
-	try {
-		$iret = wppa_query( $query );
-	}
-	catch( Exception $e ) {
-		wppa_log( 'err', 'wppa_del_row() caught exception: ' .  $e->getMessage() );
-		return false;
-	}
-
-	wppa_clear_query_cache();
-	return $iret;
-}
-
-// Get db table count conditionally
-// Example: wppa_get_count( WPPA_PHOTOS, ['album' => 6, 'status' => 'private'], ['=', '!='], 'and' );
-// to get the count of non private photos in album 6
-function wppa_get_count( $table, $conditions = array(), $operators = array(), $andor = 'and' ) {
-global $wpdb;
-
-	$query = "SELECT COUNT(*) FROM $table ";
-	if ( count( $conditions ) ) {
-		$query .= "WHERE ";
-		$first = true;
-		$index = 0;
-		foreach ( array_keys( $conditions ) as $key ) {
-			$field = $key;
-			$value = $conditions[$key];
-			$op    = isset( $operators[$index] ) ? $operators[$index] : "=";
-			$ao    = ( $andor == 'and' ? "AND " : "OR " );
-			if ( $first ) {
-				$first = false;
-			}
-			else {
-				$query .= $ao;
-			}
-			$query .= "$key $op '$value' ";
-			$index++;
-		}
-	}
-	try {
-		$iret = wppa_get_var( $query );
-	}
-	catch( Exception $e ) {
-		wppa_log( 'err', 'wppa_get_count() caught exception: ' .  $e->getMessage() );
-		return false;
-	}
+	$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE %i = %s", $table, $col, $value ) );
+	
 	return $iret;
 }

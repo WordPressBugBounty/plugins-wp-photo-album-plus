@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.1.13.003
+* version 9.2.01.001
 *
 */
 
@@ -32,7 +32,7 @@ global $wppa_hide_this;
 	// Start test area
 
 	if ( wppa_is_file( dirname( __FILE__ ) . '/wppatestcode.php' ) ) include 'wppatestcode.php';
-
+	
 	// End test area
 
 	// Initialize
@@ -209,7 +209,7 @@ global $wppa_hide_this;
 							wppa_copy( $file['tmp_name'], WPPA_UPLOAD_PATH . '/audiostub.jpg' );
 
 							// Thumbx, thumby, phtox and photoy must be cleared for the new stub
-							wppa_query( "UPDATE $wpdb->wppa_photos
+							$wpdb->query( "UPDATE $wpdb->wppa_photos
 										   SET thumbx = 0, thumby = 0, photox = 0, photoy = 0
 										   WHERE ext = 'xxx'"
 										  );
@@ -247,7 +247,7 @@ global $wppa_hide_this;
 							wppa_copy( $file['tmp_name'], WPPA_UPLOAD_PATH . '/documentstub.png' );
 
 							// Thumbx, thumby, phtox and photoy must be cleared for the new stub
-							wppa_query( "UPDATE $wpdb->wppa_photos
+							$wpdb->query( "UPDATE $wpdb->wppa_photos
 										   SET thumbx = 0, thumby = 0, photox = 0, photoy = 0
 										   WHERE ext = 'pdf'"
 										  );
@@ -518,10 +518,10 @@ global $wppa_hide_this;
 			$vals_page[] = 0;
 
 			// Pages if any
-			$pages = wppa_get_results( "SELECT ID, post_title, post_content, post_parent FROM $wpdb->posts
+			$pages = $wpdb->get_results( "SELECT ID, post_title, post_content, post_parent FROM $wpdb->posts
 										  WHERE post_type = 'page'
 										  AND post_status = 'publish'
-										  ORDER BY post_title" );
+										  ORDER BY post_title", ARRAY_A );
 			if ( $pages ) {
 
 				// Translate
@@ -2016,7 +2016,7 @@ global $wppa_hide_this;
 							$html = wppa_input( $slug, '220', __('Enter album ids separated by commas','wp-photo-album-plus' ) );
 						}
 						else {
-							$albums = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums" );
+							$albums = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums", ARRAY_A );
 							$albums = wppa_add_paths( $albums );
 							$albums = wppa_array_sort( $albums, 'name' );
 							$opts = array();
@@ -2290,7 +2290,7 @@ global $wppa_hide_this;
 						$name = __( 'Preview', 'wp-photo-album-plus' );
 						$desc = __( 'Current "photo of the day":', 'wp-photo-album-plus' );
 						$slug = 'wppa_potd_photo';
-						$html = '<div id="potdpreview">' . wppa_html_tag( 'img', ['src' => wppa_get_imgdir() . 'spinner.gif'] ) . '</div>';
+						$html = '<div id="preview">' . wppa_html_tag( 'img', ['src' => wppa_get_imgdir() . 'spinner.gif'] ) . '</div>';
 						wppa_setting_new( $slug, 15, $name, $desc, $html );
 
 						$name = __( 'Show selection', 'wp-photo-album-plus' );
@@ -4282,10 +4282,10 @@ global $wppa_hide_this;
 						$help .= '<br>'.__('Or you may use the standard page on which you display the generic album.', 'wp-photo-album-plus' );
 						$slug = 'wppa_search_linkpage';
 						wppa_verify_page($slug);
-						$pages = wppa_get_results( "SELECT ID, post_title, post_content FROM $wpdb->posts
+						$pages = $wpdb->get_results( "SELECT ID, post_title, post_content FROM $wpdb->posts
 													  WHERE post_type = 'page'
 													  AND post_status = 'publish'
-													  ORDER BY post_title" );
+													  ORDER BY post_title", ARRAY_A );
 						$opts = array();
 						$vals = array();
 						$opts[] = __('--- Please select a page ---', 'wp-photo-album-plus' );
@@ -6909,6 +6909,13 @@ global $wppa_hide_this;
 						$onch = '';
 						$html = wppa_select_m($slug, $opts, $vals, $onch, '', false, '', '220' );
 						wppa_setting_new($slug, '48', $name, $desc, $html, $help);
+						
+						$name = __('SEO optimize', 'wp-photo-album-plus');
+						$desc = __('Creates metatags for featured items and physical image sizes in img tags', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_seo_optimize';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '49', $name, $desc, $html, $help);
 
 						$name = __('Enable debug mode', 'wp-photo-album-plus');
 						$desc = __('Switch on for debugging purposes', 'wp-photo-album-plus');
@@ -7231,7 +7238,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_default_parent';
 						$opts = array( __('--- none ---', 'wp-photo-album-plus' ), __('--- separate ---', 'wp-photo-album-plus' ) );
 						$vals = array( 0, '-1');
-						$albs = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name" );
+						$albs = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name", ARRAY_A );
 						if ( $albs ) {
 							foreach ( $albs as $alb ) {
 								$opts[] = wppa_translate( stripslashes( $alb['name'] ) );
@@ -7303,7 +7310,7 @@ global $wppa_hide_this;
 						$slug = 'wppa_grant_parent';
 						$opts = array( __('--- none ---', 'wp-photo-album-plus' ), __('--- separate ---', 'wp-photo-album-plus' ) );
 						$vals = array( 'zero', '-1');
-						$albs = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name" );
+						$albs = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name", ARRAY_A );
 						if ( $albs ) {
 							foreach ( $albs as $alb ) {
 								$opts[] = wppa_translate( stripslashes( $alb['name'] ) );
@@ -9391,9 +9398,9 @@ global $wppa_hide_this;
 											);
 						wppa_setting_box_header_new($tab, $coldef);
 
-						$labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_exif
+						$labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif
 													   WHERE photo = 0
-													   ORDER BY tag" );
+													   ORDER BY tag", ARRAY_A );
 
 						if ( is_array( $labels ) ) {
 							$i = 1;
@@ -9448,9 +9455,9 @@ global $wppa_hide_this;
 											);
 						wppa_setting_box_header_new($tab, $coldef);
 
-						$labels = wppa_get_results( "SELECT * FROM $wpdb->wppa_iptc
+						$labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_iptc
 																	   WHERE photo = 0
-																	   ORDER BY tag" );
+																	   ORDER BY tag", ARRAY_A );
 
 						if ( is_array( $labels ) ) {
 							$i = 1;

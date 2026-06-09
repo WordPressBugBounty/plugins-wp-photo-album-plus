@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 9.1.04.006
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -60,9 +60,12 @@ class AlbumWidget extends WP_Widget {
 				}
 				else {
 					$order = wppa_get_album_order_a();
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id > 0 ORDER BY %s %s", $order['order'], $order['desc'] );
-					$query = wppa_fix_query( $query );
-					$albums = wppa_get_results( $query );
+					if ( $order['desc'] ) {
+						$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id > 0 ORDER BY %i DESC", $order['order'] ), ARRAY_A );
+					}
+					else {
+						$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id > 0 ORDER BY %i", $order['order'] ), ARRAY_A );
+					}
 				}
 				break;
 			case 'last':
@@ -70,15 +73,18 @@ class AlbumWidget extends WP_Widget {
 					$albums = array();
 				}
 				else {
-					$query = "SELECT * FROM $wpdb->wppa_albums WHERE id > 0 ORDER BY timestamp DESC";
-					$albums = wppa_get_results( $query );
+					$albums = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums WHERE id > 0 ORDER BY timestamp DESC", ARRAY_A );
 				}
 				break;
 			default:
 				$order = wppa_get_album_order_a( $parent );
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %s %s", $parent, $order['order'], $order['desc'] );
-				$query = wppa_fix_query( $query );
-				$albums = wppa_get_results( $query );
+				if ( $order['desc'] ) {
+					$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $parent, $order['order'] ), ARRAY_A );
+				}
+				else {
+					$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i", $parent, $order['order'] ), ARRAY_A );
+				}
+				break;
 		}
 
 		$albums = wppa_strip_void_albums( $albums );
@@ -97,13 +103,16 @@ class AlbumWidget extends WP_Widget {
 			$ids = wppa_alb_to_enum_children( $ids );
 			$ids_arr = explode( '.', $ids );
 			$ids_arr = wppa_strip_void_albums( $ids_arr );
-			$ids = implode( ',', $ids_arr );
 
 			// Do the new query
 			$order = wppa_get_album_order_a( $parent );
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN (%s) ORDER BY %s %s LIMIT %d", $ids, $order['order'], $order['desc'], $max );
-			$query = wppa_fix_query( $query );
-			$albums = wppa_get_results( $query );
+			$placeholders = implode( ',', array_fill( 0, count( $ids_arr ), '%d' ) );
+			if ( $order['desc'] ) {
+				$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN ($placeholders) ORDER BY %i DESC LIMIT %d", array_merge( $ids_arr, $order['order'], $max ) ), ARRAY_A );
+			}
+			else {
+				$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN ($placeholders) ORDER BY %i LIMIT %d", array_merge( $ids_arr, $order['order'], $max ) ), ARRAY_A );
+			}
 		}
 
 		$widget_content = "\n".'<!-- WPPA+ album Widget start -->';
@@ -123,8 +132,7 @@ class AlbumWidget extends WP_Widget {
 				$imageid 		= wppa_get_coverphoto_id( $album['id'] );
 				$photos_used .= '.' . $imageid;
 				$image 			= $imageid ? wppa_cache_photo( $imageid ) : false;
-				$query 			= $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s", $album['id'] );
-				$imgcount 		= wppa_get_var( $query );
+				$imgcount 		= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s", $album['id'] ) );
 				$subalbumcount 	= wppa_has_children( $album['id'] );
 				$thumb 			= $image;
 
@@ -213,10 +221,13 @@ class AlbumWidget extends WP_Widget {
 							</a>';
 						}
 						elseif ( $link['is_lightbox'] ) {
-							$porder = wppa_get_poc( $album['id'] );
-							$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %s", $album['id'], $porder );
-							$query = wppa_fix_query( $query );
-							$thumbs = wppa_get_results( $query );
+							$porder = wppa_get_poc_a( $album['id'] );
+							if ( $order['desc'] ) {
+								$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $album['id'], $porder['order'] ), ARRAY_A );
+							}
+							else {
+								$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $album['id'], $porder['order'] ), ARRAY_A );
+							}
 							if ( $thumbs ) foreach ( $thumbs as $thumb ) {
 								$title = wppa_get_lbtitle('alw', $thumb['id']);
 								if ( wppa_is_video( $thumb['id']  ) ) {
@@ -368,8 +379,7 @@ class AlbumWidget extends WP_Widget {
 		wppa_echo( wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) ) );
 
 		// Parent album selection
-		$query = "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name";
-		$albs = wppa_get_results( $query );
+		$albs = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name", ARRAY_A );
 		$albs = wppa_add_paths( $albs );
 		$albs = wppa_array_sort( $albs, 'name' );
 

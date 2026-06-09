@@ -2,7 +2,7 @@
 /**
  * WPPA common block functions
  *
- * Version: 8.7.02.002
+ * Version: 9.2.01.001
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -19,8 +19,7 @@ global $wpdb;
 	/* Make the album list  wppaAlbumList */
 	{
 		// Get all album names and ids
-		$query  = "SELECT id, name FROM $wpdb->wppa_albums";
-		$albums = wppa_get_results( $query );
+		$albums = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums", ARRAY_A );
 
 		// Add paths
 		$albums = wppa_add_paths( $albums );
@@ -41,8 +40,7 @@ global $wpdb;
 	/* Make the photo list  wppaPhotoList */
 	{
 		// Get the first 250 photo names and ids
-		$query  = "SELECT id, name FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 250";
-		$photos = wppa_get_results( $query );
+		$photos = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 250", ARRAY_A );
 
 		// Sort
 		$photos = wppa_array_sort( $photos, 'name' );

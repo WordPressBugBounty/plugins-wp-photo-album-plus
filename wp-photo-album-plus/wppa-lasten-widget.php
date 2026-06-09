@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the last uploaded photos
-* Version 9.0.00.005
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -66,7 +66,7 @@ class LasTenWidget extends WP_Widget {
 			case 0: // ---all---
 				break;
 			case '-2': // ---generic---
-				$albs = wppa_get_results( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = 0" );
+				$albs = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = 0" );
 				$album = '';
 				foreach ( $albs as $alb ) {
 					$album .= '.' . $alb['id'];
@@ -91,37 +91,30 @@ class LasTenWidget extends WP_Widget {
 
 		// Eiter look at timestamp or at date/time modified
 		$order_by = wppa_switch( 'lasten_use_modified' ) ? 'modified' : 'timestamp';
+		$ob = ( $order_by ? $order_by : 'id' );
 
 		// If you want only 'New' photos in the selection, the period must be <> 0;
 		if ( wppa_switch( 'lasten_limit_new' ) && wppa_opt( 'max_photo_newtime' ) ) {
 			$newtime = " " . $order_by . " >= ".( time() - wppa_opt( 'max_photo_newtime' ) );
+			$tm = time() - wppa_opt( 'max_photo_newtime' );
+			$albarr = $album ? explode( ',', $album ) : array();
+			$placeholders = implode( ',', array_fill( 0, count( $albarr ), '%d' ) );
 			if ( $album ) {
-				$q = "SELECT * FROM $wpdb->wppa_photos
-					  WHERE (".$newtime.")
-					  AND album IN ( ".$album." )
-					  ORDER BY " . $order_by . " DESC LIMIT " . $max;
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE %i >= %d AND album IN ($placeholders) ORDER BY %i DESC LIMIT %d", array_merge( $ob, $tm, $albarr, $ob, $max ) ), ARRAY_A );
 			}
 			else {
-				$q = "SELECT * FROM $wpdb->wppa_photos
-					  WHERE (".$newtime.")
-					  AND album > 0
-					  ORDER BY " . $order_by . " DESC LIMIT " . $max;
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE %i >= %d AND album > 0 ORDER BY %i DESC LIMIT %d", $ob, $tm, $ob, $max), ARRAY_A );
 			}
 		}
 		else {
 			if ( $album ) {
-				$q = "SELECT * FROM $wpdb->wppa_photos
-				      WHERE album IN ( ".$album." )
-					  ORDER BY " . $order_by . " DESC LIMIT " . $max;
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) ORDER BY %i DESC LIMIT %d", $ob, $max ), ARRAY_A );
 			}
 			else {
-				$q = "SELECT * FROM $wpdb->wppa_photos
-					  WHERE album > 0
-					  ORDER BY " . $order_by . " DESC LIMIT " . $max;
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album > 0 ORDER BY %i DESC LIMIT %d", $ob, $max ), ARRAY_A );
 			}
 		}
 
-		$thumbs 		= wppa_get_results( $q );
 		$thumbs 		= wppa_strip_void_photos( $thumbs );
 
 		$widget_content = "\n".'<!-- WPPA+ LasTen Widget start -->';

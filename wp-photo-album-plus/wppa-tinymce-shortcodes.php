@@ -2,7 +2,7 @@
 /* wppa-tinymce-shortcodes.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 9.0.00.000
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -43,20 +43,20 @@ global $wpdb;
 		$albums = null;
 	}
 	else {
-		$albums = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY timestamp DESC" );
+		$albums = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY timestamp DESC", ARRAY_A );
 		$albums = wppa_add_paths( $albums );
 		$albums = wppa_array_sort( $albums, 'name' );
 	}
 
 	// Prepare photoinfo
-	$photos = wppa_get_results( $wpdb->prepare( "SELECT id, name, album, ext FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT %d", wppa_opt( 'generator_max' ) ) );
+	$photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, name, album, ext FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT %d", wppa_opt( 'generator_max' ) ), ARRAY_A );
 
 	// Get Tags/cats
 	$tags 	= wppa_get_taglist();
 	$cats 	= wppa_get_catlist();
 
 	// Pages suitable for landing
-	$pages = wppa_get_results( "SELECT ID, post_title, post_content, post_parent FROM $wpdb->posts WHERE post_type = 'page' AND post_status = 'publish' ORDER BY post_title" );
+	$pages = $wpdb->get_results( "SELECT ID, post_title, post_content, post_parent FROM $wpdb->posts WHERE post_type = 'page' AND post_status = 'publish' ORDER BY post_title", ARRAY_A );
 
 	if ( $pages ) {
 

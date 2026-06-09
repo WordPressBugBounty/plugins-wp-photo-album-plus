@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * local js code for admin pages
-* Version 9.1.12.001
+* Version 9.2.01.001
 *
 */
 
@@ -1187,7 +1187,8 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 											var seqno = potddata.seqno;
 												jQuery("#potdseqno").html(seqno);
 											var preview  = potddata.preview;
-												jQuery("#potdpreview").html(preview);
+			console.log(preview);
+												jQuery("#preview").html(preview);
 											var pool     = potddata.pool;
 												jQuery("#potd-pool").html(pool);
 										}

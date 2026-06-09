@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.1.10.001
+* Version: 9.2.01.001
 *
 */
 
@@ -182,7 +182,7 @@ global $wppa_after_smx;
 
 	// Assume all toplevel albums used when generic
 	if ( $wppa['cache'] && $atts['type'] == 'generic' ) {
-		$temp = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = 0 ORDER BY id" );
+		$temp = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent = 0 ORDER BY id" );
 		$albums_used = implode( '.', $temp );
 	}
 
@@ -323,7 +323,7 @@ global $wppa_after_smx;
 			$the_post = get_post( $post_id );
 			$the_name = $the_post->post_title;
 			$owner_id = $the_post->post_author;
-			$albs = wppa_get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s", $the_name ) );
+			$albs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s", $the_name ) );
 			if ( $albs ) {
 				$atts['album'] = implode( '.', $albs );
 			}
@@ -622,10 +622,10 @@ global $wppa_after_smx;
 		case 'lastupdate':
 			$album = $atts['album'] ? $atts['album'] : 0;
 			if ( $album ) {
-				$timestamp = wppa_get_var( $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE album = %d ORDER BY timestamp DESC LIMIT 1", $album ) );
+				$timestamp = $wpdb->get_var( $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE album = %d ORDER BY timestamp DESC LIMIT 1", $album ) );
 			}
 			else {
-				$timestamp = wppa_get_var( "SELECT timestamp FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1" );
+				$timestamp = $wpdb->get_var( "SELECT timestamp FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1" );
 			}
 			if ( $timestamp ) {
 				$result = wppa_local_date( wppa_get_option( 'date_format' ), $timestamp );
@@ -901,7 +901,7 @@ global $wpdb;
 		foreach( array_keys( $atts['album_arr'] ) as $key ) {
 			$a = false;
 			if ( strlen( $atts['album_arr'][$key] ) == 16 && substr( $atts['album_arr'][$key], 0, 1 ) != '#' ) {
-				$a = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $atts['album_arr'][$key] ) );
+				$a = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $atts['album_arr'][$key] ) );
 				if ( $a ) $atts['album_arr'][$key] = $a;
 			}
 		}
@@ -1189,18 +1189,17 @@ global $wppa_after_smx;
 		$seed = floor( $seed * 0.9 );
 
 		if ( wppa_opt( 'photo_shortcode_random_albums' ) != '-2' ) {
-			$albs  = str_replace( '.', ',', wppa_expand_enum( wppa_opt( 'photo_shortcode_random_albums' ) ) );
-			$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN (%s) ORDER BY RAND(%d) LIMIT 1000", $albs, $seed );
-			$query = wppa_fix_query( $query );
-			$photo_arr = wppa_get_col( $query );
+			$albs = explode( '.', wppa_expand_enum( wppa_opt( 'photo_shortcode_random_albums' ) ) );
+			$placeholders = implode( ',', array_fill( 0, count( $albs ), '%d' ) );
+			$photo_arr = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders) ORDER BY RAND(%d) LIMIT 1000", array_merge($albs, [$seed] ) ) );
 		}
 		else {
-			$photo_arr = wppa_get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos ORDER BY RAND(%d) LIMIT 1000", $seed ) );
+			$photo_arr = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos ORDER BY RAND(%d) LIMIT 1000", $seed ) );
 		}
 		$photo = wppa_find_first_visible( $photo_arr );
 		if ( $photo ) {
 			if ( wppa_switch( 'photo_shortcode_random_fixed' ) ) {
-				$post_content = wppa_get_var( $wpdb->prepare( "SELECT post_content
+				$post_content = $wpdb->get_var( $wpdb->prepare( "SELECT post_content
 																 FROM $wpdb->posts
 																 WHERE ID = %d", $wppa_postid ) );
 				if ( wppa_switch( 'photo_shortcode_random_fixed_html' ) ) {
@@ -1209,7 +1208,7 @@ global $wppa_after_smx;
 				else {
 					$post_content = preg_replace( '/\[photo random\]/', '[photo '.$photo.']', $post_content, 1, $done );
 				}
-				wppa_query( $wpdb->prepare( "UPDATE $wpdb->posts
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts
 											   SET post_content = %s
 											   WHERE ID = %d", $post_content, $wppa_postid ) );
 			}
@@ -1219,7 +1218,7 @@ global $wppa_after_smx;
 		}
 	}
 	elseif ( $photo == '#last' ) {
-		$photo_arr = wppa_get_col( "SELECT id FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1000" );
+		$photo_arr = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1000" );
 		$photo = wppa_find_first_visible( $photo_arr );
 	}
 	elseif ( ! wppa_is_posint( $photo ) ) {
@@ -1317,7 +1316,7 @@ global $wppa_after_smx;
 		$text = wppa_filter_iptc( $text, $photo, true );				// 2# tags
 		$text = wppa_filter_exif( $text, $photo, true );				// E# tags
 
-		$wppa_after_smx = $text; //'<div class="wp-caption-text" >' . wp_kses_post( $text ) . '</div>';
+		$wppa_after_smx = wp_kses_post( $text );
 	}
 	else {
 		$wppa_after_smx = '';

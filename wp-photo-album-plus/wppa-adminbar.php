@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* Version 9.0.00.000
+* Version 9.2.01.001
 *
 */
 
@@ -12,22 +12,20 @@ if ( ! defined( 'ABSPATH' ) ) exit();
 add_action( 'admin_bar_menu', 'wppa_admin_bar_menu', 97 );
 
 function wppa_admin_bar_menu() {
-	global $wp_admin_bar;
-	global $wpdb;
+global $wp_admin_bar;
+global $wpdb;
 
 	$wppaplus = 'wppa-admin-bar';
 
 	$menu_items = array();
 
 	// Pending comments
-	$query = "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'pending'";
-	$com_pend = wppa_get_var( $query );
+	$com_pend = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'pending'" );
 	if ( $com_pend ) $com_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$com_pend.'</span>';
 	else $com_pending = '';
 
 	// Pending uploads
-	$query = "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending' AND album > 0";
-	$upl_pend = wppa_get_var( $query );
+	$upl_pend = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending' AND album > 0" );
 	if ( $upl_pend ) $upl_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$upl_pend.'</span>';
 	else $upl_pending = '';
 

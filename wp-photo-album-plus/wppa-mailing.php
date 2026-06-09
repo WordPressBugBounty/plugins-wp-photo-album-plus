@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 9.0.10.002
+* Version 9.2.01.001
 *
 */
 
@@ -99,7 +99,7 @@ global $wpdb;
 	if ( wppa_opt( 'mailinglist_policy' ) == 'opt-out' ) {
 
 		$from 	= wppa_get_option( 'wppa_mailinglist_highest_user_auto_subscribed', 0 );
-		$to 	= wppa_get_var( "SELECT ID from $wpdb->users ORDER BY ID DESC LIMIT 1" );
+		$to 	= $wpdb->get_var( "SELECT ID from $wpdb->users ORDER BY ID DESC LIMIT 1" );
 
 		if ( $to > $from ) {
 
@@ -201,7 +201,7 @@ global $wpdb;
 
 	// Find itemtyupe: photo, video, audio or document; translated
 	if ( $com ) {
-		$p = wppa_get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $com ) );
+		$p = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $com ) );
 		$itemtype = wppa_get_type( $p, true );
 		if ( ! $pho ) $pho = $p;
 	}
@@ -271,8 +271,8 @@ global $wpdb;
 		case 'newalbumnotify':
 			{
 				// If album removed, quit
-				$album = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id = %d", $alb ) );
-				if ( ! $album ) {
+				$alb = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id = %d", $alb ), ARRAY_A );
+				if ( ! $alb ) {
 					wppa_log( 'Eml', 'Mailing skipped: album ' . $alb . ' vanished' );
 					wppa_exit();
 				}
@@ -356,8 +356,7 @@ global $wpdb;
 				// See if there are more directly uploaded by this user in this album
 				$timestamp 	= wppa_get_photo_item( $pho, 'timestamp' );
 				$owner 		= wppa_get_photo_item( $pho, 'owner' );
-				$query 		= $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE timestamp >= %d AND owner = %s", $timestamp, $owner );
-				$photos 	= wppa_get_col( $query );
+				$photos 	= $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE timestamp >= %d AND owner = %s", $timestamp, $owner ) );
 				$multi 		= count( $photos ) > 1;
 
 				// The subject
@@ -433,7 +432,7 @@ global $wpdb;
 		case 'commentnotify':
 
 				// Get the comment
-				$comment = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ) );
+				$comment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ), ARRAY_A );
 
 				// Get the photo id
 //				if ( ! $pho ) {
@@ -624,7 +623,7 @@ global $wpdb;
 		case 'commentapproved':
 
 				// Get the comment
-				$comment = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ) );
+				$comment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ), ARRAY_A );
 
 				// The photo
 				if ( ! $pho ) {
@@ -722,7 +721,7 @@ global $wpdb;
 		case 'commentprevious':
 
 				// Get the comment
-				$comment = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ) );
+				$comment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ), ARRAY_A );
 
 				if ( $comment ) {
 
@@ -741,7 +740,7 @@ global $wpdb;
 					}
 
 					// Get the users who commented on the photo
-					$users = wppa_get_col( $wpdb->prepare( "SELECT DISTINCT user FROM $wpdb->wppa_comments WHERE photo = %d", $pho ) );
+					$users = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT user FROM $wpdb->wppa_comments WHERE photo = %d", $pho ) );
 
 					// If the current author is in the list: remove him, we do not send mails to the owner of the comment
 					$users = array_diff( $users, [$comment['user']] );
@@ -869,7 +868,7 @@ global $wpdb;
 		case 'moderatecomment':
 
 				// The comment
-				$comment = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ) );
+				$comment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $com ), ARRAY_A );
 
 				// The photo
 				if ( ! $pho ) {

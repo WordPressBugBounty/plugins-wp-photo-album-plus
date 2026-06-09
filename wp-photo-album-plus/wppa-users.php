@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 9.1.00.017
+* Version 9.2.01.001
 *
 */
 
@@ -15,7 +15,7 @@ global $wpdb;
 static $usercount;
 
 	if ( empty( $usercount ) ) {
-		$usercount = wppa_get_var( "SELECT COUNT(*) FROM $wpdb->users" );
+		$usercount = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->users" );
 	}
 
 	return $usercount;
@@ -31,8 +31,7 @@ static $users;
 			$users = array();
 		}
 		else {
-			$users = wppa_get_results( "SELECT * FROM $wpdb->users
-										  ORDER BY display_name" );
+			$users = $wpdb->get_results( "SELECT * FROM $wpdb->users ORDER BY display_name", ARRAY_A );
 		}
 	}
 	return $users;
@@ -254,7 +253,7 @@ global $wp_roles;
 	}
 
 	// Check for global max albums per user setting
-	$albs = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums
+	$albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums
 											 WHERE owner = %s", wppa_get_user() ) );
 	$gmax = wppa_opt( 'max_albums' );
 	if ( $gmax && $albs >= $gmax ) {
@@ -329,7 +328,7 @@ static $result = -1;
 	}
 
 	if ( is_numeric( $user ) ) {
-		$user = wppa_get_var( $wpdb->prepare( "SELECT user_login FROM $wpdb->users
+		$user = $wpdb->get_var( $wpdb->prepare( "SELECT user_login FROM $wpdb->users
 												 WHERE ID = %d", $user ) );
 	}
 	else {
@@ -519,7 +518,7 @@ function wppa_display_name( $owner ) {
 function wppa_get_admin_ids_a() {
 global $wpdb;
 
-	$admins = wppa_get_col( $wpdb->prepare( "SELECT user_id
+	$admins = $wpdb->get_col( $wpdb->prepare( "SELECT user_id
 											   FROM $wpdb->usermeta
 											   WHERE meta_key = 'wp_capabilities'
 											   AND meta_value LIKE %s", '%' . $wpdb->esc_like( 'administrator' ) . '%' ) );
@@ -565,11 +564,11 @@ global $wpdb;
 
 	if ( is_user_logged_in() ) {
 		$uid = wppa_get_user_id();
-		$cnt = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND userid = %d", $id, $uid ) );
+		$cnt = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND userid = %d", $id, $uid ) );
 	}
 	else {
 		$uid = wppa_get_user_ip();
-		$cnt = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND ip = %s", $id, $uid ) );
+		$cnt = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND ip = %s", $id, $uid ) );
 	}
 	return ( $cnt > 0 );
 }
@@ -580,11 +579,11 @@ global $wpdb;
 
 	if ( is_user_logged_in() ) {
 		$uid = wppa_get_user_id();
-		$cnt = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE photo = %d AND userid = %d", $id, $uid ) );
+		$cnt = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE photo = %d AND userid = %d", $id, $uid ) );
 	}
 	else {
 		$uid = wppa_get_user_ip();
-		$cnt = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE photo = %d AND ip = %s", $id, $uid ) );
+		$cnt = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE photo = %d AND ip = %s", $id, $uid ) );
 	}
 	return ( $cnt > 0 );
 }

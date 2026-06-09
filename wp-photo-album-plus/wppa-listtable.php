@@ -4,7 +4,7 @@
 *
 * Copy of wp version
 * Modified by OpaJaap
-* Version 9.1.09.004
+* Version 9.2.01.001
 *
 */
 
@@ -465,7 +465,7 @@ class WPPA_List_Table {
 				$extra_checks = $wpdb->prepare( ' AND post_status = %s', $_GET['post_status'] );
 			}
 
-			$months = wppa_get_results(
+			$months = wppa _get_ results(
 				$wpdb->prepare(
 					"
 				SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month

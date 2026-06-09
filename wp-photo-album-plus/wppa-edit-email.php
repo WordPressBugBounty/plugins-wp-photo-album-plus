@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version: 9.0.07.002
+* Version: 9.2.01.001
 *
 */
 
@@ -37,12 +37,12 @@ global $wpdb;
 	$useimg 	= $parms['dir'] == 'desc' ? $upimg : $downimg;
 
 	// Get users
-	$total 		= wppa_get_count( $wpdb->users );
 	$users 		= get_users( ['ID','user_login','display_name',
 								'orderby'=>$parms['order'],
 								'order'=>$parms['dir'],
 								'number'=>$parms['pagesize'],
 								'paged'=>$parms['page']] );
+	$total 		= count( $users );
 
 	$skips = ( $parms['page'] - 1 ) * $parms['pagesize'];
 	if ( $skips >= $total ) {

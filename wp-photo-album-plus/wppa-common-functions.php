@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.1.10.008
+* Version: 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -551,7 +551,7 @@ function wppa_get_album_order_column( $parent = 0 ) {
 	}
 
 	switch ( $order ) {
-		case 1:
+		case '1':
 		case '-1':
 			$result = 'a_order';
 			break;
@@ -751,6 +751,22 @@ global $wppa;
     return $result;
 }
 
+// Returns array order and desc for given Album
+function wppa_get_poc_a( $id = 0, $no_random = false ) {
+	
+	$result = [];
+	$temp = wppa_get_poc( $id = 0, $no_random = false );
+	if ( strpos( $temp, 'DESC' ) !== false ) {
+		$result['desc'] = true;
+		$result['order'] = trim( str_replace( 'DESC', '', $temp ) );
+	}
+	else {
+		$result['desc'] = false;
+		$result['order'] = trim( $temp );
+	}
+	return $result;
+}
+
 // Album order
 function wppa_get_aoc( $id = 0, $no_random = false ) {
 
@@ -825,8 +841,7 @@ global $wpdb;
 	if ( $name == '' ) return '';
     $name = stripslashes( $name );
 
-	$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE name = %s", $name );
-    $albs = wppa_get_results( $query );
+    $albs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE name = %s", $name ), ARRAY_A );
 
     if ( empty( $albs ) ) {
 		return '';
@@ -915,19 +930,18 @@ global $current_user;
 
 		// Administrator has always access OR If all albums are public
 		if ( wppa_user_is_admin() ) {
-			$query = "SELECT id FROM $wpdb->wppa_albums";
-			$albs = wppa_get_results( $query );
+			$albs = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums" );
 			if ( $albs ) return true;
 			else return false;	// No albums in system
 		}
 
 		// Any --- public --- albums?
-		$albs = wppa_get_results( "SELECT id FROM $wpdb->wppa_albums WHERE owner = '--- public ---'" );
+		$albs = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE owner = '--- public ---'" );
 
 		if ( $albs ) return true;
 
 		// Any logged out created albums? ( owner = ip )
-		$albs = wppa_get_results( "SELECT owner FROM $wpdb->wppa_albums" );
+		$albs = $wpdb->get_col( "SELECT owner FROM $wpdb->wppa_albums" );
 		if ( $albs ) foreach ( $albs as $a ) {
 			if ( wppa_is_int( str_replace( '.', '', $a['owner'] ) ) ) return true;
 		}
@@ -936,7 +950,7 @@ global $current_user;
 		if ( is_user_logged_in() ) {
 			$current_user = wp_get_current_user();
 			$user = $current_user->user_login;
-			$any_albs = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE owner = %s", $user ) );
+			$any_albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE owner = %s", $user ) );
 
 			if ( $any_albs ) return true;
 			else return false;	// No albums for user accessible
@@ -969,7 +983,7 @@ global $current_user;
 			$owner = $alb['owner'];
 		}
 		elseif ( is_numeric( $alb ) ) {
-			$owner = wppa_get_var( $wpdb->prepare( "SELECT owner FROM $wpdb->wppa_albums WHERE id = %s", $alb ) );
+			$owner = $wpdb->get_var( $wpdb->prepare( "SELECT owner FROM $wpdb->wppa_albums WHERE id = %s", $alb ) );
 		}
 
 		// -- public --- ?
@@ -1252,12 +1266,12 @@ static $result_cache;
 	if ( ! $limit_max ) return '-1';		// Unlimited max
 
 	if ( ! $limit_time ) {					// For ever
-		$curcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s", $alb ) );
+		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s", $alb ) );
 	}
 	else {									// Time criterium in place
 		$timnow = time();
 		$timthen = $timnow - $limit_time;
-		$curcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s AND timestamp > %s", $alb, $timthen ) );
+		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %s AND timestamp > %s", $alb, $timthen ) );
 	}
 
 	if ( $curcount >= $limit_max ) $result = 0;	// No more allowed
@@ -1293,10 +1307,9 @@ global $wpdb;
 		if ( $tree_limit ) {
 			$me = wppa_get_user();
 			$tree_albums = wppa_alb_to_enum_children( $last_parent );
-			$alb_list = str_replace( '.', ',', $tree_albums );
-			$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album IN (%s) AND owner = `%s`", $alb_list, $me );
-			$query = wppa_fix_query( $query );
-			$count = wppa_get_var( $query );
+			$albs = explode( '.', $tree_albums );
+			$placeholders = implode( ',', array_fill( 0, count($albs), '%d' ) );
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND owner = %s", array_merge( $albs, [$me] ) ) );
 			return max( 0, $tree_limit - $count );
 		}
 	}
@@ -1335,20 +1348,20 @@ global $wpdb;
 	// Get the currently uploaded photos
 	if ( ! $limit_time ) {					// For ever
 		if ( $album_c ) {
-			$curcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND album = %d", $user, $album_c ) );
+			$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND album = %d", $user, $album_c ) );
 		}
 		else {
-			$curcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0", $user ) );
+			$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0", $user ) );
 		}
 	}
 	else {									// Time criterium in place
 		$timnow = time();
 		$timthen = $timnow - $limit_time;
 		if ( $album_c ) {
-			$curcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND timestamp > %s AND album = %d", $user, $timthen, $album_c ) );
+			$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND timestamp > %s AND album = %d", $user, $timthen, $album_c ) );
 		}
 		else {
-			$curcount = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND timestamp > %s AND album > 0", $user, $timthen ) );
+			$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND timestamp > %s AND album > 0", $user, $timthen ) );
 		}
 	}
 
@@ -1783,14 +1796,15 @@ global $wpdb;
 			// $albums = $args['array'];
 			$albums = array();
 
-			$query = "SELECT id, name, max_children, crypt, owner
-											 FROM $wpdb->wppa_albums
-											 WHERE id IN (" . implode( ',', $args['array'] ) . ") " .
-											 ( $args['checkowner'] && ! wppa_user_is_admin() ? "AND owner IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
-											 wppa_get_album_order( $args['root'] );
+			$placeholders = implode( ',', array_fill( 0, count( $args['array'] ), '%d' ) );
 
-			$temp = wppa_get_results( $query );
-
+			if ( $args['checkowner'] && ! wppa_user_is_admin() ) {
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT id, name, max_children, crypt, owner FROM $wpdb->wppa_albums WHERE id IN ($placeholders)
+															AND owner IN ( '--- public ---', %s )", array_merge( $args['array'], [wppa_get_user()] ) ), ARRAY_A );
+			}
+			else {
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT id, name, max_children, crypt, owner FROM $wpdb->wppa_albums WHERE id IN ($placeholders)", $args['array'] ), ARRAY_A );
+			}
 
 			// To keep the preciously created sequence intact when an array is given, copy the data from $temp in the sequence of $args['array']
 			foreach( $args['array'] as $id ) {
@@ -1802,13 +1816,12 @@ global $wpdb;
 			}
 		}
 		else {
-			$query = "SELECT id, name, max_children, crypt, owner
-											   FROM $wpdb->wppa_albums " .
-											   ( $args['checkowner'] && ! wppa_user_is_admin() ? "WHERE owner IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
-											   wppa_get_album_order( $args['root'] );
-
-			$albums = wppa_get_results( $query );
-
+			if ( $args['checkowner'] && ! wppa_user_is_admin() ) {
+				$albums = $wpdb->get_results( $wpdb->prepare( "SELECT id, name, max_children, crypt, owner FROM $wpdb->wppa_albums WHERE owner IN ( '--- public ---', %s ) ORDER BY name", wppa_get_user() ), ARRAY_A );
+			}
+			else {
+				$albums = $wpdb->get_results( "SELECT id, name, max_children, crypt, owner FROM $wpdb->wppa_albums ORDER BY name", ARRAY_A );
+			}
 		}
 
 		// Check for bp profile
@@ -2043,10 +2056,10 @@ global $wpdb;
 	if ( $last_check < ( time() - 300 ) ) {	// Longer than 5 mins ago
 
 		// Publish scheduled photos
-		$to_publish = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
+		$to_publish = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
 														   WHERE status = 'scheduled'
 														   AND scheduledtm < %s",
-														   wppa_get_default_scheduledtm() ) );
+														   wppa_get_default_scheduledtm() ), ARRAY_A );
 		if ( $to_publish ) foreach( $to_publish as $photo ) {
 			wppa_update_photo( $photo['id'], ['scheduledtm' => '', 'status' => 'publish'] );
 			wppa_update_album( $photo['album'] );	// For New indicator on album
@@ -2054,7 +2067,7 @@ global $wpdb;
 		}
 
 		// Remove scheduledtm from albums when it is in the past, so new photos do not get this anymore
-		$to_update = wppa_get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums
+		$to_update = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums
 													  WHERE scheduledtm <> ''
 													  AND scheduledtm < %s",
 													  wppa_get_default_scheduledtm() ) );
@@ -2067,7 +2080,7 @@ global $wpdb;
 		$maxtime = time() - 600;
 
 		// Delete photos scheduled for deletion
-		$to_delete = wppa_get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos
+		$to_delete = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos
 													  WHERE scheduledel <> ''
 													  AND scheduledel < %s
 													  AND modified < %s",
@@ -2078,20 +2091,20 @@ global $wpdb;
 		}
 
 		// Delete albums scheduled for deletion
-		$albums_to_delete = wppa_get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums
+		$albums_to_delete = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums
 															 WHERE scheduledel <> ''
 															 AND scheduledel < %s
 															 AND modified < %s",
 															 wppa_get_default_scheduledtm(),
 															 $maxtime ) );
 		if ( $albums_to_delete ) {
-			$delalbs = implode( ',', $albums_to_delete );
-			$photos_to_delete = wppa_get_col( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ( $delalbs )" );
+			$placeholders = implode( ',', array_fill( 0, count( $albums_to_delete ), '%d' ) );
+			$photos_to_delete = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $albums_to_delete ) );
 			if ( $photos_to_delete ) foreach( $photos_to_delete as $id ) {
 				wppa_delete_photo( $id );
 			}
-			wppa_query( "DELETE FROM $wpdb->wppa_albums WHERE id IN ( $delalbs )" );
-			wppa_query( "UPDATE $wpdb->wppa_albums SET a_parent = '-1' WHERE a_parent IN ( $delalbs )" );
+			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_albums WHERE id IN ($placeholders)", $albums_to_delete ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_albums SET a_parent = '-1' WHERE a_parent IN ($placeholders)", $albums_to_delete ) );
 		}
 
 		// Update timestamp of this action

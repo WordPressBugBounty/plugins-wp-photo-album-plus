@@ -1,5 +1,14 @@
 WP Photo Album Plus Changelog
 
+= 9.2.01 =
+
+* Security fix
+* Over 600 codechanges to better comply with the wp plugin coding rules.
+* Changing anything on the comments admin page did not work. Fixed.
+* You can now switch off buikt-in SEO optimizations in Asvanved settings -> System -> I -> Item 49. This switches off:
+- meta tags for featured items in the header of the page,
+- height and width attributes for physical image sizes in img tags.
+
 = 9.1.13 =
 
 * Fixed a layout issue on album sort in the album admin.

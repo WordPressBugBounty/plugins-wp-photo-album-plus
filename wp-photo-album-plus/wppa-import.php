@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.1.07.001
+* Version 9.2.01.001
 *
 */
 
@@ -199,11 +199,11 @@ global $wppa_import_errors;
 			if ( $is_depot && wppa_has_realmedia() ) {
 
 				// See what's in there
-				$rm_itemcount 		= wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_realmedialibrary_posts" );//wppa_get_import_files();
-				$rm_itemsdone 		= wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE rml_id <> ''" );
+				$rm_itemcount 		= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_realmedialibrary_posts" );//wppa_get_import_files();
+				$rm_itemsdone 		= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE rml_id <> ''" );
 
-				$rm_albumcount 	= wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_realmedialibrary" );//wppa_get_albumcount( $files );
-				$rm_albumsdone 	= wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE rml_id <> ''" );
+				$rm_albumcount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_realmedialibrary" );//wppa_get_albumcount( $files );
+				$rm_albumsdone 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE rml_id <> ''" );
 			}
 		}
 
@@ -630,7 +630,7 @@ global $wppa_import_errors;
 
 			// Display the realmedia albums
 			if ( $is_depot && wppa_has_realmedia() ) {
-				$rml_albums 	= wppa_get_results( "SELECT * FROM $wpdb->wppa_realmedialibrary" );
+				$rml_albums 	= $wpdb->get_results( "SELECT * FROM $wpdb->wppa_realmedialibrary", ARRAY_A );
 				$rm_albumcount 	= is_array( $rml_albums ) ? count( $rml_albums ) : 0;
 				if ( $rm_albumcount ) {
 					wppa_import_header( __( 'RealMedia albums', 'wp-photo-album-plus' ) );
@@ -641,7 +641,7 @@ global $wppa_import_errors;
 					$ct = 0;
 					foreach( $rml_albums as $rml_album ) {
 						$rml_album_id 	= $rml_album['id'];
-						$wppa_album_id 	= wppa_get_var( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = $rml_album_id LIMIT 1" );
+						$wppa_album_id 	= $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = %d LIMIT 1", $rml_album_id ) );
 						$rml_album_name = $rml_album['name'];
 						wppa_import_item_check( $idx, 'rma', $rml_album_name, ( $wppa_album_id ? true : false ) ); 	// disable when already exists in wppa
 						wppa_import_fixcount( $ct, 4 );
@@ -654,7 +654,7 @@ global $wppa_import_errors;
 
 			// Display the realmedia items
 			if ( $is_depot && wppa_has_realmedia() ) {
-				$rml_posts 		= wppa_get_results( "SELECT * FROM $wpdb->wppa_realmedialibrary_posts" );
+				$rml_posts 		= $wpdb->get_results( "SELECT * FROM $wpdb->wppa_realmedialibrary_posts", ARRAY_A );
 				$rm_postcount 	= is_array( $rml_posts ) ? count( $rml_posts ) : 0;
 				if ( $rm_postcount ) {
 					wppa_import_header( __( 'RealMedia items', 'wp-photo-album-plus' ) );
@@ -666,8 +666,8 @@ global $wppa_import_errors;
 					foreach( $rml_posts as $rml_post ) {
 						$attachment 	= $rml_post['attachment'];
 						$rml_album 		= $rml_post['fid'];
-						$rml_item_name 	= wppa_get_var( "SELECT post_title FROM $wpdb->posts WHERE ID = $attachment" );
-						$rml_album_name = wppa_get_var( "SELECT name FROM $wpdb->wppa_realmedialibrary WHERE id = $rml_album" );
+						$rml_item_name 	= $wpdb->get_var( $wpdb->prepare( "SELECT post_title FROM $wpdb->posts WHERE ID = %d", $attachment ) );
+						$rml_album_name = $wpdb->get_var( $wpdb->prepare( "SELECT name FROM $wpdb->wppa_realmedialibrary WHERE id = %d", $rml_album ) );
 						$dis 			= ! $rml_album_name;
 						wppa_import_item_check( $idx, 'rmi', $rml_item_name . ' (' . ( $rml_album_name ? $rml_album_name : '???' ) . ')', $dis );
 						wppa_import_fixcount( $ct, 4 );

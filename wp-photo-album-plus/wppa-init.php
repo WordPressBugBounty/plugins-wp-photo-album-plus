@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version: 9.1.00.011
+* Version: 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -309,7 +309,7 @@ global $wpdb;
 
 	if ( current_user_can( 'wppa_settings' ) ) {
 		if ( wppa_get_option( 'wppa_tags_ok' ) != 1 ) {
-			$tag = wppa_get_var( "SELECT tags FROM $wpdb->wppa_photos WHERE tags <> '' ORDER BY id DESC LIMIT 1" );
+			$tag = $wpdb->get_var( "SELECT tags FROM $wpdb->wppa_photos WHERE tags <> '' ORDER BY id DESC LIMIT 1" );
 			if ( $tag ) {
 				if ( substr( $tag, 0, 1 ) != ',' ) {
 					add_action('admin_notices', 'wppa_tag_message');
@@ -333,7 +333,7 @@ global $wpdb;
 
 	if ( current_user_can( 'wppa_settings' ) ) {
 		if ( wppa_get_option( 'wppa_cats_ok' ) != 1 ) {
-			$tag = wppa_get_var( "SELECT cats FROM $wpdb->wppa_albums WHERE cats <> '' ORDER BY id DESC LIMIT 1" );
+			$tag = $wpdb->get_var( "SELECT cats FROM $wpdb->wppa_albums WHERE cats <> '' ORDER BY id DESC LIMIT 1" );
 			if ( $tag ) {
 				if ( substr( $tag, 0, 1 ) != ',' ) {
 					add_action('admin_notices', 'wppa_cat_message');

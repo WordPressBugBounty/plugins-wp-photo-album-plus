@@ -4,7 +4,7 @@
 *
 * Contains dashboard widgets code
 *
-* Version 9.1.13.002
+* Version 9.2.01.001
 *
 */
 
@@ -74,9 +74,8 @@ global $wpdb;
 
 	// Recently uploaded photos
 	wppa_echo( '<h3>' . __( 'Recently uploaded photos', 'wp-photo-album-plus' ) . '</h3>' );
-
-	$query = "SELECT * FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 5";
-	$photos = wppa_get_results( $query );
+	
+	$photos = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 5", ARRAY_A );
 
 	if ( ! empty( $photos ) ) {
 		wppa_echo( '<table>' );
@@ -142,8 +141,7 @@ global $wpdb;
 
 	// Recent comments
 	wppa_echo( '<h3>' . __( 'Recent comments on photos', 'wp-photo-album-plus' ) . '</h3>' );
-	$query = "SELECT * FROM $wpdb->wppa_comments ORDER BY timestamp DESC LIMIT 5";
-	$comments = wppa_get_results( $query );
+	$comments = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_comments ORDER BY timestamp DESC LIMIT 5", ARRAY_A );
 	if ( ! empty( $comments ) ) {
 
 		wppa_echo( '<table>' );

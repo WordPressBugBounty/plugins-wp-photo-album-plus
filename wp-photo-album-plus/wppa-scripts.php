@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.1.04.005
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -228,11 +228,7 @@ global $wpdb;
 
 	// Tinymce photo
 	if ( wppa_switch( 'photo_shortcode_enabled' ) ) {
-		$id = wppa_get_var( "SELECT id FROM $wpdb->wppa_photos
-		WHERE ext <> 'xxx'
-		AND panorama = 0
-		ORDER BY timestamp DESC
-		LIMIT 1" );
+		$id = $wpdb->get_var( "SELECT id FROM $wpdb->wppa_photos WHERE ext <> 'xxx' AND panorama = 0 ORDER BY timestamp DESC LIMIT 1" );
 
 		// Fake we are in a widget, to prevent wppa_get_picture_html() from bumping viewcount
 		wppa( 'in_widget', true );

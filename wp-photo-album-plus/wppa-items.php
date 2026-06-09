@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.1.13.005
+* vrsion: 9.2.01.001
 *
 */
 
@@ -29,7 +29,7 @@ static $cache;
 
 		// Get max ... albums
 		$max = wppa_opt( 'pre_cache_albums' );
-		$allalbs = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums LIMIT %d", $max ) );
+		$allalbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums LIMIT %d", $max ), ARRAY_A );
 
 		// Store in cache
 		foreach( $allalbs as $album ) {			// Add multiple
@@ -112,7 +112,7 @@ static $cache;
 
 		// Get max ... photos
 		$max = wppa_opt( 'pre_cache_photos' );
-		$allpho = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos ORDER BY id DESC LIMIT %d", $max ) );
+		$allpho = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos ORDER BY id DESC LIMIT %d", $max ), ARRAY_A );
 
 		// Store in cache
 		foreach( $allpho as $photo ) {			// Add multiple
@@ -578,10 +578,13 @@ global $wpdb;
 		$seq = $seqs[$alb];
 	}
 	else {
-		$ord = wppa_get_poc( $alb );
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %s", $alb, $ord );
-		$query = wppa_fix_query( $query );
-		$seq = wppa_get_col( $query );
+		$ord = wppa_get_poc_a( $alb );
+		if ( $ord['desc'] ) {
+			$seq = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $alb, $ord['order'] ) );
+		}
+		else {
+			$seq = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $alb, $ord['order'] ) );
+		}
 		$seqs[$alb] = $seq;
 	}
 	$no = 0;

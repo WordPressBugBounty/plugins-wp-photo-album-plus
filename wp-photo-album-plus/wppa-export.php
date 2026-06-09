@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version: 9.0.07.002
+* Version: 9.2.01.001
 *
 */
 
@@ -62,7 +62,7 @@ global $wppa_opt;
 	}';
 	wppa_add_inline_script( 'wppa-admin', $the_js, true );
 
-	$albums 	= wppa_get_results( "SELECT * FROM $wpdb->wppa_albums ORDER BY name" );
+	$albums 	= $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums ORDER BY name", ARRAY_A );
 	foreach( array_keys( $albums ) as $key ) {
 		if ( ! wppa_is_album_visible( $albums[$key]['id'] ) ) {
 			unset( $albums[$key] );
@@ -166,7 +166,7 @@ global $wppa_opt;
 
 						// Find number of photos in album
 						if ( wppa_user_is_admin() ) {
-							$numphotos = wppa_get_var( $wpdb->prepare(
+							$numphotos = $wpdb->get_var( $wpdb->prepare(
 														 "SELECT COUNT(*)
 														  FROM $wpdb->wppa_photos
 														  WHERE album = %d
@@ -174,7 +174,7 @@ global $wppa_opt;
 														  AND filename NOT LIKE %s", $id, '%.pdf' ) );
 						}
 						else {
-							$numphotos = wppa_get_var( $wpdb->prepare(
+							$numphotos = $wpdb->get_var( $wpdb->prepare(
 														 "SELECT COUNT(*)
 														  FROM $wpdb->wppa_photos
 														  WHERE album = %d
@@ -284,6 +284,8 @@ global $wppa_temp_idx;
 global $wppa_try_continue;
 global $wppa_opt;
 
+	wppa_log('misc', 'wppa_export_photos() called');
+	
 	$wppa_opt['wppa_lazy'] = 'none';
 	$wppa_temp_idx 		= 0;
 	$wppa_try_continue 	= false;
@@ -342,7 +344,7 @@ global $wppa_opt;
 		">' );
 
 	// The actual export procedure. find the albums
-	$albums = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums ORDER BY id" );
+	$albums = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums ORDER BY id" );
 
 	$done 	= 0;
 	$abort 	= false;
@@ -378,39 +380,42 @@ global $wppa_opt;
 
 			$usr = wppa_get_user();
 			$from = get_transient( "wppa-album-$id-last-export-$usr" );
+
 			if ( ! $from ) $from = 0;
 
 			if ( wppa_user_is_admin() ) {
-				$total = wppa_get_var( $wpdb->prepare(
-										"SELECT COUNT(*) FROM $wpdb->wppa_photos
-										 WHERE album = %d
-										 AND ext <> 'xxx'
-										 AND filename NOT LIKE %s", $id, '%.pdf' ) );
 
-				$photos = wppa_get_results( $wpdb->prepare(
+				$total = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d AND ext != 'xxx' AND filename NOT LIKE %s", $id, '%'. $wpdb->esc_like( '.pdf' ) ) );
+				wppa_log_query( $total );
+				
+				$photos = $wpdb->get_results( $wpdb->prepare(
 											 "SELECT * FROM $wpdb->wppa_photos
 											  WHERE album = %d
 											  AND id > %d
 											  AND ext <> 'xxx'
 											  AND filename NOT LIKE %s
-											  ORDER BY id", $id, $from, '%.pdf' ) );
+											  ORDER BY id", $id, $from, '%'.$wpdb->esc_like( 'pdf' ) ), ARRAY_A );
+				wppa_log_query( $photos );
+
 			}
 			else {
-				$total = wppa_get_var( $wpdb->prepare(
+				$total = $wpdb->get_var( $wpdb->prepare(
 										"SELECT COUNT(*) FROM $wpdb->wppa_photos
 										 WHERE album = %d
 										 AND ext <> 'xxx'
 										 AND filename NOT LIKE %s
-										 AND ( status NOT IN ('pending', 'scheduled') OR owner = %s )", $id, '%.pdf', wppa_get_user() ) );
+										 AND ( status NOT IN ('pending', 'scheduled') OR owner = %s )", $id, '%'.$wpdb->esc_like( 'pdf' ), wppa_get_user() ) );
+				wppa_log_query( $total );
 
-				$photos = wppa_get_results( $wpdb->prepare(
+				$photos = $wpdb->get_results( $wpdb->prepare(
 											 "SELECT * FROM $wpdb->wppa_photos
 											  WHERE album = %d
 											  AND id > %d
 											  AND ext <> 'xxx'
 											  AND filename NOT LIKE %s
 											  AND ( status NOT IN ('pending', 'scheduled') OR owner = %s )
-											  ORDER BY id", $id, $from, '%.pdf', wppa_get_user() ) );
+											  ORDER BY id", $id, $from, '%'.$wpdb->esc_like( 'pdf' ), wppa_get_user() ) );
+				wppa_log_query( $photos );
 			}
 
 			if ( $total > count( $photos ) ) {
@@ -555,50 +560,27 @@ global $wppa_temp_idx;
 
 	$inc_usr = wppa_get( 'inc-usr', '', 'text' );
 
-	$album = wppa_get_row($wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums
-											 WHERE id = %d", $id ) );
+	$album = $wpdb->get_row($wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums
+											 WHERE id = %d", $id ), ARRAY_A );
 
 	if ( $album ) {
-		$fname 	= WPPA_DEPOT_PATH.'/'.$id.'.amf';
-		$file 	= wppa_fopen( $fname, 'wb');
-		if ( $file ) {
-			$err = ! wppa_fwrite( $file,
-				"name=" . $album['name'] . "\n" .
-				"desc=" . wppa_nl_to_txt( $album['description'] ) . "\n" .
-				"aord=" . $album['a_order'] . "\n" .
-				"prnt=" . wppa_get_album_name( $album['a_parent'], array( 'raw' => true ) ) . "\n" .
-				"pord=" . $album['p_order_by'] . "\n" .
-				( $inc_usr ? "ownr=" . $album['owner'] . "\n" : '' ) );
+		$file 	= WPPA_DEPOT_PATH.'/'.$id.'.amf';
 
-/*
-					main_photo bigint(20) NOT NULL,
-					cover_linktype tinytext NOT NULL,
-					cover_linkpage bigint(20) NOT NULL,
-					timestamp tinytext NOT NULL,
-					upload_limit tinytext NOT NULL,
-					alt_thumbsize tinytext NOT NULL,
-					default_tags tinytext NOT NULL,
-					cover_type tinytext NOT NULL,
-					suba_order_by tinytext NOT NULL,
-*/
+		wppa_put_contents( $file, 
+			"name=" . $album['name'] . "\n" .
+			"desc=" . wppa_nl_to_txt( $album['description'] ) . "\n" .
+			"aord=" . $album['a_order'] . "\n" .
+			"prnt=" . wppa_get_album_name( $album['a_parent'], array( 'raw' => true ) ) . "\n" .
+			"pord=" . $album['p_order_by'] . "\n" .
+			( $inc_usr ? "ownr=" . $album['owner'] . "\n" : '' ) );
 
-			if ( $err ) {
-				/* translators: filename */
-				wppa_error_message( sprintf( __( 'Cannot write to file %s.', 'wp-photo-album-plus' ) , $fname ) );
-				wppa_fclose( $file );
-				return false;
-			}
-			else {
-				wppa_fclose( $file );
-				if ( $wppa_zip ) {
-					$wppa_zip->addFile( $fname, basename( $fname ) );
-				}
-				$wppa_temp[$wppa_temp_idx] = $fname;
-				$wppa_temp_idx++;
-			}
+		if ( $wppa_zip ) {
+			$wppa_zip->addFile( $file, basename( $file ) );
+			$wppa_temp[$wppa_temp_idx] = $file;
+			$wppa_temp_idx++;
 		}
 		else {
-			wppa_error_message( __( 'Could not open photo output file.', 'wp-photo-album-plus' ) );
+			wppa_error_message( __( 'Could not open album output file.', 'wp-photo-album-plus' ) );
 			return false;
 		}
 	}
@@ -620,46 +602,21 @@ global $wppa_temp_idx;
 	$inc_usr = wppa_get( 'inc-usr', '', 'text' );
 
 	if ( $photo ) {
-		$fname = WPPA_DEPOT_PATH . '/' . $photo['id'] . '.pmf';
-		$file = wppa_fopen( $fname, 'wb' );
-		if ( $file ) {
-			$err = ! wppa_fwrite( $file,
-				"name=" . $photo['name'] . "\n" .
-				"desc=" . wppa_nl_to_txt( $photo['description'] ) . "\n" .
-				"pord=" . $photo['p_order'] . "\n" .
-				"albm=" . wppa_get_album_name( $photo['album'], array( 'raw' => true ) ) . "\n" .
-				"lnku=" . $photo['linkurl']."\n" .
-				"lnkt=" . $photo['linktitle']."\n" .
-				( $inc_usr ? "ownr=" . $photo['owner'] . "\n" : '' ) );
+		$file = WPPA_DEPOT_PATH . '/' . $photo['id'] . '.pmf';
+		
+		wppa_put_contents( $file, 
+			"name=" . $photo['name'] . "\n" .
+			"desc=" . wppa_nl_to_txt( $photo['description'] ) . "\n" .
+			"pord=" . $photo['p_order'] . "\n" .
+			"albm=" . wppa_get_album_name( $photo['album'], array( 'raw' => true ) ) . "\n" .
+			"lnku=" . $photo['linkurl']."\n" .
+			"lnkt=" . $photo['linktitle']."\n" .
+			( $inc_usr ? "ownr=" . $photo['owner'] . "\n" : '' ) );
 
-/*
-					ext tinytext NOT NULL,
-					mean_rating tinytext NOT NULL,
-					linktarget tinytext NOT NULL,
-					timestamp tinytext NOT NULL,
-					status tinytext NOT NULL,
-					rating_count bigint(20) NOT NULL default 0,
-					tags tinytext NOT NULL,
-					alt tinytext NOT NULL,
-					filename tinytext NOT NULL,
-					modified tinytext NOT NULL,
-					location tinytext NOT NULL,
-*/
-
-			if ( $err ) {
-				/* translators: filenema */
-				wppa_error_message( sprintf( __( 'Cannot write to file %s.', 'wp-photo-album-plus' ) , $fname ) );
-				wppa_fclose( $file );
-				return false;
-			}
-			else {
-				wppa_fclose( $file );
-				if ( $wppa_zip ) {
-					$wppa_zip->addFile( $fname, basename( $fname ) );
-				}
-				$wppa_temp[$wppa_temp_idx] = $fname;
-				$wppa_temp_idx++;
-			}
+		if ( $wppa_zip ) {
+			$wppa_zip->addFile( $file, basename( $file ) );
+			$wppa_temp[$wppa_temp_idx] = $file;
+			$wppa_temp_idx++;
 		}
 		else {
 			wppa_error_message( __( 'Could not open photo output file.', 'wp-photo-album-plus' ) );

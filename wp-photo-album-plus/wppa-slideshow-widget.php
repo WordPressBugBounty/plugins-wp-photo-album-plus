@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a slideshow in the sidebar
-* Version: 9.0.10.006
+* Version: 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -179,9 +179,8 @@ class SlideshowWidget extends WP_Widget {
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
 		// Album
-		if ( ! wppa_has_many_albums() ) { // wppa_opt( 'photo_admin_max_albums' ) || wppa_opt( 'photo_admin_max_albums' ) >= wppa_get_count( WPPA_ALBUMS ) ) {
+		if ( ! wppa_has_many_albums() ) {
 			$body =
-//			'<option value="-2"' . ( $instance['album'] == '-2' ? ' selected' : '' ) . ' >' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>' .
 			wppa_album_select_a( array (
 											'selected' 	=> $instance['album'],
 											'path' 		=> true,

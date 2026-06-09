@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 9.1.10.011
+* Version 9.2.01.001
 *
 */
 
@@ -54,7 +54,7 @@ function wppa_decrypt_photo( $photo ) {
 global $wpdb;
 
 	// Assume single encrypted
-	$result = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $photo ) );
+	$result = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $photo ) );
 	if ( wppa_is_posint( $result ) ) {
 		return $result;
 	}
@@ -64,7 +64,7 @@ global $wpdb;
 		$crphoarr = explode( '.', $photo );
 		$ids = [];
 		foreach( $crphoarr as $crp ) {
-			$p = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $crp ) );
+			$p = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE crypt = %s", $crp ) );
 			if ( $p ) {
 				$ids[] = $p;
 			}
@@ -150,7 +150,7 @@ function wppa_decrypt_album( $album ) {
 global $wpdb;
 
 	// Assume single encrypted
-	$result = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $album ) );
+	$result = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $album ) );
 	if ( wppa_is_posint( $result ) ) {
 		return $result;
 	}
@@ -160,7 +160,7 @@ global $wpdb;
 		$cralbarr = explode( '.', $album );
 		$ids = [];
 		foreach( $cralbarr as $cra ) {
-			$a = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $cra ) );
+			$a = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE crypt = %s", $cra ) );
 			if ( $a ) {
 				$ids[] = $a;
 			}

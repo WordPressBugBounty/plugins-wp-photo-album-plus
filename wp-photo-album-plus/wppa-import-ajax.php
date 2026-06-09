@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the actual import functions
-* Version: 9.1.07.008
+* Version: 9.2.01.001
 *
 */
 
@@ -835,7 +835,7 @@ global $wpdb;
 
 		// Interprete and verify header. All fields from .csv MUST be in table fields, else fail
 		$csv_fields = str_getcsv( $header, wppa_opt( 'csv_sep' ) );
-		$db_fields  = wppa_get_results( "DESCRIBE " . $is_db_table . "" );
+		$db_fields  = $wpdb->get_results( $wpdb->prepare( "DESCRIBE %i", $is_db_table ) );
 
 		foreach( $csv_fields as $csv_field ) {
 			$ok = false;
@@ -870,14 +870,14 @@ global $wpdb;
 				$id = trim( current( $data_arr ) );
 				if ( wppa_is_int( $id ) && $id > 0 ) {
 
-					$existing_data = wppa_get_row( "SELECT * FROM " . $is_db_table . " WHERE id = $id" );
+					$existing_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM %i WHERE id = %d", $is_db_table, $id ), ARRAY_A );
 
 					// If entry exists:
 					// 1. save existing data,
 					// 2. remove entry,
 					if ( $existing_data ) {
 						$data = $existing_data;
-						wppa_query( "DELETE FROM " . $is_db_table . " WHERE id = $id" );
+						$wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE id = %d", $is_db_table, $id ) );
 					}
 
 					// Entry does not / no longer exist, add csv data to data array
@@ -1027,13 +1027,13 @@ global $wpdb;
 				$search = $data_arr[0];
 				switch ( strtolower($captions[0]) ) {
 					case 'photoname':
-						$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE name = %s", $data_arr[0] ) );
+						$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE name = %s", $data_arr[0] ), ARRAY_A );
 						break;
 					case 'filename':
-						$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE filename = %s", $data_arr[0] ) );
+						$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE filename = %s", $data_arr[0] ), ARRAY_A );
 						break;
 					case 'name':
-						$photos = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE name = %s OR filename = %s", $data_arr[0], $data_arr[0] ) );
+						$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE name = %s OR filename = %s", $data_arr[0], $data_arr[0] ), ARRAY_A );
 						break;
 					default:
 						wppa_log( 'err', 'Unimplemented captions[0]: ' . strtolower( $captions[0] ) . ' in wppa_import_photos()' );
@@ -1326,8 +1326,7 @@ global $wpdb;
 global $wppa_done;
 global $wppa_skip;
 
-	$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_realmedialibrary WHERE name = %s LIMIT 1", $name );
-	$rm_album = wppa_get_row( $query );
+	$rm_album = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_realmedialibrary WHERE name = %s LIMIT 1", $name ), ARRAY_A );
 	if ( ! $rm_album ) {
 		return; // It is not an rm album
 	}
@@ -1338,13 +1337,13 @@ global $wppa_skip;
 	$name 			= $rm_album['name'];
 
 	// Already created?
-	if ( wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE rml_id = $rm_album_id" ) ) {
+	if ( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE rml_id = %d", $rm_album_id ) ) ) {
 		wppa_import_quit( '9' );
 	}
 
 	// Not yet, create it
 	if ( $rm_parent > 0 ) {
-		$parent = wppa_get_var( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = $rm_parent" );
+		$parent = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = %d", $rm_parent ) );
 		if ( ! $parent ) {
 			wppa_import_quit( '29' ); // Missing parent album
 		}
@@ -1385,12 +1384,12 @@ global $wppa_skip;
 		}
 	}
 
-	$rml_posts = wppa_get_results( "SELECT * FROM $wpdb->wppa_realmedialibrary_posts" );
+	$rml_posts = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_realmedialibrary_posts", ARRAY_A );
 	$done = true;
 	foreach( $rml_posts as $rml_post ) {
 
 		$post_id = $rml_post['attachment'];
-		$wp_post = wppa_get_row( "SELECT * FROM $wpdb->posts WHERE ID = $post_id" );
+		$wp_post = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE ID = %d", $post_id ), ARRAY_A );
 
 		// Post found?
 		if ( ! $wp_post ) {
@@ -1406,7 +1405,7 @@ global $wppa_skip;
 		if ( $item_name == $name ) {
 
 			// Already converted?
-			$id = wppa_get_var( "SELECT id FROM $wpdb->wppa_photos WHERE rml_id = $post_id LIMIT 1" );
+			$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE rml_id = %d LIMIT 1", $post_id ) );
 
 			if ( $id ) {
 				$wppa_skip++;
@@ -1418,7 +1417,7 @@ global $wppa_skip;
 			$mime 			= $wp_post['post_mime_type'];
 			$wp_post_id 	= $wp_post['ID'];
 			$rml_album 		= $rml_post['fid'];
-			$album 			= wppa_get_var( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = $rml_album" );
+			$album 			= $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE rml_id = %d", $rml_album ) );
 			$desc 			= $wp_post['post_content'];
 			$ext 			= strtolower( wppa_get_ext( $file ) );
 
@@ -1426,7 +1425,7 @@ global $wppa_skip;
 
 				$id = '';
 
-				$entry_found = wppa_get_var( "SELECT id FROM $wpdb->wppa_photos WHERE rml_id = $post_id AND album = $album" );
+				$entry_found = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE rml_id = %d AND album = %d", $post_id, $album ) );
 
 				if ( ! $entry_found ) {
 

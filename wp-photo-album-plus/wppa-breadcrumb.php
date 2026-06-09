@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.1.12.003
+* Version 9.2.01.001
 *
 */
 
@@ -29,8 +29,7 @@ static $post_type_value;
 			$type = $post_type_value[$pid];
 		}
 		else {
-			$query = $wpdb->prepare( "SELECT post_type FROM $wpdb->posts WHERE ID = %s", $pid );
-			$type = wppa_get_var( $query );
+			$type = $wpdb->get_var( $wpdb->prepare( "SELECT post_type FROM $wpdb->posts WHERE ID = %s", $pid ) );
 			$post_type_value[$pid] = $type;
 		}
 		if ( $type == 'post' && ! wppa_switch( 'show_bread_posts' ) ) {
@@ -121,8 +120,7 @@ static $post_type_value;
 			$value = $post_page_value[$pid];
 		}
 		else {
-			$query = $wpdb->prepare( "SELECT post_title FROM $wpdb->posts WHERE post_status = 'publish' AND ID = %s LIMIT 0,1", $pid );
-			$value = wppa_get_var( $query );
+			$value = $wpdb->get_var( $wpdb->prepare( "SELECT post_title FROM $wpdb->posts WHERE post_status = 'publish' AND ID = %s LIMIT 0,1", $pid ) );
 			if ( $value ) {
 				$value = wppa_translate( stripslashes( $value ) );
 			}
@@ -201,8 +199,7 @@ static $post_type_value;
 						$value .= ' ' . __('of owner:', 'wp-photo-album-plus' ) . ' <b>' . $ss_data['3'] . '</b>';
 						break;
 					case 'i':
-						$query = $wpdb->prepare( "SELECT description FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", str_replace( 'H', '#', $ss_data['2'] ) );
-						$label = wppa_get_var( $query );
+						$label = $wpdb->get_var( $wpdb->prepare( "SELECT description FROM $wpdb->wppa_iptc WHERE tag = %s AND photo = 0", str_replace( 'H', '#', $ss_data['2'] ) ) );
 						$label = trim( $label, ':' );
 						$value .= ' ' . __('with iptc tag:', 'wp-photo-album-plus' ) . ' <b>' . wppa_translate($label) . '</b> ' . __('with content:', 'wp-photo-album-plus' ) .' <b>' . $ss_data['3'] . '</b>';
 						break;
@@ -763,8 +760,7 @@ global $wpdb;
 		$slide = '';
 	}
 
-	$query = $wpdb->prepare( "SELECT cover_linkpage FROM $wpdb->wppa_albums WHERE id = %s", $parent );
-	$pagid = wppa_get_var( $query );
+	$pagid = $wpdb->get_var( $wpdb->prepare( "SELECT cover_linkpage FROM $wpdb->wppa_albums WHERE id = %s", $parent ) );
 
 	$value 	= wppa_get_album_name( $parent );
 	$href 	=
@@ -794,8 +790,7 @@ static $parents;
 		$parent = $parents[$page];
 	}
 	else {
-		$query = $wpdb->prepare( "SELECT post_parent FROM $wpdb->posts WHERE post_type = 'page' AND post_status = 'publish' AND id = %s LIMIT 0,1", $page );
-		$parent = wppa_get_var(  $query );
+		$parent = $wpdb->get_var( $wpdb->prepare( "SELECT post_parent FROM $wpdb->posts WHERE post_type = 'page' AND post_status = 'publish' AND id = %s LIMIT 0,1", $page ) );
 		$parents[$page] = $parent;
 	}
 
@@ -803,8 +798,7 @@ static $parents;
 
 	wppa_crumb_page_ancestors( $parent );
 
-	$query = $wpdb->prepare( "SELECT post_title FROM " . $wpdb->posts . " WHERE post_type = 'page' AND post_status = 'publish' AND id = %s LIMIT 0,1", $parent );
-	$title = wppa_get_var( $query );
+	$title = $wpdb->get_var( $wpdb->prepare( "SELECT post_title FROM $wpdb->posts WHERE post_type = 'page' AND post_status = 'publish' AND id = %s LIMIT 0,1", $parent ) );
 
 	$title = wppa_translate( stripslashes( $title ) );
 	if ( ! $title ) {

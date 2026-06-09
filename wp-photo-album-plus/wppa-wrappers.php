@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.1.13.005
+* Version 9.2.01.003
 *
 */
 
@@ -517,6 +517,9 @@ global $wp_filesystem;
 		wppa_mktree( dirname( $path ) );
 	}
 
+	$wp_filesystem->put_contents( $path, $contents );
+
+/*
 	$fp = @fopen( $path, 'wb' );
 	if ( ! $fp )
 		return false;
@@ -537,7 +540,7 @@ global $wp_filesystem;
 //	}
 
 	wppa_chmod( $path );
-
+*/
 	return true;
 }
 
@@ -1116,6 +1119,7 @@ add_filter( 'safe_style_css', function( $styles ) {
 				'z-index',
 				'box-shadow',
 				'box-sizing',
+				'line-break',
 				];
 
     return array_merge( $styles, $my_styles );
@@ -1192,160 +1196,7 @@ function wppa_optimize_image( $file ) {
 		$p = ( $s0 - $s1 ) / $s0 * 100;
 		wppa_log( 'fso', str_replace( WPPA_CONTENT_PATH, '...', $file ) . ' optimized by ewww_image_optimizer. Compression: ' . sprintf( '%5.2f', $p ) . '%.' );
 	}
-
-//	if( ... ) {
-//	}
-
 }
-
-// Wrappers for direct db calls
-//
-// The following functions all produce in Plugin Check the following warnings:
-//
-// - Use of a direct database call is discouraged.
-// - Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().
-//
-// These messages are false positive, because wp has no other way to create/maintain structure,
-// insert, write or read data to/from db tables that are specifically designed for this plugin.
-//
-function wppa_get_results( $query = false, $form = ARRAY_A ) {
-global $wpdb;
-static $cache;
-global $wppa_query_cache_hit;
-
-	$wppa_query_cache_hit = false;
-	if ( !$query ) {
-		$cache = array();
-		return;
-	}
-	if ( !is_array( $cache ) ) $cache = array();
-	$idx = md5( $query );
-	if ( isset( $cache[$idx] ) ) {
-		$wppa_query_cache_hit = true;
-		return $cache[$idx];
-	}
-	wppa_log( 'db', $query );
-	$result = $wpdb->get_results( $query, $form );
-	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
-		$cache[$idx] = $result;
-	}
-	return $result;
-}
-
-function wppa_get_var( $query = false ) {
-global $wpdb;
-static $cache;
-global $wppa_query_cache_hit;
-
-	$wppa_query_cache_hit = false;
-	if ( !$query ) {
-		$cache = array();
-		return;
-	}
-	if ( !is_array( $cache ) ) $cache = array();
-	$idx = md5( $query );
-	if ( isset( $cache[$idx] ) ) {
-		$wppa_query_cache_hit = true;
-		return $cache[$idx];
-	}
-	wppa_log( 'db', $query );
-	$result = $wpdb->get_var( $query );
-	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
-		$cache[$idx] = $result;
-	}
-	return $result;
-}
-
-function wppa_get_col( $query = false ) {
-global $wpdb;
-static $cache;
-global $wppa_query_cache_hit;
-
-	$wppa_query_cache_hit = false;
-
-	if ( !$query ) {
-		$cache = array();
-		return;
-	}
-	if ( !is_array( $cache ) ) $cache = array();
-	$idx = md5( $query );
-	if ( isset( $cache[$idx] ) ) {
-		$wppa_query_cache_hit = true;
-		return $cache[$idx];
-	}
-	wppa_log( 'db', $query );
-	$result = $wpdb->get_col( $query );
-	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
-		$cache[$idx] = $result;
-	}
-	return $result;
-}
-
-function wppa_get_row( $query = false ) {
-global $wpdb;
-static $cache;
-global $wppa_query_cache_hit;
-
-	$wppa_query_cache_hit = false;
-	if ( !$query ) {
-		$cache = array();
-		return;
-	}
-	if ( !is_array( $cache ) ) $cache = array();
-	$idx = md5( $query );
-	if ( isset( $cache[$idx] ) ) {
-		$wppa_query_cache_hit = true;
-		return $cache[$idx];
-	}
-	wppa_log( 'db', $query );
-	$result = $wpdb->get_row( $query, ARRAY_A );
-	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
-		$cache[$idx] = $result;
-	}
-	return $result;
-}
-
-function wppa_query( $query = false ) {
-global $wpdb;
-static $cache;
-global $wppa_query_cache_hit;
-
-	$wppa_query_cache_hit = false;
-	if ( !$query ) {
-		$cache = array();
-		return;
-	}
-	if ( !is_array( $cache ) ) $cache = array();
-	$idx = md5( $query );
-	if ( isset( $cache[$idx] ) ) {
-		$wppa_query_cache_hit = true;
-		return $cache[$idx];
-	}
-	wppa_log( 'db', $query );
-	$result = $wpdb->query( $query );
-	if ( ! strpos( $query, 'wppa_session' ) ) { 	// Do not cache session queries
-		$cache[$idx] = $result;
-	}
-	return $result;
-}
-
-function wppa_clear_query_cache() {
-global $wppa_query_cache_hit;
-
-	$wppa_query_cache_hit = false;
-	wppa_get_results();
-	wppa_get_var();
-	wppa_get_row();
-	wppa_get_col();
-	wppa_query();
-}
-
-//function wppa_update( $table, $data, $where ) {
-//global $wpdb;
-
-//	wppa_log( 'db', "Update in table $table id = " . $where['id'] ); // . ": " . var_export( $data, true ) );
-//	return $wpdb->update( $table, $data, $where );
-//}
 
 function wppa_insert( $table, $data ) {
 global $wpdb;
@@ -1372,4 +1223,63 @@ function wppa_check_filetype_and_ext( $temp_name, $name, $mimetypes ) {
 	else {
 		return wp_check_filetype_and_ext( $temp_name, $name, $mimetypes );
 	}
+}
+
+function wppa_show_query() {
+global $wpdb;
+
+	// Are we enabled?
+	if ( ! current_user_can( 'administrator' ) ) return;
+	if ( ! in_array( wppa_opt( 'print_debug' ), ['all', 'queries'] ) ) return;
+
+	// Yes
+	$stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 3 );
+	$result = $wpdb->last_result;
+	$count = count( $result );
+	if ( $count == 1 ) {
+		$temp = var_export( $result, true );
+		$temp = trim( str_replace( ["array", "(object)", "array", "COUNT(*)", "=>", "(0 ", "0", "(", ")", "'", '"', " ", ",", ], '', $temp ) );
+		$res = $temp;
+		$brackets = [' (',') '];
+	}
+	else {
+		$res = $count;
+		$brackets = [' [','] '];
+	}
+	is_array( $wpdb->last_result ) ? count( $wpdb->last_result ) : $wpdb->last_result;
+	$qu = ( defined( 'DOING_WPPA_AJAX' ) ? 'A ' : '' ) . basename( $stack[0]['file'] ) . ' ' . $stack[0]['line'] . ': ' . $wpdb->last_query . $brackets[0] . $res . $brackets[1];
+	$msg = '<span style="line-break: anywhere; color: darkblue;">' . $qu . '</span><br>';
+	if ( wppa( 'in_widget' ) || ( is_admin() && ! defined( 'DOING_AJAX' )  ) ) {
+		wppa_echo( $msg );
+	}
+	else {
+		wppa_out( $msg );
+	}
+}
+
+function wppa_log_query( $result = false ) {
+global $wpdb;
+
+	// Are we enabled?
+	if ( ! current_user_can( 'administrator' ) ) return;
+	if ( ! in_array( wppa_opt( 'print_debug' ), ['all', 'queries'] ) ) return;
+
+	// Yes
+	$stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 3 );
+	if ( $result === false ) $count = '';
+	elseif ( wppa_is_int( $result ) ) $count = $result;
+	elseif ( is_array( $result ) ) $count = count( $result );
+	$qu = ( defined( 'DOING_WPPA_AJAX' ) ? 'A ' : 'S ' ) . basename( $stack[0]['file'] ) . ' ' . $stack[0]['line'] . ': ' . $wpdb->last_query . ( $count ? ' (' . $count . ')' : '' );
+	wppa_log( 'db', $qu );
+}
+
+function wppa_show_url( $url ) {
+
+	// Are we enabled?
+	if ( ! current_user_can( 'administrator' ) ) return;
+	if ( ! in_array( wppa_opt( 'print_debug' ), ['all', 'urls'] ) ) return;
+
+	// Yes
+	$url = ( defined( 'DOING_WPPA_AJAX' ) ? 'A ' : 'S ' ) . $url;
+	wppa_out( '<span style="line-break: anywhere; color: brown;">' . $url . '</span><br>' );
 }

@@ -3,7 +3,7 @@
 /*
 /* Contains all wppa smart cache functions
 /*
-/* Version 9.0.00.000
+/* Version 9.2.01.001
 */
 
 // Test for caching
@@ -170,8 +170,7 @@ global $wpdb;
 					foreach( $caches as $cache ) {
 						if ( wppa_filetime( $cache ) < ( time() - 300 ) ) {
 							wppa_unlink( $cache );
-							$query = $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE filename = %s", str_replace( WPPA_CONTENT_PATH, '...', $cache ) );
-							$iret = wppa_query( $query );
+							$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE filename = %s", str_replace( WPPA_CONTENT_PATH, '...', $cache ) ) );
 						}
 					}
 				}
@@ -183,8 +182,7 @@ global $wpdb;
 	if ( ! $albums && ! $photos && ! $other ) {
 
 		// Last resort: assume generic or separate toplevel
-		$query  = "SELECT id FROM $wpdb->wppa_albums WHERE a_parent < 1 ORDER BY id";
-		$albs   = wppa_get_col( $query );
+		$albs   = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE a_parent < 1 ORDER BY id" );
 		$albums = implode( '.', $albs );
 	}
 	if ( ! $page ) {
@@ -295,80 +293,72 @@ global $wpdb;
 	$page 		= $args['page'];
 	$other 		= $args['other'];
 
+	$sep 	= '.';
+	$wild 	= '%';
+	
 	// Album based
 	if ( $album != '' ) {
 
-		$query = "SELECT filename FROM $wpdb->wppa_caches WHERE albums LIKE '%.$album.%' OR albums = '.*.'";
-		$files = wppa_get_col( $query );
+		$files = $wpdb->get_col( $wpdb->prepare( "SELECT filename FROM $wpdb->wppa_caches WHERE albums LIKE %s OR albums = '.*.'", $wild.$wpdb->esc_like($sep.$album.$sep).$wild ) );
 		foreach( $files as $file ) {
 			$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 			if ( wppa_is_file( $path ) ) {
 				wppa_unlink( $path, true );
 			}
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE albums LIKE '%.$album.%' OR albums = '.*.'";
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE albums LIKE %s OR albums = '.*.'", $wild.$wpdb->esc_like($sep.$album.$sep).$wild ) );
 	}
 
 	// Photo based
 	if ( $photo != '' ) {
 
-		$query = "SELECT filename FROM $wpdb->wppa_caches WHERE photos LIKE '%.$photo.%' OR photos = '.*.'";
-		$files = wppa_get_col( $query );
+		$files = $wpdb->get_col( $wpdb->prepare( "SELECT filename FROM $wpdb->wppa_caches WHERE photos LIKE %s OR photos = '.*.'", $wild.$wpdb->esc_like($sep.$photo.$sep).$wild ) );
 		foreach( $files as $file ) {
 			$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 			if ( wppa_is_file( $path ) ) {
 				wppa_unlink( $path, true );
 			}
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE photos LIKE '%.$photo.%' OR photos = '.*.'";
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE photos LIKE %s OR photos = '.*.'", $wild.$wpdb->esc_like($sep.$photo.$sep).$wild ) );
 	}
 
 	// All albums
 	if ( $albums ) {
 
-		$query = "SELECT filename FROM $wpdb->wppa_caches WHERE albums <> '..'";
-		$files = wppa_get_col( $query );
+		$files = $wpdb->get_col( "SELECT filename FROM $wpdb->wppa_caches WHERE albums <> '..'" );
 		foreach( $files as $file ) {
 			$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 			if ( wppa_is_file( $path ) ) {
 				wppa_unlink( $path, true );
 			}
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE albums <> '..'";
-		wppa_query( $query );
+		$wpdb->query( "DELETE FROM $wpdb->wppa_caches WHERE albums <> '..'" );
 	}
 
 	// All photos
 	if ( $photos ) {
 
-		$query = "SELECT filename FROM $wpdb->wppa_caches WHERE photos <> '..'";
-		$files = wppa_get_col( $query );
+		$files = $wpdb->get_col( "SELECT filename FROM $wpdb->wppa_caches WHERE photos <> '..'" );
 		foreach( $files as $file ) {
 			$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 			if ( wppa_is_file( $path ) ) {
 				wppa_unlink( $path, true );
 			}
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE photos <> '..'";
-		wppa_query( "DELETE FROM $wpdb->wppa_caches WHERE photos <> '..'" );
+		$wpdb->query( "DELETE FROM $wpdb->wppa_caches WHERE photos <> '..'" );
 	}
 
 	// Page based
 	if ( $page ) {
 
-		$p = strval( intval( $page ) );
-		$query = "SELECT filename FROM $wpdb->wppa_caches WHERE page = $p";
-		$files = wppa_get_col( $query );
+		$files = $wpdb->get_col( $wpdb->prepare( "SELECT filename FROM $wpdb->wppa_caches WHERE page = %d", $page ) );
 		foreach( $files as $file ) {
 			$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 			if ( wppa_is_file( $path ) ) {
 				wppa_unlink( $path, true );
 			}
 		}
-		$query = $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE page = %d", $p );
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE page = %d", $page ) );
 	}
 
 	// Clear all shortcode caches
@@ -378,8 +368,7 @@ global $wpdb;
 		if ( wppa_is_dir( $root ) ) {
 			wppa_tree_empty( $root );
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE filename LIKE '%/wppa-shortcode/%'";
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE filename LIKE %s", $wild.$wpdb->esc_like('/wppa-shortcode/').$wild ) );
 		wppa_log( 'fso', 'All wppa shortcode caches cleared' );
 	}
 
@@ -390,24 +379,21 @@ global $wpdb;
 		if ( wppa_is_dir( $root ) ) {
 			wppa_tree_empty( $root );
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE filename LIKE '%/wppa-widget/%'";
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE filename LIKE %s", $wild.$wpdb->esc_like('/wppa-widget/').$wild ) );
 		wppa_log( 'fso', 'All wppa widget caches cleared' );
 	}
 
 	// Clear Other caches
 	if ( $other ) {
 
-		$query = "SELECT filename FROM $wpdb->wppa_caches WHERE other = '$other'";
-		$files = wppa_get_col( $query );
+		$files = $wpdb->get_col( $wpdb->prepare( "SELECT filename FROM $wpdb->wppa_caches WHERE other = %s", $other ) );
 		foreach( $files as $file ) {
 			$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 			if ( wppa_is_file( $path ) ) {
 				wppa_unlink( $path, true );
 			}
 		}
-		$query = "DELETE FROM $wpdb->wppa_caches WHERE other = '$other'";
-		wppa_query( $query );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE other = %s", $other ) );
 	}
 
 	// Always clear non-wppa cache
@@ -491,17 +477,17 @@ function wppa_remove_widget_cache( $widget_id ) {
 global $wpdb;
 
 	if ( ! $widget_id ) return;
+	
+	$wild 	= '%';
 
-	$query = "SELECT filename FROM $wpdb->wppa_caches WHERE filename LIKE '%$widget_id%'";
-	$files = wppa_get_col( $query );
+	$files = $wpdb->get_col( $wpdb->prepare( "SELECT filename FROM $wpdb->wppa_caches WHERE filename LIKE %s", $wild.$wpdb->esc_like($widget_id).$wild ) );
 	foreach ( $files as $file ) {
 		$path = str_replace( '...', WPPA_CONTENT_PATH, $file );
 		if ( wppa_is_file( $path ) ) {
 			wppa_unlink( $path, true );
 		}
 	}
-	$query = "DELETE FROM $wpdb->wppa_caches WHERE filename LIKE '%$widget_id%'";
-	wppa_query( $query );
+	$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_caches WHERE filename LIKE %s", $wild.$wpdb->esc_like($widget_id).$wild ) );
 }
 
 // Cache admin page
@@ -572,8 +558,7 @@ global $wpdb;
 					if ( wppa_get( 'delete' ) ) {
 						wppa_unlink( $file, false );
 					}
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_caches WHERE filename = %s", str_replace( WPPA_CONTENT_PATH, '...', $file ) );
-					$meta = wppa_get_row( $query );
+					$meta = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_caches WHERE filename = %s", str_replace( WPPA_CONTENT_PATH, '...', $file ) ) );
 					if ( ! $meta ) {
 						$meta['albums'] = '';
 						$meta['photos'] = '';

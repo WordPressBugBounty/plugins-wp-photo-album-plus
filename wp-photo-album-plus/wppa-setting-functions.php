@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 9.1.11.001
+* Version 9.2.01.001
 *
 */
 
@@ -631,7 +631,7 @@ global $wppa_opt;
 	$slug = substr( $xslug, 5 );
 
 	// If page vanished, update to 0
-	$iret = wppa_get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts
+	$iret = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts
 											 WHERE post_type = 'page'
 											 AND post_status = 'publish'
 											 AND ID = %s", wppa_opt( $slug )));
@@ -1051,7 +1051,7 @@ function wppa_get_potd_preview_html( $photo ) {
 		}
 		else {
 			$html = wppa_html_tag( 'div', ['id' => "potdpreview", 'style' => "display:inline-block;width:25%;text-align:center;float:left"],
-						wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "width:180px;"] ) );
+						wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $photo['id'] ), 'style' => "width:180px;height:auto;"] ) );
 		}
 		$html .= '
 			<div style="display:inline-block;width:75%;text-align:center;vertical-align:middle">' .
@@ -1089,13 +1089,10 @@ function wppa_get_potd_pool_html() {
 
 					// Get the photos
 					$alb 	= wppa_opt( 'potd_album' );
-					$opt 	= wppa_is_int( $alb ) ? ' ' . wppa_get_photo_order( $alb ) . ' ' : '';
-					$cnt 	= wppa_get_widgetphotos( $alb, 'count' );
-					if ( $cnt < 101 ) {
-						$photos = wppa_get_widgetphotos( $alb, $opt );
-					}
-					else {
-						$photos = array();
+					$photos = wppa_get_widgetphotos( $alb );
+					$cnt = count( $photos );
+					if ( $cnt > 100 ) {
+						$photos = [];
 					}
 
 					// See if we do this
@@ -1110,7 +1107,7 @@ function wppa_get_potd_pool_html() {
 
 						// Yes, display the pool
 						foreach ( $photos as $photo ) {
-							$id = $photo['id'];
+							$id = $photo;//['id'];
 
 							// Open container div
 							$html .= '
@@ -1133,7 +1130,9 @@ function wppa_get_potd_pool_html() {
 									// The image if a photo
 									else {
 										$html .= wppa_html_tag( 'img', ['src' => wppa_get_thumb_url( $id ),
-																		'style' => "max-width:180px;max-height:135px;margin:auto;",
+																		'width' => wppa_get_photo_item( $id, 'thumbx' ),
+																		'height' => wppa_get_photo_item( $id, 'thumby' ),
+																		'style' => "max-width:180px;max-height:135px;margin:auto;width:auto;height:auto;",
 																		'alt' => wppa_get_photo_name( $id )] );
 										// Audio ?
 										if ( wppa_has_audio( $id ) ) {
@@ -1156,7 +1155,7 @@ function wppa_get_potd_pool_html() {
 									<div
 										style="font-size:9px; line-height:10px;float:left"
 										>
-										(#' . strval( intval( $photo['p_order'] ) ) . ')
+										(#' . wppa_get_photo_item( $photo, 'p_order' ) . ')
 									</div>';
 
 									if ( wppa_get_option( 'wppa_potd_method' ) == 1 ) { 	// Only if fixed photo

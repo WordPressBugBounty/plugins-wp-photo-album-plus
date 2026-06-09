@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 9.0.00.005
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -56,9 +56,7 @@ class FeaTenWidget extends WP_Widget {
 
 			// Owner/public
 			case '-3':
-				$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
-											 WHERE status = 'featured'
-											 ORDER BY RAND(" . wppa_get_randseed( 'session' ) . ")" );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d)", wppa_get_randseed( 'session' ) ), ARRAY_A );
 				if ( $temp ) {
 					$c = 0;
 					$thumbs = array();
@@ -78,9 +76,7 @@ class FeaTenWidget extends WP_Widget {
 
 			// Generic
 			case '-2':
-				$temp = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
-											 WHERE status = 'featured'
-											 ORDER BY RAND(" . wppa_get_randseed( 'session' ) . ")" );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d)", wppa_get_randseed( 'session' ) ), ARRAY_A );
 				if ( $temp ) {
 					$c = 0;
 					$thumbs = array();
@@ -99,15 +95,13 @@ class FeaTenWidget extends WP_Widget {
 
 			// All
 			case 0:
-				$thumbs = wppa_get_results( "SELECT * FROM $wpdb->wppa_photos
-											   WHERE status = 'featured'
-											   ORDER BY RAND(" . wppa_get_randseed( 'session' ) . ") LIMIT " . $max );
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d) LIMIT %d", wppa_get_randseed( 'session' ), $max ), ARRAY_A );
 				break;
 
 			// Album spec
 			default:
 				if ( wppa_is_album_visible( $album ) ) {
-					$thumbs = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' AND album = %d ORDER BY RAND(%d) LIMIT %d", $album, wppa_get_randseed( 'session' ), $max ) );
+					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' AND album = %d ORDER BY RAND(%d) LIMIT %d", $album, wppa_get_randseed( 'session' ), $max ), ARRAY_A );
 				}
 				else {
 					$thumbs = array();

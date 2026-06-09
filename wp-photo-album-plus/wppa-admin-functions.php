@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.1.09.003
+* Version: 9.2.01.003
 *
 */
 
@@ -129,8 +129,7 @@ global $wpdb;
 	// Find the album( s ) if any
 	if ( ! $alb && ! $pid ) {
 		$start_time = wppa_get_option( 'wppa_remake_start', 0 );
-		$query = "SELECT id FROM $wpdb->wppa_albums";
-		$albums = wppa_get_results( $query );
+		$albums = $wpdb->get_results( "SELECT id FROM $wpdb->wppa_albums", ARRAY_A );
 	}
 	elseif ( $alb ) {
 		$start_time = wppa_get_option( 'wppa_remake_start_album_'.$alb, 0 );
@@ -146,11 +145,8 @@ global $wpdb;
 			if ( $files ) foreach ( $files as $file ) {
 				if ( ! wppa_is_dir( $file ) ) {
 					$filename = basename( $file );
-					$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE filename = %s OR filename = %s OR ( filename = '' AND name = %s )",
-											 $filename,
-											 wppa_strip_ext( $filename ) . '.xxx',	// May be a multimedia iten
-											 $filename );
-					$photos = wppa_get_results( $query );
+					$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE filename = %s OR filename = %s OR ( filename = '' AND name = %s )",
+																  $filename, wppa_strip_ext( $filename ) . '.xxx', $filename ), ARRAY_A );
 
 					if ( $photos ) foreach ( $photos as $photo ) {	// Photo exists
 						$modified_time = $photo['modified'];
@@ -178,8 +174,7 @@ global $wpdb;
 
 	// Do it with a single photo
 	elseif ( $pid ) {
-		$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $pid );
-		$photo = wppa_get_row( $query );
+		$photo = wppa_cache_photo( $pid );
 		if ( $photo ) {
 			$file = wppa_get_o1_source_path( $photo['id'] );
 			if ( ! wppa_is_file( $file ) ) {
@@ -258,8 +253,7 @@ global $wpdb;
 
 	$err = '2';
 	// Find photo details
-	$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $photoid );
-	$photo = wppa_get_row( $query );
+	$photo = wppa_cache_photo( $photoid );
 	if ( ! $photo ) return $err;
 
 	$albumfrom 	= $photo['album'];
@@ -373,8 +367,7 @@ global $wpdb;
 function wppa_copy_exif( $fromphoto, $tophoto ) {
 global $wpdb;
 
-	$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo = %d", $fromphoto );
-	$exiflines = wppa_get_results( $query );
+	$exiflines = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo = %d", $fromphoto ), ARRAY_A );
 	if ( $exiflines ) foreach ( $exiflines as $line ) {
 		$bret = wppa_create_exif_entry( array( 'photo' => $tophoto, 'tag' => $line['tag'], 'description' => $line['description'], 'status' => $line['status'] ) );
 	}
@@ -382,8 +375,7 @@ global $wpdb;
 function wppa_copy_iptc( $fromphoto, $tophoto ) {
 global $wpdb;
 
-	$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = %d", $fromphoto );
-	$iptclines = wppa_get_results( $query );
+	$iptclines = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = %d", $fromphoto ), ARRAY_A );
 	if ( $iptclines ) foreach ( $iptclines as $line ) {
 		$bret = wppa_create_iptc_entry( array( 'photo' => $tophoto, 'tag' => $line['tag'], 'description' => $line['description'], 'status' => $line['status'] ) );
 	}
@@ -398,8 +390,7 @@ global $wpdb;
 
 	// Get the ext
 	$err = '2';
-	$query = $wpdb->prepare( "SELECT ext FROM $wpdb->wppa_photos WHERE id = %d", $id );
-	$ext = wppa_get_var( $query );
+	$ext = $wpdb->get_var( $wpdb->prepare( "SELECT ext FROM $wpdb->wppa_photos WHERE id = %d", $id ) );
 	if ( ! $ext ) return $err;
 
 	// Get the image
@@ -560,8 +551,7 @@ function _wppa_sanitze_files( $root, $from = '' ) {
 function wppa_update_single_photo( $file, $id, $name, $nothumb = false ) {
 global $wpdb;
 
-	$query = $wpdb->prepare( "SELECT id, name, ext, album, filename FROM $wpdb->wppa_photos WHERE id = %s", $id );
-	$photo = wppa_get_row( $query );
+	$photo = $wpdb->get_row( $wpdb->prepare( "SELECT id, name, ext, album, filename FROM $wpdb->wppa_photos WHERE id = %s", $id ), ARRAY_A );
 
 	// Find extension
 	$ext = $photo['ext'];
@@ -603,28 +593,26 @@ global $allphotos;
 
 	// If alb given, get the entry
 	if ( $alb ) {
-		$query = $wpdb->prepare(
+		$photos = $wpdb->get_results( $wpdb->prepare(
 				"SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND (filename = %s OR filename = %s OR ( filename = '' AND name = %s ) OR ( filename = %s ) )",
 				$alb,
 				wppa_sanitize_file_name( basename( $file ) ),								// Usual
 				$name,																		// Filename is different in is_wppa_tree import
 				$name,																		// Old; pre saving filenames
 				wppa_strip_ext( wppa_sanitize_file_name( basename( $file ) ) ) . '.xxx'		// Media poster file
-			);
+			), ARRAY_A );
 	}
 
 	// Find photo entries that apply to the supplied filename
 	else {
-		$query = $wpdb->prepare(
+		$photos = $wpdb->get_results( $wpdb->prepare(
 				"SELECT * FROM $wpdb->wppa_photos WHERE filename = %s OR filename = %s OR ( filename = '' AND name = %s ) OR ( filename = %s )",
 				wppa_sanitize_file_name( basename( $file ) ),								// Usual
 				$name,																		// Filename is different in is_wppa_tree import
 				$name,																		// Old; pre saving filenames
 				wppa_strip_ext( wppa_sanitize_file_name( basename( $file ) ) ) . '.xxx'		// Media poster file
-			);
+			), ARRAY_A );
 	}
-
-	$photos = wppa_get_results( $query );
 
 	// If photo entries found, process them all
 	if ( $photos ) {
@@ -896,8 +884,7 @@ global $wpdb;
 	$result = '';
 
 	// Get the fieldnames
-	$query = "DESCRIBE $table";
-	$fields = wppa_get_results( $query );
+	$fields = $wpdb->get_results( "DESCRIBE $table", ARRAY_A );
 
 	// Write the .csv header
 	if ( is_array( $fields ) ) {
@@ -909,15 +896,13 @@ global $wpdb;
 	wppa_fwrite( $file, $result );
 
 	// Init getting the data
-	$query = "SELECT COUNT(*) FROM $table";
-	$count = wppa_get_var( $query );
+	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $table" );
 	$iters = ceil( $count / 1000 );
 	$iter  = 0;
 
 	// Read chunks of 1000 rows
 	while ( $iter < $iters ) {
-		$query = "SELECT * FROM $table ORDER BY id LIMIT " . 1000 * $iter . ",1000";
-		$data  = wppa_get_results( $query, ARRAY_N );
+		$data  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i ORDER BY id LIMIT %d %d", $table, 1000 * $iter, 1000 ), ARRAY_N );
 
 		// Process rows
 		if ( $data ) {
@@ -940,16 +925,16 @@ global $wpdb;
 function wppa_album_admin_footer() {
 global $wpdb;
 
-	$query 			= "SELECT COUNT(*) FROM $wpdb->wppa_albums";
-	$albcount 		= wppa_get_var( $query );
-	$query 			= "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE a_parent = 0";
-	$topalbumcount 	= wppa_get_var( $query );
-	$query 			= "SELECT COUNT(*) FROM $wpdb->wppa_photos";
-	$photocount 	= wppa_get_var( $query );
-	$query 			= "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending'";
-	$pendingcount 	= wppa_get_var( $query );
-	$query 			= "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'scheduled'";
-	$schedulecount 	= wppa_get_var( $query );
+	$albcount 		= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums" );
+	wppa_show_query();
+	$topalbumcount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE a_parent = 0" );
+	wppa_show_query();
+	$photocount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
+	wppa_show_query();
+	$pendingcount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending'" );
+	wppa_show_query();
+	$schedulecount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'scheduled'" );
+	wppa_show_query();
 
 	$result = '
 	<div style="clear:both;display:block">' .
@@ -967,14 +952,12 @@ global $wpdb;
 			$result .= sprintf( __( '<strong>%d</strong> items are scheduled for later publishing.', 'wp-photo-album-plus' ), $pendingcount ) . '<br>';
 		}
 
-		$query 		= "SELECT id, name FROM $wpdb->wppa_albums ORDER BY id DESC LIMIT 1";
-		$lastalbum 	= wppa_get_row( $query );
+		$lastalbum 	= $wpdb->get_row( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY id DESC LIMIT 1", ARRAY_A );
 		if ( $lastalbum ) {
 			/* translators: name of album, id of album */
 			$result .= '<br>' . sprintf( __( 'The most recently added album is <strong>%1$s</strong> (%2$d).', 'wp-photo-album-plus' ), esc_html( stripslashes( $lastalbum['name'] ) ), $lastalbum['id'] );
 		}
-		$query 		= "SELECT id, name, album FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1";
-		$lastphoto 	= wppa_get_row( $query );
+		$lastphoto 	= $wpdb->get_row( "SELECT id, name, album FROM $wpdb->wppa_photos ORDER BY timestamp DESC LIMIT 1", ARRAY_A );
 		if ( ! $lastphoto ) {
 			$result .= '<br>' . __( 'There are no items yet', 'wp-photo-album-plus' );
 			return $result;
@@ -988,8 +971,7 @@ global $wpdb;
 			$album = $lastphoto['album'];
 		}
 
-		$query = $wpdb->prepare( "SELECT id, name FROM $wpdb->wppa_albums WHERE id = %s", $album );
-		$lastphotoalbum = wppa_get_row( $query );
+		$lastphotoalbum = $wpdb->get_row( $wpdb->prepare( "SELECT id, name FROM $wpdb->wppa_albums WHERE id = %s", $album ), ARRAY_A );
 		if ( $lastphoto ) {
 			/* translators: name of item, id of item */
 			$result .= '<br>' . sprintf( __( 'The most recently added item is <strong>%1$s</strong> (%2$d)', 'wp-photo-album-plus' ), sanitize_text_field( $lastphoto['name'] ), $lastphoto['id'] );
@@ -1453,8 +1435,7 @@ global $wpdb;
 		$name 		= wppa_get_photo_name( $id );
 		$album_name = $name ? $name : wppa_strip_ext( wppa_get_photo_item( $id, 'filename' ) );
 		$parent 	= wppa_get_photo_item( $id, 'album' );
-		$query 		= $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s AND a_parent = %d LIMIT 1", $name, $parent );
-		$alb 		= wppa_get_var( $query );
+		$alb 		= $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s AND a_parent = %d LIMIT 1", $name, $parent ) );
 		$result['album'] = $alb;
 	}
 	$result['crashed'] =

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 9.1.13.004
+* Version: 9.2.01.001
 *
 */
 
@@ -37,14 +37,12 @@ function wppa_add_admin() {
 
 	// See if there are comments pending moderation
 	$com_pending = '';
-	$query = "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'pending' OR status = 'spam' OR status = ''";
-	$com_pending_count = wppa_get_var( $query );
+	$com_pending_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status IN ('pending', 'spam', '')" );
 	if ( $com_pending_count ) $com_pending = '<span class="update-plugins"><span class="plugin-count">' . $com_pending_count . '</span></span>';
 
 	// See if there are uploads pending moderation
 	$upl_pending = '';
-	$query = "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending' AND album > 0";
-	$upl_pending_count = wppa_get_var( $query );
+	$upl_pending_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending' AND album > 0" );
 	if ( $upl_pending_count ) $upl_pending = '<span class="update-plugins"><span class="plugin-count">' . $upl_pending_count . '</span></span>';
 
 	// Compute total pending moderation
@@ -537,19 +535,16 @@ global $wpdb;
 		$user = get_user_by( 'ID', $user_id );
 		$user_login = $user->user_login;
 
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE owner = %s", $user_login );
-		$photos = wppa_get_col( $query );
+		$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE owner = %s", $user_login ) );
 		if ( $photos ) foreach( $photos as $photo ) {
 			wppa_delete_photo( $photo );
 		}
 
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE owner = %s", $user_login );
-		$albums = wppa_get_col( $query );
+		$albums = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE owner = %s", $user_login ) );
 		if ( $albums ) foreach( $albums as $album ) {
 
 			// If album is empty: remove it
-			$query = "SELECT COUNT (*) FROM WPPA_PHOTOS WHERE album = $album";
-			$is_empty = ( 0 == wppa_get_var( $query ) );
+			$is_empty = ( 0 == $wpdb->get_var( $wpdb->prepare( "SELECT COUNT (*) FROM WPPA_PHOTOS WHERE album = %d", $album ) ) );
 			if ( $is_empty ) {
 				wppa_del_row( WPPA_ALBUMS, 'id', $album );
 			}

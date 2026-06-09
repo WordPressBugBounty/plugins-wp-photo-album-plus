@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version: 9.0.00.000
+* Version: 9.2.01.001
 *
 */
 
@@ -148,11 +148,7 @@ class SearchPhotos extends WP_Widget {
 		$values  	= array( 0 );
 		$disabled 	= array( false );
 
-		$query = 	"SELECT ID, post_title, post_content, post_parent " .
-					"FROM " . $wpdb->posts . " " .
-					"WHERE post_type = 'page' AND post_status = 'publish' " .
-					"ORDER BY post_title ASC";
-		$pages = 	wppa_get_results( $query );
+		$pages = 	$wpdb->get_results( "SELECT ID, post_title, post_content, post_parent FROM $wpdb->posts WHERE post_type = 'page' AND post_status = 'publish' ORDER BY post_title ASC", ARRAY_A );
 
 		if ( $pages ) {
 

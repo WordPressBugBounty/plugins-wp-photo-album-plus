@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the photo of the day widget
-* Version 9.1.13.002
+* Version 9.2.01.003
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -125,8 +125,8 @@ class PhotoOfTheDay extends WP_Widget {
 			// The counter
 			if ( wppa_switch( 'potd_counter' ) ) { 	// If we want this
 
-				$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d", $alb );
-				$c = wppa_get_var( $query ) - 1;
+				$c = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d", $alb ) ) - 1;
+				wppa_show_query();
 				if ( $c > 0 ) {
 					if ( wppa_opt( 'potd_counter_link' ) == 'thumbs' ) {
 						$lnk = wppa_get_album_url( array( 'album' => $alb,

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* version 9.1.12.005
+* version 9.2.01.001
 *
 */
 
@@ -59,8 +59,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 		// Pagination
 		$parms 		= wppa_get_paging_parms( 'comment_admin' );
 		$reload_url = get_admin_url() . 'admin.php?page=wppa_manage_comments';
-		$query 		= "SELECT COUNT(*) FROM $wpdb->wppa_comments " . wppa_get_comadmin_sel_filter();
-		$total 		= wppa_get_var( $query );
+		$total 		= wppa_get_comment_admin_items( true );
 		wppa_admin_pagination( $parms['pagesize'], $parms['page'], $total, $reload_url,'top' );
 	}
 
@@ -242,16 +241,15 @@ class WPPA_Comment_table extends WPPA_List_Table {
 	function process_bulk_action() {
 		global $wpdb;
 
-		$ids = (array) wppa_get( 'commentids' );
+		$ids = (array) wppa_get( 'commentids', '', 'text' );
 
 		$current_action = $this->current_action();
 
 		if ( $current_action && $ids ) {
 
 			foreach( $ids as $id ) {
-
-				$query = $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %s", $id );
-				$photo = wppa_get_var( $query );
+				
+				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %s", $id ) );
 
 				// Delete
 				if ( 'delete' === $current_action || 'deletesingle' === $current_action ) {
@@ -302,7 +300,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 		global $wpdb;
 
 		$parms 		= wppa_get_paging_parms( 'comment_admin' );
-		$per_page 	= $parms['pagesize'];
+//		$per_page 	= $parms['pagesize'];
 		$columns 	= $this->get_columns();
 		$hidden 	= array();
 		$sortable 	= $this->get_sortable_columns();
@@ -310,13 +308,13 @@ class WPPA_Comment_table extends WPPA_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		$this->process_bulk_action();
 
-		$filter 	= wppa_get_comadmin_sel_filter();
-		$query 			= "SELECT COUNT(*) FROM $wpdb->wppa_comments " . $filter;
-		$total_items 	= wppa_get_var( $query );
-		$limit 			= ( $parms['page'] - 1 ) * $parms['pagesize'] . "," . $parms['pagesize'];
-		$query 			=  "SELECT * FROM $wpdb->wppa_comments " . $filter . " ORDER BY " . $parms['order'] . " " . $parms['dir'] . " LIMIT " . $limit;
-		$data 			= wppa_get_results( $query );
+//		$filter 	= wppa_get_comadmin_sel_filter();
+//		$total_items 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments " . $filter );
+//		$limit 			=  . "," . ;
+//		$data 			= $wpdb->get_results( "SELECT * FROM $wpdb->wppa_comments " . $filter . " ORDER BY " . $parms['order'] . " " . $parms['dir'] . " LIMIT " . $limit, ARRAY_A );
 
+		$data = wppa_get_comment_admin_items( false, $parms['page'], $parms['pagesize'] );
+		
 		$this->items 	= $data;
 
 		// Disable wp pagination, we do our selbes
@@ -375,22 +373,22 @@ global $wpdb;
 				<tbody>
 					<tr>
 						<td style="margin:0;font-weight:bold;color:#777777">' . __( 'Total:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0;font-weight:bold">' . wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments" ) . '</td>
+						<td style="margin:0;font-weight:bold">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments" ) . '</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td style="margin:0;font-weight:bold;color:green">' . __( 'Approved:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0;font-weight:bold">' . wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'approved'" ) . '</td>
+						<td style="margin:0;font-weight:bold">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'approved'" ) . '</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td style="margin:0;font-weight:bold;color:#e66f00">' . __( 'Pending:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0;font-weight:bold">' . wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'pending' OR status = ''" ) . '</td>
+						<td style="margin:0;font-weight:bold">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'pending' OR status = ''" ) . '</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td style="margin:0;font-weight:bold;color:red">' . __( 'Spam:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0;font-weight:bold">' . wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'spam'" ) . '</td>
+						<td style="margin:0;font-weight:bold">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'spam'" ) . '</td>
 						<td></td>
 					</tr>' );
 					if ( $spamtime ) {
@@ -424,6 +422,74 @@ global $wpdb;
 	</div>' );
 }
 
+function wppa_get_comment_admin_items( $count_only = false, $page = 1, $pagesize = 10000 ) {
+global $wpdb;
+
+	$cids 	= wppa_get( 'commentids' );
+	$bl 	= wppa_get( 'backlink', '', 'text' );
+	
+	// If spec asked for, find them
+	if ( $cids && $bl ) {
+
+		if ( ! is_array( $cids ) ) {
+			$cids = [$cids]; // one
+		}
+		$the_ids = $cids;
+	}
+	
+	// Find all, in the right order
+	else {	
+		$parms = wppa_get_paging_parms( 'comment_admin' );
+		if ( strtoupper( $parms['dir'] == 'DESC' ) ) {
+			$the_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments ORDER BY %i DESC", $parms['order'] ) );
+		}
+		else {
+			$the_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments ORDER BY %i", $parms['order'] ) );
+		}
+	}
+	
+	// Now filter on Status
+	$status = wppa_get_cookie( 'comadmin-show' );
+	switch ( $status ) {
+		case 'spam':
+		case 'approved':
+			$void = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments WHERE status != %s", $status ) );
+			break;
+		case 'pending':
+			$void = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_comments WHERE status NOT IN ('pending', '')" );
+			break;
+		default:
+			$void = [];
+			break;
+	}
+	$the_ids = array_diff( $the_ids, $void );
+	$count 	 = count( $the_ids );
+	if ( $count_only ) {
+		return $count;
+	}
+	
+	$skip = ( $page - 1 ) * $pagesize;
+	if ( $skip > $count ) {
+		$skip = 0;
+		$page = 1;
+	}
+	
+	// Slice the page
+	if ( $count > $pagesize ) {
+		$the_ids = array_slice( $the_ids, ( $page - 1 ) * $pagesize, $pagesize );
+	}
+	
+	// Now get the full data in the same sequence ORDER
+	$result = [];
+	foreach ( $the_ids as $id ) {
+		$result[] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $id ), ARRAY_A );
+	}
+	
+	// Done
+	return $result;
+}
+
+/*
 function wppa_get_comadmin_sel_filter() {
 
 	// default
@@ -462,3 +528,4 @@ function wppa_get_comadmin_sel_filter() {
 
 	return $filter;
 }
+*/

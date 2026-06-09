@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 9.0.00.000
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -44,7 +44,8 @@ class UpldrWidget extends WP_Widget {
 		$showphotocount 	= wppa_checked( $instance['showphotocount'] );
 		$total_ownercount 	= 0;
 		$total_photocount 	= 0;
-		$selalbs 			= str_replace( '.', ',', wppa_expand_enum( wppa_alb_to_enum_children( wppa_expand_enum( $instance['parent'] ) ) ) );
+		$selalbs 			= explode( '.', wppa_expand_enum( wppa_alb_to_enum_children( wppa_expand_enum( $instance['parent'] ) ) ) );
+		$placeholders 		= implode( array_fill( 0, count( $selalbs ), '%d' ) );
 
 		// Make the data we need
 		if ( $users ) foreach ( $users as $user ) {
@@ -55,36 +56,34 @@ class UpldrWidget extends WP_Widget {
 				}
 				else {
 					if ( $instance['parent'] ) {
-						$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = `%s` AND album IN (%s)
-												  AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` )", $user['user_login'], $selalbs, $me );
+						$photo_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s AND album IN ($placeholders)
+												  AND ( status NOT IN ('pending', 'scheduled' ) OR owner = %s )", array_merge( [$user['user_login']], $selalbs, [$me] ) ) );
 					}
 					else {
-						$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = `%s`
-												  AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` )", $user['user_login'], $me );
+						$photo_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE owner = %s
+												  AND ( status NOT IN ( 'pending', 'scheduled' ) OR owner = %s )", $user['user_login'], $me ) );
 					}
-					$query  = wppa_fix_query( $query );
 
-					$photo_count = wppa_get_var( $query );
 					if ( $user['user_login'] != $me ) {
 						$upldrcache[$this->get_widget_id()][$user['user_login']]['c'] = $photo_count;
 						$needupdate = true;
 					}
 				}
 				if ( $photo_count ) {
-					if ( $user['user_login'] != $me && isset ( $upldrcache[$this->get_widget_id()][$user['user_login']]['d'] ) ) $last_dtm = $upldrcache[$this->get_widget_id()][$user['user_login']]['d'];
+					if ( $user['user_login'] != $me && isset ( $upldrcache[$this->get_widget_id()][$user['user_login']]['d'] ) ) {
+						$last_dtm = $upldrcache[$this->get_widget_id()][$user['user_login']]['d'];
+					}
 					else {
 						if ( $instance['parent'] ) {
-							$query = $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE owner = `%s` AND album IN (%s)
-													  AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` )
-													  ORDER BY timestamp DESC LIMIT 1", $user['user_login'], $selalbs, $me );
+							$last_dtm = $wpdb->get_var( $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE owner = %s AND album IN ($placeholders)
+													  AND ( status NOT IN ('pending', 'scheduled' ) OR owner = %s )
+													  ORDER BY timestamp DESC LIMIT 1", array_merge( [$user['user_login']], $selalbs, [$me] ) ) );
 						}
 						else {
-							$query = $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE owner = `%s`
-													  AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` )
-													  ORDER BY timestamp DESC LIMIT 1", $user['user_login'], $me );
+							$last_dtm = $wpdb->get_var( $wpdb->prepare( "SELECT timestamp FROM $wpdb->wppa_photos WHERE owner = %s
+													  AND ( status NOT IN ('pending', 'scheduled' ) OR owner = %s )
+													  ORDER BY timestamp DESC LIMIT 1", $user['user_login'], $me ) );
 						}
-						$query = wppa_fix_query( $query );
-						$last_dtm = wppa_get_var( $query );
 					}
 
 					if ( $user['user_login'] != $me ) {
@@ -242,7 +241,7 @@ class UpldrWidget extends WP_Widget {
 					$albums = array();
 				}
 				else {
-					$albums = wppa_get_results( "SELECT id, name FROM $wpdb->wppa_albums" );
+					$albums = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums", ARRAY_A );
 				}
 				if ( ! empty( $albums ) ) {
 					$albums = wppa_add_paths( $albums );

@@ -2,7 +2,7 @@
 /* wppa-tinymce-common.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 9.0.00.000
+* Version 9.2.01.001
 *
 */
 
@@ -12,11 +12,11 @@ function wppa_make_tinymce_photo_dialog( $front = false ) {
 global $wpdb;
 
 	// Prepare albuminfo
-	$albums = wppa_get_results( $wpdb->prepare( "SELECT id, name
+	$albums = $wpdb->get_results( $wpdb->prepare( "SELECT id, name
 												   FROM $wpdb->wppa_albums
 												   WHERE owner = %s
 												   OR owner = '--- public ---'
-												   ORDER BY name", wppa_get_user() ) );
+												   ORDER BY name", wppa_get_user() ), ARRAY_A );
 
 	// Make the html
 	// Open wrapper
@@ -224,11 +224,11 @@ global $wpdb;
 	$result = '';
 
 	// Prepare photoinfo
-	$my_photos = wppa_get_results( $wpdb->prepare( "SELECT id, name, album, ext
+	$my_photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, name, album, ext
 													  FROM $wpdb->wppa_photos
 													  WHERE owner = %s
 													  ORDER BY timestamp DESC
-													  LIMIT %d", wppa_get_user(), wppa_opt( 'generator_max' ) ) );
+													  LIMIT %d", wppa_get_user(), wppa_opt( 'generator_max' ) ), ARRAY_A );
 
 	if ( $my_photos ) {
 
@@ -290,9 +290,9 @@ global $wpdb;
 	$result = '';
 
 	// Prepare photoinfo
-	$all_photos = wppa_get_results( $wpdb->prepare( "SELECT id, name, album, ext
+	$all_photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, name, album, ext
 													   FROM $wpdb->wppa_photos
-													   ORDER BY timestamp DESC LIMIT %d", wppa_opt( 'generator_max' ) ) );
+													   ORDER BY timestamp DESC LIMIT %d", wppa_opt( 'generator_max' ) ), ARRAY_A );
 
 	if ( $all_photos ) {
 

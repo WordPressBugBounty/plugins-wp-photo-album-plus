@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various funcions
-* Version 8.8.01.005
+* Version 9.2.01.001
 *
 */
 
@@ -24,19 +24,13 @@ function wppa_create_wppa_htaccess_( $filename ) {
 
 		// Grant access
 		case 'grant':
-			$file = wppa_fopen( $filename, 'wb' );
-			if ( $file ) {
-				wppa_fwrite( $file, '<IfModule mod_rewrite.c>' );
-				wppa_fwrite( $file, "\n" . 'RewriteEngine Off' );
-				wppa_fwrite( $file, "\n" . '</IfModule>' );
-				wppa_fwrite( $file, "\n" . 'Order Allow,Deny' );
-				wppa_fwrite( $file, "\n" . 'Allow from all' );
-				wppa_fclose( $file );
-				wppa_log( 'Fso', 'File ' . $filename . ' created.' );
-			}
-			else {
-				wppa_log( 'Err', 'Can not create ' . $filename );
-			}
+			$content =
+			"<IfModule mod_rewrite.c>\n" .
+			"RewriteEngine Off\n" .
+			"</IfModule>\n" .
+			"Order Allow,Deny\n" .
+			"Allow from all";
+			wppa_put_contents( $filename, $content );
 			break;
 
 		// No hotlink
@@ -53,29 +47,14 @@ function wppa_create_wppa_htaccess_( $filename ) {
 			if ( $i ) {
 				$domain = substr( $domain, 0, $i );
 			}
-			$file = wppa_fopen( $filename, 'wb' );
-			if ( $file ) {
-/*
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?beta.opajaap.nl [NC]
-RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?beta.opajaap.nl.*$ [NC]
-RewriteRule \.(jpg|jpeg|png|gif)$ - [NC,F]
-</IfModule>
-*/
-				wppa_fwrite( $file, 		  '<IfModule mod_rewrite.c>' );
-				wppa_fwrite( $file, "\n" . 'RewriteEngine On' );
-				wppa_fwrite( $file, "\n" . 'RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?' . $domain . ' [NC]' );
-				wppa_fwrite( $file, "\n" . 'RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?' . $domain . '.*$ [NC]' );
-				wppa_fwrite( $file, "\n" . 'RewriteRule \.(jpg|jpeg|png|gif|webp|mp4|ogv|webm|mp3|wav|ogg)$ - [NC,F]' );
-				wppa_fwrite( $file, "\n" . '</IfModule>' );
-				wppa_fclose( $file );
-				wppa_log( 'Fso', 'File ' . $filename . ' created.' );
-			}
-			else {
-				wppa_log( 'Err', 'Can not create ' . $filename );
-			}
-
+			$content =
+			"<IfModule mod_rewrite.c>\n" .
+			"RewriteEngine On\n" .
+			'RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?'.$domain.' [NC]'."\n" .
+			'RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?'.$domain.'.*$ [NC]'."\n" .
+			'RewriteRule \.(jpg|jpeg|png|gif|webp|mp4|ogv|webm|mp3|wav|ogg)$ - [NC,F]'."\n" .
+			"</IfModule>";
+			wppa_put_contents( $filename, $content );
 			break;
 
 		// Destroy it
@@ -148,30 +127,24 @@ global $wpdb;
 	}
 
 	// Create .htaccess file
-	$file = wppa_fopen( $pl_root . '/.htaccess', 'wb' );
-	if ( ! $file ) {
-		wppa_log( 'Error', 'Can not create '.$pl_root . '/.htaccess' );
-		return false;
-	}
+	$file = $pl_root . '/.htaccess';
+	$content =
+	'<IfModule mod_rewrite.c>' . "\n" .
+	'RewriteEngine On' . "\n" .
+	'RewriteBase /' . str_replace( ABSPATH, '', $pl_root ) . "\n";
 
-	wppa_fwrite( $file, '<IfModule mod_rewrite.c>' );
-	wppa_fwrite( $file, "\n" . 'RewriteEngine On' );
-	// RewriteBase /wp-content/wppa-pl
-	wppa_fwrite( $file, "\n" . 'RewriteBase /' . str_replace( ABSPATH, '', $pl_root ) );
-
-	$query = "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name DESC";
-	$albs = wppa_get_results( $query );
+	$albs = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums ORDER BY name DESC", ARRAY_A );
 
 	if ( $albs ) foreach( $albs as $alb ) {
 
 		$fm = wppa_get_album_name_for_pl( $alb['id'], $alb['name'] );
 		$to = $source_root . '/album-'.$alb['id'];
 
-		wppa_fwrite( $file, "\n" . 'RewriteRule ^'.$fm.'/(.*) /'.$to.'/$1 [NC]' );
+		$content .= 'RewriteRule ^'.$fm.'/(.*) /'.$to.'/$1 [NC]' . "\n";
 	}
 
-	wppa_fwrite( $file, "\n" . '</IfModule>' );
-	wppa_fclose( $file );
+	$content .= '</IfModule>';
+	wppa_put_contents( $file, $content );
 
 	// Remove required flag
 	delete_option( 'wppa_pl_htaccess_required' );

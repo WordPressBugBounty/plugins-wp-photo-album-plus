@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.1.06.006
+* Version 9.2.01.001
 *
 */
 
@@ -224,7 +224,7 @@ global $wppa_cron_maintenance_slugs;
 	$tc = array( $create_albums, $create_photos, $create_rating, $create_comments, $create_iptc, $create_exif, $create_index, $create_session, $create_caches );
 
 	// Find existing tables
-	$r = wppa_get_results( "SHOW TABLES" );
+	$r = $wpdb->get_results( "SHOW TABLES", ARRAY_A );
 	$s = array();
 	foreach( $r as $i ) {
 		foreach( $i as $j ) {
@@ -237,7 +237,7 @@ global $wppa_cron_maintenance_slugs;
 	$idx = 0;
 	while ( $idx < 9 ) {
 		if ( ! in_array( $tn[$idx], $existing_tables ) ) {
-			$bret = wppa_query( $tc[$idx] );
+			$bret = $wpdb->query( $wpdb->prepare( "CREATE TABLE %i ( id bigint(20) NOT NULL AUTO_INCREMENT, PRIMARY KEY (id) ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci", $tn[$idx] ) ); // $tc[$idx] );
 			if ( ! $bret ) {
 				wppa_log( 'err', 'Failed to create ' . $tn[$idx] );
 			}
@@ -247,10 +247,10 @@ global $wppa_cron_maintenance_slugs;
 
 	// Change longtext into text in existring tables
 	if ( $old_rev < '8400001' ) {
-		wppa_query( "ALTER TABLE $wpdb->wppa_albums CHANGE `custom` `custom` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
-		wppa_query( "ALTER TABLE $wpdb->wppa_photos CHANGE `custom` `custom` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
-		wppa_query( "ALTER TABLE $wpdb->wppa_albums CHANGE `description` `description` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
-		wppa_query( "ALTER TABLE $wpdb->wppa_photos CHANGE `description` `description` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
+		$wpdb->query( "ALTER TABLE $wpdb->wppa_albums CHANGE `custom` `custom` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
+		$wpdb->query( "ALTER TABLE $wpdb->wppa_photos CHANGE `custom` `custom` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
+		$wpdb->query( "ALTER TABLE $wpdb->wppa_albums CHANGE `description` `description` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
+		$wpdb->query( "ALTER TABLE $wpdb->wppa_photos CHANGE `description` `description` TEXT CHARACTER SET utf8mb4 NOT NULL;" );
 	}
 
 	// Update tables with possibly new fields
@@ -263,7 +263,7 @@ global $wppa_cron_maintenance_slugs;
 	// Change collate
 	if ( $old_rev < '8400001' ) {
 		foreach( $tn as $t ) {
-			wppa_query( "ALTER TABLE $t CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci" );
+			$wpdb->query( "ALTER TABLE $t CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci" );
 			wppa_log( 'obs', "$t converted to support emoji's" );
 			if ( wppa_is_time_up() ) {
 				return;
@@ -284,8 +284,8 @@ global $wppa_cron_maintenance_slugs;
 
 			// Fix bug because of different usernames in rating and comments
 			if ( wppa_get_option( 'wppa_vote_needs_comment' ) == 'yes' || wppa_get_option( 'wppa_comment_need_vote' ) == 'yes' ) {
-				wppa_query( "UPDATE $wpdb->wppa_rating SET status = 'publish' WHERE status = 'pending'" );
-				wppa_query( "UPDATE $wpdb->wppa_comments SET status = 'approved' WHERE status = 'pending'" );
+				$wpdb->query( "UPDATE $wpdb->wppa_rating SET status = 'publish' WHERE status = 'pending'" );
+				$wpdb->query( "UPDATE $wpdb->wppa_comments SET status = 'approved' WHERE status = 'pending'" );
 				wppa_schedule_maintenance_proc( 'wppa_rerate' );
 			}
 		}
@@ -305,7 +305,7 @@ global $wppa_cron_maintenance_slugs;
 		}
 
 		if ( $old_rev <= '7702006' ) {
-			wppa_query( "UPDATE $wpdb->wppa_albums SET upload_limit_tree = 0 WHERE upload_limit_tree = ''" );
+			$wpdb->query( "UPDATE $wpdb->wppa_albums SET upload_limit_tree = 0 WHERE upload_limit_tree = ''" );
 			if ( wppa_opt( 'area_size' ) == '' ) delete_option( 'wppa_area_size' );
 		}
 
@@ -337,7 +337,7 @@ global $wppa_cron_maintenance_slugs;
 		}
 
 		if ( $old_rev <= '8004004' ) {
-			wppa_query( "UPDATE $wpdb->wppa_albums SET status = 'publish' WHERE status = ''" );
+			$wpdb->query( "UPDATE $wpdb->wppa_albums SET status = 'publish' WHERE status = ''" );
 		}
 
 		if ( $old_rev <= '8110000' ) {
@@ -368,8 +368,8 @@ global $wppa_cron_maintenance_slugs;
 			}
 		}
 
-		$ca = wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE crypt = ''" );
-		$cp = wppa_get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE crypt = ''" );
+		$ca = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE crypt = ''" );
+		$cp = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE crypt = ''" );
 		if ( $ca ) {
 			wppa_schedule_maintenance_proc( 'wppa_crypt_albums' );
 		}
@@ -392,7 +392,7 @@ global $wppa_cron_maintenance_slugs;
 				update_option( 'wppa_show_empty_thumblist', 'always' );
 			}
 		}
-		
+
 		if ( $old_rev <= '9110008' ) {
 			$from 		= WPPA_PATH . '/img/album.jpg';
 			$to 		= WPPA_UPLOAD_PATH . '/icons/album.jpg';
@@ -607,10 +607,8 @@ static $user;
 			case 'category':
 
 				// The option hold a category
-				$grant_parents = wppa_get_col( 	"SELECT id " .
-													"FROM $wpdb->wppa_albums " .
-													"WHERE cats LIKE '%," . wppa_opt( 'grant_parent' ) . ",%'"
-												);
+				$likecats = '%' . $wpdb->esc_like( wppa_opt( 'grant_parent' ) ) . '%';
+				$grant_parents = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE cats LIKE %s", $likecats ) );
 				if ( empty( $grant_parents ) ) {
 					// Selection set to category, but no albums exist with that category
 					return array();
@@ -618,10 +616,7 @@ static $user;
 				break;
 
 			case 'indexsearch':
-				$temp = wppa_get_var( "SELECT albums " .
-										"FROM $wpdb->wppa_index " .
-										"WHERE slug = '" . wppa_opt( 'grant_parent' ) . "'"
-										);
+				$temp = $wpdb->get_var( $wpdb->prepare( "SELECT albums FROM $wpdb->wppa_index WHERE slug = %s", wppa_opt( 'grant_parent' ) ) );
 
 				$grant_parents = explode( '.', wppa_expand_enum( $temp ) );
 				if ( empty( $grant_parents ) ) {
@@ -643,8 +638,7 @@ static $user;
 
 	// Get all the parents of the current user albums if not done already
 	if ( ! is_array( $my_albs_parents ) ) {
-		$query = $wpdb->prepare( "SELECT DISTINCT a_parent FROM $wpdb->wppa_albums WHERE owner = %s", $owner );
-		$my_albs_parents = wppa_get_col( $query );
+		$my_albs_parents = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT a_parent FROM $wpdb->wppa_albums WHERE owner = %s", $owner ) );
 		if ( ! is_array( $my_albs_parents ) ) {
 			$my_albs_parents = array();
 		}

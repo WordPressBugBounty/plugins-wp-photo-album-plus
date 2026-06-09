@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various conversion functions
-* Version: 9.1.12.001
+* Version: 9.2.01.001
 *
 */
 
@@ -95,29 +95,20 @@ global $wpdb;
 						if ( $limit ) {
 							if ( $parent ) {
 								if ( $limit ) {
-									$q = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums
-														  WHERE a_parent = %s
-														  ORDER BY timestamp DESC
-														  LIMIT %d", $parent, $limit );
+									$albs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %s ORDER BY timestamp DESC LIMIT %d", $parent, $limit ), ARRAY_A );
 								}
 								else {
-									$q = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums
-														  WHERE a_parent = %s
-														  ORDER BY timestamp DESC", $parent );
+									$albs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %s ORDER BY timestamp DESC", $parent ), ARRAY_A );
 								}
 							}
 							else {
 								if ( $limit ) {
-									$q = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums
-														  ORDER BY timestamp DESC
-														  LIMIT %d", $limit );
+									$albs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums ORDER BY timestamp DESC LIMIT %d", $limit ), ARRAY_A );
 								}
 								else {
-									$q = "SELECT * FROM $wpdb->wppa_albums
-										  ORDER BY timestamp DESC";
+									$albs = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums ORDER BY timestamp DESC", ARRAY_A ) ;
 								}
 							}
-							$albs = wppa_get_results( $q );
 							wppa_cache_album( 'add', $albs );
 							if ( is_array( $albs ) ) foreach ( array_keys( $albs ) as $key ) $albs[$key] = $albs[$key]['id'];
 							$id = implode( '.', $albs );
@@ -446,8 +437,7 @@ global $wpdb;
 	$wppa['is_owner'] = wppa_get( 'owner' );
 
 	if ( $wppa['is_owner'] ) {
-		$albs = wppa_get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums
-													 WHERE owner = %s", $wppa['is_owner'] ) );
+		$albs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE owner = %s", $wppa['is_owner'] ), ARRAY_A );
 		wppa_cache_album( 'add', $albs );
 		$id = '';
 		if ( $albs ) foreach ( $albs as $alb ) {
@@ -536,39 +526,6 @@ global $wppa_current_shortcode;
 	wppa_out( $result );
 }
 
-function wppa_show_query( $query, $count = 0 ) {
-global $wppa_query_cache_hit;
-
-	if ( ! current_user_can( 'administrator' ) ) return;
-	if ( ! in_array( wppa_opt( 'print_debug' ), ['all', 'queries'] ) ) return;
-
-	$query = ( defined( 'DOING_WPPA_AJAX' ) ? 'A ' : 'S ' ) . $query;
-	if ( strlen( $query ) > 100 ) {
-		$opos = strpos( $query, 'ORDER' );
-		if ( $opos ) {
-			if ( $opos > 100 ) {
-				$query = substr( $query, 0, 80 ) . '... ' . substr( $query, $opos );
-			}
-		}
-		else {
-			$query = substr( $query, 0, 95 ) . '...';
-		}
-	}
-	if ( $count ) {
-		$query .= ' Found '.$count.' items'.($wppa_query_cache_hit?' cached':'');
-	}
-	wppa_out( '<span style="line-break: anywhere; color: blue;">' . $query . '</span><br>' );
-}
-
-function wppa_show_url( $url ) {
-
-	if ( ! current_user_can( 'administrator' ) ) return;
-	if ( ! in_array( wppa_opt( 'print_debug' ), ['all', 'urls'] ) ) return;
-
-	$url = ( defined( 'DOING_WPPA_AJAX' ) ? 'A ' : 'S ' ) . $url;
-	wppa_out( '<span style="line-break: anywhere; color: brown;">' . $url . '</span><br>' );
-}
-
 // Put appropriate value in wppa( 'start_album' ) and return album clause for query
 function wppa_interprete_album( $alb ) {
 global $wpdb;
@@ -583,9 +540,7 @@ global $wpdb;
 		$clause = $wpdb->prepare( " album = %d ", $alb );
 	}
 	elseif ( substr( $alb, 0, 1 ) == '$' ) {
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s LIMIT 1", substr( $alb, 1 ) );
-		wppa_show_query( '98: '.$query );
-		$id = wppa_get_var( $query );
+		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s LIMIT 1", substr( $alb, 1 ) ) );
 		if ( $id ) {
 			wppa( 'start_album', $id );
 			$clause = $wpdb->prepare( " album = %d ", $id );
@@ -618,9 +573,7 @@ global $wpdb;
 		$result = "$alb";
 	}
 	elseif ( substr( $alb, 0, 1 ) == '$' ) {
-		$query = $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s LIMIT 1", substr( $alb, 1 ) );
-		wppa_show_query( '98: '.$query );
-		$id = wppa_get_var( $query );
+		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE name = %s LIMIT 1", substr( $alb, 1 ) ) );
 		if ( $id ) {
 			$result = "$id";
 			wppa( 'start_album', $id );

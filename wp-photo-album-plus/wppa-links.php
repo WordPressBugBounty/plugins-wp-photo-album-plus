@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.1.12.003
+* Version: 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1588,7 +1588,7 @@ global $wpdb;
 
 	// owner/public?
 	if ( $album == '-3' ) {
-		$temp = wppa_get_results( "SELECT id FROM $wpdb->wppa_albums WHERE owner = '" . wppa_get_user() . "' OR owner = '--- public ---' ORDER BY id" );
+		$temp = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE owner = %s OR owner = '--- public ---' ORDER BY id", wppa_get_user() ) );
 		$album = '';
 		if ( $temp ) {
 			foreach( $temp as $t ) {
@@ -1869,7 +1869,7 @@ global $wpdb;
 			break;
 		case 'plainpage':
 			$result['url'] = get_permalink( $page );
-			$result['title'] = wppa_get_var( $wpdb->prepare( "SELECT post_title FROM " . $wpdb->prefix . "posts WHERE ID = %s", $page ) );
+			$result['title'] = $wpdb->get_var( $wpdb->prepare( "SELECT post_title FROM " . $wpdb->prefix . "posts WHERE ID = %s", $page ) );
 			$result['is_url'] = true;
 			$result['is_lightbox'] = false;
 			return $result;

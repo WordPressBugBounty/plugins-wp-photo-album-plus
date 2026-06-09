@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 9.0.00.005
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -68,14 +68,41 @@ class ThumbnailWidget extends WP_Widget {
 			$max += '1000';
 		}
 
+		// Get the thumbs
 		if ( $album ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status <> `pending` AND status <> `scheduled` AND album = %d %s LIMIT %d", $album, $sortby, $max );
+			$thumbs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status <> 'pending' AND status <> 'scheduled' AND album = %d LIMIT %d", $album, $max ) );
 		}
 		else {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status <> `pending` AND status <> `scheduled` %s LIMIT %d", $sortby, $max );
+			$thumbs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status <> 'pending' AND status <> 'scheduled' LIMIT %d", $max ) );
 		}
-		$query = wppa_fix_query( $query );
-		$thumbs = wppa_get_results( $query );
+		
+		// Now order them
+		if ( $thumbs ) {
+			$desc = false;
+			if ( strpos( $sortby, 'DESC' ) !== false ) {
+				$desc = true;
+			}
+			$sortby = str_replace( 'ORDER BY', '', $sortby );
+			$sortby = trim( str_replace( 'DESC', '', $sortby ) );
+			
+			$placeholders = implode( ',', array_fill( 0, count( $thumbs) , '%d' ) );
+			if ( $sortby == 'RAND()' ) {
+				$rand = wppa_get_randseed( 'session' );
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $thumbs, [$rand] ) ), ARRAY_A );
+				wppa_show_query($thumbs);
+			}
+			else {
+				if ( ! $sortby ) $sortby = 'id';
+				if ( $desc ) {
+					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i DESC", array_merge( $thumbs, [$sortby] ) ), ARRAY_A );
+					wppa_show_query($thumbs);
+				}
+				else {
+					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i", array_merge( $thumbs, [$sortby] ) ), ARRAY_A );
+					wppa_show_query($thumbs);
+				}
+			}			
+		}
 
 		$widget_content = "\n".'<!-- WPPA+ thumbnail Widget start -->';
 		$maxw = wppa_opt( 'thumbnail_widget_size' );
@@ -205,13 +232,13 @@ class ThumbnailWidget extends WP_Widget {
 							__( 'Number of votes desc', 'wp-photo-album-plus' ),
 							__( 'Timestamp desc', 'wp-photo-album-plus' ),
 							);
-		$values  = array(	'',
-							'ORDER BY p_order',
-							'ORDER BY name',
-							'ORDER BY RAND()',
-							'ORDER BY mean_rating DESC',
-							'ORDER BY rating_count DESC',
-							'ORDER BY timestamp DESC',
+		$values  = array(	'id',
+							'p_order',
+							'name',
+							'RAND()',
+							'mean_rating DESC',
+							'rating_count DESC',
+							'timestamp DESC',
 							);
 
 		wppa_widget_selection( $this, 'sortby', $instance['sortby'], __( 'Sort by', 'wp-photo-album-plus' ), $options, $values );

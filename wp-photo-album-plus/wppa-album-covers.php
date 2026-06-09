@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.1.13.001
+* Version: 9.2.01.001
 *
 */
 
@@ -1204,6 +1204,7 @@ static $cached_cover_photo_ids;
 	$user   = wppa_get_user();
 	$rand   = wppa_get_randseed( 'page' );
 	$allalb = str_replace( '.', ',', wppa_expand_enum( wppa_alb_to_enum_children( $alb ) ) );
+	$albarr = explode( ',', $allalb );
 	$temp 	= null;
 
 	// main_photo is 0? Default
@@ -1220,98 +1221,99 @@ static $cached_cover_photo_ids;
 	if ( '-9' == $id ) {
 		$rs = wppa_get_randseed( 'page' );
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %s ORDER BY RAND(%d) LIMIT %d", $alb, $rs, $count );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %s ORDER BY RAND(%d) LIMIT %d", $alb, $rs, $count ), ARRAY_A );
 		}
 		else {
 			if ( is_user_logged_in() ) {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending','scheduled') OR owner = %s ) ORDER BY RAND(%d) LIMIT %d", $alb, $user, $rs, $count );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending','scheduled') OR owner = %s ) ORDER BY RAND(%d) LIMIT %d", $alb, $user, $rs, $count ), ARRAY_A );
 			}
 			else {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending','scheduled','private') ORDER BY RAND(%d) LIMIT %d", $alb, $rs, $count );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending','scheduled','private') ORDER BY RAND(%d) LIMIT %d", $alb, $rs, $count ), ARRAY_A );
 			}
 		}
-		$temp = wppa_get_results( $query );
 	}
 
 	// main_photo is -2? Last upload
 	if ( '-2' == $id ) {
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY timestamp DESC LIMIT %d", $alb, $count );
-			$temp = wppa_get_results( $query );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY timestamp DESC LIMIT %d", $alb, $count ), ARRAY_A );
 		}
 		else {
 			if ( is_user_logged_in() ) {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending','scheduled') OR owner = %s ) ORDER BY timestamp DESC LIMIT %d", $alb, $user, $count );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending','scheduled') OR owner = %s ) ORDER BY timestamp DESC LIMIT %d", $alb, $user, $count ), ARRAY_A );
 			}
 			else {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending','scheduled','private') ORDER BY timestamp DESC LIMIT %d", $alb, $count );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending','scheduled','private') ORDER BY timestamp DESC LIMIT %d", $alb, $count ), ARRAY_A );
 			}
-			$temp = wppa_get_results( $query );
 		}
 	}
 
 	// main_phtot is -1? Random featured
 	if ( '-1' == $id ) {
-		$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status = 'featured' ORDER BY RAND(%d) LIMIT %d",$alb, $rand, $count );
-		$temp = wppa_get_results( $query );
+		$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status = 'featured' ORDER BY RAND(%d) LIMIT %d",$alb, $rand, $count ), ARRAY_A );
 	}
 
+	$placeholders = implode( ',', array_fill( 0, count( $albarr ), '%d' ) );
+	
 	// Random from children
 	if ( '-3' == $id ) {
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN (%s) ORDER BY RAND(%d) LIMIT %d", $allalb, $rand, $count );
-			$query = wppa_fix_query( $query );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $albarr, [$rand], [$count] ) ), ARRAY_A );
 		}
 		else {
 			if ( is_user_logged_in() ) {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN (%s) AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` ) ORDER BY RAND(%d) LIMIT %d", $allalb, $user, $rand, $count );
-				$query = wppa_fix_query( $query );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND ( status NOT IN ('pending', 'scheduled') OR owner = %s ) ORDER BY RAND(%d) LIMIT %d", array_merge( $albarr, [$user], [$rand], [$count] ) ), ARRAY_A );
 			}
 			else {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN (%s) AND status <> `pending` AND status <> `scheduled` AND status <> `private` ORDER BY RAND(%d) LIMIT %d", $allalb, $rand, $count );
-				$query = wppa_fix_query( $query );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND status NOT IN ('pending', 'scheduled', 'private') ORDER BY RAND(%d) LIMIT %d", array_merge( $albarr, [$rand], [$count] ) ), ARRAY_A );
 			}
 		}
-		$temp = wppa_get_results( $query );
 	}
 
 	// Most recent from children
 	if ( '-4' == $id ) {
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN (%s) ORDER BY timestamp DESC LIMIT %d", $allalb, $count );
-			$query = wppa_fix_query( $query );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) ORDER BY timestamp DESC LIMIT %d", array_merge( $albarr, [$count] ) ), ARRAY_A );
 		}
 		else {
 			if ( is_user_logged_in() ) {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN (%s) AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` ) ORDER BY timestamp DESC LIMIT %d", $allalb, $user, $count );
-				$query = wppa_fix_query( $query );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND ( status NOT IN ('pending', 'scheduled') OR owner = %s ) ORDER BY timestamp DESC LIMIT %d", array_merge( $albarr, [$user], [$count] ) ), ARRAY_A );
 			}
 			else {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN (%s) AND status <> `pending` AND status <> `scheduled` AND status <> `private` ORDER BY timestamp DESC LIMIT %d", $allalb, $count );
-				$query = wppa_fix_query( $query );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND status NOT IN ('pending', 'scheduled', 'private') ORDER BY timestamp DESC LIMIT %d", array_merge( $albarr, [$count] ) ), ARRAY_A );
 			}
 		}
-		$temp = wppa_get_results( $query );
 	}
 
 	// Imagefactory multiple like album photo order
 	if ( '-5' == $id ) {
-		$porder = wppa_get_poc( $alb );
+		$porder = wppa_get_poc_a( $alb );
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %s LIMIT %d", $alb, $porder, $count );
-			$query = wppa_fix_query( $query );
+			if ( $porder['desc'] ) {
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC LIMIT %d", $alb, $porder['order'], $count ), ARRAY_A );
+			}
+			else {
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i LIMIT %d", $alb, $porder['order'], $count ), ARRAY_A );
+			}
 		}
 		else {
 			if ( is_user_logged_in() ) {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( ( status <> `pending` AND status <> `scheduled` ) OR owner = `%s` ) ORDER BY %s LIMIT %d", $alb, $user, $porder, $count );
-				$query = wppa_fix_query( $query );
+				if ( $porder['desc'] ) {
+					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending', 'scheduled') OR owner = %s ) ORDER BY %i DESC LIMIT %d", $alb, $user, $porder['order'], $count ), ARRAY_A );
+				}
+				else {
+					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending', 'scheduled') OR owner = %s ) ORDER BY %i LIMIT %d", $alb, $user, $porder['order'], $count ), ARRAY_A );
+				}
 			}
 			else {
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status <> `pending` AND status <> `scheduled` AND status <> `private` ORDER BY %s LIMIT %d", $alb, $porder, $count );
-				$query = wppa_fix_query( $query );
+				if ( $porder['desc'] ) {
+					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending', 'scheduled', 'private' ) ORDER BY %i DESC LIMIT %d", $alb, $porder['order'], $count ), ARRAY_A );
+				}
+				else {
+					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending', 'scheduled', 'private' ) ORDER BY %i LIMIT %d", $alb, $porder['order'], $count ), ARRAY_A );
+				}
 			}
 		}
-		$temp = wppa_get_results( $query );
 	}
 
 	// Add to 2nd level cache
@@ -1706,19 +1708,17 @@ global $wpdb;
 
 	// If random...
 	if ( $albumorder_col == 'random' ) {
-
-		$query  = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY RAND(%d)", $id, wppa_get_randseed() );
-
-		$subs = wppa_get_results( $query );
+		$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY RAND(%d)", $id, wppa_get_randseed() ), ARRAY_A );
 	}
 
 	// Not random, Decending?
 	else {
-
-		if ( wppa_is_album_order_desc( $id ) ) $dir = 'DESC'; else $dir = '';
-		$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %s %s", $id, $albumorder_col, $dir );
-		$query = wppa_fix_query( $query );
-		$subs = wppa_get_results( $query );
+		if ( wppa_is_album_order_desc( $id ) ) {
+			$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $id, $albumorder_col ), ARRAY_A );
+		}
+		else {
+			$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i", $id, $albumorder_col ), ARRAY_A );
+		}
 	}
 
 	// Only if there are sub albums
@@ -1984,9 +1984,18 @@ global $wppa_no_lightbox;
 
 	if ( $wppa_no_lightbox ) return '';
 
-	$query 	= $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %s", $albumid, wppa_get_poc( $albumid ) );
-	$query 	= wppa_fix_query( $query );
-	$thumbs = wppa_get_results( $query );
+	$desc = false;
+	$order = wppa_get_poc( $albumid );
+	if ( strpos( $order, 'DESC' ) !== false ) {
+		$order = trim( str_replace( 'DESC', '', $order ) );
+		$desc = true;
+	}
+	if ( $desc ) {
+		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $albumid, $order ), ARRAY_A );
+	}
+	else {	
+		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $albumid, $order ), ARRAY_A );
+	}
 	$result = '';
 	$first 	= true;
 	$mocc 	= wppa( 'mocc' );

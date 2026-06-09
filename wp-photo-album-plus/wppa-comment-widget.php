@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the recent commets on photos
-* Version 9.0.00.005
+* Version 9.2.01.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -90,8 +90,7 @@ class wppaCommentWidget extends WP_Widget {
 				$onmouseout   = wppa_mouseout( 'thumb' );
 
 				$title = '';
-				$query = $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE photo = %s AND status = 'approved' ORDER BY timestamp DESC", $id );
-				$comments = wppa_get_results( $query );
+				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE photo = %s AND status = 'approved' ORDER BY timestamp DESC", $id ), ARRAY_A );
 				if ( $comments ) {
 					$first = true;
 					$first_comment = $comments[0];

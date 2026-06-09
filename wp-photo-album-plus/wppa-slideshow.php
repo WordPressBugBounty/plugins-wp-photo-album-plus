@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.1.12.003
+* Version 9.2.01.001
 *
 */
 
@@ -132,7 +132,7 @@ global $previous_page_last_id;
 	if ( wppa( 'start_photo' ) && ! wppa_is_int( wppa( 'start_photo' ) ) ) {
 		global $wpdb;
 		$s = wppa( 'start_photo' );
-		$id = wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE sname = %s OR crypt = %s LIMIT 1", $s, $s ) );
+		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE sname = %s OR crypt = %s LIMIT 1", $s, $s ) );
 		wppa( 'start_photo', $id );
 	}
 
@@ -951,7 +951,7 @@ static $cache;
 			$mylast = $cache[$id];
 		}
 		else {
-			$mylast = wppa_get_var( $wpdb->prepare( "SELECT value FROM $wpdb->wppa_rating WHERE photo = %s AND user = %s ORDER BY id DESC LIMIT 1",
+			$mylast = $wpdb->get_var( $wpdb->prepare( "SELECT value FROM $wpdb->wppa_rating WHERE photo = %s AND user = %s ORDER BY id DESC LIMIT 1",
 													  $id,
 													  wppa_get_user() ) );
 			$cache[$id] = $mylast !== null;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version: 9.1.00.001
+* Version: 9.2.01.003
 *
 *
 */
@@ -53,7 +53,7 @@ global $pcount;
 		foreach ( $words as $word ) {
 
 			// Get the row of the index table where the word is registered.
-			$indexline = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug = %s", $word ) );
+			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug = %s", $word ), ARRAY_A );
 
 			// If this line does not exist yet, create it with only one album number as data
 			if ( ! $indexline ) {
@@ -122,7 +122,7 @@ global $pcount;
 			if ( strlen( $word ) <= 20 ) { // Max sluglength is 20 char
 
 				// Get the row of the index table where the word is registered.
-				$indexline = wppa_get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug = %s", $word ) );
+				$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE slug = %s", $word ), ARRAY_A );
 
 				// If this line does not exist yet, create it with only one album number as data
 				if ( ! $indexline ) {
@@ -483,10 +483,10 @@ global $wpdb;
 
 	// Comments
 	if ( wppa_switch( 'search_comments' ) ) {
-		$coms = wppa_get_results($wpdb->prepare( "SELECT comment FROM $wpdb->wppa_comments WHERE photo = %s AND status = 'approved'", $thumb['id'] ) );
+		$coms = $wpdb->get_col( $wpdb->prepare( "SELECT comment FROM $wpdb->wppa_comments WHERE photo = %s AND status = 'approved'", $thumb['id'] ) );
 		if ( $coms ) {
 			foreach ( $coms as $com ) {
-				$words .= ' ' . stripslashes( $com['comment'] );
+				$words .= ' ' . stripslashes( $com );
 			}
 		}
 	}

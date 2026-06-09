@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.0.00.000
+/* Version 9.2.01.003
 /*
 */
 
@@ -14,160 +14,128 @@ This fila also contains functions for the use in the widget activation screens f
 */
 
 // This function returns an array of photos that meet the current photo of the day selection criteria
-function wppa_get_widgetphotos( $alb, $option = '' ) {
+function wppa_get_widgetphotos( $alb ) {
 global $wpdb;
 
-	if ( ! $alb ) return false;
+	$photos = array();
 
-	$photos = false;
-	$query = '';
-	if ( $option == 'count' ) {
-		$option = '';
-		$count_only = true;
+	// Get all the photos from the supplied album indicator
+	if ( wppa_opt( 'potd_album_type' ) ) {
+		if ( wppa_is_posint( $alb ) ) {
+			if ( wppa_switch( 'potd_include_subs' ) ) {
+				$albs = explode( '.', wppa_alb_to_enum_children( $alb ) );
+				$placeholders = implode( '.', array_fill( 0, count( $albs ), '%d' ) );
+				$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $albs ) );
+				wppa_show_query();
+			}
+			else {
+				$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d", $alb ) );
+				wppa_show_query();
+			}
+		}
+		elseif ( $alb == 'all' ) {
+			$photos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos" );
+			wppa_show_query();
+		}
+		elseif ( $alb == 'sep' ) {
+			if ( wppa_switch( 'potd_include_subs' ) ) {
+				$sepalbs = explode( '.', wppa_alb_to_enum_children( '-1' ) );
+			}
+			else {
+				$sepalbs = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE parent = -1" );
+				wppa_show_query();
+			}
+			$placeholders = implode( ',', array_fill( 0, count( $sepalbs ), '%d' ) );
+			$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $sepalbs ) );
+			wppa_show_query();
+		}
+		elseif ( $alb == 'all-sep' ) {
+			if ( wppa_switch( 'potd_include_subs' ) ) {
+				$allminsepalbs = explode( '.', wppa_alb_to_enum_children( '0' ) );
+			}
+			else {
+				$allminsepalbs = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_albums WHERE parent = 0" );
+			}
+			$placeholders = implode( ',', array_fill( 0, count( $allminsepalbs ), '%d' ) );
+			$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $allminsepalbs ) );
+			wppa_show_query();
+		}
+		if ( wppa_switch( 'potd_inverse' ) ) {
+			$allphotos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos" );
+			$photos = array_diff( $allphotos, $photos );
+		}
 	}
-	else {
-		$count_only = false;
+	else { // virtual
+		if ( $alb == 'topten' ) {
+
+			// Find the 'top' policy
+			switch ( wppa_opt( 'topten_sortby' ) ) {
+				case 'mean_rating':
+					$photos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos ORDER BY mean_rating DESC, rating_count DESC, views DESC LIMIT 100" );
+					wppa_show_query();
+					break;
+				case 'rating_count':
+					$photos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos ORDER BY rating_count DESC, mean_rating DESC, views DESC LIMIT 100" );
+					wppa_show_query();
+					break;
+				case 'views':
+					$photos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos ORDER BY views DESC, mean_rating DESC, rating_count DESC LIMIT 100" );
+					wppa_show_query();
+					break;
+				default:
+					wppa_log( 'err', 'Unimplemented sortig method '.wppa_opt( 'topten_sortby' ).' in wppa_get_widgetphotos()' );
+					return [];
+					break;
+			}
+		}
+		elseif ( wppa_opt( 'potd_method' ) == '3' ) {	// Last uplad?
+			$placeholders = implode( ',', array_fill( 0, count( $photos ), '%d' ) );
+			$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY timestamp DESC", $photos ) );
+			wppa_show_query();
+		}
 	}
 
 	// Compile status clause
-	switch( wppa_opt( 'potd_status_filter' ) ) {
+	$sfilter =  wppa_opt( 'potd_status_filter' );
+	$voidphotos = [];
+	switch( $sfilter ) {
 		case 'publish':
-			$statusclause = " status = 'publish' ";
-			break;
 		case 'featured':
-			$statusclause = " status = 'featured' ";
-			break;
 		case 'gold':
-			$statusclause = " status = 'gold' ";
-			break;
 		case 'silver':
-			$statusclause = " status = 'silver' ";
-			break;
 		case 'bronze':
-			$statusclause = " status = 'bronze' ";
+			$voidphotos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status <> %s", $sfilter ) );
+			wppa_show_query();
 			break;
 		case 'anymedal':
-			$statusclause = " status IN ( 'gold', 'silver', 'bronze' ) ";
+			$voidphotos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE status NOT IN ('gold', 'silver', 'bronze')" );
+			wppa_show_query();
 			break;
 		default:
-			$statusclause = " status <> 'scheduled' ";
-			if ( ! is_user_logged_in() ) {
-				$statusclause .= " AND status <> 'private' ";
+			if ( is_user_logged_in() ) {
+				$voidphotos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE status = 'scheduled'" );
+				wppa_show_query();
 			}
-	}
-
-	// If physical album(s) and include sub albums is active, make it an enumeration(with ',' as seperator)
-	if ( wppa_opt( 'potd_album_type' ) == 'physical' && wppa_switch( 'potd_include_subs' ) ) {
-		$alb = str_replace( ',', '.', $alb );
-		$alb = wppa_expand_enum( wppa_alb_to_enum_children( $alb ) );
-		$alb = str_replace( '.', ',', $alb );
-	}
-
-	// If physical albums and inverse selection is active, invert selection
-	if ( wppa_opt( 'potd_album_type' ) == 'physical' && wppa_switch( 'potd_inverse' ) ) {
-		$albs = explode( ',', $alb );
-		$all  = wppa_get_col( "SELECT id FROM $wpdb->wppa_albums " );
-		$alb  = implode( ',', array_diff( $all, $albs ) );
-	}
-
-	/* Now find out the final query */
-
-	/* Physical albums */
-
-	// Is it a single album?
-	if ( wppa_is_int( $alb ) ) {
-		$query = $wpdb->prepare( "SELECT id, p_order FROM $wpdb->wppa_photos WHERE album = %d AND %s %s", $alb, str_replace( "'", "`", $statusclause ), str_replace( "'", "`", $option ) );
-		$query = wppa_fix_query( $query );
-	}
-
-	// Is it an enumeration of album ids?
-	elseif ( strchr( $alb, ',' ) ) {
-		$alb = trim( $alb, ',' );
-
-		$query = 	"SELECT id, p_order " .
-					"FROM $wpdb->wppa_photos " .
-					"WHERE album IN ( " . $alb . " ) " .
-					"AND " . $statusclause . $option;
-	}
-
-	/* Virtual albums */
-	// Is it ALL?
-	elseif ( $alb == 'all' ) {
-		$query = 	"SELECT id, p_order " .
-					"FROM $wpdb->wppa_photos " .
-					"WHERE " . $statusclause . $option;
-	}
-
-	// Is it SEP?
-	elseif ( $alb == 'sep' ) {
-		$albs = wppa_get_results( "SELECT id, a_parent FROM $wpdb->wppa_albums" );
-		$query = "SELECT id, p_order FROM $wpdb->wppa_photos WHERE ( album = 0 ";
-		$first = true;
-		foreach ( $albs as $a ) {
-			if ( $a['a_parent'] == '-1' ) {
-				$query .= "OR album = '" . $a['id'] . "' ";
+			else {
+				$voidphotos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE status IN ('private', 'scheduled')" );
+				wppa_show_query();
 			}
-		}
-		$query .= ") AND " . $statusclause . $option;
+			break;
+	}
+	$photos = array_diff( $photos, $voidphotos );
+//	$photos = wppa_strip_void_photos( $photos );
+
+	if ( ! count( $photos ) ) return [];
+
+	// If change every ..., order by p_order
+	if ( wppa_opt( 'potd_method' ) == '4' ) {
+		$placeholders = implode( ',', array_fill( 0, count( $photos ), '%d' ) );
+		$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY p_order", $photos ) );
+		wppa_show_query();
 	}
 
-	// Is it ALL-SEP?
-	elseif ( $alb == 'all-sep' ) {
-		$albs = wppa_get_results( "SELECT id, a_parent FROM $wpdb->wppa_albums" );
-		$query = "SELECT id, p_order FROM $wpdb->wppa_photos WHERE ( album IN (0";
-		foreach ( $albs as $a ) {
-			if ( $a['a_parent'] != '-1' ) {
-				$query .= ",'" . $a['id'] . "'";
-			}
-		}
-		$query .= ") ) AND " . $statusclause . $option;
-	}
-
-	// Is it Topten?
-	elseif ( $alb == 'topten' ) {
-
-		// Find the 'top' policy
-		switch ( wppa_opt( 'topten_sortby' ) ) {
-			case 'mean_rating':
-				$sortby = 'mean_rating DESC, rating_count DESC, views DESC';
-				break;
-			case 'rating_count':
-				$sortby = 'rating_count DESC, mean_rating DESC, views DESC';
-				break;
-			case 'views':
-				$sortby = 'views DESC, mean_rating DESC, rating_count DESC';
-				break;
-			default:
-				wppa_error_message( 'Unimplemented sorting method' );
-				$sortby = '';
-				break;
-		}
-
-		// It is assumed that status is ok for top rated photos
-		$query = "SELECT id, p_order FROM $wpdb->wppa_photos ORDER BY " . $sortby . " LIMIT " . wppa_opt( 'topten_count' );
-	}
-
-	// Do the query
-	if ( $query ) {
-
-		// First get the count
-		if ( $count_only ) {
-			$tquery = str_replace( 'id, p_order', 'COUNT(*)', $query);
-			$total = wppa_get_var( $tquery );
-			return $total;
-		}
-
-		if ( strpos( $query, 'LIMIT' ) === false ) {
-			$query .= ' LIMIT 100';
-		}
-		$photos = wppa_get_results( $query );
-
-		// Strip void photos
-		$photos = wppa_strip_void_photos( $photos );
-	}
-	else {
-		$photos = array();
-	}
+	// Make sure indexes are successive so you van get the nth value by key = n
+	$photos = explode( '.', implode( '.', $photos ) );
 
 	// Ready
 	return $photos;
@@ -189,13 +157,16 @@ global $wpdb;
 			if ( $album == 'topten' ) {
 				$images = wppa_get_widgetphotos( $album );
 				if ( count( $images ) > 1 ) {	// Select a random first from the current selection
-					$idx = wp_rand( 0, count( $images ) - 1 );
-					$id = $images[$idx]['id'];
+					$idx = wp_rand( 0, min( count( $images )-1, 10 ) );
+					$id = $images[$idx];
 				}
 			}
 			elseif ( $album != '' ) {
-				$images = wppa_get_widgetphotos( $album, "ORDER BY RAND() LIMIT 0,1" );
-				$id = $images[0]['id'];
+				$images = wppa_get_widgetphotos( $album );
+				if ( count( $images ) ) {
+					$idx = wp_rand( 0, min( count( $images )-1, 100 ) );
+					$id = $images[$idx];
+				}
 			}
 			break;
 
@@ -206,20 +177,12 @@ global $wpdb;
 				$images = wppa_get_widgetphotos( $album );
 				if ( $images ) {
 
-					// find last uploaded image in the $images pool
-					$temp = 0;
-					foreach( $images as $img ) {
-						if ( $img['timestamp'] > $temp ) {
-							$temp = $img['timestamp'];
-							$image = $img;
-						}
-					}
-					$id = $image['id'];
+					$id = $image[0];
 				}
 			}
 			elseif ( $album != '' ) {
-				$images = wppa_get_widgetphotos( $album, "ORDER BY timestamp DESC LIMIT 0,1" );
-				$id = $images[0]['id'];
+				$images = wppa_get_widgetphotos( $album );
+				$id = $images[0];
 			}
 			break;
 
@@ -228,10 +191,10 @@ global $wpdb;
 			$album = wppa_opt( 'potd_album' );
 			if ( $album != '' ) {
 				$per = wppa_opt( 'potd_period' );
-				$photos = wppa_get_widgetphotos( $album, " LIMIT 366" );
+				$photos = wppa_get_widgetphotos( $album );
 				if ( $per == 0 ) {
 					if ( $photos ) {
-						$id = $photos[wp_rand( 0, count( $photos )-1 )]['id'];
+						$id = $photos[wp_rand( 0, count( $photos )-1 )];
 					}
 				}
 				elseif ( $per == 'day-of-week' ) {
@@ -243,7 +206,7 @@ global $wpdb;
 						while ( $d < 1 ) $d += '7';
 						$seqno = $d;
 						foreach ( $photos as $img ) {
-							if ( $img['p_order'] == $d ) $id = $img['id'];
+							if ( wppa_get_photo_item( $img, 'p_order' ) == $d ) $id = $img;
 						}
 					}
 				}
@@ -256,7 +219,7 @@ global $wpdb;
 						while ( $d < 1 ) $d += '31';
 						$seqno = $d;
 						foreach ( $photos as $img ) {
-							if ( $img['p_order'] == $d ) $id = $img['id'];
+							if ( wppa_get_photo_item( $img, 'p_order' ) == $d ) $id = $img;
 						}
 					}
 				}
@@ -269,7 +232,7 @@ global $wpdb;
 						while ( $d < 0 ) $d += '366';
 						$seqno = $d;
 						foreach ( $photos as $img ) {
-							if ( $img['p_order'] == $d ) $id = $img['id'];
+							if ( wppa_get_photo_item( $img, 'p_order' ) == $d ) $id = $img;
 						}
 					}
 				}
@@ -280,7 +243,7 @@ global $wpdb;
 						$w = strval(intval(date_i18n( "W" )));
 						$seqno = $w;
 						foreach ( $photos as $img ) {
-							if ( $img['p_order'] == $w ) $id = $img['id'];
+							if ( wppa_get_photo_item( $img, 'p_order' ) == $w ) $id = $img;
 						}
 					}
 				}
@@ -290,6 +253,7 @@ global $wpdb;
 					$u = floor( $u );
 					$u /= $per;
 					$u = floor( $u );
+
 
 					// Cached value?
 					$cache = wppa_get_option( 'wppa_potd_id_cache', false );
@@ -304,39 +268,21 @@ global $wpdb;
 
 					// Not found in cache
 					if ( ! $id ) {
+
 						// Find the right photo out of the photos found by wppa_get_widgetphotos(),
 						// based on the Change every { any timeperiod } algorithm.
 						if ( $photos ) {
 							$p = count( $photos );
 							$idn = fmod( $u, $p );
-
-							// If from topten,...
-							if ( $album == 'topten' ) {
-
-								// Do a re-read of the same to order by rand, reproduceable
-								// This can not be done by wppa_get_widgetphotos(),
-								// it does already ORDER BY for the top selection criterium.
-								// So we save the ids, and do a SELECT WHERE id IN ( array of found ids ) ORDER BY RAND( seed )
-								$ids = array();
-								foreach( $photos as $photo ) {
-									$ids[] = $photo['id'];
-								}
-								$photos = wppa_get_results( 	"SELECT id, p_order " .
-																"FROM $wpdb->wppa_photos " .
-																"WHERE id IN (" . implode( ',', $ids ) . ") " .
-																"ORDER BY RAND(".$idn.")" );
-							}
-
-							// Not from topten, use wppa_get_widgetphotos() to get a reproduceable random sequence
-							else {
-								$photos = wppa_get_widgetphotos( $album, " ORDER BY RAND($idn) LIMIT 366" );
-							}
+							$ids = $photos;
+							$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+							$photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, p_order FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $ids, [$idn] ) ), ARRAY_A );
+							wppa_show_query();
 
 							// Image found
 							$id = $photos[$idn]['id'];
+							wppa_update_option( 'wppa_potd_id_cache', array( $u => $id ) );
 						}
-
-						wppa_update_option( 'wppa_potd_id_cache', array( $u => $id ) );
 					}
 				}
 			}

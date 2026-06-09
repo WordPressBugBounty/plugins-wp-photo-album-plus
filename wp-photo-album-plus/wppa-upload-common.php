@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains common upload functions
-* Version: 9.0.09.002
+* Version: 9.2.01.001
 *
 */
 
@@ -272,7 +272,7 @@ global $wppa_supported_document_extensions;
 							while ( $i < count( $names ) -1 ) {
 
 								// Find album with parent is current and name is sub album name
-								$a = wppa_get_var( $wpdb->prepare( "SELECT id
+								$a = $wpdb->get_var( $wpdb->prepare( "SELECT id
 																	  FROM $wpdb->wppa_albums
 																	  WHERE name = %s
 																	  AND a_parent = %d
@@ -430,7 +430,7 @@ global $wpdb;
 	if ( ! $file || ! $album ) return false;
 
 	// Identical?
-	if ( wppa_get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE filename = %s AND album = %d", basename( $file ), $album ) ) ) {
+	if ( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE filename = %s AND album = %d", basename( $file ), $album ) ) ) {
 		return true;
 	}
 
@@ -460,33 +460,14 @@ global $wpdb;
 global $wppa_supported_photo_extensions;
 
 	if ( ! $file ) return false;	// Copy/move very old photo, before filnametracking
-	$id = wppa_get_var( $wpdb->prepare( "SELECT id
+	$id = $wpdb->get_var( $wpdb->prepare( "SELECT id
 										   FROM $wpdb->wppa_photos
 										   WHERE filename LIKE %s
 										   AND album = %d",
 										   $wpdb->esc_like( wppa_strip_ext( basename( $file ) ) ) . '.%',
 										   $album
 										) );
-	/* Start debug
-	$aliasses = wppa_get_results( $wpdb->prepare( "SELECT *
-												    FROM $wpdb->wppa_photos
-												    WHERE filename LIKE %s
-												    AND album = %d",
-												    $wpdb->esc_like( wppa_strip_ext( basename( $file ) ) ) . '.%',
-												    $album
-												) );
-	foreach( $aliasses as $a ) {
-		wppa_log( 'obs', 'Alias is '.$a['id'].' in album '.$a['album'].' filename '.$a['filename']);
-	}
-	if ( $id ) wppa_log( 'obs', 'Is file alias returns '.$id);
-	/* End debug */
 	return $id;
-	/*
-	if ( ! $id ) return false;
-	$ext = wppa_get_photo_item( $id, 'ext' );
-	if ( in_array( $ext, $wppa_supported_photo_extensions ) ) return false;
-	return $id;
-	*/
 }
 
 // Fix for missing rotate in video metadata. see https://core.trac.wordpress.org/ticket/56217#comment:10
