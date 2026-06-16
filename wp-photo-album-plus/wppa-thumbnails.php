@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.2.01.001
+* Version: 9.2.02.001
 *
 */
 
@@ -285,7 +285,7 @@ global $wpdb;
 												 'onmouseover' => $onmouseover, 'onmouseout' => $onmouseout] );
 			}
 			else {
-				if ( wppa_opt( 'thumb_linktype' ) == 'fullpopup' && wppa_is_photo( $id ) && wppa_switch( 'art_monkey_on' ) && ( strpos( wppa_opt( 'art_monkey_types' ), 'photo' ) !== false ) ) $pointer = 'pointer;';
+				if ( wppa_opt( 'thumb_linktype' ) == 'fullpopup' && wppa_is_photo( $id ) && wppa_is_item_downloadable( $id ) && ( strpos( wppa_opt( 'art_monkey_types' ), 'photo' ) !== false ) ) $pointer = 'pointer;';
 				else $pointer = 'default;';
 				$result .= wppa_html_tag( 'img', ['id' => 'i-'.$xid.'-'.$mocc, 'src' => $imgurl, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:'.$pointer,
 												  'width' => $thumb['thumbx'], 'height' => $thumb['thumby'],

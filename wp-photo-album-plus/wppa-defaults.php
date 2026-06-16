@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* version 9.1.12.005
+* version 9.2.02.001
 *
 */
 
@@ -778,6 +778,8 @@ horizrailenabled:false,";
 						'wppa_art_monkey_slide' 			=> 'none',
 						'wppa_art_monkey_thumb' 			=> 'no',
 						'wppa_art_monkey_lightbox' 			=> 'no',
+						'wppa_art_monkey_roles' 			=> '-all-',
+						'wppa_art_monkey_albums' 			=> '-all-',
 
 						'wppa_allow_download_album' 		=> 'no',
 						'wppa_download_album_source' 		=> 'yes',

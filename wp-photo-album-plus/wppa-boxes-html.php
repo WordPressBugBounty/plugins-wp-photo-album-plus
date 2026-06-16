@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.01.002
+* Version 9.2.02.003
 *
 */
 
@@ -171,7 +171,7 @@ global $wpdb;
 
 		// Sequence is by mean rating
 		if ( $type == 'average' ) {
-			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND mean_rating <> '' ORDER BY mean_rating DESC LIMIT %d", array_merge( $albarr, $max ) ), ARRAY_A );
+			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND mean_rating <> '' ORDER BY mean_rating DESC LIMIT %d", array_merge( $albarr, [$max] ) ), ARRAY_A );
 			wppa_show_query();
 		}
 
@@ -4816,7 +4816,11 @@ global $wpdb;
 		$thumb = wppa_cache_photo( $photo );
 		$album = $thumb['album'];
 		$order = wppa_get_poc_a( $album );
-		if ( $order['desc'] ) {
+		if ( $order['rand'] ) {
+			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, page_id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d)", $album, $order['rand'] ), ARRAY_A );
+			wppa_show_query();
+		}
+		elseif ( $order['desc'] ) {
 			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, page_id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $album, $order['order'] ), ARRAY_A );
 			wppa_show_query();
 		}

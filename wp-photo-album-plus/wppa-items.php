@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.2.01.001
+* vrsion: 9.2.02.003
 *
 */
 
@@ -239,7 +239,7 @@ global $wppa_skip_alb_to_gal;
 				$result .= ' ';
 			}
 			$user = wppa_get_user_by( 'login', $thumb['owner'] );
-			if ( $user && ( $args['isthumb'] || ( ! ( wppa_switch( 'art_monkey_on' ) && wppa_opt( 'art_monkey_display' ) == 'button' ) ) ) ) {
+			if ( $user && ( $args['isthumb'] || ( ! ( wppa_is_item_downloadable( $id ) && wppa_opt( 'art_monkey_display' ) == 'button' ) ) ) ) {
 				$premium = wppa_get_premium_html( $user->ID );
 			}
 			else {
@@ -579,7 +579,10 @@ global $wpdb;
 	}
 	else {
 		$ord = wppa_get_poc_a( $alb );
-		if ( $ord['desc'] ) {
+		if ( $ord['rand'] ) {
+			$seq = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d)", $alb, $ord['rand'] ) );
+		}
+		elseif ( $ord['desc'] ) {
 			$seq = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $alb, $ord['order'] ) );
 		}
 		else {
@@ -1058,8 +1061,10 @@ function wppa_get_sourcex( $id, $force = false ) {
 	}
 	if ( wppa_is_file( $path ) ) {
 		$sizes = getimagesize( $path );
-		$result = $sizes[0];
-		wppa_update_photo( $id, ['sourcex' => $result] );
+		if ( is_array( $sizes ) ) {
+			$result = $sizes[0];
+			wppa_update_photo( $id, ['sourcex' => $result] );
+		}
 	}
 	return $result;
 }
@@ -1079,8 +1084,10 @@ function wppa_get_sourcey( $id, $force = false ) {
 	}
 	if ( wppa_is_file( $path ) ) {
 		$sizes = getimagesize( $path );
-		$result = $sizes[1];
-		wppa_update_photo( $id, ['sourcey' => $result] );
+		if ( is_array( $sizes ) ) {
+			$result = $sizes[1];
+			wppa_update_photo( $id, ['sourcey' => $result] );
+		}
 	}
 	return $result;
 }

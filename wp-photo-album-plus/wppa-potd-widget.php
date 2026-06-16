@@ -126,7 +126,7 @@ class PhotoOfTheDay extends WP_Widget {
 			if ( wppa_switch( 'potd_counter' ) ) { 	// If we want this
 
 				$c = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d", $alb ) ) - 1;
-				wppa_show_query();
+				$widget_content .= wppa_show_query( true );
 				if ( $c > 0 ) {
 					if ( wppa_opt( 'potd_counter_link' ) == 'thumbs' ) {
 						$lnk = wppa_get_album_url( array( 'album' => $alb,

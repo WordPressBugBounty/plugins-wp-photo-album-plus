@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.2.01.001
+* Version: 9.2.02.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1800,7 +1800,7 @@ global $wpdb;
 			break;
 		case 'fullpopup':
 			// Only if download photos is enabled and it is a photo
-			if ( ! wppa_is_mobile() && wppa_switch( 'art_monkey_on' ) && ( strpos( wppa_opt( 'art_monkey_types' ), 'photo' ) !== false ) && wppa_is_photo( $id ) ) {
+			if ( ! wppa_is_mobile() && wppa_is_item_downloadable( $id ) && ( strpos( wppa_opt( 'art_monkey_types' ), 'photo' ) !== false ) && wppa_is_photo( $id ) ) {
 				$wid = wppa_get_photox( $id );
 				$hig = wppa_get_photoy( $id );
 				$url = esc_url( wppa_download_url( $id ) );
@@ -2176,7 +2176,7 @@ global $wppa_supported_photo_extensions;
 	}
 
 	// Feature enabled?
-	if ( ! wppa_switch( 'art_monkey_on' ) ) {
+	if ( ! wppa_is_item_downloadable( $id ) ) {
 		return $label;
 	}
 

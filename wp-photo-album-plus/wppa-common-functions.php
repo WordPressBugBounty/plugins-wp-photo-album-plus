@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.01.001
+* Version: 9.2.02.003
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -753,9 +753,15 @@ global $wppa;
 
 // Returns array order and desc for given Album
 function wppa_get_poc_a( $id = 0, $no_random = false ) {
-	
+
 	$result = [];
-	$temp = wppa_get_poc( $id = 0, $no_random = false );
+	$temp = wppa_get_poc( $id = 0, $no_random );
+	if ( strpos( $temp, 'RAND' ) !== false ) {
+		$result['rand'] = wppa_get_randseed();
+	}
+	else {
+		$result['rand'] = false;
+	}
 	if ( strpos( $temp, 'DESC' ) !== false ) {
 		$result['desc'] = true;
 		$result['order'] = trim( str_replace( 'DESC', '', $temp ) );
@@ -1288,9 +1294,14 @@ static $result_cache;
 // Then: if album <> 0 and 'role_limit_per_album' is set, look at the album, not global
 function wppa_allow_user_uploads( $album = false ) {
 global $wpdb;
+static $this_count;
 
 	if ( ! is_user_logged_in() ) {
 		return 0;
+	}
+
+	if ( ! is_array( $this_count ) ) {
+		$this_count = array();
 	}
 
 	// PHASE 1 // TEST FOR TREE LIMIT
@@ -1309,7 +1320,13 @@ global $wpdb;
 			$tree_albums = wppa_alb_to_enum_children( $last_parent );
 			$albs = explode( '.', $tree_albums );
 			$placeholders = implode( ',', array_fill( 0, count($albs), '%d' ) );
-			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND owner = %s", array_merge( $albs, [$me] ) ) );
+			if ( isset( $this_count[$tree_albums] ) ) {
+				$count = $this_count[$tree_albums];
+			}
+			else {
+				$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND owner = %s", array_merge( $albs, [$me] ) ) );
+				$this_count[$tree_albums] = $count;
+			}
 			return max( 0, $tree_limit - $count );
 		}
 	}

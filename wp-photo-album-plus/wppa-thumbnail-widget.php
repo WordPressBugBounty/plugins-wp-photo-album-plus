@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 9.2.01.001
+* Version 9.2.02.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -31,6 +31,7 @@ class ThumbnailWidget extends WP_Widget {
 		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
 		$cache 			= wppa_cache_widget( $instance['cache'] );
 		$cachefile 		= wppa_get_widget_cache_path( $this->id );
+		$widget_content = '';
 
 		// Logged in only and logged out?
 		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
@@ -75,7 +76,7 @@ class ThumbnailWidget extends WP_Widget {
 		else {
 			$thumbs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status <> 'pending' AND status <> 'scheduled' LIMIT %d", $max ) );
 		}
-		
+
 		// Now order them
 		if ( $thumbs ) {
 			$desc = false;
@@ -84,27 +85,27 @@ class ThumbnailWidget extends WP_Widget {
 			}
 			$sortby = str_replace( 'ORDER BY', '', $sortby );
 			$sortby = trim( str_replace( 'DESC', '', $sortby ) );
-			
+
 			$placeholders = implode( ',', array_fill( 0, count( $thumbs) , '%d' ) );
 			if ( $sortby == 'RAND()' ) {
 				$rand = wppa_get_randseed( 'session' );
 				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $thumbs, [$rand] ) ), ARRAY_A );
-				wppa_show_query($thumbs);
+				$widget_content .= wppa_show_query( true );
 			}
 			else {
 				if ( ! $sortby ) $sortby = 'id';
 				if ( $desc ) {
 					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i DESC", array_merge( $thumbs, [$sortby] ) ), ARRAY_A );
-					wppa_show_query($thumbs);
+					$widget_content .= wppa_show_query( true );
 				}
 				else {
 					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i", array_merge( $thumbs, [$sortby] ) ), ARRAY_A );
-					wppa_show_query($thumbs);
+					$widget_content .= wppa_show_query( true );
 				}
-			}			
+			}
 		}
 
-		$widget_content = "\n".'<!-- WPPA+ thumbnail Widget start -->';
+		$widget_content .= "\n".'<!-- WPPA+ thumbnail Widget start -->';
 		$maxw = wppa_opt( 'thumbnail_widget_size' );
 		$maxh = $maxw;
 		$lineheight = wppa_opt( 'fontsize_widget_thumb' ) * 1.5;

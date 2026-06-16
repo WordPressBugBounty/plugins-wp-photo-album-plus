@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.2.01.001
+* Version: 9.2.02.003
 *
 */
 
@@ -1289,7 +1289,10 @@ static $cached_cover_photo_ids;
 	if ( '-5' == $id ) {
 		$porder = wppa_get_poc_a( $alb );
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			if ( $porder['desc'] ) {
+			if ( $porder['rand'] ) {
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d) LIMIT %d", $alb, $porder['rand'], $count ), ARRAY_A );
+			}
+			elseif ( $porder['desc'] ) {
 				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC LIMIT %d", $alb, $porder['order'], $count ), ARRAY_A );
 			}
 			else {
@@ -1298,7 +1301,10 @@ static $cached_cover_photo_ids;
 		}
 		else {
 			if ( is_user_logged_in() ) {
-				if ( $porder['desc'] ) {
+				if ( $porder['rand'] ) {
+					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending', 'scheduled') OR owner = %s ) ORDER BY RAND(%d) LIMIT %d", $alb, $user, $porder['rand'], $count ), ARRAY_A );
+				}
+				elseif ( $porder['desc'] ) {
 					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND ( status NOT IN ('pending', 'scheduled') OR owner = %s ) ORDER BY %i DESC LIMIT %d", $alb, $user, $porder['order'], $count ), ARRAY_A );
 				}
 				else {
@@ -1306,7 +1312,10 @@ static $cached_cover_photo_ids;
 				}
 			}
 			else {
-				if ( $porder['desc'] ) {
+				if ( $porder['rand'] ) {
+					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending', 'scheduled', 'private' ) ORDER BY RAND(%d) DESC LIMIT %d", $alb, $porder['rand'], $count ), ARRAY_A );
+				}
+				elseif ( $porder['desc'] ) {
 					$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d AND status NOT IN ('pending', 'scheduled', 'private' ) ORDER BY %i DESC LIMIT %d", $alb, $porder['order'], $count ), ARRAY_A );
 				}
 				else {

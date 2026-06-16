@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 9.2.01.001
+* Version 9.2.02.003
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -222,7 +222,10 @@ class AlbumWidget extends WP_Widget {
 						}
 						elseif ( $link['is_lightbox'] ) {
 							$porder = wppa_get_poc_a( $album['id'] );
-							if ( $order['desc'] ) {
+							if ( $porder['rand'] ) {
+								$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d)", $album['id'], $porder['rand'] ), ARRAY_A );
+							}
+							elseif ( $porder['desc'] ) {
 								$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $album['id'], $porder['order'] ), ARRAY_A );
 							}
 							else {

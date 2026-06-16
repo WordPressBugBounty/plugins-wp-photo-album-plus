@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.2.01.003
+* Version: 9.2.02.002
 *
 */
 
@@ -719,15 +719,6 @@ global $wpdb;
 	$time 	= time();
 	$total 	= 0;
 
-	// Exclude seps?
-
-	if ( wppa_switch( 'excl_sep' ) && $sep ) {
-		$alb_clause = "album > 0 AND album NOT IN (" . $sep . ")";
-	}
-	else {
-		$alb_clause = "album > 0";
-	}
-
 	// Get the sep albums
 	if ( wppa_switch( 'excl_sep' ) && $sep ) {
 		$sep = explode( '.', wppa_expand_enum( wppa_alb_to_enum_children( '-1' ) ) );
@@ -751,11 +742,11 @@ global $wpdb;
 		foreach( $tag_arr as $tag )  {
 			$result[$tag]['tag'] = $tag;
 			if ( wppa_switch( 'excl_sep' ) && $sep ) {
-				$phts = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status NOT IN (`pending`,`scheduled`)
+				$phts = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status NOT IN ('pending','scheduled')
 									  AND album > 0 AND album NOT IN ($placeholders) AND tags LIKE %s", array_merge( $sep, ['%,' . $wpdb->esc_like( $tag ) . ',%'] ) ) );
 			}
 			else {
-				$phts = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status NOT IN (`pending`,`scheduled`)
+				$phts = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE status NOT IN ('pending','scheduled')
 														AND album > 0 AND tags LIKE %s", '%,' . $wpdb->esc_like( $tag ) . ',%' ) );
 			}
 			$result[$tag]['ids'] = $phts;
@@ -3192,8 +3183,6 @@ global $wpdb;
 	if ( count( $result ) > $max_count ) {
 		$result = array_slice( $result, 0, $max_count );
 	}
-
-	// wppa_show_query( '70: '.$query, count($photo_ids).' clipped to '.count($result) );
 
 	return $result;
 }
@@ -6556,4 +6545,39 @@ function wppa_array_intersect( $arr1, $arr2 ) {
 
 	if ( $arr1 === false ) return (array) $arr2;
 	return array_intersect( (array) $arr1, (array) $arr2 );
+}
+
+function wppa_is_item_downloadable( $id ) {
+
+	if ( ! wppa_switch( 'art_monkey_on' ) ) return false;
+
+	// Init no
+	$may = false;
+
+	// Check for roles limitation if any defined
+	$roles = wppa_opt( 'art_monkey_roles' );
+	if ( $roles == '-all-' ) $may = true;
+	if ( ! $may ) {
+		$roles = explode( ',', $roles );
+		foreach( $roles as $role ) {
+			if ( ! $may ) {
+				$may = current_user_can( $role );
+			}
+		}
+	}
+	if ( ! $may ) return false; // User role not ok
+
+	// Re-init no
+	$may = false;
+
+	// Check on album limitation if any defined
+	$albums = wppa_opt( 'art_monkey_albums' );
+	if ( $albums == '-all-' ) return true;
+
+	$album = wppa_get_photo_item( $id, 'album' );
+	$albums = explode( ',', $albums );
+
+	$may = in_array( $album, $albums );
+
+	return $may;
 }

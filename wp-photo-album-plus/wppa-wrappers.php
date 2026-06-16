@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.2.01.003
+* Version 9.2.02.002
 *
 */
 
@@ -1225,7 +1225,7 @@ function wppa_check_filetype_and_ext( $temp_name, $name, $mimetypes ) {
 	}
 }
 
-function wppa_show_query() {
+function wppa_show_query( $return = false ) {
 global $wpdb;
 
 	// Are we enabled?
@@ -1249,8 +1249,8 @@ global $wpdb;
 	is_array( $wpdb->last_result ) ? count( $wpdb->last_result ) : $wpdb->last_result;
 	$qu = ( defined( 'DOING_WPPA_AJAX' ) ? 'A ' : '' ) . basename( $stack[0]['file'] ) . ' ' . $stack[0]['line'] . ': ' . $wpdb->last_query . $brackets[0] . $res . $brackets[1];
 	$msg = '<span style="line-break: anywhere; color: darkblue;">' . $qu . '</span><br>';
-	if ( wppa( 'in_widget' ) || ( is_admin() && ! defined( 'DOING_AJAX' )  ) ) {
-		wppa_echo( $msg );
+	if ( $return ) {
+		return $msg;
 	}
 	else {
 		wppa_out( $msg );

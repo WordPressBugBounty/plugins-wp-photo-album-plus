@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.2.01.001
+* Version: 9.2.02.003
 *
 */
 
@@ -129,6 +129,7 @@ global $wpdb;
 			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
 														   WHERE album < 0 ORDER BY modified DESC
 														   LIMIT %d, %d", $skip, $pagesize ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 
 			$count = count( $photos );
 			if ( ! $count && $parms['page'] > 1 ) {
@@ -144,6 +145,7 @@ global $wpdb;
 			$p = wppa_get( 'photo', '', 'pcrypt', 'strict' );
 			$count 	= $p ? 1 : 0;
 			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $p ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 			$count 	= is_array( $photos ) ? count( $photos ) : 0;
 			$link 	= '';
 		}
@@ -153,7 +155,9 @@ global $wpdb;
 			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
 														   ORDER BY timestamp DESC, id DESC
 														   LIMIT %d, %d", $skip, $pagesize ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 			$count 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
+			wppa_echo( wppa_show_query( true ) );
 
 			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album );
@@ -168,12 +172,18 @@ global $wpdb;
 			$is_album = true;
 			$counts = wppa_get_treecounts_a( $album, true );
 			$count 	= $counts['selfphotos'] + $counts['pendselfphotos'] + $counts['scheduledselfphotos'];
-			$porder = wppa_get_poc_a( $album, 'no_random' );
-			if ( $porder['desc'] ) {
+			$porder = wppa_get_poc_a( $album );
+			if ( $porder['rand'] ) {
+				$photos  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d) LIMIT %d, %d", $album, $porder['rand'], $skip, $pagesize ), ARRAY_A );
+				wppa_echo( wppa_show_query( true ) );
+			}
+			elseif ( $porder['desc'] ) {
 				$photos  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC LIMIT %d, %d", $album, $porder['order'], $skip, $pagesize ), ARRAY_A );
+				wppa_echo( wppa_show_query( true ) );
 			}
 			else {
 				$photos  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i LIMIT %d, %d", $album, $porder['order'], $skip, $pagesize ), ARRAY_A );
+				wppa_echo( wppa_show_query( true ) );
 			}
 			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
@@ -189,6 +199,7 @@ global $wpdb;
 		$count 	= 1;
 		$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
 													   WHERE id = %s", $photo ), ARRAY_A );
+		wppa_echo( wppa_show_query( true ) );
 		$link 	= '';
 	}
 
@@ -198,6 +209,7 @@ global $wpdb;
 													   WHERE owner = %s
 													   ORDER BY timestamp DESC
 													   LIMIT %d, %d", $owner, $skip, $pagesize ), ARRAY_A );
+		wppa_echo( wppa_show_query( true ) );
 
 		if ( ! count( $photos ) && $parms['page'] > 1 ) {
 			wppa_album_photos( $album, $photo, $owner, $moderate, true );
@@ -219,6 +231,7 @@ global $wpdb;
 		// Moderate a single photo
 		if ( $photo ) {
 			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $photo ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 			$count 	= is_array( $photos ) ? count( $photos ) : 0;
 			$link 	= '';
 		}
@@ -229,6 +242,7 @@ global $wpdb;
 			$photos = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos
 										   WHERE status = 'pending'
 										   AND album > 0", ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 			$count = count( $photos );
 		}
 
@@ -237,6 +251,7 @@ global $wpdb;
 
 			// Find pending comments
 			$cmt = $wpdb->get_col( "SELECT photo FROM $wpdb->wppa_comments WHERE status IN ('pending', 'spam')" );
+			wppa_echo( wppa_show_query( true ) );
 
 			$photos = array();
 			if ( is_array( $cmt ) && count( $cmt ) ) {
@@ -246,6 +261,7 @@ global $wpdb;
 
 				foreach( $cmt as $id ) {
 					$photos[] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $id ), ARRAY_A );
+					wppa_echo( wppa_show_query( true ) );
 				}
 			}
 		}
@@ -364,6 +380,7 @@ global $wpdb;
 				$ids = $photos;
 				$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 				$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY timestamp DESC", $ids ), ARRAY_A );
+				wppa_echo( wppa_show_query( true ) );
 			}
 		}
 
@@ -538,12 +555,15 @@ global $wpdb;
 
 			// Is there exif data?
 			$exifs = $quick ? array() : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_exif WHERE photo = %s ORDER BY tag, id", $id ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 
 			// Is there iptc data?
 			$iptcs = $quick ? array() : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE photo = %s ORDER BY tag, id", $id ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 
 			// Are there comments?
 			$comments = $quick ? array() : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE photo = %s ORDER BY timestamp DESC ", $id ), ARRAY_A );
+			wppa_echo( wppa_show_query( true ) );
 
 			// Anchor for scroll to
 			wppa_echo( '<a id="photo_' . $id . '"></a>' );
@@ -3997,7 +4017,7 @@ global $wpdb;
 				//		$imgstyle = 'width:'.$w.'px;height:'.$h.'px;margin-top:'.$mt.'px;';
 						$imgstyle = 'max-width:100%;max-height:100%;margin:auto;';
 						if ( wppa_is_video( $id ) ) {
-							$result .= 
+							$result .=
 							'<div style="width:160px;height:120px;text-align:center;position:relative;padding:10px 10px 10px;">' .
 							wppa_get_video_html( ['id' => $id, 'controls' => false, 'tagid' => 'pa-id-'.$id, 'class' => 'wppa-bulk-thumb', 'style' => $imgstyle, 'use_thumb' => true] ) .
 							'</div>';

@@ -1066,8 +1066,8 @@ global $wppa;
 
 	// #tags
 	if ( wppa( 'is_tag' ) ) {
-		$tags = wppa( 'is_tag' );
-		if ( $tags == ',-none-,' ) {
+		$tags = trim( wppa( 'is_tag' ), ';,' );
+		if ( $tags == '-none-' ) {
 			$ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE tags = ''" );
 			wppa_show_query();
 			$total_ids = wppa_array_intersect( $total_ids, $ids );
@@ -1075,14 +1075,14 @@ global $wppa;
 		else {
 			if ( strpos( $tags, ';' ) !== false || wppa( 'is_related' ) ) {
 				$andor = 'OR';
+				$totphos = [];
 			}
 			else {
 				$andor = 'AND';
+				$totphos = false;
 			}
 			$tags = wppa_sanitize_tags( $tags );
 			$seltags = explode( ',', trim( $tags, ',' ) );
-			$first = true;
-			$totphos = [];
 			foreach ( $seltags as $tag ) {
 				$phos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE tags LIKE %s", '%,' . $wpdb->esc_like( $tag ) . ',%' ) );
 				wppa_show_query();
@@ -1090,16 +1090,10 @@ global $wppa;
 					$totphos = array_merge( $totphos, $phos );
 				}
 				else {
-					if ( $first ) {
-						$totphos = $phos;
-					}
-					else {
-						$totphos = array_intersect( $totphos, $phos );
-					}
-					$first = false;
+					$totphos = wppa_array_intersect( $totphos, $phos );
 				}
 			}
-			$ids = $phos;
+			$ids = $totphos;
 			$total_ids = wppa_array_intersect( $total_ids, $ids );
 		}
 		if ( wppa( 'related_count' ) ) {
@@ -1109,17 +1103,17 @@ global $wppa;
 
 	// #cats
 	if ( wppa( 'is_cat' ) ) {
-		$cats = wppa( 'is_cat' );
+		$cats = trim( wppa( 'is_cat' ), ';,' );
 		if ( strpos( $cats, ';' ) !== false ) {
 			$andor = 'OR';
+			$totalbs = [];
 		}
 		else {
 			$andor = 'AND';
+			$totalbs = false;
 		}
 		$cats = wppa_sanitize_cats( $cats );
 		$selcats = explode( ',', trim( $cats, ',' ) );
-		$first = true;
-		$totalbs = [];
 		foreach( $selcats as $cat ) {
 			$albs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE cats LIKE %s", '%,' . $wpdb->esc_like( $cat ) . ',%' ) );
 			wppa_show_query();
@@ -1127,21 +1121,18 @@ global $wppa;
 				$totalbs = array_merge( $totalbs, $albs );
 			}
 			else {
-				if ( $first ) {
-					$totalbs = $albs;
-				}
-				else {
-					$totalbs = array_intersect( $totalbs, $albs );
-				}
+				$totalbs = wppa_array_intersect( $totalbs, $albs );
 			}
-			$first = false;
 		}
 		$albs = $totalbs;
 
 		if ( ! count( $albs ) ) {
 			return array();
 		}
-		$ids = $albs;
+
+		// albs -> phos
+		$placeholders = implode( ',', array_fill( 0, count( $albs ), '%d' ) );
+		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $albs ) );
 		$total_ids = wppa_array_intersect( $total_ids, $ids );
 	}
 
@@ -2233,7 +2224,7 @@ static $user;
 			$fullname = wppa_get_download_html( $id, 'nameonly', $fullname );
 
 			// In case of art monkey button on, do not place the medal on the button, but seperately
-			if ( wppa_switch( 'art_monkey_on' ) && wppa_opt( 'art_monkey_display' ) == 'button' ) {
+			if ( wppa_is_item_downloadable( $id ) && wppa_opt( 'art_monkey_display' ) == 'button' ) {
 				$fullname .= wppa_the_medal_html( $id );
 			}
 		}
@@ -2548,7 +2539,7 @@ function wppa_get_slide_name_a( $id ) {
 	$alb 		= wppa_get_photo_item( $id, 'album' );
 	$disp 		= wppa_is_item_displayable( $alb, 'name', 'show_full_name' ) || ( wppa('in_widget') && wppa('name_on'));
 	$addmedal 	= true;
-	if ( wppa_switch( 'art_monkey_on' ) && wppa_opt( 'art_monkey_display' ) == 'button' ) $addmedal = false;
+	if ( wppa_is_item_downloadable( $id ) && wppa_opt( 'art_monkey_display' ) == 'button' ) $addmedal = false;
 
 	if ( $disp && ( ! wppa( 'is_slideonly' ) || wppa( 'name_on' ) ) && ! wppa( 'is_filmonly' ) ) {
 		$name = esc_js( wppa_get_photo_name( $id ) );
@@ -2556,7 +2547,7 @@ function wppa_get_slide_name_a( $id ) {
 														'addmedal' 	=> $addmedal,
 														'escjs' 	=> true,
 														'showname' 	=> true,
-														'nobpdomain' => wppa_switch( 'art_monkey_on' ),
+														'nobpdomain' => wppa_is_item_downloadable( $id ),
 													) );
 	}
 
@@ -5510,7 +5501,7 @@ function wppa_get_lbtitle( $type, $id ) {
 	$thumb 	= wppa_cache_photo( $id );
 	$alb 	= $thumb['album'];
 
-	$do_download = wppa_switch( 'art_monkey_on' ) && wppa_switch( 'art_monkey_lightbox' );
+	$do_download = wppa_is_item_downloadable( $id ) && wppa_switch( 'art_monkey_lightbox' );
 	if ( $type == 'xphoto' ) $type = 'mphoto';
 
 	$do_name 	= wppa_is_item_displayable( $alb, 'name', 'ovl_name' );

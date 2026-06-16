@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 9.2.01.001
+* Version 9.2.02.002
 *
 */
 
@@ -258,10 +258,11 @@ global $wppa_opt;
 	}
 
 	$size 	= min( 10, count( $opts ) );
+	$max_width = wppa_is_posint( $max_width ) ? 'max-width:' . $max_width . 'px' : '';
 	$title 	= wppa_is_mobile() ? '' : __( 'Hold CTRL key to add/remove items from the selection, click outside the selectionbox for immediate update', 'wp-photo-album-plus' );
 	$html 	= '
 	<select
-		style="float:left;font-size:11px;margin:0px;padding:0px;max-width:' . $max_width . 'px;height:auto !important;"
+		style="float:left;font-size:11px;margin:0px;padding:0px;' . $max_width . ';height:auto !important;"
 		id="' . $slug . '"
 		multiple
 		size="' . $size . '"

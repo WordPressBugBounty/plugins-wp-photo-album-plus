@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.2.01.001
+* version 9.2.02.002
 *
 */
 
@@ -32,7 +32,7 @@ global $wppa_hide_this;
 	// Start test area
 
 	if ( wppa_is_file( dirname( __FILE__ ) . '/wppatestcode.php' ) ) include 'wppatestcode.php';
-	
+
 	// End test area
 
 	// Initialize
@@ -5653,6 +5653,44 @@ global $wppa_hide_this;
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '9', $name, $desc, $html, $help, $amo, 'amo');
 
+						$name = __('Show download link for user roles', 'wp-photo-album-plus');
+						$desc = __('Limit downloads to users with certain roles', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_art_monkey_roles';
+						$opts = [];
+						$vals = [];
+						$roles = $wp_roles->roles;
+						foreach (array_keys($roles) as $key) {
+							$role = $roles[$key];
+							$rolename = translate_user_role( $role['name'] );
+							$opts[] = $rolename;
+							$vals[] = $key;
+						}
+						$html = wppa_select_m($slug, $opts, $vals);
+						wppa_setting_new($slug, '10', $name, $desc, $html, $help, $amo, 'amo');
+
+						$name = __('Show download link on items from albums', 'wp-photo-album-plus');
+						$desc = __('Limit downloads to items from certain albums', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_art_monkey_albums';
+						$opts = [];
+						$vals = [];
+						$albs = $wpdb->get_results( "SELECT id, name FROM $wpdb->wppa_albums", ARRAY_A );
+
+						// Add paths
+						$albs = wppa_add_paths( $albs );
+
+						// Sort
+						$albs = wppa_array_sort( $albs, 'name' );
+
+						// Convertto opts and vals arrays
+						foreach( $albs as $alb ) {
+							$opts[] = $alb['name'];
+							$vals[] = $alb['id'];
+						}
+						$html = wppa_select_m($slug, $opts, $vals, '', '', false, '', 'auto');
+						wppa_setting_new($slug, '11', $name, $desc, $html, $help, $amo, 'amo');
+
 						wppa_setting_box_footer_new();
 					}
 					// Other links
@@ -6909,7 +6947,7 @@ global $wppa_hide_this;
 						$onch = '';
 						$html = wppa_select_m($slug, $opts, $vals, $onch, '', false, '', '220' );
 						wppa_setting_new($slug, '48', $name, $desc, $html, $help);
-						
+
 						$name = __('SEO optimize', 'wp-photo-album-plus');
 						$desc = __('Creates metatags for featured items and physical image sizes in img tags', 'wp-photo-album-plus');
 						$help = '';
@@ -10429,7 +10467,7 @@ global $wppa_hide_this;
 						wppa_setting_new($slug, '13', $name, $desc, $html, $help);
 
 						$name = __('Enable debug messages', 'wp-photo-album-plus');
-						$desc = __('Prints debug messages on the frontend', 'wp-photo-album-plus');
+						$desc = __('Prints debug messages at the frontend and certain admin pages', 'wp-photo-album-plus');
 						$help = __('The debug messages are only displayed to administrators', 'wp-photo-album-plus');
 						$slug = 'wppa_print_debug';
 						$opts = ['none', 'queries', 'urls', 'all'];
