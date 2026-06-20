@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.02.003
+* Version: 9.2.02.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -268,7 +268,8 @@ global $wppa_current_shortcode_atts;
 		'rating_start' 				=> 0,
 		'rating_end'				=> 0,
 		'is_multi_virtual' 			=> false,
-		'random' 					=> '',
+		'random' 					=> '', 		// randseed
+		'is_random' 				=> '', 		// random overrule bu shortcode
 		'get_photos_result' 		=> '',
 		'is_name' 					=> '',
 		'is_iptc' 					=> '',
@@ -300,16 +301,26 @@ global $wppa_randseed_modified;
 		// This randseed is for one pageload only
 		case 'page':
 
-			// Reset the default randseed
-			wppa_renew_randseed();
-
-			// Not Been here before?
-			if ( ! $wppa_volitile_randseed ) {
-
-				// Make new pageload specific rsandseed
-				$wppa_volitile_randseed = time() % 7487;
+			if ( wppa( 'random' ) ) {
+				$result = wppa( 'random' );
 			}
-			$result = $wppa_volitile_randseed;
+			elseif ( wppa_get( 'random', 0, 'int' ) ) {
+				$result = wppa( 'random' );
+			}
+
+			else {
+
+				// Reset the default randseed
+				wppa_renew_randseed();
+
+				// Not Been here before?
+				if ( ! $wppa_volitile_randseed ) {
+
+					// Make new pageload specific rsandseed
+					$wppa_volitile_randseed = time() % 7487;
+				}
+				$result = $wppa_volitile_randseed;
+			}
 			break;
 
 		// This randseed is new for each pagelad and all subsequent ajax calls.
@@ -595,7 +606,7 @@ global $wppa;
 
 	// Random overrule?
 	if ( wppa( 'is_random' ) ) {
-		$result = " ORDER BY RAND(" . time() % 4711 . ")";
+		$result = " ORDER BY RAND(" . wppa_get_randseed() . ")";
 		return $result;
 	}
 
@@ -949,7 +960,7 @@ global $current_user;
 		// Any logged out created albums? ( owner = ip )
 		$albs = $wpdb->get_col( "SELECT owner FROM $wpdb->wppa_albums" );
 		if ( $albs ) foreach ( $albs as $a ) {
-			if ( wppa_is_int( str_replace( '.', '', $a['owner'] ) ) ) return true;
+			if ( wppa_is_int( str_replace( '.', '', $a ) ) ) return true;
 		}
 
 		// Any albums owned by this user?

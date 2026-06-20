@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.2.02.001
+* Version: 9.2.02.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -2365,8 +2365,8 @@ function wppa_roundup_url( $url, $no_random = false ) {
 			$temp_2[] = 'wppa-medals-only=1';
 		}
 
-		// See if random overrule, Then: add arg
-		if ( wppa( 'random' ) && ! $no_random ) {
+		// See if random overrule, or current url is random Then: add arg
+		if ( wppa( 'random' ) ) { //( wppa( 'is_random' ) || wppa_get( 'random', 0, 'int' ) ) ) { // && ! $no_random ) ) {
 			$temp_2[] = 'wppa-random=' . wppa( 'random' );
 		}
 

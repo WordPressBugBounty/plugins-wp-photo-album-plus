@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.2.01.001
+* Version: 9.2.02.004
 *
 */
 
@@ -171,7 +171,7 @@ global $wppa_after_smx;
 	$wppa['meonly'] 	= $atts['meonly'];
 	$wppa['container-wrapper-class'] = $atts['class'];
 	$wppa['targetmocc'] = $atts['targetmocc'];
-	$wppa['random']  	= $atts['random'];
+	$wppa['is_random']  	= $atts['random'];
 	$wppa['max'] 		= $atts['max'];
 	$wppa['bpprofile'] 	= $atts['bpprofile'];
 

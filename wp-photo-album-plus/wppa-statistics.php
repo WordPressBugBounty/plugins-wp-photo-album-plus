@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.2.01.001
+* Version: 9.2.02.004
 *
 */
 
@@ -66,7 +66,7 @@ global $wpdb;
 	// Owner or public
 	else {
 		if ( $alb ) {
-			$placeholders = implode( ',', array_fill( count( $alb ), '%d' ) );
+			$placeholders = implode( ',', array_fill( 0, count( $alb ), '%d' ) );
 			$alb[] = '--- public ---';
 			$alb[] = wppa_get_user();
 			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id IN ($placeholders) AND ( owner = %s OR owner = %s )", $alb ) );

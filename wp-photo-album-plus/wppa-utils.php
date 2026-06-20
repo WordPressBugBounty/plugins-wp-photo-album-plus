@@ -720,13 +720,14 @@ global $wpdb;
 	$total 	= 0;
 
 	// Get the sep albums
-	if ( wppa_switch( 'excl_sep' ) && $sep ) {
+	if ( wppa_switch( 'excl_sep' ) ) {
 		$sep = explode( '.', wppa_expand_enum( wppa_alb_to_enum_children( '-1' ) ) );
 		$placeholders = implode( ',', array_fill( '0', count( $sep ), '%d' ) );
 	}
+	else $sep = false;
 
 	// Get the existing tags raw
-	if ( wppa_switch( 'excl_sep' ) && $sep ) {
+	if ( wppa_switch( 'excl_sep' ) && is_array( $sep ) ) {
 		$raw_tagcol = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT tags FROM $wpdb->wppa_photos WHERE status NOT IN ('pending', 'scheduled') AND album > 0 AND album NOT IN ($placeholders) AND tags <> ''", $sep ) );
 	}
 	else {

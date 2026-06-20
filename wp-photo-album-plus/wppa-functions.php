@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.01.002
+* Version: 9.2.02.004
 *
 */
 
@@ -891,11 +891,11 @@ global $albums_used;
 
 	// Order random?
 	$ran = false;
-	if ( wppa( 'random' ) ) {
+	if ( wppa( 'is_random' ) ) {
 		$ran = wppa( 'random' );
 	}
 	elseif ( strpos( $order, 'RAND' ) !== false ) {
-		wppa( 'random', wppa_get_randseed( 'page' ) );
+		wppa( 'random', wppa_get_randseed() );
 		$ran = wppa( 'random' );
 	}
 
@@ -1003,7 +1003,7 @@ global $wppa;
 			wppa( 'random', wppa_get( 'random', 0, 'int' ) );
 		}
 		if ( ! wppa( 'random' ) ) {
-			wppa( 'random', wppa_get_randseed( 'page' ) );
+			wppa( 'random', wppa_get_randseed() );
 		}
 	}
 
@@ -1499,7 +1499,7 @@ global $wppa;
 
 	// Order random set by shortcode?
 	$sc_random = false;
-	if ( wppa( 'random' ) ) {
+	if ( wppa( 'is_random' ) ) {
 		if ( wppa( 'is_lasten' ) || wppa( 'is_topten' ) ) {
 			$sc_random = true;
 		}

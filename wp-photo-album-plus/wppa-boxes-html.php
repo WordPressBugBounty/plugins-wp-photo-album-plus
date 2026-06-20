@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.02.003
+* Version 9.2.02.004
 *
 */
 
@@ -4611,7 +4611,7 @@ global $wppa_exif_cache;
 
 	// Get tha labels if not yet present
 	if ( ! is_array( $wppa_exif_labels ) ) {
-		$wppa_exif_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag" );
+		$wppa_exif_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0 ORDER BY tag", ARRAY_A );
 		wppa_show_query();
 	}
 
