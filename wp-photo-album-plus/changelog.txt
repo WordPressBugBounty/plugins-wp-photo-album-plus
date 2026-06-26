@@ -1,5 +1,9 @@
 WP Photo Album Plus Changelog
 
+= 9.2.03 =
+
+* Security fix
+
 = 9.2.02 =
 
 * Fixed bugs related to selection by cats and tags
