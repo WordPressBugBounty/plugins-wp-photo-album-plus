@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.01.001
+* Version: 9.2.04.003
 *
 */
 
@@ -328,11 +328,11 @@ global $wppa_supported_audio_extensions;
 			}
 
 			if ( $brand ) {
-				$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT f_description FROM $wpdb->wppa_exif WHERE photo > 0 AND tag = %s 
+				$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT f_description FROM $wpdb->wppa_exif WHERE photo > 0 AND tag = %s
 					AND brand = %s AND f_description <> '' ORDER BY f_description", $tag, $brand ), ARRAY_A );
 			}
 			else {
-				$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT f_description FROM $wpdb->wppa_exif WHERE photo > 0 AND tag = %s 
+				$exifdata = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT f_description FROM $wpdb->wppa_exif WHERE photo > 0 AND tag = %s
 					AND f_description <> '' ORDER BY f_description", $tag ), ARRAY_A );
 			}
 
@@ -1564,7 +1564,7 @@ global $wppa_supported_audio_extensions;
 			}
 
 			// Compute my avg rating
-			$myrats = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating WHERE photo = %d AND user = %s AND status = 'publish'", $photo, $user ) );
+			$myrats = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_rating WHERE photo = %d AND user = %s AND status = 'publish'", $photo, $user ), ARRAY_A );
 
 			if ( $myrats ) {
 				$sum = 0;
@@ -4445,7 +4445,15 @@ global $wppa_supported_audio_extensions;
 				wppa_echo( '||1||'.__( 'Security check failure' , 'wp-photo-album-plus' ) );
 				wppa_exit();
 			}
+
+			// Check for valid table name
 			$table = wppa_get( 'table' );
+			$allowed_tables = [$wpdb->wppa_albums, $wpdb->wppa_photos, $wpdb->wppa_rating, $wpdb->wppa_comments, $wpdb->wppa_iptc, $wpdb->wppa_exif, $wpdb->wppa_index];
+			if ( ! in_array( $table, $allowed_tables ) ) {
+				wppa_echo( '||2||' . __( 'Invalid table identification', 'wp-photo-album-plus' ) );
+				wppa_exit();
+			}
+
 			$bret = wppa_export_table( $table );
 			if ( $bret ) {
 				wppa_echo( '||0||' . WPPA_UPLOAD_URL . '/temp/' . $table . '.csv' );

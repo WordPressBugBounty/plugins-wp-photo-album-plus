@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.02.004
+* Version: 9.2.04.001
 *
 */
 
@@ -445,6 +445,10 @@ global $other_deps;
 	elseif ( wppa( 'is_tagcloudbox' ) ) {
 		wppa_tagcloud_box( wppa( 'taglist' ), wppa_opt( 'tagcloud_min' ), wppa_opt( 'tagcloud_max' ) );
 	}
+	// Is it the ownerselection box?
+	elseif ( wppa( 'is_ownerselection' ) ) {
+		wppa_owmerselection_box();
+	}
 	// Is it an upload box?
 	elseif ( wppa( 'is_upload' ) ) {
 		wppa_upload_box();
@@ -639,6 +643,7 @@ global $albums_used;
 	if ( wppa( 'calendar' ) == 'exifdtm' ) return false;
 	if ( wppa( 'calendar' ) == 'timestamp' ) return false;
 	if ( wppa( 'calendar' ) == 'modified' ) return false;
+	if ( wppa( 'ownersearch' ) ) return false;
 
 	// Init
 	wppa_show_item_selection_runparms();
@@ -1015,8 +1020,15 @@ global $wppa;
 		wppa( 'start_album', wppa_alb_to_enum_children( wppa( 'start_album' ) ) );
 	}
 
+	// If ownersearch...
+	if ( wppa( 'ownersearch' ) ) {
+		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0", wppa( 'is_owner' ) ) );
+		wppa_show_query();
+		$total_ids = $ids;
+	}
+
 	// Single Album
-	if ( wppa_is_posint( wppa( 'start_album' ) ) ) {
+	elseif ( wppa_is_posint( wppa( 'start_album' ) ) ) {
 		$a = wppa( 'start_album' );
 		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %d", $a ) );
 		wppa_show_query();
@@ -1137,7 +1149,7 @@ global $wppa;
 	}
 
 	// #owner
-	if ( wppa( 'is_owner' ) ) {
+	if ( wppa( 'is_owner' ) && ! wppa( 'ownersearch' ) ) {
 		$albs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_albums WHERE owner = %s", wppa( 'is_owner' ) ) );
 		wppa_show_query();
 		$ids = array();
@@ -1395,6 +1407,13 @@ global $wppa;
 			$max = wppa( 'related_count' );
 		}
 	}
+
+	// Ownersearch
+//	if ( wppa( 'ownersearch' ) ) {
+//		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0", wppa( 'is_owner' ) ) );
+//		wppa_show_query();
+//		$total_ids = $ids;//wppa_array_intersect( $total_ids, $ids );
+//	}
 
 	// Calendar
 	if ( wppa( 'calendar' ) ) {

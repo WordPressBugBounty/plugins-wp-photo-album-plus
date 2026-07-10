@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various conversion functions
-* Version: 9.2.01.001
+* Version: 9.2.04.001
 *
 */
 
@@ -16,6 +16,8 @@ global $wpdb;
 
 	// We start with arg $albumm, so clear start_album first
 	wppa( 'start_album', '' );
+
+	wppa( 'is_owner', wppa_get( 'owner', '', 'text' ) );
 
 	if ( $albums ) {
 
@@ -396,6 +398,7 @@ global $wpdb;
 	$wppa['is_parent'] = wppa_get( 'parent', 0, 'int' );
 	$wppa['landscape'] = wppa_get( 'landscape', 0, 'int' );
 	$wppa['portrait'] = wppa_get( 'portrait', 0, 'int' );
+	$wppa['ownersearch'] = wppa_get( 'ownersearch', 0, 'int' );
 
 	if ( wppa_get( 'lbtimeout' ) ) $wppa['lbtimeout'] = wppa_get( 'lbtimeout' );
 	if ( wppa_get( 'lbstart' ) ) $wppa['lbstart'] = wppa_get( 'lbstart' );
@@ -502,7 +505,7 @@ global $wppa_current_shortcode;
 			   'is_tagcloudbox', 'is_related', 'related_count', 'is_owner', 'is_parent', 'is_upldr', 'is_cat', 'bestof', 'is_subsearch', 'is_rootsearch', 'is_superviewbox', 'is_searchbox',
 			   'may_sub', 'may_root', 'shortcode_content', 'is_supersearch', 'supersearch', 'is_wppa_tree', 'is_calendar', 'current_photo', 'is_stereobox', 'is_url',
 			   'is_inverse', 'is_admins_choice', 'random', 'is_combinedsearch', 'is_potdhis', 'is_contest', 'start_photos', 'landscape', 'portrait', 'is_audioonly',
-			   'is_notify', 'is_virtual', 'is_multi_virtual', 'is_cover'];
+			   'is_notify', 'is_virtual', 'is_multi_virtual', 'is_cover', 'ownersearch'];
 
 	$result = '<span style="color: darkred;">' . $wppa_current_shortcode . '</span><br><span style="line-break: anywhere; color: green;">';
 	foreach( $sparms as $parm ) {

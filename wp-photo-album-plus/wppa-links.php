@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.2.02.004
+* Version: 9.2.04.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1010,7 +1010,7 @@ global $previous_page_last_id;
 	$ref_occur = wppa( 'targetmocc' );
 
 	// album
-	if ( ! wppa_get( 'forceroot' ) ) {
+	if ( ! wppa_get( 'forceroot' ) && ! wppa( 'ownersearch' ) ) {
 		if ( ( $occur == $ref_occur || wppa( 'ajax' ) ) && wppa_get('album') ) {
 				$alb = wppa_get( 'album' );
 		}
@@ -1098,6 +1098,15 @@ global $previous_page_last_id;
 	if ( $searchstring ) {
 		$extra_url .= '&amp;wppa-src=1&amp;wppa-searchstring='.$searchstring;
 	}
+
+	if ( wppa( 'is_owner' ) ) {
+//		$extra_url .= '&amp;wppa-owner='.wppa( 'is_owner' );
+	}
+
+	if ( wppa( 'ownersearch' ) ) {
+//		$extra_url .= '&amp;wppa-ownersearch='.wppa( 'ownersearch' );
+	}
+
 
 	// Almost ready
 	$link_url .= $extra_url;
@@ -2381,6 +2390,12 @@ function wppa_roundup_url( $url, $no_random = false ) {
 		}
 		if ( wppa( 'portrait' ) ) {
 			$temp_2[] = 'wppa-portrait=1';
+		}
+
+		// Ownersearch?
+		if ( wppa( 'ownersearch' ) ) {
+			$temp_2[] = 'wppa-ownersearch=1';
+			$temp_2[] = 'wppa-owner='.wppa('is_owner');
 		}
 
 		$temp[1] = implode( '&', $temp_2 );

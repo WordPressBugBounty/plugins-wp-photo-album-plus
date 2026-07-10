@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.02.004
+* Version 9.2.04.001
 *
 */
 
@@ -1540,6 +1540,65 @@ function wppa_get_tagcloud_html( $seltags = '', $minsize = '8', $maxsize = '24' 
 	}
 
 	return $result;
+}
+
+// Owner selection box
+function wppa_owmerselection_box() {
+global $wppa;
+
+	if ( is_feed() ) return;
+
+	// No landing shortcode needed, its all here
+	$wppa['mocc'] = $wppa['mocc'] - 1;
+	wppa_out( do_shortcode( '[wppa type="landing"]' ) );
+	$wppa['mocc'] = $wppa['mocc'] + 1;
+
+	// Start selection box
+	wppa_container( 'open' );
+
+	wppa_out( '
+		<div
+			id="wppa-ownerselection-' . wppa( 'mocc' ) . '"
+			class="wppa-box wppa-ownerselection"
+			>' .
+			wppa_get_ownerselecton_html() . '
+			<div class="wppa-clear" ></div>
+		</div>' );
+
+	wppa_container( 'close' );
+}
+
+// Get html for ownerselection
+function wppa_get_ownerselecton_html() {
+global $wpdb;
+
+	$mocc = wppa( 'mocc' );
+
+	$owners = $wpdb->get_results( "SELECT DISTINCT owner FROM $wpdb->wppa_photos", ARRAY_A );
+	foreach( array_keys( $owners ) as $key ) {
+		$owner = wppa_get_user_by( 'login', $owners[$key]['owner'], true );
+		if ( $owner ) {
+			$owners[$key]['name'] = $owner->display_name;
+		}
+		else {
+			unset( $owners[$key] );
+		}
+	}
+	$owners = wppa_array_sort( $owners, 'name', SORT_ASC );
+
+	// Now we have the array of users that ever uploaded an item, sorted by displayname
+	$url = 'document.location.href=\''.get_permalink().'?wppa-occur='.($mocc-1).'&wppa-ownersearch=1&wppa-owner=\'';
+	$onchange = $url;
+	//'wppaDoAjaxRender(event, '.($mocc+1).', \''.$ajx.'\'+this.value, \''.$url.'\'+this.value )';
+	$result = '<select id="wppa-ownerselection-'.$mocc.'" name="wppa-ownerselection-'.$mocc.'" onchange="'.$onchange.'+this.value">';
+	$result .= '<option id="dummy" value="" disabled selected>' . __('Please select a user', 'wp-photo-album-plus') . '</option>';
+	foreach( $owners as $owner ) {
+		$result .= '<option id="wppa-owner-' . esc_attr( $owner['owner'] ) . '" value="' . esc_attr( $owner['owner'] ) . '" >' . $owner['name'] . '</option>';
+	}
+	$result .= '</select>';
+
+	return $result;
+
 }
 
 // The multitag box

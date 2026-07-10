@@ -3541,16 +3541,20 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 			$link 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=all&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 		}
 		else {
-			$porder = wppa_get_poc( $album );
+			$porder = wppa_get_poc_a( $album, 'admin' );
 			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d", $album ) );
 			wppa_echo( wppa_show_query( true ) );
-			if ( strpos( $porder, 'DESC' ) ) {
-				$porder = trim( str_replace( 'DESC', '', $porder ) );
-				$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC LIMIT %d, %d", $album, $porder, $skip, $pagesize ), ARRAY_A );
+			if ( $porder['rand'] ) {
+				$porder['rand'] = wppa_local_date( 'z' );
+				$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d) LIMIT %d, %d", $album, $porder['rand'], $skip, $pagesize ), ARRAY_A );
+				wppa_echo( wppa_show_query( true ) );
+			}
+			elseif ( $porder['desc'] ) {
+				$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC LIMIT %d, %d", $album, $porder['order'], $skip, $pagesize ), ARRAY_A );
 				wppa_echo( wppa_show_query( true ) );
 			}
 			else {
-				$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i LIMIT %d, %d", $album, $porder, $skip, $pagesize ), ARRAY_A );
+				$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i LIMIT %d, %d", $album, $porder['order'], $skip, $pagesize ), ARRAY_A );
 				wppa_echo( wppa_show_query( true ) );
 			}
 

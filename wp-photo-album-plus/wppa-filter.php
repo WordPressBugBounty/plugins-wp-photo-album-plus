@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.2.02.004
+* Version: 9.2.04.001
 *
 */
 
@@ -253,6 +253,7 @@ global $wppa_after_smx;
 							   'calendar',
 							   'notify',
 							   'intro',
+							   'ownerselection',
 							   );
 	$void_delay_albums = array( '#me',
 								'#upldr',
@@ -502,6 +503,9 @@ global $wppa_after_smx;
 		case 'tagcloud':
 			$wppa['taglist'] = wppa_sanitize_tags($atts['taglist']);
 			$wppa['is_tagcloudbox'] = true;
+			break;
+		case 'ownerselection':
+			$wppa['is_ownerselection'] = true;
 			break;
 		case 'bestof':
 			$wppa['bestof'] = true;

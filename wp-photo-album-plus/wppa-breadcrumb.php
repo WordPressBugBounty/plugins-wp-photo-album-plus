@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.2.01.001
+* Version 9.2.04.001
 *
 */
 
@@ -557,12 +557,25 @@ static $post_type_value;
 		wppa_bcitem( $value, $href, $title, 'b9' );
 	}
 	else { 			// Maybe a simple normal standard album???
-		if ( wppa( 'is_owner' ) ) {
+		if ( wppa( 'is_owner' ) ) { // || wppa_get( 'owner', '', 'text' ) ) {
 			$usr = wppa_get_user_by( 'login', wppa( 'is_owner' ) );
 			if ( $usr ) $dispname = $usr->display_name;
 			else $dispname = wppa( 'is_owner' );	// User deleted
-			/* translators: username */
-			$various = sprintf( __( 'Various albums by %s' , 'wp-photo-album-plus' ), $dispname );
+			if ( wppa( 'ownersearch' ) ) { //|| wppa_get( 'ownersearch', 0, 'int' ) ) {
+				$can_media = wppa_switch( 'enable_video' ) || wppa_switch( 'enable_pdf' ) || wppa_switch( 'enable_audio' );
+				if ( $can_media ) {
+					/* translators: username */
+					$various = sprintf( __( 'Media items by %s' , 'wp-photo-album-plus' ), $dispname );
+				}
+				else {
+					/* translators: username */
+					$various = sprintf( __( 'Photos by %s' , 'wp-photo-album-plus' ), $dispname );
+				}
+			}
+			else {
+				/* translators: username */
+				$various = sprintf( __( 'Various albums by %s' , 'wp-photo-album-plus' ), $dispname );
+			}
 		}
 		else $various = __( 'Various albums' , 'wp-photo-album-plus' );
 		if ( wppa( 'is_slide' ) ) {

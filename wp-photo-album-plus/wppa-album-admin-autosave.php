@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.2.01.001
+* Version 9.2.04.002
 *
 */
 
@@ -18,7 +18,7 @@ static $cache;
 
 	// Init query cache
 	if ( ! $cache ) $cache = [];
-	
+
 	// Are we legally here?
 	if ( ! current_user_can( 'wppa_admin' ) ) {
 		wp_die( esc_html__( 'Isufficient access rights', 'wp-photo-album-plus' ) );
@@ -320,7 +320,7 @@ static $cache;
 					wp_die( esc_html__( 'You do not have the rights to do this', 'wp-photo-album-plus' ) );
 				}
 				$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET description = %s WHERE album = %d", wppa_opt( 'newphoto_description' ), $edit_id ) );
-				
+
 				/* translators: integer number */
 				wppa_ok_message( sprintf( __( '%d photo descriptions updated', 'wp-photo-album-plus' ), $iret ) );
 			}
@@ -331,7 +331,7 @@ static $cache;
 					wp_die( esc_html__( 'You do not have the rights to do this', 'wp-photo-album-plus' ) );
 				}
 				$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET description = '' WHERE album = %d", $edit_id ) );
-				
+
 				/* translators: integer number */
 				wppa_ok_message( sprintf( __( '%d item descriptions cleared', 'wp-photo-album-plus' ), $iret ) );
 			}
@@ -3389,7 +3389,7 @@ global $wpdb;
 static $cache;
 
 	if ( ! $cache ) $cache = [];
-	
+
 	if ( is_array( $alb ) ) {
 		$id = $alb['id'];
 	}
@@ -3575,12 +3575,12 @@ global $wpdb;
 
 	// If random...
 	if ( $albumorder_col == 'random' ) {
-		$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %s ORDER BY RAND(%d)", $parent, wppa_get_randseed() ), ARRAY_A );
+		$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %s ORDER BY RAND(%d)", $parent, wppa_get_randseed('page') ), ARRAY_A );
 	}
 
 	// Not random
 	else {
-		
+
 		// Ascending or descending
 		if ( $is_descending ) {
 			$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $parent, $albumorder_col ), ARRAY_A );

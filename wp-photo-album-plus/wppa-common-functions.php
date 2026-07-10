@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.02.004
+* Version: 9.2.04.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -279,6 +279,8 @@ global $wppa_current_shortcode_atts;
 		'bpprofile' 				=> '',
 		'usr' 						=> '', // Use search results, for paginated search
 		'photo_count' 				=> '',
+		'is_ownerselection' 		=> false,
+		'ownersearch' 				=> '',
 	);
 
 	if ( false && is_array( $wppa_runtime_settings ) ) {
@@ -295,7 +297,12 @@ global $wppa_randseed_modified;
 
 		// This randseed survives pageloads up to the duration of the session ( usually 1 hour )
 		case 'session':
-			$result = $wppa_session['randseed'];
+			$result = $wppa_session['id'] % 4711 + 13;;
+			break;
+
+		// Once a day
+		case 'admin':
+			$result = wppa_local_date( 'd', time() );
 			break;
 
 		// This randseed is for one pageload only
@@ -310,8 +317,7 @@ global $wppa_randseed_modified;
 
 			else {
 
-				// Reset the default randseed
-				wppa_renew_randseed();
+
 
 				// Not Been here before?
 				if ( ! $wppa_volitile_randseed ) {
@@ -710,7 +716,7 @@ function wppa_is_photo_order_desc( $id = 0 ) {
 }
 
 // Returns the columname for ORDER BY clause, DESC added where appliccable
-function wppa_get_poc( $id = 0, $no_random = false ) {
+function wppa_get_poc( $id = 0, $admin = 'session' ) {
 global $wppa;
 
 	// Init
@@ -718,7 +724,7 @@ global $wppa;
 
 	// Random overrule?
 	if ( wppa( 'is_random' ) ) {
-		$result = 'RAND(' . wppa_get_randseed() . ')';
+		$result = 'RAND(' . wppa_get_randseed('session') . ')';
 		return $result;
 	}
 
@@ -732,22 +738,14 @@ global $wppa;
 		$order = wppa_opt( 'list_photos_by' );
 	}
 
-	// If No random and is random so far, use default by id
-	if ( $no_random && $order == '3' ) {
-		$order = '2';
-	}
-	if ( $no_random && $order == '-3' ) {
-		$order = '-2';
-	}
-
     switch ( $order ) {
 
 		case '1': $result = 'p_order'; break;
 		case '-1': $result = 'p_order DESC'; break;
 		case '2': $result = 'name'; break;
 		case '-2': $result = 'name DESC'; break;
-		case '3': $result = 'RAND(' . wppa_get_randseed() . ')'; break;
-		case '-3': $result = 'RAND(' . wppa_get_randseed() . ')'; break;
+		case '3': $result = 'RAND(' . wppa_get_randseed($admin) . ')'; break;
+		case '-3': $result = 'RAND(' . wppa_get_randseed($admin) . ')'; break;
 		case '4': $result = 'mean_rating'; break;
 		case '-4': $result = 'mean_rating DESC'; break;
 		case '5': $result = 'timestamp'; break;
@@ -758,17 +756,16 @@ global $wppa;
 		case '-7': $result = 'exifdtm DESC'; break;
 		default: $result = 'id';
     }
-
     return $result;
 }
 
 // Returns array order and desc for given Album
-function wppa_get_poc_a( $id = 0, $no_random = false ) {
+function wppa_get_poc_a( $id = 0, $admin = 'session' ) {
 
 	$result = [];
-	$temp = wppa_get_poc( $id = 0, $no_random );
+	$temp = wppa_get_poc( $id, $admin );
 	if ( strpos( $temp, 'RAND' ) !== false ) {
-		$result['rand'] = wppa_get_randseed();
+		$result['rand'] = wppa_get_randseed('session');
 	}
 	else {
 		$result['rand'] = false;

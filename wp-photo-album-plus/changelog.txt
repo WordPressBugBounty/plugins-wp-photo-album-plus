@@ -1,5 +1,14 @@
 WP Photo Album Plus Changelog
 
+= 9.2.04 =
+
+* New shortcode type: [wppa type="ownerselection"]
+Shows a selectionbox with all users that have items uploaded. When a user is selected, you will see the thumbnails of the items by that user.
+* Security fix.
+* Bulk edit album did not show photos when the photo sequwnce order was set to random. Fixed. Also fixed other issues regarding random.
+* Fixed a bug in Ratings processing.
+* Export db tables did not work, fixed.
+
 = 9.2.03 =
 
 * Security fix
@@ -8,7 +17,7 @@ WP Photo Album Plus Changelog
 
 * Fixed bugs related to selection by cats and tags
 * New feature: You can now restrict frontend item download capability on a mix of userroles and albums.
-Related settings: Photo ALbums -> Settings -> Basic settings -> Links -> IV: Frontend download links -> Items 11 and 12 
+Related settings: Photo ALbums -> Settings -> Basic settings -> Links -> IV: Frontend download links -> Items 11 and 12
 * Fixed a problem with album admin when default photosequence is random.
 
 * various fixes: fe fatal errors and pagination on admin pages; and in random photo sequence
@@ -30,7 +39,7 @@ Related settings: Photo ALbums -> Settings -> Basic settings -> Links -> IV: Fro
 
 = 9.1.12 =
 
-* Performance and seo optimizing release. 
+* Performance and seo optimizing release.
 You can now convert .jpg and .png files to .webp files, possibly leading to substantial smaller filesizes to improve pageload speed.
 Relatred settings:
 Advanced settings -> New -> I -> Item 42: Convert new .jpg and .png files to .webp right after upload

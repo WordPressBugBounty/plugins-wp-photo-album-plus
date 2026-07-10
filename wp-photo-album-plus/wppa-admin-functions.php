@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.2.01.003
+* Version: 9.2.04.003
 *
 */
 
@@ -902,12 +902,11 @@ global $wpdb;
 
 	// Read chunks of 1000 rows
 	while ( $iter < $iters ) {
-		$data  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i ORDER BY id LIMIT %d %d", $table, 1000 * $iter, 1000 ), ARRAY_N );
+		$data  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table ORDER BY id LIMIT %d, %d", 1000 * $iter, 1000 ), ARRAY_A );
 
 		// Process rows
 		if ( $data ) {
 			foreach( $data as $row ) {
-
 				// Write to file
 				fputcsv( $file, $row, wppa_opt( 'csv_sep' ) );
 			}

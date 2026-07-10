@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.2.01.001
+* Version 9.2.04.003
 *
 */
 
@@ -234,6 +234,7 @@ global $wpdb;
 	$bret = wppa_insert( $table, $data, $format );
 	if ( $bret ) {
 		wppa_clear_cache( array( 'photo' => $data['photo'], 'other' => 'R' ) );
+//		wppa_schedule_maintenance_proc( 'wppa_rerate' );
 		return $data['id'];
 	}
 

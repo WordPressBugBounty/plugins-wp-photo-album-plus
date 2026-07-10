@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.2.01.001
+* Version: 9.2.04.003
 *
 */
 
@@ -304,7 +304,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	
+
 	wppa_cache_album( 'invalidate' );
 	return $iret;
 }
@@ -700,7 +700,7 @@ global $wpdb;
 		}
 	}
 
-	
+
 	wppa_cache_photo( 'invalidate' );
 	return $iret;
 }
@@ -766,13 +766,14 @@ global $wpdb;
 	// Do the update
 	try {
 		$iret = $wpdb->update( WPPA_RATING, $fields, ['id' => $id] );
+//		wppa_schedule_maintenance_proc( 'wppa_rerate' );
 	}
 	catch( Exception $e ) {
 		wppa_log( 'err', 'wppa_update_rating() caught exception: ' .  $e->getMessage() );
 		$iret = false;
 	}
 
-	
+
 	return $iret;
 }
 
@@ -844,7 +845,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	
+
 	return $iret;
 }
 
@@ -890,7 +891,7 @@ global $wpdb;
 		$iret = false;
 	}
 
-	
+
 	return $iret;
 }
 
@@ -903,7 +904,7 @@ global $wpdb;
 	}
 	$wpdb->query( $wpdb->prepare( "UPDATE %i SET %i = %s", $table, $col, $val ) );
 
-	
+
 	return true;
 }
 
@@ -912,8 +913,8 @@ function wppa_clear_table( $table ) {
 global $wpdb;
 
 	$wpdb->query( $wpdb->prepare( "TRUNCATE TABLE %i", $table ) );
-	
-	
+
+
 	return true;
 }
 
@@ -922,6 +923,6 @@ function wppa_del_row( $table, $col, $value ) {
 global $wpdb;
 
 	$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE %i = %s", $table, $col, $value ) );
-	
+
 	return $iret;
 }
