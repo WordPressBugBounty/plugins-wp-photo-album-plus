@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.04.001
+* Version 9.2.05.001
 *
 */
 
@@ -4048,6 +4048,8 @@ global $wpdb;
 							>';
 
 							$c = $comment['comment']; 						// Get raw comment
+
+							/*
 							while(strchr($c,'\\')) $c = stripslashes($c); 	// Remove all slashes
 							$c = str_replace( '<br>', "\n", $c ); 			// For backward compat keep existing linebreak tags for later by nl2br
 							$c = wp_strip_all_tags( $c );
@@ -4057,12 +4059,14 @@ global $wpdb;
 							if ( wppa_switch( 'comment_clickable' ) ) {
 								$c = make_clickable( $c );
 							}
+							*/
+
 							$commentblock .= '
 							<blockquote
 								class="wppa-comment-bquote"
 								style="padding:5px 0;margin:5px 0 0;width:98%;"
 								>' .
-								$c . '
+								wp_kses_post( convert_smilies( $c ) ) . '
 							</blockquote>';
 
 							// Status approved
@@ -4349,11 +4353,7 @@ global $wpdb;
 							$smily_html = wppa_switch( 'comment_smiley_picker' ) ? wppa_get_smiley_picker_html( 'wppa-comment-'.$mocc ) : '';
 
 							// The current comment text
-						//	$txt = wppa( 'comment_text' );
-						//	$txt = stripslashes( $txt );
-						//	$txt = esc_js( $txt );
-						//	$txt = html_entity_decode( $txt );
-						$txt = wppa_decode( wppa_get( 'comment', '', 'textarea' ) );
+							$txt = wppa_get( 'comment' );
 
 							// The comment input
 							$comment_input = '

@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.04.003
+* Version: 9.2.05.001
 *
 */
 
@@ -528,8 +528,7 @@ global $wppa_supported_audio_extensions;
 			break;
 
 		case 'do-comment':
-			$data = isset( $_POST['data'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['data'] ) ), true ) : array();
-
+			$data = isset( $_POST['data'] ) ? json_decode( wp_unslash( $_POST['data'] ), true ) : array();
 			if ( is_array( $data ) ) {
 				$_REQUEST = array_merge( $_REQUEST, $data );
 			}
@@ -554,13 +553,13 @@ global $wppa_supported_audio_extensions;
 				}
 
 				// Sanitize comment
-				$comment = wppa_get( 'comment', '', 'html' );
+				$comment = wppa_get( 'comment' );
 
 				// Update comment in db
 				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET comment = %s WHERE id = %d", $comment, $comid ) );
 
 				// Return sanitized text
-				wppa_echo( wp_json_encode( ['txt' => $comment] ) );
+				wppa_echo( wp_json_encode( ['txt' => esc_html($comment)] ) );
 				exit();
 			}
 			else {
@@ -572,7 +571,7 @@ global $wppa_supported_audio_extensions;
 				// Security check
 				if ( wppa_switch( 'direct_comment' ) ) {
 					if ( ! $photoid || ( wppa_get_photo_item( $photoid, 'album' ) < 1 ) ) {
-						wppa_echo( wp_json_encode( ['txt' => esc_html__( 'Missing or invalid photo id' , 'wp-photo-album-plus' )] ) );
+						wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '80', true )] ) );
 						wppa_exit();
 					}
 				}
@@ -1329,7 +1328,7 @@ global $wppa_supported_audio_extensions;
 			// Security check
 			if ( wppa_switch( 'direct_comment' ) ) {
 				if ( ! $photo || ( wppa_get_photo_item( $photo, 'album' ) < 1 ) ) {
-					wppa_echo( wp_json_encode( ['txt' => '0||100||'.__( 'Missing or invalid photo id', 'wp-photo-album-plus' )] ) );
+					wppa_echo( wp_json_encode( ['txt' => '0||100||'.__( 'Security check failure', 'wp-photo-album-plus' ).' (2)'] ) );
 					wppa_exit();
 				}
 			}
@@ -1339,7 +1338,7 @@ global $wppa_supported_audio_extensions;
 					wppa_exit();
 				}
 				if ( ! $photo || ( wppa_get_photo_item( $photo, 'album' ) < 1 ) ) {
-					wppa_echo( wp_json_encode( ['txt' => '0||100||'.__( 'Missing or invalid photo id', 'wp-photo-album-plus' )] ) );
+					wppa_echo( wp_json_encode( ['txt' => '0||100||'.__( 'Security check failure', 'wp-photo-album-plus' ).' (3)'] ) );
 					wppa_exit();
 				}
 			}

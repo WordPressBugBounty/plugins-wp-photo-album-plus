@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.1.12.002';
+var wppaJsAjaxVersion = '9.2.05.001';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -1310,6 +1310,9 @@ function wppaAjaxComment( mocc, id ) {
 	// Make the Ajax send data
 	var theComment = jQuery( "#wppa-comment-"+mocc ).val();
 	theComment = theComment.replace(/&/g,'%26');
+	theComment = theComment.replace(/</g,'\\<');
+	theComment = theComment.replace(/>/g,'\\>');
+
 	var data = { photoid: id,
 				 comname: jQuery( "#wppa-comname-"+mocc ).val(),
 				 comment: theComment,
@@ -1322,7 +1325,6 @@ function wppaAjaxComment( mocc, id ) {
 				 dbagree: jQuery( "#db-agree-" + mocc ).prop( 'checked' ) ? 'yes' : 'no'
 	};
 	var theData = JSON.stringify( data );
-//	console.log(theData);
 
 	// Do the ajax commit
 	jQuery.ajax( { 	url: 		wppaAjaxUrl + '?action=wppa&wppa-action=do-comment',

@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.1.12.002
+/* Version 9.2.05.001
 /* Various js routines used in admin pages
 */
 
@@ -2105,6 +2105,8 @@ function wppaAjaxCommentUpdate( elm, id ) {
 
 	// Make the Ajax send data
 	var theComment = jQuery( elm ).val();
+	theComment = theComment.replace(/</g,'\\<');
+	theComment = theComment.replace(/>/g,'\\>');
 	theComment = theComment.replace(/&/g,'%26');
 	var data = {
 				 admin: 	1,
@@ -2112,9 +2114,9 @@ function wppaAjaxCommentUpdate( elm, id ) {
 				 comid: 	id,
 				 nonce: 	jQuery('#nonce-'+id).html(),
 	};
-console.log(data);
+
 	var theData = JSON.stringify( data );
-console.log(theData);
+
 	// Do the ajax commit
 	jQuery.ajax( { 	url: 		wppaAjaxUrl + '?action=wppa&wppa-action=do-comment',
 					data: 		'data='+theData,
@@ -2131,6 +2133,10 @@ console.log(theData);
 									jQuery( '#wppa-admin-spinner' ).show();
 								},
 					success: 	function( xresult, status, xhr ) {
+
+						//			document.location.reload();
+
+									/**/
 									var result;
 									if ( xresult.txt ) {
 										result = xresult.txt;
@@ -2139,15 +2145,17 @@ console.log(theData);
 										theResult = JSON.parse( xresult );
 										result = theResult.txt;
 									}
-console.log('result = '+result);
+
 									// sanitize
 									if ( result ) {
 										result = result.replace( /\\/g, '' );
+										result = result.replace( /&gt;/g, '>' );
+										result = result.replace( /&lt;/g, '<' );
 
 										// Show result
 										jQuery( elm ).val( result );
-			console.log('hier '+result);
 									}
+						/*			*/
 
 								},
 					error: 		function( xhr, status, error ) {

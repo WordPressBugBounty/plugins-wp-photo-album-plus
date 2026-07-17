@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* version 9.2.01.001
+* version 9.2.05.001
 *
 */
 
@@ -115,13 +115,11 @@ class WPPA_Comment_table extends WPPA_List_Table {
 
 	function column_commenttext( $item ) {
 
-		$backlink =  wppa_get('backlink', '', 'text');
-		if ( ! $backlink ) $backlink = 'nixyz';
 		$action = '
 		<a
 			id="href-' . $item['id'] . '"
 			style="display:none;"
-			href="?page=wppa_manage_comments&commentids=' . $item['id'] . '&action=editsingle&backlink=' . urlencode($backlink) . '&commenttext=' . urlencode( $item['comment'] ) . '"
+			href="?page=wppa_manage_comments&commentids=' . $item['id'] . '&action=editsingle&commenttext=' . urlencode( $item['comment'] ) . '"
 			>
 			<div id="di-' . $item['id'] . '">' .
 				__( 'Update', 'wp-photo-album-plus' ) . '
@@ -140,7 +138,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 			' style="width:98%;"' .
 			' onchange="wppaAjaxCommentUpdate( this, '.$item['id'].');"' .
 			' >' .
-			stripslashes( $item['comment'] ) .
+			( $item['comment'] ) .
 		'</textarea>' .
 		$this->row_actions( $actions );
 
@@ -149,9 +147,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 
 	function column_status( $item ) {
 
-		$backlink =  wppa_get('backlink', '', 'text');
-		if ( ! $backlink ) $backlink = 'nixyz';
-		$p1 = '<a href="?page=wppa_manage_comments&commentids=' . $item['id'] . '&paged=' . wppa_get( 'paged', 1, 'int' ) . '&backlink=' . urlencode($backlink);
+		$p1 = '<a href="?page=wppa_manage_comments&commentids[0]=' . $item['id'] . '&paged=' . wppa_get( 'paged', 1, 'int' );
 		$actions = array(
 			'approvesingle' 	=> $p1 . '&action=approvesingle" >' . __( 'Approve', 'wp-photo-album-plus' ) . '</a>',
 			'pendingsingle' 	=> $p1 . '&action=pendingsingle" >' . __( 'Pending', 'wp-photo-album-plus' ) . '</a>',
@@ -241,14 +237,14 @@ class WPPA_Comment_table extends WPPA_List_Table {
 	function process_bulk_action() {
 		global $wpdb;
 
-		$ids = (array) wppa_get( 'commentids', '', 'text' );
+		$ids = (array) wppa_get( 'commentids' );//, '', 'text' );
 
 		$current_action = $this->current_action();
 
 		if ( $current_action && $ids ) {
 
 			foreach( $ids as $id ) {
-				
+
 				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %s", $id ) );
 
 				// Delete
@@ -292,8 +288,12 @@ class WPPA_Comment_table extends WPPA_List_Table {
 			}
 		}
 
+		// Clear cookie
+		wppa_set_cookie( 'comadmin-show', 'all' );
+
 		// Clear cache
 		wppa_clear_cache( array( 'other' => 'C' ) );
+
 	}
 
 	function prepare_items() {
@@ -314,7 +314,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 //		$data 			= $wpdb->get_results( "SELECT * FROM $wpdb->wppa_comments " . $filter . " ORDER BY " . $parms['order'] . " " . $parms['dir'] . " LIMIT " . $limit, ARRAY_A );
 
 		$data = wppa_get_comment_admin_items( false, $parms['page'], $parms['pagesize'] );
-		
+
 		$this->items 	= $data;
 
 		// Disable wp pagination, we do our selbes
@@ -411,12 +411,6 @@ global $wpdb;
 			$testListTable->display();
 			wppa_echo( '
 		</form>' );
-		$link = wppa_get( 'backlink', '', 'text' );
-		if ( $link ) {
-			wppa_echo( '
-			<br><a href="' . esc_url( $link ) . '">' . __('Back to previous page', 'wp-photo-album-plus') . '</a>
-			' );
-		}
 
 	wppa_echo( '
 	</div>' );
@@ -426,19 +420,18 @@ function wppa_get_comment_admin_items( $count_only = false, $page = 1, $pagesize
 global $wpdb;
 
 	$cids 	= wppa_get( 'commentids' );
-	$bl 	= wppa_get( 'backlink', '', 'text' );
-	
+
 	// If spec asked for, find them
-	if ( $cids && $bl ) {
+	if ( $cids && ! wppa_get( 'action' ) ) {
 
 		if ( ! is_array( $cids ) ) {
 			$cids = [$cids]; // one
 		}
 		$the_ids = $cids;
 	}
-	
+
 	// Find all, in the right order
-	else {	
+	else {
 		$parms = wppa_get_paging_parms( 'comment_admin' );
 		if ( strtoupper( $parms['dir'] == 'DESC' ) ) {
 			$the_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments ORDER BY %i DESC", $parms['order'] ) );
@@ -447,7 +440,7 @@ global $wpdb;
 			$the_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_comments ORDER BY %i", $parms['order'] ) );
 		}
 	}
-	
+
 	// Now filter on Status
 	$status = wppa_get_cookie( 'comadmin-show' );
 	switch ( $status ) {
@@ -467,65 +460,24 @@ global $wpdb;
 	if ( $count_only ) {
 		return $count;
 	}
-	
+
 	$skip = ( $page - 1 ) * $pagesize;
 	if ( $skip > $count ) {
 		$skip = 0;
 		$page = 1;
 	}
-	
+
 	// Slice the page
 	if ( $count > $pagesize ) {
 		$the_ids = array_slice( $the_ids, ( $page - 1 ) * $pagesize, $pagesize );
 	}
-	
+
 	// Now get the full data in the same sequence ORDER
 	$result = [];
 	foreach ( $the_ids as $id ) {
 		$result[] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_comments WHERE id = %d", $id ), ARRAY_A );
 	}
-	
+
 	// Done
 	return $result;
 }
-
-/*
-function wppa_get_comadmin_sel_filter() {
-
-	// default
-	$filter = '';
-
-	$cids 	= wppa_get( 'commentids' );
-	$bl 	= wppa_get( 'backlink', '', 'text' );
-	if ( $cids && $bl ) {
-
-		if ( is_array( $cids ) ) {
-			$filter = "WHERE id IN (" . implode( ',', $cids ) . ")";
-		}
-		else {
-			$filter = "WHERE id = " . $cids;
-		}
-	}
-
-	// Normal use
-	else {
-		switch( wppa_get_cookie( 'comadmin-show' ) ) {
-			case 'all':
-				break;
-			case 'spam':
-				$filter = "WHERE status = 'spam'";
-				break;
-			case 'pending':
-				$filter = "WHERE status = 'pending' OR status = ''";
-				break;
-			case 'approved':
-				$filter = "WHERE status = 'approved'";
-				break;
-			default:
-				break;
-		}
-	}
-
-	return $filter;
-}
-*/

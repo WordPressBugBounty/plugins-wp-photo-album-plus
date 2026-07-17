@@ -1,5 +1,9 @@
 WP Photo Album Plus Changelog
 
+= 9.2.05 =
+
+* Comment admin now works correctly.
+
 = 9.2.04 =
 
 * New shortcode type: [wppa type="ownerselection"]

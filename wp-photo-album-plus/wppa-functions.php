@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.04.001
+* Version: 9.2.05.001
 *
 */
 
@@ -2638,9 +2638,9 @@ global $wppa_done;
 	}
 
 	// Retrieve and filter comment
-	$comment = wppa_get( 'comment', '', 'textarea' );
-	$comment = wppa_filter_html( $comment );
-	$comment = wp_strip_all_tags( $comment );
+	$comment = wppa_get( 'comment' );
+//	$comment = wppa_filter_html( $comment );
+//	$comment = wp_strip_all_tags( $comment );
 
 	$policy = wppa_opt( 'moderate_comment' );
 	switch ( $policy ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.2.03.001
+* Version: 9.2.05.001
 *
 */
 
@@ -163,9 +163,13 @@ function wppa_get_get_filter( $name ) {
 			$result = 'src';
 			break;
 
+		// Post
+		case 'comment':
+			$result = 'post';
+			break;
+
 		// Html
 		case 'comment':
-//		case 'commenttext':
 		case 'upn-description':
 		case 'user-desc': 		// Desc by user during fe upload
 		case 'albumeditdesc': 	// Fe album desc
@@ -317,6 +321,10 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			return isset( $_REQUEST[$key] ) ? wppa_sanitize_searchstring( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) ) : $default;
 			break;
 
+		case 'post':
+			return isset( $_REQUEST[$key] ) ? wp_kses_post( nl2br( str_replace( '%26', '&', wp_unslash( $_REQUEST[$key] ) ) ) ) : $default;
+			break;
+
 		case 'html':
 		case 'custom':
 			$allowed = current_user_can( 'unfiltered_html' ) ? wppa_allowed_tags() : wppa_allowed_simple_tags();
@@ -437,6 +445,16 @@ function wppa_get_cookie( $name, $default = '' ) {
 	}
 
 	return $result;
+}
+
+// Set cookie
+function wppa_set_cookie( $name, $value = '' ) {
+
+	// Sanitize
+	$name 		= sanitize_text_field( $name );
+	$default 	= sanitize_text_field( $value );
+
+	$_COOKIE[$name] = $value;
 }
 
 // Get the sanitzed value of request uri

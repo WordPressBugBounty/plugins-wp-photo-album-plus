@@ -5,7 +5,7 @@ Tags: photo, video, audio, pdf, lightbox
 Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 5.5
-Stable tag: 9.2.03.001
+Stable tag: 9.2.04.003
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

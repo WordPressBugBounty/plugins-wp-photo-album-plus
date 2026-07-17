@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.2.04.001
+* Version: 9.2.05.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -878,8 +878,9 @@ function wppa_moderate_links( $type, $id, $comid = '', $status = '' ) {
 						if ( current_user_can('wppa_comments') ) $result .= '
 						<a class="wppa-approve-'.$comid.'"
 							style="font-weight:bold; color:blue; cursor:pointer"
-							onclick="document.location=\''.get_admin_url().'admin.php?page=wppa_manage_comments&amp;commentids='.$comid.'&amp;backlink=\'+encodeURIComponent(document.location.href)" >
-							' . __('Edit', 'wp-photo-album-plus' ) .
+							href="'.get_admin_url().'admin.php?page=wppa_manage_comments&amp;commentids[0]='.$comid.'" target="_blank" >'.
+//							onclick="document.location.href=\''.get_admin_url().'admin.php?page=wppa_manage_comments&amp;commentids[0]='.$comid.'&amp;target=blank\'">
+							'' . __('Edit', 'wp-photo-album-plus' ) .
 						'</a>';
 
 						// Delete
