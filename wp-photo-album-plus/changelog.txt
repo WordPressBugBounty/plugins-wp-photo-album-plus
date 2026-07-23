@@ -1,5 +1,12 @@
 WP Photo Album Plus Changelog
 
+= 9.2.06 =
+
+* Max search items did not work. Fixed.
+* Search results are now also paginated to avoid problems when large numbers of items are found during search.
+* New setting: System -> I -> Item 98: Use compressed javascript. Switch off for debugging purposes.
+* Single quotes in comments broke the dispay of slideshows. Fixed.
+
 = 9.2.05 =
 
 * Comment admin now works correctly.

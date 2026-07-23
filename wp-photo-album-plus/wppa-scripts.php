@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.2.01.001
+* Version 9.2.06.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -224,7 +224,8 @@ global $wpdb;
 	wppaFontDirectory = "'.WPPA_UPLOAD_URL.'/fonts/",
 	wppaOutputType = "' . wppa_opt( 'photo_shortcode_fe_type' ) . '",
 	wppaOvlNavIconSize = ' . wppa_opt( 'nav_icon_size_lightbox' ) . ',
-	wppaOvlVideoPauseStop = ' . ( wppa_switch( 'video_pause_stop_lb' ) ? 'true' : 'false' ) . ';';
+	wppaOvlVideoPauseStop = ' . ( wppa_switch( 'video_pause_stop_lb' ) ? 'true' : 'false' ) . ',
+	wppaAlreadyAlerted = false;';
 
 	// Tinymce photo
 	if ( wppa_switch( 'photo_shortcode_enabled' ) ) {
@@ -325,7 +326,7 @@ global $wppa_opt;
 
 	// First see if an 'all' file is present. This is to save http requests
 	$all_file = dirname( __FILE__ ) . '/js/wppa-all.js';
-	if ( wppa_is_file( $all_file ) ) {
+	if ( wppa_is_file( $all_file ) && wppa_switch( 'compress_js' ) ) {
 		$js_ver = gmdate( "ymd-Gis", filemtime( $all_file ) );
 		wp_enqueue_script( 'wppa-all', WPPA_URL . '/js/wppa-all.js', $js_depts, $js_ver, $footer );
 		wp_localize_script( 'wppa-all', 'wppaObj', array(

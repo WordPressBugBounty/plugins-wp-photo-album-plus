@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.05.001
+* Version: 9.2.06.001
 *
 */
 
@@ -754,16 +754,6 @@ global $albums_used;
 				}
 			}
 
-			// Check maximum
-			$max = intval ( wppa_opt( 'max_search_albums' ) );
-			if ( $max && is_array( $total_ids ) && count( $total_ids ) > $max ) {
-				/* translators: integer, integer */
-				$alert_text = sprintf( 	__( 'There are %1$d albums found. Only the first %2$d will be shown. Please refine your search criteria.', 'wp-photo-album-plus' ),
-										count( $total_ids ),
-										wppa_opt( 'max_search_albums' ) );
-				wppa_alert_text( $alert_text );
-			}
-
 			if ( is_array( $total_ids ) && count( $total_ids ) ) {
 				wppa( 'any', true );
 			}
@@ -902,6 +892,16 @@ global $albums_used;
 	elseif ( strpos( $order, 'RAND' ) !== false ) {
 		wppa( 'random', wppa_get_randseed() );
 		$ran = wppa( 'random' );
+	}
+
+	// Max by searchmax?
+	if ( ( wppa( 'src' ) || wppa( 'supersearch' ) ) && wppa_opt( 'max_search_albums' ) ) $max = wppa_opt( 'max_search_albums' );
+	if ( $max && is_array( $total_ids ) && count( $total_ids ) > $max ) {
+		/* translators: integer, integer */
+		$alert_text = sprintf( 	__( 'There are %1$d albums found. Only the first %2$d will be shown. Please refine your search criteria.', 'wp-photo-album-plus' ),
+								count( $total_ids ),
+								wppa_opt( 'max_search_albums' ) );
+		wppa_alert_text( $alert_text );
 	}
 
 	// Final query
@@ -1529,6 +1529,20 @@ global $wppa;
 
 	// Max by shortcode?
 	if ( wppa( 'max' ) ) $max = wppa( 'max' );
+
+	// Max by searchmax?
+	elseif ( ( wppa( 'src' ) || wppa( 'supersearch' ) ) && wppa_opt( 'max_search_photos' ) ) {
+
+		$max = wppa_opt( 'max_search_photos' );
+
+		if ( $max && is_array( $total_ids ) && count( $total_ids ) > $max ) {
+			/* translators: integer, integer */
+			$alert_text = sprintf( 	__( 'There are %1$d photos found. Only the first %2$d will be shown. Please refine your search criteria.', 'wp-photo-album-plus' ),
+									count( $total_ids ),
+									wppa_opt( 'max_search_photos' ) );
+			wppa_alert_text( $alert_text );
+		}
+	}
 
 	// Post process for subsearch
 	if ( wppa( 'is_subsearch' ) ) {
@@ -3872,10 +3886,10 @@ function wppa_get_npages( $type, $array ) {
 	$tps = wppa_get_pagesize( 'thumbs' );
 
 	// Switch pagination off when searching
-//	if ( is_search() ) {
-//		$aps = 0;
-//		$tps = 0;
-//	}
+	if ( is_search() ) {
+		$aps = 0;
+		$tps = 0;
+	}
 
 	$arraycount = is_array( $array ) ? count( $array ) : 0;
 	$result = 0;
@@ -4020,9 +4034,9 @@ function wppa_run_slidecontainer( $thumbs ) {
 function wppa_is_pagination() {
 
 	// Pagination is off during search
-	if ( is_search() ) {
-		return false;
-	}
+//	if ( is_search() ) {
+//		return false;
+//	}
 
 	if ( ( wppa_get_pagesize( 'albums' ) == 0 && wppa_get_pagesize( 'thumbs' ) == 0 ) ) return false;
 	else return true;

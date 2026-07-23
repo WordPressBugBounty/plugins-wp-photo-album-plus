@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.2.05.001
+/* Version 9.2.06.002
 /* Various js routines used in admin pages
 */
 
@@ -2151,6 +2151,8 @@ function wppaAjaxCommentUpdate( elm, id ) {
 										result = result.replace( /\\/g, '' );
 										result = result.replace( /&gt;/g, '>' );
 										result = result.replace( /&lt;/g, '<' );
+										result = result.replace( /&#039;/g, "'" );
+										result = result.replace( /&quot;/g, '"' );
 
 										// Show result
 										jQuery( elm ).val( result );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.2.05.001
+* Version: 9.2.06.002
 *
 */
 
@@ -322,7 +322,7 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			break;
 
 		case 'post':
-			return isset( $_REQUEST[$key] ) ? wp_kses_post( nl2br( str_replace( '%26', '&', wp_unslash( $_REQUEST[$key] ) ) ) ) : $default;
+			return isset( $_REQUEST[$key] ) ? wp_kses_post( ( str_replace( '%26', '&', wp_unslash( $_REQUEST[$key] ) ) ) ) : $default;
 			break;
 
 		case 'html':

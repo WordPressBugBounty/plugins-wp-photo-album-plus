@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.2.01.001
+* Version 9.2.06.001
 *
 */
 
@@ -124,7 +124,7 @@ global $previous_page_last_id;
 	if ( ! $thumbs ) return $thumbs;
 
 	// Not on search
-	if ( wppa( 'src' ) ) return $thumbs;
+//	if ( wppa( 'src' ) ) return $thumbs;
 
 	$mocc = wppa( 'mocc' );
 

@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.04.002
+* Version: 9.2.06.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1236,21 +1236,21 @@ global $wppa_alert_reload;
 	if ( $wppa_alert_reload == 'home' ) {
 		$result =
 		wppa_html_tag( 'div', ['class' => "wppa-kamikaze"],
-			wppa_html_tag( 'img', ['src' => "dummy", 'onerror' => "alert( '" . esc_js( $wppa_alert_text ) . "' );document.location.href='" . home_url() . "'"] ) );
+			wppa_html_tag( 'img', ['src' => "dummy", 'nolazy', 'onerror' => "alert( '" . esc_js( $wppa_alert_text ) . "' );document.location.href='" . home_url() . "'"] ) );
 	}
 
 	// Just reload after?
 	elseif ( $wppa_alert_reload ) {
 		$result =
 		wppa_html_tag( 'div', ['class' => "wppa-kamikaze"],
-			wppa_html_tag( 'img', ['src' => "dummy", 'onerror' => "alert( '" . esc_js( $wppa_alert_text ) . "' );document.location.reload( true );"] ) );
+			wppa_html_tag( 'img', ['src' => "dummy", 'nolazy', 'onerror' => "alert( '" . esc_js( $wppa_alert_text ) . "' );document.location.reload( true );"] ) );
 	}
 
 	// Just alert (once)
 	else {
 		$result =
 		wppa_html_tag( 'div', ['class' => "wppa-kamikaze"],
-			wppa_html_tag( 'img', ['src' => "dummy", 'style' => "display:none", 'onerror' => "alert( '" . esc_js( $wppa_alert_text ) . "' );jQuery( '.wppa-kamikaze' ).html( '' )"] ) );
+			wppa_html_tag( 'img', ['src' => "dummy", 'class' => "nolazy", 'style' => "display:none", 'onerror' => "if(!wppaAlreadyAlerted){wppaAlreadyAlerted=true;alert( '" . esc_js( $wppa_alert_text ) . "' );jQuery( '.wppa-kamikaze' ).html( '' )}"] ) );
 	}
 
 	$wppa_alert_html = wppa_echo( $result, ['return' => true, 'needonerror' => true] );

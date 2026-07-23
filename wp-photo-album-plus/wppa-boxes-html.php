@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.05.001
+* Version 9.2.06.002
 *
 */
 
@@ -3957,7 +3957,7 @@ global $wpdb;
 						// Inc counter
 						$n_comments++;
 
-						// Prmium user?
+						// Premium user?
 						$premium = wppa_get_premium( $comment['userid'] );
 
 						// Prepare html
@@ -4054,8 +4054,10 @@ global $wpdb;
 							$c = str_replace( '<br>', "\n", $c ); 			// For backward compat keep existing linebreak tags for later by nl2br
 							$c = wp_strip_all_tags( $c );
 							$c = convert_smilies( $c );
+							*/
 							$c = nl2br( $c );
 							$c = str_replace( "'", "&apos;", $c ); 			// Convert single quote to html entity
+							/*
 							if ( wppa_switch( 'comment_clickable' ) ) {
 								$c = make_clickable( $c );
 							}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.2.02.002
+* version 9.2.06.001
 *
 */
 
@@ -6954,6 +6954,13 @@ global $wppa_hide_this;
 						$slug = 'wppa_seo_optimize';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '49', $name, $desc, $html, $help);
+
+						$name = __('Use copressed javascript', 'wp-photo-album-plus');
+						$desc = __('Switch off for debugging purposes', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_compress_js';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '98', $name, $desc, $html, $help);
 
 						$name = __('Enable debug mode', 'wp-photo-album-plus');
 						$desc = __('Switch on for debugging purposes', 'wp-photo-album-plus');

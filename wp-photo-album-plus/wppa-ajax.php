@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.05.001
+* Version: 9.2.06.001
 *
 */
 
@@ -1690,7 +1690,7 @@ global $wppa_supported_audio_extensions;
 			}
 
 			// Output
-			echo wp_json_encode( ['html' => $html, 'js' => $js] );
+			echo wp_json_encode( ['html' => $html.wppa_alert_html(), 'js' => $js] );
 
 			$tim_2 	= microtime( true );
 			$nq_2 	= get_num_queries();
