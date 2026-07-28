@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.2.05.001';
+var wppaJsAjaxVersion = '9.2.07.002';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -551,11 +551,12 @@ function wppaAjaxRemovePhotoFromZip( mocc, id, reload ) {
 }
 
 // Remove admins choice zipfile
-function wppaAjaxDeleteMyZip() {
+function wppaAjaxDeleteMyZip(nonce,login) {
 
 	jQuery.ajax( { 	url: 		wppaAjaxUrl,
 				data: 		'action=wppa' +
-							'&wppa-action=delmyzip',
+							'&wppa-action=delmyzip'+
+							'&wppa-nonce=' + nonce,
 				async: 		true,
 				type: 		'GET',
 				timeout: 	60000,
@@ -574,8 +575,9 @@ function wppaAjaxDeleteMyZip() {
 									result = theResult.txt;
 								}
 
+								jQuery('#'+login).html(result);
 								// Reload
-								document.location.reload( true );
+								//document.location.reload( true );
 
 							},
 				error: 		function( xhr, status, error ) {

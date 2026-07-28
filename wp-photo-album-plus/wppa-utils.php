@@ -6220,7 +6220,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 		// Check for exceptions
 		if ( $attribs['class'] ) {
-			if ( strpos( 'nolazy', $attribs['class'] ) !== false ) {
+			if ( strpos( $attribs['class'], 'nolazy' ) !== false ) {
 				$lazy = false;
 			}
 		}

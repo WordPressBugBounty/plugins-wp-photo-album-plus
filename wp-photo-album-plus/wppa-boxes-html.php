@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.06.002
+* Version 9.2.07.002
 *
 */
 
@@ -1391,6 +1391,7 @@ function wppa_get_admins_choice_html( $admins ) {
 
 		// Compose the current users zip filename
 		$myzip = $zipsdir.wppa_get_user().'.zip';
+		$nonce = wp_create_nonce( 'wppa-delmyzip' );
 
 		foreach( $zipfiles as $zipfile ) {
 
@@ -1418,14 +1419,14 @@ function wppa_get_admins_choice_html( $admins ) {
 							$title .= esc_attr($stat['name']) . "\n";
 						}
 						$result .= 	'
-						<li title="' . $title . '" >
+						<li title="' . $title . '" id="' . esc_attr( $login ) . '" >
 							<a href="'. WPPA_UPLOAD_URL.'/zips/'.basename($zipfile).'" >' .
 								$user . '
 							</a>';
 							if ( $zipfile == $myzip ) {
 								$result .= '
 								<a
-									onclick="wppaAjaxDeleteMyZip();"
+									onclick="wppaAjaxDeleteMyZip(\''.$nonce.'\',\''.$login.'\');"
 									style="float:right;cursor:pointer"
 								>' .
 									__('Delete', 'wp-photo-album-plus' ) . '

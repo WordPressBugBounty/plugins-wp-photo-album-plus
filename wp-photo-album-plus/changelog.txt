@@ -1,5 +1,10 @@
 WP Photo Album Plus Changelog
 
+= 9.2.07 =
+
+* Fixed a bug in lazy load, did not work everywhere meant.
+* 4 security fixes.
+
 = 9.2.06 =
 
 * Max search items did not work. Fixed.

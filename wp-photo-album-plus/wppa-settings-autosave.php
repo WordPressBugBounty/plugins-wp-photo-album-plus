@@ -6955,7 +6955,7 @@ global $wppa_hide_this;
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '49', $name, $desc, $html, $help);
 
-						$name = __('Use copressed javascript', 'wp-photo-album-plus');
+						$name = __('Use compressed javascript', 'wp-photo-album-plus');
 						$desc = __('Switch off for debugging purposes', 'wp-photo-album-plus');
 						$help = '';
 						$slug = 'wppa_compress_js';

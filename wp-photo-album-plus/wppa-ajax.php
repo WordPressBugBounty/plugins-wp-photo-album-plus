@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.06.001
+* Version: 9.2.07.002
 *
 */
 
@@ -208,6 +208,13 @@ global $wppa_supported_audio_extensions;
 			wppa_exit();
 			break;
 		case 'delexportzips':
+			$nonce = wppa_get( 'nonce' );
+			if ( ! wp_verify_nonce( $nonce, 'wppa-export-nonce' ) ) {
+				wppa_exit();
+			}
+			if ( ! current_user_can( 'wppa_export' ) ) {
+				wppa_exit();
+			}
 			$dir = WPPA_DEPOT_PATH;
 			$files = wppa_glob( $dir . '/*.zip' );
 			if ( $files ) {
@@ -232,6 +239,13 @@ global $wppa_supported_audio_extensions;
 			wppa_exit();
 			break;
 		case 'gettogo':
+			if ( ! current_user_can( 'wppa_settings' ) ) {
+				wppa_exit();
+			}
+			$nonce = wppa_get( 'nonce' );
+			if ( ! wp_verify_nonce( $nonce, 'nonce' ) ) {
+				wppa_exit();
+			}
 			$slug 	= 	wppa_get( 'slug' );
 			$result = 	wppa_get_option( $slug . '_togo', '' ) .
 						'|' .
@@ -1004,6 +1018,19 @@ global $wppa_supported_audio_extensions;
 
 		case 'delmyzip':
 
+			// My choice only avail to logged in users
+			if ( ! is_user_logged_in() ) {
+				wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '93', true ) ] ) );
+				wppa_exit();
+			}
+				
+			// Check nonce
+			$nonce = wppa_get( 'nonce' );
+			if ( ! wp_verify_nonce( $nonce, 'wppa-delmyzip' ) ) {
+				wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '94', true ) ] ) );
+				wppa_exit();
+			}
+			
 			// Verify existance of zips dir
 			$zipsdir = WPPA_UPLOAD_PATH . '/zips/';
 			if ( wppa_is_dir( $zipsdir ) ) {
@@ -1011,10 +1038,8 @@ global $wppa_supported_audio_extensions;
 				// Compose the users zip filename
 				$zipfile = $zipsdir.wppa_get_user().'.zip';
 
-				// Check file existance and remove
-				if ( wppa_is_file( $zipfile ) ) {
-					@ wp_delete_file( $zipfile );
-				}
+				// Remove when exists
+				wppa_unlink( $zipfile );
 			}
 
 			// Remove all User displayname tags
@@ -1028,7 +1053,7 @@ global $wppa_supported_audio_extensions;
 			}
 			wppa_clear_taglist();
 			$txt = 'zip removed';
-			echo wp_json_encode( ['txt' => $txt] );
+			wppa_echo( wp_json_encode( ['txt' => $txt] ) );
 			wppa_exit();
 			break;
 

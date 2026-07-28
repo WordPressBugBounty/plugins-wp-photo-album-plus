@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.2.06.002
+/* Version 9.2.07.002
 /* Various js routines used in admin pages
 */
 
@@ -382,7 +382,8 @@ function wppaAjaxDeleteExportZips() {
 
 	jQuery.ajax( { 	url: 		wppaAdminAjaxUrl,
 					data: 		'action=wppa' +
-								'&wppa-action=delexportzips',
+								'&wppa-action=delexportzips' +
+								'&wppa-nonce=' + jQuery('#wppa-export-nonce').val(),
 					async: 		false,
 					type: 		'GET',
 					timeout: 	60000,
@@ -1171,6 +1172,7 @@ function wppaMaintenanceProc(slug, intern, asCronJob ) {
 									}
 
 									// Start update togo
+									nonce = jQuery('#wppa-nonce').val();
 									setTimeout( function() {wppaAjaxUpdateTogo(slug);}, 1000 );
 								},
 
@@ -1732,7 +1734,7 @@ function wppaAjaxUpdateTogo(slug) {
 	jQuery.ajax( { 	url:		wppaAdminAjaxUrl,
 					data: 		'action=wppa' +
 								'&wppa-action=gettogo' +
-								'&slug=' + slug,
+								'&slug=' + slug + '&wppa-nonce=' + jQuery('#wppa-nonce').val(),
 					async: 		true,
 					type: 		'GET',
 					timeout: 	100000,

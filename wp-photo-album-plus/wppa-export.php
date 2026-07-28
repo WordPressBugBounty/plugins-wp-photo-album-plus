@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version: 9.2.01.001
+* Version: 9.2.07.001
 *
 */
 
@@ -38,6 +38,9 @@ global $wppa_opt;
 		<h1>' .
 			get_admin_page_title() . '
 		</h1>' );
+
+	// Nonce field
+	wppa_echo( wp_nonce_field( 'wppa-export-nonce', 'wppa-export-nonce', false, false ) );
 
 	// Do the export if requested
 	if ( wppa_get( 'export-submit' ) ) {
@@ -285,7 +288,7 @@ global $wppa_try_continue;
 global $wppa_opt;
 
 	wppa_log('misc', 'wppa_export_photos() called');
-	
+
 	$wppa_opt['wppa_lazy'] = 'none';
 	$wppa_temp_idx 		= 0;
 	$wppa_try_continue 	= false;
@@ -387,7 +390,7 @@ global $wppa_opt;
 
 				$total = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d AND ext != 'xxx' AND filename NOT LIKE %s", $id, '%'. $wpdb->esc_like( '.pdf' ) ) );
 				wppa_log_query( $total );
-				
+
 				$photos = $wpdb->get_results( $wpdb->prepare(
 											 "SELECT * FROM $wpdb->wppa_photos
 											  WHERE album = %d
@@ -566,7 +569,7 @@ global $wppa_temp_idx;
 	if ( $album ) {
 		$file 	= WPPA_DEPOT_PATH.'/'.$id.'.amf';
 
-		wppa_put_contents( $file, 
+		wppa_put_contents( $file,
 			"name=" . $album['name'] . "\n" .
 			"desc=" . wppa_nl_to_txt( $album['description'] ) . "\n" .
 			"aord=" . $album['a_order'] . "\n" .
@@ -603,8 +606,8 @@ global $wppa_temp_idx;
 
 	if ( $photo ) {
 		$file = WPPA_DEPOT_PATH . '/' . $photo['id'] . '.pmf';
-		
-		wppa_put_contents( $file, 
+
+		wppa_put_contents( $file,
 			"name=" . $photo['name'] . "\n" .
 			"desc=" . wppa_nl_to_txt( $photo['description'] ) . "\n" .
 			"pord=" . $photo['p_order'] . "\n" .

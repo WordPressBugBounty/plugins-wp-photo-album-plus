@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.06.001
+* Version: 9.2.07.001
 *
 */
 
@@ -351,7 +351,7 @@ global $other_deps;
 
 	// See if non default lightbox Start
 	if ( wppa( 'lbstart' ) ) {
-		wppa_js( 'wppaOvlSlideStart[\'' . wppa( 'mocc' ) .'\'] = \'' . wppa( 'lbstart' ) . '\';' );
+		wppa_js( 'wppaOvlSlideStart[\'' . wppa( 'mocc' ) .'\'] = \'' . esc_js( wppa( 'lbstart' ) ) . '\';' );
 	}
 
 	// Subsearch or rootsearch?
