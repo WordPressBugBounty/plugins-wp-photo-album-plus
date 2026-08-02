@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.07.002
+* Version 9.2.08.003
 *
 */
 
@@ -1572,6 +1572,7 @@ global $wppa;
 // Get html for ownerselection
 function wppa_get_ownerselecton_html() {
 global $wpdb;
+global $wppa_lang;
 
 	$mocc = wppa( 'mocc' );
 
@@ -1579,19 +1580,33 @@ global $wpdb;
 	foreach( array_keys( $owners ) as $key ) {
 		$owner = wppa_get_user_by( 'login', $owners[$key]['owner'], true );
 		if ( $owner ) {
-			$owners[$key]['name'] = $owner->display_name;
+			if ( $owner->display_name == __( 'Unknown user', 'wp-photo-album-plus' ) ) {
+				$owners[$key]['name'] = $owners[$key]['owner']; // login name
+			}
+			else {
+				$owners[$key]['name'] = $owner->display_name; 	// display name
+			}
 		}
 		else {
+			unset( $owners[$key] );
+		}
+		if ( ! $owners[$key]['name'] ) {
 			unset( $owners[$key] );
 		}
 	}
 	$owners = wppa_array_sort( $owners, 'name', SORT_ASC );
 
-	// Now we have the array of users that ever uploaded an item, sorted by displayname
-	$url = 'document.location.href=\''.get_permalink().'?wppa-occur='.($mocc-1).'&wppa-ownersearch=1&wppa-owner=\'';
-	$onchange = $url;
-	//'wppaDoAjaxRender(event, '.($mocc+1).', \''.$ajx.'\'+this.value, \''.$url.'\'+this.value )';
-	$result = '<select id="wppa-ownerselection-'.$mocc.'" name="wppa-ownerselection-'.$mocc.'" onchange="'.$onchange.'+this.value">';
+	if ( $wppa_lang ) {
+		$l = '&lang=' . $wppa_lang;
+	}
+	else {
+		$l = '';
+	}
+
+	$url = wppa_get_permalink('',true).'wppa-occur='.($mocc-1).$l.'&wppa-photos-only=1&wppa-upldr=\'+this.value+\'&wppa-cover=0&vt=1';
+	$onchange = 'wppaDoAjaxRender(event,'.($mocc-1).',\''.wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.($mocc-1).$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value,\''.$url.'\')';
+
+	$result = '<select id="wppa-ownerselection-'.$mocc.'" name="wppa-ownerselection-'.$mocc.'" onchange="'.esc_attr($onchange).'">';
 	$result .= '<option id="dummy" value="" disabled selected>' . __('Please select a user', 'wp-photo-album-plus') . '</option>';
 	foreach( $owners as $owner ) {
 		$result .= '<option id="wppa-owner-' . esc_attr( $owner['owner'] ) . '" value="' . esc_attr( $owner['owner'] ) . '" >' . $owner['name'] . '</option>';

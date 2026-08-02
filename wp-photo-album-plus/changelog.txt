@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.2.08 =
+
+* album="#featured" did not work. Fixed.
+* 1 security fix.
+* type="ownerselection" now works correctly.
+
 = 9.2.07 =
 
 * Fixed a bug in lazy load, did not work everywhere meant.

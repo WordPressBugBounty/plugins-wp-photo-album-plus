@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.07.002
+* Version: 9.2.08.002
 *
 */
 
@@ -4382,6 +4382,12 @@ global $wppa_supported_audio_extensions;
 			break;
 
 		case 'do-fe-upload':
+			$album = wppa_get( 'upload-album' );
+			if ( ! wppa_have_access( $album ) ) {
+				wppa_alert_text( __( 'ERROR: Illegal attempt to upload a file.', 'wp-photo-album-plus' ) );
+				echo wp_json_encode( ['html' => wppa_alert_html()] );
+				wppa_exit();;
+			}
 			require_once 'wppa-non-admin.php';
 			wppa_user_upload();
 			global $wppa_upload_succes_id;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.07.001
+* Version: 9.2.08.002
 *
 */
 
@@ -909,7 +909,7 @@ global $albums_used;
 	$dsc = strpos( $order, 'DESC' ) !== false;
 	$placeholders = implode( ',', array_fill( 0, count( $total_ids ), '%d' ) );
 	if ( $ran ) {
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $total_ids, [$ran], [$max] ) ), ARRAY_A );
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $total_ids, [$ran+wppa('mocc')], [$max] ) ), ARRAY_A );
 		wppa_show_query();
 	}
 	else {
@@ -1230,8 +1230,8 @@ global $wppa;
 		// Max count
 		$max = wppa( 'is_featen' );
 
-		$a = explode( ',', wppa_get_album_IN_string( wppa( 'start_album' ) ) );
-		if ( $a ) {
+		if ( wppa( 'start_album' ) ) {
+			$a = explode( ',', wppa_get_album_IN_string( wppa( 'start_album' ) ) );
 			$placeholders = implode( ',', array_fill( 0, count( $a ), '%d' ) );
 			$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND status = 'featured'", $a ) );
 			wppa_show_query();
@@ -1560,7 +1560,7 @@ global $wppa;
 		wppa_show_query();
 	}
 	elseif ( strpos( $order, 'RAND' ) !== false ) {
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $total_ids, [$ran], [$max] ) ), ARRAY_A );
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $total_ids, [$ran+wppa('mocc')], [$max] ) ), ARRAY_A );
 		wppa_show_query();
 	}
 	elseif ( strpos( $order, 'DESC' ) ) {
@@ -1578,7 +1578,7 @@ global $wppa;
 	// Re-order random
 	if ( $sc_random ) {
 		$placeholders = implode( ',', array_fill( 0, count( $final_ids ), '%d' ) );
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $final_ids, [$ran] ) ), ARRAY_A );
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $final_ids, [$ran+wppa('mocc')] ) ), ARRAY_A );
 		wppa_show_query();
 	}
 

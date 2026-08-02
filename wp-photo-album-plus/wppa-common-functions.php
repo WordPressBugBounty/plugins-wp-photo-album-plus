@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.06.002
+* Version: 9.2.08.003
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -297,7 +297,7 @@ global $wppa_randseed_modified;
 
 		// This randseed survives pageloads up to the duration of the session ( usually 1 hour )
 		case 'session':
-			$result = $wppa_session['id'] % 4711 + 13;;
+			$result = $wppa_session['randseed'];
 			break;
 
 		// Once a day
