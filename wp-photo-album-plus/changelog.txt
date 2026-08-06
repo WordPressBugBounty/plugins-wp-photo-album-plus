@@ -1,5 +1,9 @@
 WP Photo Album Plus Changelog
 
+= 9.2.09 =
+
+* Securrity fix.
+
 = 9.2.08 =
 
 * album="#featured" did not work. Fixed.

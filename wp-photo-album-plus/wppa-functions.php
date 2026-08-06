@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.08.002
+* Version: 9.2.09.002
 *
 */
 
@@ -4670,6 +4670,17 @@ global $wppa_alert;
 	// Upload possible?
 	$may_upload = wppa_switch( 'user_upload_on' );
 	if ( ! is_user_logged_in() ) $may_upload = false;	// Must login
+
+	// Are roles specified and do i have one?
+	if ( ! wppa_check_user_upload_role() ) {
+		$may_upload = false;
+	}
+
+	// May user upload to this album?
+	$album = wppa_get( 'upload-album' );
+	if ( ! wppa_have_access( $album ) ) {
+		$may_upload = false;
+	}
 
 	// Create album possible?
 	$may_create = wppa_switch( 'user_create_on' );

@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.08.002
+* Version: 9.2.09.001
 *
 */
 
@@ -1242,17 +1242,14 @@ global $wppa_supported_audio_extensions;
 			// Used by delay feature
 			$nonce = wppa_get( 'nonce' );
 			if ( ! wp_verify_nonce( $nonce, 'wppa-check' ) ) {
-				$shouldbe = wp_create_nonce( 'wppa-check' );
-				wppa_log( 'err', 'Nonce expected = '.$shouldbe.', found = '.$nonce);
-				echo wp_json_encode( ['html' => __( 'Security check failure', 'wp-photo-album-plus' ), 'js' => ''] );
+				echo wp_json_encode( ['html' => __('Security check failure', 'wp-photo-album-plus'), 'js' => ''] );
 				wppa_exit();
 			}
 
 			// Is it a valid shortcode?
 			$shortcode = wppa_get( 'shortcode' );
 			if ( $shortcode != '[wppa]' && substr( $shortcode, 0, 6 ) != '[wppa ' && substr( $shortcode, 0, 7 ) != '[photo ' ) {
-				wppa_log('war', 'Shortcode '.$shortcode.' rejected');
-				echo wp_json_encode( ['html' => __( 'Shortcode check failure', 'wp-photo-album-plus' ), 'js' => ''] );
+				echo wp_json_encode( ['html' => __('Security check failure', 'wp-photo-album-plus'), 'js' => ''] );
 				wppa_exit();
 			}
 
@@ -1260,11 +1257,10 @@ global $wppa_supported_audio_extensions;
 			// Some still use [/wppa] so we simply cut off after the first ]
 			$bpos = strpos( $shortcode, ']' );
 			if ( strlen( $shortcode ) != $bpos + 1 ) {
-				wppa_log( 'war', 'Shortcode ' . esc_html( $shortcode ) . ' trimmed after ]' );
 				$shortcode = substr( $shortcode, 0, $bpos + 1 );
 			}
 
-			// Yes
+			// Yes, do it
 			ob_start();
 			wppa_load_theme();
 			$result = do_shortcode( str_replace( '%23', '#', $shortcode ) );
@@ -1289,7 +1285,7 @@ global $wppa_supported_audio_extensions;
 			// Get possible premature output
 			$unexpected = ob_get_clean();
 			if ( $unexpected ) {
-				wppa_log( 'err', strlen( $unexpected ) . ' chars of unexpected output captured while doing ajax render: ' . str_replace( '&', '8', htmlspecialchars( $unexpected ) ) );
+				wppa_log( 'err', strlen( $unexpected ) . ' chars of unexpected output captured while doing ajax render.' );
 			}
 
 			// Output
