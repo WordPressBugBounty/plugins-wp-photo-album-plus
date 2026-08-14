@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.08.003
+* Version: 9.2.10.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -997,7 +997,7 @@ global $current_user;
 			$owner = $alb['owner'];
 		}
 		elseif ( is_numeric( $alb ) ) {
-			$owner = $wpdb->get_var( $wpdb->prepare( "SELECT owner FROM $wpdb->wppa_albums WHERE id = %s", $alb ) );
+			$owner = $wpdb->get_var( $wpdb->prepare( "SELECT owner FROM $wpdb->wppa_albums WHERE id = %d", $alb ) );
 		}
 
 		// -- public --- ?

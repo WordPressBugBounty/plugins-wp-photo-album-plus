@@ -306,7 +306,7 @@ global $wpdb;
 	$data['description'] 	= strip_shortcodes( wppa_filter_html( $data['description'] ) );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['tags'] 			= str_replace( '-none-,', '', $data['tags'] );
-	$sdtm = $wpdb->get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %s", $data['album'] ) );
+	$sdtm = $wpdb->get_var( $wpdb->prepare( "SELECT scheduledtm FROM $wpdb->wppa_albums WHERE id = %d", $data['album'] ) );
 	if ( $sdtm ) {
 		$data['scheduledtm'] = $sdtm;
 	}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* version 9.2.01.001
+* version 9.2.10.004
 *
 */
 
@@ -264,7 +264,7 @@ global $is_reschedule;
 			case 'wppa_cleanup_a':
 			case 'wppa_cleanup_b':
 				$orphan_album = wppa_get_option( 'wppa_orphan_album', 0 );
-				$album_exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $orphan_album ) );
+				$album_exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %d", $orphan_album ) );
 				if ( ! $album_exists ) $orphan_album = false;
 				if ( ! $orphan_album ) {
 					$orphan_album = wppa_create_album_entry( ['name' 		=> __('Orphan photos', 'wp-photo-album-plus' ),

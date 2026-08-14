@@ -773,7 +773,7 @@ global $wpdb;
 		$slide = '';
 	}
 
-	$pagid = $wpdb->get_var( $wpdb->prepare( "SELECT cover_linkpage FROM $wpdb->wppa_albums WHERE id = %s", $parent ) );
+	$pagid = $wpdb->get_var( $wpdb->prepare( "SELECT cover_linkpage FROM $wpdb->wppa_albums WHERE id = %d", $parent ) );
 
 	$value 	= wppa_get_album_name( $parent );
 	$href 	=

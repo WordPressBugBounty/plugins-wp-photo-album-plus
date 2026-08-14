@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.10.003
+* Version: 9.2.10.004
 *
 */
 
@@ -5466,7 +5466,7 @@ global $wpdb;
 		$limits = wppa_get_user_upload_limits();
 	}
 	else {
-		$limits = $wpdb->get_var( $wpdb->prepare( "SELECT upload_limit FROM $wpdb->wppa_albums WHERE id = %s", $album ) );
+		$limits = $wpdb->get_var( $wpdb->prepare( "SELECT upload_limit FROM $wpdb->wppa_albums WHERE id = %d", $album ) );
 	}
 	$temp = explode( '/', $limits );
 	$limit_max  = isset( $temp[0] ) ? $temp[0] : 0;

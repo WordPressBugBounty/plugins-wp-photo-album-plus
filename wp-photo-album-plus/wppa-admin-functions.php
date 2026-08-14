@@ -551,7 +551,7 @@ function _wppa_sanitze_files( $root, $from = '' ) {
 function wppa_update_single_photo( $file, $id, $name, $nothumb = false ) {
 global $wpdb;
 
-	$photo = $wpdb->get_row( $wpdb->prepare( "SELECT id, name, ext, album, filename FROM $wpdb->wppa_photos WHERE id = %s", $id ), ARRAY_A );
+	$photo = $wpdb->get_row( $wpdb->prepare( "SELECT id, name, ext, album, filename FROM $wpdb->wppa_photos WHERE id = %d", $id ), ARRAY_A );
 
 	// Find extension
 	$ext = $photo['ext'];
@@ -970,7 +970,7 @@ global $wpdb;
 			$album = $lastphoto['album'];
 		}
 
-		$lastphotoalbum = $wpdb->get_row( $wpdb->prepare( "SELECT id, name FROM $wpdb->wppa_albums WHERE id = %s", $album ), ARRAY_A );
+		$lastphotoalbum = $wpdb->get_row( $wpdb->prepare( "SELECT id, name FROM $wpdb->wppa_albums WHERE id = %d", $album ), ARRAY_A );
 		if ( $lastphoto ) {
 			/* translators: name of item, id of item */
 			$result .= '<br>' . sprintf( __( 'The most recently added item is <strong>%1$s</strong> (%2$d)', 'wp-photo-album-plus' ), sanitize_text_field( $lastphoto['name'] ), $lastphoto['id'] );

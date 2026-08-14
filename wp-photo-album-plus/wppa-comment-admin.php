@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* version 9.2.05.001
+* version 9.2.10.004
 *
 */
 
@@ -245,7 +245,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 
 			foreach( $ids as $id ) {
 
-				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %s", $id ) );
+				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $id ) );
 
 				// Delete
 				if ( 'delete' === $current_action || 'deletesingle' === $current_action ) {

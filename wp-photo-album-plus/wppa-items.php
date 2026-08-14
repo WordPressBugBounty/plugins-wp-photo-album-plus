@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.2.10.001
+* vrsion: 9.2.10.004
 *
 */
 
@@ -81,7 +81,7 @@ static $cache;
 	}
 
 	// Not in cache, do query
-	$cache[$id] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id = %s", $id ), ARRAY_A );
+	$cache[$id] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id = %d", $id ), ARRAY_A );
 
 	// Found one?
 	if ( isset( $cache[$id] ) ) {
@@ -165,7 +165,7 @@ static $cache;
 	}
 
 	// Not in cache, do query
-	$cache[$id] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $id ), ARRAY_A );
+	$cache[$id] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $id ), ARRAY_A );
 	if ( $cache[$id] ) {
 		wppa( 'current_photo', $cache[$id] );
 		return $cache[$id];

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.2.02.004
+* Version: 9.2.10.004
 *
 */
 
@@ -199,7 +199,7 @@ global $wpdb;
 	elseif ( $photo && ! $moderate ) {
 		$count 	= 1;
 		$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos
-													   WHERE id = %s", $photo ), ARRAY_A );
+													   WHERE id = %d", $photo ), ARRAY_A );
 		wppa_echo( wppa_show_query( true ) );
 		$link 	= '';
 	}
@@ -231,7 +231,7 @@ global $wpdb;
 
 		// Moderate a single photo
 		if ( $photo ) {
-			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $photo ), ARRAY_A );
+			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $photo ), ARRAY_A );
 			wppa_echo( wppa_show_query( true ) );
 			$count 	= is_array( $photos ) ? count( $photos ) : 0;
 			$link 	= '';
@@ -3336,7 +3336,7 @@ function wppa_album_photos_bulk( $album, $page_1 = false ) {
 							break;
 						case 'wppa-bulk-move-to':
 							if ( $newalb ) {
-								$photo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %s", $id ), ARRAY_A );
+								$photo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id = %d", $id ), ARRAY_A );
 								wppa_echo( wppa_show_query( true ) );
 								if ( wppa_switch( 'void_dups' ) ) {	// Check for already exists
 									$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE filename = %s AND album = %d", $photo['filename'], $newalb ) );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.2.10.001
+* Version: 9.2.10.004
 *
 */
 
@@ -883,7 +883,7 @@ static $cache;
 	if ( ! $alb ) return false;
 	if ( ! $cache ) $cache = [];
 	if ( ! isset( $cache[$alb] ) ) {
-		$cache[$alb] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %s", $alb ) );
+		$cache[$alb] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE id = %d", $alb ) );
 	}
 	return $cache[$alb];
 }
@@ -895,7 +895,7 @@ static $cache;
 	if ( ! $id ) return false;
 	if ( ! $cache ) $cache = [];
 	if ( ! isset( $cache[$id] ) ) {
-		$cache[$id] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE id = %s", $id ) );
+		$cache[$id] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE id = %d", $id ) );
 	}
 	return $cache[$id];
 }
@@ -908,7 +908,7 @@ static $cache;
 	if ( ! $cache ) $cache = [];
 	if ( ! $cache[$alb] ) $cache[$alb] = [];
 	if ( ! isset( $cache[$alb][$id] ) ) {
-		$cache[$alb][$id] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photosWHERE album = %s AND filename = %s", $alb, $id ) );
+		$cache[$alb][$id] = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album = %d AND filename = %d", $alb, $id ) );
 	}
 	return $cache[$alb][$id];
 }
@@ -916,7 +916,7 @@ static $cache;
 function wppa_dislike_check($photo) {
 global $wpdb;
 
-	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %s AND value = -1", $photo ) );
+	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND value = -1", $photo ) );
 
 	if ( wppa_opt( 'dislike_mail_every' ) > 0) {		// Feature enabled?
 		if ( $count % wppa_opt( 'dislike_mail_every' ) == 0 ) {	// Mail the admin
@@ -981,7 +981,7 @@ global $wpdb;
 function wppa_pendrat_get( $id ) {
 global $wpdb;
 
-	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %s AND status = 'pending'", $id ) );
+	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND status = 'pending'", $id ) );
 	return $count;
 }
 

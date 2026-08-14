@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* Version: 9.2.01.001
+* Version: 9.2.10.004
 *
 *
 */
@@ -2934,7 +2934,7 @@ global $wpdb;
 			// If f_description or thabrand changed: update
 			if ( $f_description != $exif['f_description'] || $tagbrand != $exif['brand'] ) {
 				$id = $exif['id'];
-				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET f_description = %s, brand = %s WHERE id = %s", $f_description, $tagbrand, $id ) );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET f_description = %s, brand = %s WHERE id = %d", $f_description, $tagbrand, $id ) );
 				$photodata = wppa_cache_photo( $photo );
 
 				// If the format changed and the exif tag is used in the description, the photo must be re-indexed
