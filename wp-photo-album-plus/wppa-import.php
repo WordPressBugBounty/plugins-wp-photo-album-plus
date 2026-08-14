@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.2.01.001
+* Version 9.2.10.001
 *
 */
 
@@ -613,7 +613,7 @@ global $wppa_import_errors;
 										$img_url = str_replace( 'http://', 'https://', $img_url );
 									}
 								}
-								wppa_echo( wppa_html_tag( 'img', ['src' => $img_url, 'alt' => ' '.__( 'not readable', 'wp-photo-album-plus' ), 'style' => "max-height:48px;",
+								wppa_echo( wppa_html_tag( 'img', ['src' => $img_url, 'alt' => ' '.__( 'not readable', 'wp-photo-album-plus' ), 'style' => "max-height:48px;width:auto;",
 																  'onmouseover' => "if (jQuery('#wppa-zoom').prop('checked')) jQuery(this).css('max-height', '144px')",
 																  'onmouseout' => "if (jQuery('#wppa-zoom').prop('checked')) jQuery(this).css('max-height', '48px')"] ) );
 							}

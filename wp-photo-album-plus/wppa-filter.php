@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.2.04.001
+* Version: 9.2.10.002
 *
 */
 
@@ -143,6 +143,7 @@ global $wppa_after_smx;
 	$wppa_current_shortcode_atts 	= (array) $xatts;
 	$wppa_no_timer 					= false;
 	$is_calendar 					= false;
+	$is_ownerselection 				= false;
 
 	// Save shortcode
 	$wppa_current_shortcode 			= sanitize_text_field( stripslashes( wppa_get_shortcode( 'wppa', $xatts ) ) );
@@ -506,6 +507,7 @@ global $wppa_after_smx;
 			break;
 		case 'ownerselection':
 			$wppa['is_ownerselection'] = true;
+			$is_ownerselection = true;
 			break;
 		case 'bestof':
 			$wppa['bestof'] = true;
@@ -748,11 +750,15 @@ global $wppa_after_smx;
 	// Ready to render
 	$result =  wppa_albums();						// Get the HTML
 
-	// Calendar needs an extra container
-	if ( $is_calendar ) {
+	// Calendar and ownerselection below need an extra container after
+	if ( $is_calendar || ( $is_ownerselection && wppa_switch( 'ownersel_below' ) ) ) {
 		wppa_reset_occurrance();
-		wppa_bump_mocc(); //$wppa['mocc'] += 1;
+		wppa_bump_mocc();
 		wppa_container( 'open' );
+		if ( wppa_get( 'occur' ) == wppa( 'mocc' ) ) {
+			wppa_url_to_runparms();
+			wppa_theme();
+		}
 		wppa_container( 'close' );
 		$result .= $wppa['out'];
 	}

@@ -1,5 +1,12 @@
 WP Photo Album Plus Changelog
 
+= 9.2.10 =
+
+* Security fix
+* New setting: Basc settings -> Layout -> I -> Item 14: Ownerselection results below, to display the results below the selectionbox rather than above it.
+* Ownerselection did not work when ajax method set to none. Fixed.
+* Calendars by exifdtm did not work. Fixed.
+
 = 9.2.09 =
 
 * Securrity fix.

@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.2.07.002
+/* Version 9.2.10.001
 /* Various js routines used in admin pages
 */
 
@@ -2066,7 +2066,7 @@ function wppaAjaxReplaceLog() {
 									jQuery( "#wppa-spinner" ).show();
 								},
 					success: 	function( result, status, xhr ) {
-									result = wppaEntityDecode(result);
+
 									jQuery( "#wppa-logbody" ).html( result.substr( 1 ));
 									jQuery( "#wppa-spinner" ).hide();
 								},

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.08.003
+* Version 9.2.10.003
 *
 */
 
@@ -1549,10 +1549,13 @@ global $wppa;
 
 	if ( is_feed() ) return;
 
-	// No landing shortcode needed, its all here
-	$wppa['mocc'] = $wppa['mocc'] - 1;
-	wppa_out( do_shortcode( '[wppa type="landing"]' ) );
-	$wppa['mocc'] = $wppa['mocc'] + 1;
+	if ( ! wppa_switch( 'ownersel_below' ) ) {
+
+		// No landing shortcode needed, its all here
+		$wppa['mocc'] = $wppa['mocc'] - 1;
+		wppa_out( do_shortcode( '[wppa type="landing"]' ) );
+		$wppa['mocc'] = $wppa['mocc'] + 1;
+	}
 
 	// Start selection box
 	wppa_container( 'open' );
@@ -1567,6 +1570,7 @@ global $wppa;
 		</div>' );
 
 	wppa_container( 'close' );
+
 }
 
 // Get html for ownerselection
@@ -1603,8 +1607,9 @@ global $wppa_lang;
 		$l = '';
 	}
 
-	$url = wppa_get_permalink('',true).'wppa-occur='.($mocc-1).$l.'&wppa-photos-only=1&wppa-upldr=\'+this.value+\'&wppa-cover=0&vt=1';
-	$onchange = 'wppaDoAjaxRender(event,'.($mocc-1).',\''.wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.($mocc-1).$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value,\''.$url.'\')';
+	$res_mocc = wppa_switch( 'ownersel_below' ) ? $mocc + 1 : $mocc - 1;
+	$url = wppa_get_permalink('',true).'?wppa-occur='.$res_mocc.$l.'&wppa-photos-only=1&wppa-upldr=\'+this.value+\'&wppa-cover=0&vt=1';
+	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.$res_mocc.$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value,\''.$url.'\')';
 
 	$result = '<select id="wppa-ownerselection-'.$mocc.'" name="wppa-ownerselection-'.$mocc.'" onchange="'.esc_attr($onchange).'">';
 	$result .= '<option id="dummy" value="" disabled selected>' . __('Please select a user', 'wp-photo-album-plus') . '</option>';
@@ -5477,9 +5482,12 @@ global $photos_used;
 					$ajaxurl = wppa_get_ajaxlink('', 1) .
 								'wppa-calendar=exifdtm&wppa-caldate=' . $keys[$day] . '&' . $alb_arg . 'wppa-occur=' . $mocc1;
 
+					$normurl = wppa_get_permalink() .
+								'wppa-calendar=exifdtm&wppa-caldate=' . $keys[$day] . '&' . $alb_arg . 'wppa-occur=' . $mocc1;
+
 					$onclick = 'jQuery(\'.wppa-minicover-' . $mocc . '\').removeClass(\'wppa-minicover-current\');
 								jQuery(this).addClass(\'wppa-minicover-current\');
-								wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'\');return false;';
+								wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'' . $normurl . '\');return false;';
 
 					$result .= '
 					<a
@@ -5516,10 +5524,12 @@ global $photos_used;
 
 				$ajaxurl =  wppa_get_ajaxlink('', 1) .
 							 'wppa-calendar=' . $calendar_type . '&wppa-caldate=' . $keys[$day] . '&' . $alb_arg . 'wppa-occur=' . $mocc1;
+				$normurl =  wppa_get_permalink() .
+							 'wppa-calendar=' . $calendar_type . '&wppa-caldate=' . $keys[$day] . '&' . $alb_arg . 'wppa-occur=' . $mocc1;
 
 				$onclick = 'jQuery( \'.wppa-minicover-' . $mocc . '\' ).removeClass( \'wppa-minicover-current\' );
 							jQuery(this).addClass(\'wppa-minicover-current\');
-							wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'\');return false;';
+							wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'' . $normurl . '\');return false;';
 
 				$result .= 	'
 				<a
@@ -5950,15 +5960,15 @@ global $photos_used;
 										else {
 											$day = floor( wppa_local_strtotime( $year . '-' . $month . '-' . $current_day . '-12' ) / $secsinday );
 										}
-										$ajaxurl = wppa_encrypt_url(
-												wppa_get_ajaxlink( '', 1 ) .
-												'wppa-calendar='.substr( wppa( 'calendar' ), '4' ) . '&' .
+										$extraurl = 'wppa-calendar='.substr( wppa( 'calendar' ), '4' ) . '&' .
 												'wppa-caldate=' . $day . '&' .
 												( $albums ? 'wppa-albums=' . $albums . '&' : '' ) .
 												'wppa-vt=1&' .
 												'wppa-slide=1&' .
-												'wppa-occur=' . ( $mocc + 1 )
-												);
+												'wppa-occur=' . ( $mocc + 1 );
+										$ajaxurl = wppa_encrypt_url( wppa_get_ajaxlink( '', 1 ) . $extraurl );
+										$normurl = wppa_encrypt_url( wppa_get_permalink() . $extraurl );
+
 										$id = $thumbs[0]['id'];
 
 										// The link
@@ -5966,7 +5976,7 @@ global $photos_used;
 										<a
 											data-id="' . wppa_encrypt_photo( $id ) . '"
 											style="color:white;cursor:pointer"
-											onclick="wppaDoAjaxRender(event,' . ( $mocc + 1 ) . ', \'' . $ajaxurl . '\' );return false;"
+											onclick="wppaDoAjaxRender(event,' . ( $mocc + 1 ) . ', \'' . $ajaxurl . '\',\'' . $normurl . '\' );return false;"
 											>';
 
 										// The cell content

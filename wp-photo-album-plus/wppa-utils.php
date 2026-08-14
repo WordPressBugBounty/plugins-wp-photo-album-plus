@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.2.02.002
+* Version: 9.2.10.001
 *
 */
 
@@ -1944,9 +1944,9 @@ static $repeat_count;
 
 	// Get stacktrace 5 levels
 	if ( $trace && $dbg ) {
-		$data = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 3 );
+		$data = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 5 );
 		$traceline = ' Stack: ';
-		$traceline .= basename( $data[1]['file'] ) . ':' . $data[1]['line'];
+		$traceline .= basename( $data[1]['file'] ) . ':' . $data[1]['line'] . ' <- ' . basename( $data[2]['file'] ) . ':' . $data[2]['line'] . ' <- ' . basename( $data[3]['file'] ) . ':' . $data[3]['line'];
 	}
 	else {
 		$traceline = '';

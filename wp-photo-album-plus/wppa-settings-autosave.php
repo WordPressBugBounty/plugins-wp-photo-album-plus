@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.2.06.001
+* version 9.2.10.002
 *
 */
 
@@ -890,6 +890,13 @@ global $wppa_hide_this;
 									</tr>
 								</table>';
 						wppa_setting_new($slug, '13', $name, $desc, $html, $help);
+
+						$name = __('Ownerselection results below', 'wp-photo-album-plus');
+						$desc = __('Show results below selectionbox', 'wp-photo-album-plus');
+						$help = '';
+						$slug = 'wppa_ownersel_below';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '14', $name, $desc, $html, $help);
 
 						wppa_setting_box_footer_new();
 					}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.09.002
+* Version: 9.2.10.003
 *
 */
 
@@ -1408,13 +1408,6 @@ global $wppa;
 		}
 	}
 
-	// Ownersearch
-//	if ( wppa( 'ownersearch' ) ) {
-//		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE owner = %s AND album > 0", wppa( 'is_owner' ) ) );
-//		wppa_show_query();
-//		$total_ids = $ids;//wppa_array_intersect( $total_ids, $ids );
-//	}
-
 	// Calendar
 	if ( wppa( 'calendar' ) ) {
 		if ( wppa( 'start_album' ) ) {
@@ -1429,11 +1422,11 @@ global $wppa;
 			case 'exifdtm':
 				$d = wp_strip_all_tags( wppa( 'caldate' ) );
 				if ( count( $alb_arr ) ) {
-					$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND exifdtm LIKE %s", array_merge( $alb_arr, [$wpdb->esc_like($d)."% "] ) ) );
+					$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders) AND exifdtm LIKE %s", array_merge( $alb_arr, [$wpdb->esc_like($d)."%"] ) ) );
 					wppa_show_query();
 				}
 				else {
-					$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE exifdtm LIKE %s", $wpdb->esc_like($d)."% " ) );
+					$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE exifdtm LIKE %s", $wpdb->esc_like($d)."%" ) );
 					wppa_show_query();
 				}
 				$total_ids 	= wppa_array_intersect( $total_ids, $ids );

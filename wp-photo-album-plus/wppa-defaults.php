@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* version 9.2.06.001
+* version 9.2.10.002
 *
 */
 
@@ -484,6 +484,7 @@ horizrailenabled:false,";
 						'wppa_fs_svg_bg_color' 			=> 'transparent',
 
 						'wppa_mobile_ignore_sa' 		=> 'no',
+						'wppa_ownersel_below' 			=> 'yes',
 
 						// Table IV: Behaviour
 						// A System

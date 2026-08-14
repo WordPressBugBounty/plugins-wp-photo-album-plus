@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.2.02.003
+* vrsion: 9.2.10.001
 *
 */
 
@@ -848,6 +848,9 @@ function wppa_translate_album_keywords( $id, $text, $translate = true ) {
 // Get any album field of any album, raw data from the db
 function wppa_get_album_item( $id, $item ) {
 
+	// Can only from physical existing album
+	if ( $id < '1' ) return false;
+
 	$album = wppa_cache_album( $id );
 
 	if ( $album ) {
@@ -1108,10 +1111,9 @@ static $cache;
 	if ( isset( $cache[$xalb . $item . $default_slug] ) ) return $cache[$xalb . $item . $default_slug];
 
 	$albs = explode( '.', wppa_expand_enum( $xalb ) );
-
 	if ( is_array( $albs ) ) {
 		foreach( $albs as $alb ) {
-			if ( _wppa_is_item_displayable( $alb, $item, $default_slug ) ) {
+			if ( wppa_is_posint( $alb ) && _wppa_is_item_displayable( $alb, $item, $default_slug ) ) {
 				$cache[$xalb . $item . $default_slug] = true;
 				return true;
 			}
@@ -1124,7 +1126,7 @@ function _wppa_is_item_displayable( $alb, $item, $default_slug ) {
 
 	$default = wppa_switch( $default_slug );
 
-	if ( in_array( $alb, array( '', 0, '-1' ) ) ) return $default;
+	if ( in_array( $alb, array( '', 0, '-1', '-2' ) ) ) return $default;
 
 	// Validate args
 	if ( ! is_numeric( $alb ) ) {

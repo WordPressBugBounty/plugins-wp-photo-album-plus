@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.2.06.002
+* Version: 9.2.10.001
 *
 */
 
@@ -561,7 +561,7 @@ function wppa_http_x_forwarded_for() {
 
 	if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 		// comma separated list of ips
-		return sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		return rest_is_ip_address( $_SERVER['HTTP_X_FORWARDED_FOR'] );
 	}
 	return '';
 }
