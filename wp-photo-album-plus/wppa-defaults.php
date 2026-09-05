@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* version 9.2.10.002
+* version 9.2.11.004
 *
 */
 
@@ -1323,7 +1323,7 @@ horizrailenabled:false,";
 						'wppa_pre_cache_albums' 	=> 20,
 						'wppa_pre_cache_photos' 	=> 100,
 						'wppa_show_scgens' 			=> '',
-						'wppa_compress_js' 			=> 'yes',
+						
 						'wppa_enable_debug' 		=> 'no',
 						'wppa_seo_optimize' 		=> 'yes',
 

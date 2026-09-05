@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.2.10.001
+* Version: 9.2.11.002
 *
 */
 
@@ -188,7 +188,9 @@ function wppa_get_get_filter( $name ) {
 		case 'upn-tags':
 		case 'new-tags':
 		case 'catbox':
-			$result = 'tags';
+		case 'cat':
+		case 'cats':
+			$result = 'tagcat';
 			break;
 
 		// Custom data
@@ -329,14 +331,10 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 		case 'custom':
 			$allowed = current_user_can( 'unfiltered_html' ) ? wppa_allowed_tags() : wppa_allowed_simple_tags();
 			return isset( $_REQUEST[$key] ) ? wp_kses( html_entity_decode( wp_unslash( $_REQUEST[$key] ) ), $allowed ) : $default;
-
-		//	return isset( $_REQUEST[$key] ) ? wppa_filter_html( wp_unslash( $_REQUEST[$key] ) ) : $default;
 			break;
 
-		case 'tag':
-		case 'tags':
-		case 'cat':
-			if ( $filter == 'tag' && isset( $_REQUEST[$key] ) && strpos( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), '-none-' ) !== false ) return '-none-';
+		case 'tagcat':
+			if ( isset( $_REQUEST[$key] ) && strpos( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), '-none-' ) !== false ) return '-none-';
 			return isset( $_REQUEST[$key] ) ? str_replace( "'", "", trim( wppa_sanitize_tags( sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ), ',;' ) ) ) : $default;
 			break;
 

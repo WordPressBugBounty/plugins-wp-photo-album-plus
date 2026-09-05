@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.2.06.001
+* Version 9.2.11.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -307,7 +307,6 @@ function wppa_add_javascripts() {
 global $wppa_version;
 global $wppa_lang;
 global $wppa_opt;
-// global $wppa_jquery_loaded;
 
 	// Global array decls in the header, no depts
 	$decl_file = dirname( __FILE__ ) . '/js/wppa-decls.js';
@@ -324,45 +323,32 @@ global $wppa_opt;
 						'wp-i18n',
 	);
 
-	// First see if an 'all' file is present. This is to save http requests
-	$all_file = dirname( __FILE__ ) . '/js/wppa-all.js';
-	if ( wppa_is_file( $all_file ) && wppa_switch( 'compress_js' ) ) {
-		$js_ver = gmdate( "ymd-Gis", filemtime( $all_file ) );
-		wp_enqueue_script( 'wppa-all', WPPA_URL . '/js/wppa-all.js', $js_depts, $js_ver, $footer );
-		wp_localize_script( 'wppa-all', 'wppaObj', array(
-			'restUrl' => rest_url(),
-			'restNonce' => wp_create_nonce( 'wp_rest')
-			)
-		);
+	// The js files
+	$js_files = array(
+	'wppa-utils',
+	'wppa-main',
+	'wppa-slideshow',
+	'wppa-ajax-front',
+	'wppa-lightbox',
+	'wppa-popup',
+	'wppa-touch',
+	'wppa-zoom',
+	'wppa-spheric',
+	'wppa-flatpan',
+	);
+
+	// Enqueue them
+	foreach ( array_keys( $js_files ) as $idx ) {
+		$js_ver = gmdate( "ymd-Gis", filemtime( plugin_dir_path( __FILE__ ) . 'js/' . $js_files[$idx] . '.js' ) );
+		wp_enqueue_script( $js_files[$idx], WPPA_URL . '/js/' . $js_files[$idx] . '.js', $js_depts, $js_ver, $footer );
 	}
-
-	// No all file, do them one by one
-	else {
-		$js_files = array(
-		'wppa-utils',
-		'wppa-main',
-		'wppa-slideshow',
-		'wppa-ajax-front',
-		'wppa-lightbox',
-		'wppa-popup',
-		'wppa-touch',
-		'wppa-zoom',
-		'wppa-spheric',
-		'wppa-flatpan',
-		);
-
-		foreach ( array_keys( $js_files ) as $idx ) {
-			$js_ver = gmdate( "ymd-Gis", filemtime( plugin_dir_path( __FILE__ ) . 'js/' . $js_files[$idx] . '.js' ) );
-			wp_enqueue_script( $js_files[$idx], WPPA_URL . '/js/' . $js_files[$idx] . '.js', $js_depts, $js_ver, $footer );
-
-//			$wppa_jquery_loaded = true;
-		}
-		wp_localize_script( 'wppa-main', 'wppaObj', array(
-			'restUrl' => rest_url(),
-			'restNonce' => wp_create_nonce( 'wp_rest')
-			)
-		);
-	}
+	
+	// Localize main
+	wp_localize_script( 'wppa-main', 'wppaObj', array(
+		'restUrl' => rest_url(),
+		'restNonce' => wp_create_nonce( 'wp_rest')
+		)
+	);
 
 	// Anchor for inline scripts
 	wp_enqueue_script( 'wppa', WPPA_URL . '/js/wppa.js', $js_depts, 'dummy', true );

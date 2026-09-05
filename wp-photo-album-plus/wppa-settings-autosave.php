@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.2.10.002
+* version 9.2.11.004
 *
 */
 
@@ -2179,13 +2179,13 @@ global $wppa_hide_this;
 						$desc = __( 'Include the photos of all sub albums?', 'wp-photo-album-plus' );
 						$slug = 'wppa_potd_include_subs';
 						$html = wppa_checkbox( $slug, 'wppaPlanPotdUpdate();' );
-						wppa_setting_new( $slug, '9', $name, $desc, $html, '', $is_phys, 'physical' );
+						wppa_setting_new( $slug, '9', $name, $desc, $html, '' );
 
 						$name = __( 'Inverse selection', 'wp-photo-album-plus' );
 						$desc = __( 'Use any album, except the selection made above.', 'wp-photo-album-plus' );
 						$slug = 'wppa_potd_inverse';
 						$html = wppa_checkbox( $slug, 'wppaPlanPotdUpdate();' );
-						wppa_setting_new( $slug, 10, $name, $desc, $html, '', $is_phys, 'physical' );
+						wppa_setting_new( $slug, 10, $name, $desc, $html, '' );
 
 						// Virtual albums
 						$name = __( 'Albums to use', 'wp-photo-album-plus' );
@@ -6961,14 +6961,14 @@ global $wppa_hide_this;
 						$slug = 'wppa_seo_optimize';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '49', $name, $desc, $html, $help);
-
+/*
 						$name = __('Use compressed javascript', 'wp-photo-album-plus');
 						$desc = __('Switch off for debugging purposes', 'wp-photo-album-plus');
 						$help = '';
 						$slug = 'wppa_compress_js';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '98', $name, $desc, $html, $help);
-
+*/
 						$name = __('Enable debug mode', 'wp-photo-album-plus');
 						$desc = __('Switch on for debugging purposes', 'wp-photo-album-plus');
 						$help = '';
@@ -9988,7 +9988,7 @@ global $wppa_hide_this;
 						$help = '';
 						$html1 = WPPA_SESSION;
 						/* translators: db table */
-						$html2 = sprintf( __('Download %s is useless', 'wp-photo-album-plus' ), WPPA_SESSION );
+						$html2 = wppa_ajax_button( __('Clear table', 'wp-photo-album-plus'), 'truncate_session', $elmid = 0, $no_confirm = false );
 						$html = array( $html1, $html2 );
 						wppa_setting_new(false, '8', $name, $desc, $html, $help);
 

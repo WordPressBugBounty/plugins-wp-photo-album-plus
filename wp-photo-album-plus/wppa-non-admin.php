@@ -203,7 +203,9 @@ wppa_echo( '
 					$photo_used = wppa_expand_enum( $shortcode['attributs']['photo'] );
 				}
 				if ( $shortcode['shortcode'] == 'photo' ) {
-					$photo_used = wppa_expand_enum( $shortcode['attributs'][0] );
+					if ( isset( $shortcode['attributs'][0] ) ) {
+						$photo_used = wppa_expand_enum( $shortcode['attributs'][0] );
+					}
 				}
 
 				// wppa but no album and no photo = generic including subalbums

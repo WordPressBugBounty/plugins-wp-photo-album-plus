@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.2.04.003
+* Version 9.2.11.002
 *
 */
 
@@ -14,6 +14,7 @@ function wppa_create_session_entry() {
 global $wpdb;
 global $wppa_session;
 
+	$usag = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
 	$wppa_session = array(
 						'has_searchbox' 		=> false,
 						'rootbox' 				=> false,
@@ -29,13 +30,18 @@ global $wppa_session;
 						'user' 					=> wppa_get_user(),
 						'id' 					=> wppa_get_session_id(),
 						'uris' 					=> array(),
-						'isrobot' 				=> false,
+					//	'isrobot' 				=> false,
+						'agent' 				=> $usag,
 						'wfcart' 				=> null,
 						'is_wppa_tree' 			=> false,
 						'rem_url' 				=> array(),
 						'search_albums' 		=> '',
 						'search_photos' 		=> '',
 						);
+
+	if ( strpos( $usag, 'GPTBot' ) !== false ) $wppa_session['isrobot'] = 'GPTBot';
+
+	$wppa_session['uris'][] = date_i18n("H:i") . ' init ' . wppa_request_uri();
 
 	$table 	= $wpdb->wppa_session;
 

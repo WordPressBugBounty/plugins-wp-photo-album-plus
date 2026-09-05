@@ -4273,6 +4273,10 @@ global $wppa_supported_audio_extensions;
 				case 'wppa_meta_void_custom':
 					$value = strtolower( sanitize_text_field( $value ) );
 					break;
+				case 'wppa_truncate_session':
+					$wpdb->query("TRUNCATE TABLE $wpdb->wppa_session");
+					$alert = __('Session table cleared', 'wp-photo-album-plus');
+					break;
 
 				default:
 

@@ -195,6 +195,9 @@ class AlbumNavigatorWidget extends WP_Widget {
 		$w = $this->get_widget_id();
 		$p = $parent;
 		$o = wppa_get_album_order_a( max( 0, $parent ) );
+		if ( strpos( $o['order'], 'RAND' ) !== false ) {
+			$o['order'] = 'name';
+		}
 		$result = '';
 
 		if ( $checkowner ) {

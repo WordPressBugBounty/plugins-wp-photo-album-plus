@@ -1994,16 +1994,16 @@ global $wppa_no_lightbox;
 	if ( $wppa_no_lightbox ) return '';
 
 	$desc = false;
-	$order = wppa_get_poc( $albumid );
-	if ( strpos( $order, 'DESC' ) !== false ) {
-		$order = trim( str_replace( 'DESC', '', $order ) );
-		$desc = true;
+	$poc = wppa_get_poc_a( $albumid );
+	
+	if ( $poc['rand'] ) {
+		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d)", $albumid, $poc['rand'] ), ARRAY_A );
 	}
-	if ( $desc ) {
-		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $albumid, $order ), ARRAY_A );
+	elseif ( $poc['desc'] ) {
+		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $albumid, $poc['order'] ), ARRAY_A );
 	}
 	else {	
-		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $albumid, $order ), ARRAY_A );
+		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $albumid, $pov['order'] ), ARRAY_A );
 	}
 	$result = '';
 	$first 	= true;

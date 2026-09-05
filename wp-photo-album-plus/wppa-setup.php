@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.2.01.001
+* Version 9.2.11.001
 *
 */
 
@@ -204,7 +204,8 @@ global $wppa_cron_maintenance_slugs;
 					data text NOT NULL,
 					count bigint(20) NOT NULL default 0,
 					PRIMARY KEY  (id),
-					KEY sessionkey (session(20))
+					KEY sessionkey (session(20)),
+					KEY timestampkey (timestamp(20))
 					) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci";
 
 	$create_caches = "CREATE TABLE " . WPPA_CACHES . " (

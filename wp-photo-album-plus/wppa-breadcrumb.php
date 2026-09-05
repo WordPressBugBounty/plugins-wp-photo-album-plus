@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.2.04.001
+* Version 9.2.11.004
 *
 */
 
@@ -697,8 +697,8 @@ global $wppa_lang;
 
 	if ( $href ) {
 		wppa_out( 	'<a' .
-						( $ajax ? ' onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . $ajax . '\', \'' . $href . '\' );return false;"' : '' ) .
-						' href="' . $href . '"' .
+						( $ajax ? ' onclick="wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . esc_url( $ajax ) . '\', \'' . esc_url( $href ) . '\' );return false;"' : '' ) .
+						' href="' . esc_url( $href ) . '"' .
 						' class="wppa-nav-text ' . $class . '"' .
 						' style="cursor:pointer"' .
 						' title="' . esc_attr( $title ) . '" >' .

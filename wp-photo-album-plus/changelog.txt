@@ -1,5 +1,14 @@
 WP Photo Album Plus Changelog
 
+= 9.2.11 =
+
+* Performance improvements around maintaining session data.
+* Improved session related disply data in the stats widget.
+* Security fix.
+* Removed minified js, so wppa-all.js is no longer present in the plugin.
+* Photo of the day widget did not show up when muliple albums were selected in the settings page. Fixed.
+* Albmun navigator widget did not show up when the default album sequence method was set to random. Fixed.
+
 = 9.2.10 =
 
 * Security fix

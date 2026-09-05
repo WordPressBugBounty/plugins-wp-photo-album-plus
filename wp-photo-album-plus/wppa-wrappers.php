@@ -466,6 +466,15 @@ function wppa_chmod( $fso, $rights = false, $recursive = false ) {
 global $wp_filesystem;
 
 	if ( ! wppa_is_file( $fso ) && ! wppa_is_dir( $fso ) ) return;
+	
+	if ( ! $rights ) {
+		if ( wppa_is_dir( $fso ) ) {
+			$rights = 0755;
+		}
+		else {
+			$rights = 0644;
+		}
+	}
 
 	$fso = rtrim( $fso, '/' );
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.2.01.003
+* Version 9.2.11.001
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -58,16 +58,6 @@ function wppa_begin_session() {
 global $wpdb;
 global $wppa_session;
 
-	// First destroy expired sessions older than 24 hrs
-	$n = $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
-	if ( $n ) wppa_log( 'dbg', $n . ' old sessions removed while opening a new one' );
-
-	// Anonimize all expired sessions, except robots (for the statistics widget)
-	$wpdb->query( "UPDATE $wpdb->wppa_session
-			   SET ip = '', user = '', data = ''
-			   WHERE status = 'expired'
-			   AND data NOT LIKE '%\"isrobot\";b:1;%'" );
-
 	// Init
 	$lifetime 	= 3600;			// Sessions expire after one hour
 	$expire 	= time() - $lifetime;
@@ -99,6 +89,27 @@ global $wppa_session;
 
 	// Now create new session
 	if ( ! $session ) {
+
+		// Do cleanup only once in 5 minutes
+		if ( ! get_transient( 'wppa_session_exp' ) ) {
+
+			set_transient( 'wppa_session_exp', true, 300 );
+
+			// First destroy expired sessions older than 24 hrs
+			$tstart = microtime(true);
+			$n = $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", time() - 86400 ) );
+			$tend = microtime(true);
+			wppa_log( 'dbg', $n . ' old sessions removed while opening a new one took '.sprintf('%1.3f',($tend-$tstart)).' seconds' );
+
+			// Anonimize all expired sessions, except robots (for the statistics widget)
+			$tstart = microtime(true);
+			$n = $wpdb->query( "UPDATE $wpdb->wppa_session
+					   SET ip = '', user = '', data = ''
+					   WHERE status = 'expired'
+					   AND data NOT LIKE '%\"isrobot\";b:1;%'" );
+			$tend = microtime(true);
+			wppa_log( 'dbg', 'Anonimizing ' . $n . ' old sessions took '.sprintf('%1.3f',($tend-$tstart)).' seconds' );
+		}
 
 		$iret = wppa_create_session_entry();
 
@@ -154,7 +165,7 @@ global $wppa_session;
 	$wppa_session['page']++;
 	if ( ! isset( $wppa_session['uris'] ) ) $wppa_session['uris'] = [];
 	if ( wppa_request_uri() ) {
-		$new_item = date_i18n("g:i") . ' ' . wppa_request_uri();
+		$new_item = date_i18n("H:i") . ' ' . wppa_request_uri();
 		if ( ! in_array( $new_item, (array) $wppa_session['uris'] ) ) {
 			$wppa_session['uris'][] = $new_item;
 		}

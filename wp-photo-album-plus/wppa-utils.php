@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.2.10.004
+* Version: 9.2.11.004
 *
 */
 
@@ -1436,19 +1436,9 @@ function wppa_sanitize_tags( $value, $keepsemi = false, $keephash = false ) {
 
 	// Sanitize
 	$value = sanitize_text_field( $value );
-//	$value = wp_strip_all_tags( $value );					// Security
+	$value = wp_strip_all_tags( $value );					// Security
 
-	$value = str_replace( 	array( 					// Remove funny chars
-									'"',
-							//		'\'',
-									'\\',
-									'@',
-									'?',
-									'|',
-								 ),
-							'',
-							$value
-						);
+	$value = str_replace( ['"', "'", "`", '%', '&', '(', ')', '[', ']', '{', '}', '"', '\\', '@', '?', '|'], '', $value ); 	// Remove funny chars
 	if ( ! $keephash ) {
 		$value = str_replace( '#', '', $value );
 	}
@@ -6369,6 +6359,7 @@ function wppa_find_shortcodes( $content ) {
     foreach ( $matches as $match ) {
 
         if ( $match[1] == 'wppa' || $match[1] == 'photo'){
+			$match[2] = str_replace( 'u0022', '', stripslashes( $match[2] ) ); // json_decode( $match[2] );
             $attributs = shortcode_parse_atts( $match[2] ); // Attributs du shortcode
             $result[] = [
             'shortcode' => $match[1],
