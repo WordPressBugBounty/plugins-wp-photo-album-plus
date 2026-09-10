@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the multitag widget
-* Version 9.0.00.000
+* Version 9.3.00.001
 *
 */
 
@@ -115,7 +115,7 @@ class MultitagPhotos extends WP_Widget {
 			if ( in_array( $tag, $stags ) ) $sel = ' selected'; else $sel = '';
 			$body .= '<option value="' . esc_attr( $tag ) . '"' . $sel . ' >' . htmlspecialchars( $tag ) . '</option>';
 		}
-		wppa_widget_selection_frame( $this, 'tags', $body, '<div style="clear:both"></div>' . __( 'Select multiple tags or --- all ---', 'wp-photo-album-plus' ), 'multi' );
+		wppa_widget_selection_frame( $this, 'tags', $body, wppa_div_clear() . __( 'Select multiple tags or --- all ---', 'wp-photo-album-plus' ), 'multi' );
 
 		// Currently selected
 		if ( isset( $instance['tags'][0] ) && $instance['tags'][0] ) $s = implode( ',', $instance['tags'] ); else $s = __( '--- all ---', 'wp-photo-album-plus' );

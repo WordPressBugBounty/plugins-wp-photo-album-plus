@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.2.10.001
+/* Version 9.3.00.001
 /* Various js routines used in admin pages
 */
 
@@ -781,7 +781,7 @@ function wppaAjaxUpdateAlbum( album, actionslug, value, refresh, alb ) {
 					success: 	function( result, status, xhr ) {
 									// Any strange results returned?
 									if ( result.substring(0,1) != '{' ) {
-										alert( 'The server returned unexpected output:\n' + ArrValues[0] );
+										alert( 'The server returned unexpected output:\n' + result );
 										return;
 									}
 

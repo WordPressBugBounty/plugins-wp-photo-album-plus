@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains common upload functions
-* Version: 9.2.01.001
+* Version: 9.3.00.001
 *
 */
 
@@ -44,7 +44,7 @@ global $wppa_supported_document_extensions;
 	$the_type = wppa_get_ext( $file['name'] );
 	if ( ! in_array( $the_type, $supp ) ) {
 		wppa_upload_common_error( __( 'Invalid file-extension found during upload. Supported filetypes are', 'wp-photo-album-plus' ) . ': ' . implode( ', ', $supp ), $from );
-		return false;;
+		return false;
 	}
 
 	// See if this filename (except extension) already exists in this album
@@ -106,7 +106,7 @@ global $wppa_supported_document_extensions;
 	if ( $cerr ) {
 		/* translators: media types */
 		wppa_upload_common_error( sprintf( __( 'You can not combine %1$s with %2$s files', 'wp-photo-album-plus' ), $ext_type, $new_type ), $from );
-		return false;;
+		return false;
 	}
 
 	// Check against duplicate files
@@ -136,7 +136,7 @@ global $wppa_supported_document_extensions;
 				wppa_update_photo( $ext_id, ['filename' => wppa_strip_ext( $file['name'] ) . '.pdf'] );
 				wppa_upload_post_process( $the_type, $album, $ext_id, $from );
 				wppa_bump_version( ['source', 'photo', 'thumb', 'pdf'] );
-				return true;;
+				return true;
 			}
 
 			// Assume poster image will be creted  by imagick or uploaded, so set ext to jpg. wppa_is_pdf looks at filename extension.
@@ -155,7 +155,7 @@ global $wppa_supported_document_extensions;
 			}
 
 			wppa_upload_post_process( $the_type, $album, $id, $from );
-			return true;; // Yes we uploaded a file
+			return true; // Yes we uploaded a file
 			break;
 
 		case 'jpg':
@@ -175,7 +175,7 @@ global $wppa_supported_document_extensions;
 				wppa_make_the_photo_files( wppa_get_source_album_dir( $album ) . '/' . $file['name'], $ext_id, wppa_get_ext( $file['name'] ) );
 				wppa_upload_post_process( $the_type, $album, $ext_id, $from );
 				wppa_bump_version( ['source', 'photo', 'thumb'] );
-				return true;; // Yes we uploaded a file
+				return true; // Yes we uploaded a file
 			}
 
 			// Just a photo
@@ -186,11 +186,11 @@ global $wppa_supported_document_extensions;
 					wppa_schedule_mailinglist( 'feuploadnotify', $album, $id, 0, '', 0, 900 );
 				}
 
-				return true;; // Yes we uploaded a file
+				return true; // Yes we uploaded a file
 			}
 			else {
 				wppa_upload_common_error( __( 'Error inserting photo' , 'wp-photo-album-plus' ) . ' ' . wppa_sanitize_file_name( basename( $file['name'] ) ) . '.', $from );
-				return false;; // No we did not uploaded a file
+				return false; // No we did not uploaded a file
 			}
 			break;
 
@@ -319,20 +319,20 @@ global $wppa_supported_document_extensions;
 				wppa_upload_common_ok( sprintf( __( 'Zipfile %1$s processed. %2$s files extracted, %3$s files skipped.', 'wp-photo-album-plus' ), basename( $zipfile ), $done, $skip ), $from );
 
 				wppa_unlink( $zipfile );
-				return true;; // Yes we uploaded a file
+				return true; // Yes we uploaded a file
 			}
 
 			// Zipfile can not be opened
 			else {
 				wppa_upload_common_error( __( 'Failed to extract', 'wp-photo-album-plus' ).' '.$zipfile, $from );
 				wppa_unlink( $zipfile );
-				return false;;
+				return false;
 			}
 			break;
 
 		default:
 			wppa_upload_common_error( __( 'Unsupported filetype encountered', 'wp-photo-album-plus' ) . ': ' . $the_type, $from );
-			return false;; // No we did not uploaded a file
+			return false; // No we did not uploaded a file
 	}
 }
 

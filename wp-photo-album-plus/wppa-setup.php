@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.2.11.001
+* Version 9.3.00.001
 *
 */
 
@@ -80,7 +80,8 @@ global $wppa_cron_maintenance_slugs;
 					usedby tinytext NOT NULL,
 					capability varchar(32) NOT NULL,
 					PRIMARY KEY  (id),
-					KEY parentkey (a_parent)
+					KEY parentkey (a_parent),
+					KEY cryptkey (crypt(16))
 					) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci";
 
 	$create_photos = "CREATE TABLE $wpdb->wppa_photos (
@@ -133,7 +134,8 @@ global $wppa_cron_maintenance_slugs;
 					misc tinytext NOT NULL,
 					PRIMARY KEY  (id),
 					KEY albumkey (album),
-					KEY statuskey (status(6))
+					KEY statuskey (status(6)),
+					KEY cryptkey (crypt(16))
 					) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci";
 
 	$create_rating = "CREATE TABLE " . WPPA_RATING . " (

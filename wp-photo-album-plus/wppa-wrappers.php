@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.2.02.002
+* Version 9.3.00.001
 *
 */
 
@@ -466,7 +466,7 @@ function wppa_chmod( $fso, $rights = false, $recursive = false ) {
 global $wp_filesystem;
 
 	if ( ! wppa_is_file( $fso ) && ! wppa_is_dir( $fso ) ) return;
-	
+
 	if ( ! $rights ) {
 		if ( wppa_is_dir( $fso ) ) {
 			$rights = 0755;

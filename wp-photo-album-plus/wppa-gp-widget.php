@@ -4,7 +4,7 @@
 *
 * A text widget that interpretes wppa shortcodes
 *
-* Version 9.0.00.000
+* Version 9.3.00.001
 */
 if ( ! defined( 'ABSPATH' ) ) exit();
 
@@ -61,7 +61,7 @@ class WppaGpWidget extends WP_Widget {
 			' >' .
 			$text .
 		'</div>' .
-		'<div style="clear:both"></div>';
+		wppa_div_clear();
 
 		// Output
 		$result = "\n" . $before_widget;

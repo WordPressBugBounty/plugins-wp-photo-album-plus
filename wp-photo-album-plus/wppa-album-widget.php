@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 9.2.02.003
+* Version 9.3.00.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -59,7 +59,7 @@ class AlbumWidget extends WP_Widget {
 					$albums = array();
 				}
 				else {
-					$order = wppa_get_album_order_a();
+					$order = wppa_get_aoc_a();
 					if ( $order['desc'] ) {
 						$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id > 0 ORDER BY %i DESC", $order['order'] ), ARRAY_A );
 					}
@@ -77,7 +77,7 @@ class AlbumWidget extends WP_Widget {
 				}
 				break;
 			default:
-				$order = wppa_get_album_order_a( $parent );
+				$order = wppa_get_aoc_a( $parent );
 				if ( $order['desc'] ) {
 					$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $parent, $order['order'] ), ARRAY_A );
 				}
@@ -105,7 +105,7 @@ class AlbumWidget extends WP_Widget {
 			$ids_arr = wppa_strip_void_albums( $ids_arr );
 
 			// Do the new query
-			$order = wppa_get_album_order_a( $parent );
+			$order = wppa_get_aoc_a( $parent );
 			$placeholders = implode( ',', array_fill( 0, count( $ids_arr ), '%d' ) );
 			if ( $order['desc'] ) {
 				$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE id IN ($placeholders) ORDER BY %i DESC LIMIT %d", array_merge( $ids_arr, $order['order'], $max ) ), ARRAY_A );
@@ -336,7 +336,7 @@ class AlbumWidget extends WP_Widget {
 			$widget_content .= __( 'There are no albums (yet)', 'wp-photo-album-plus' );
 		}
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// End widget content
 		if ( ! $cache ) $widget_content .= wppa_widget_timer( 'show', $widget_title );

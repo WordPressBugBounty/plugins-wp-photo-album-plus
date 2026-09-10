@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.2.11.001
+* Version 9.3.00.002
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -131,36 +131,6 @@ global $wppa_session;
 		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %d WHERE session = %s", $count + 1, $session_id ) );
 	}
 
-	// Get info for root and sub search
-	/*
-	if ( wppa_get( 'search-submit' ) ) {
-		$wppa_session['rootbox'] = wppa_get( 'rootsearch' );
-		$wppa_session['subbox']  = wppa_get( 'subsearch' );
-		if ( $wppa_session['subbox'] ) {
-			if ( isset ( $wppa_session['use_searchstring'] ) ) {
-				$t = explode( ',', $wppa_session['use_searchstring'] );
-				foreach( array_keys( $t ) as $idx ) {
-					$t[$idx] .= ' '.wppa_test_for_search( 'at_begin_session' );
-					$t[$idx] = trim( $t[$idx] );
-					$v = explode( ' ', $t[$idx] );
-					$t[$idx] = implode( ' ', array_unique( $v ) );
-				}
-				$wppa_session['use_searchstring'] = ' '.implode( ',', array_unique( $t ) );
-			}
-			else {
-				$wppa_session['use_searchstring'] = wppa_test_for_search( 'at_begin_session' );
-			}
-		}
-		else {
-			$wppa_session['use_searchstring'] = wppa_test_for_search( 'at_begin_session' );
-		}
-		if ( isset ( $wppa_session['use_searchstring'] ) ) {
-			$wppa_session['use_searchstring'] = trim( $wppa_session['use_searchstring'], ' ,' );
-			$wppa_session['display_searchstring'] = str_replace ( ',', ' &#8746 ', str_replace ( ' ', ' &#8745 ', $wppa_session['use_searchstring'] ) );
-		}
-	}
-	*/
-
 	if ( ! isset( $wppa_session['page'] ) ) $wppa_session['page'] = 0;
 	$wppa_session['page']++;
 	if ( ! isset( $wppa_session['uris'] ) ) $wppa_session['uris'] = [];
@@ -173,10 +143,6 @@ global $wppa_session;
 			$wppa_session['isrobot'] = true;
 		}
 	}
-
-// wppa_log('dbg', 'read sesion sstr: '.$wppa_session['use_searchstring']);
-	// Reset default randseed conditionally (if wp page id changed)
-	wppa_get_randseed();
 
 	return true;
 }

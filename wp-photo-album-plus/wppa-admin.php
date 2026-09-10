@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 9.2.01.001
+* Version: 9.3.00.001
 *
 */
 
@@ -38,19 +38,19 @@ function wppa_add_admin() {
 	// See if there are comments pending moderation
 	$com_pending = '';
 	$com_pending_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status IN ('pending', 'spam', '')" );
-	if ( $com_pending_count ) $com_pending = '<span class="update-plugins"><span class="plugin-count">' . $com_pending_count . '</span></span>';
+	if ( $com_pending_count ) $com_pending = wppa_html_tag( 'span', ['class' => 'update-plugins'], wppa_html_tag( 'span', ['class' => 'plugin-count'], $com_pending_count ) );
 
 	// See if there are uploads pending moderation
 	$upl_pending = '';
 	$upl_pending_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending' AND album > 0" );
-	if ( $upl_pending_count ) $upl_pending = '<span class="update-plugins"><span class="plugin-count">' . $upl_pending_count . '</span></span>';
+	if ( $upl_pending_count ) $upl_pending = wppa_html_tag( 'span', ['class' => 'update-plugins'], wppa_html_tag( 'span', ['class' => 'plugin-count'], $upl_pending_count ) );
 
 	// Compute total pending moderation
 	$tot_pending = '';
 	$tot_pending_count = 0;
 	if ( current_user_can('wppa_comments') || current_user_can('wppa_moderate') ) $tot_pending_count += $com_pending_count;
 	if ( current_user_can('wppa_admin') || current_user_can('wppa_moderate') ) $tot_pending_count += $upl_pending_count;
-	if ( $tot_pending_count ) $tot_pending = '<span class="update-plugins"><span class="plugin-count"><b>' . $tot_pending_count . '</b></span></span>';
+	if ( $tot_pending_count ) $tot_pending = wppa_html_tag( 'span', ['class' => 'update-plugins'], wppa_html_tag( 'span', ['class' => 'plugin-count'], $tot_pending_count ) );
 
 	// Add wppa menu
 	$icon_url = WPPA_UPLOAD_URL . '/icons/camera16.png';

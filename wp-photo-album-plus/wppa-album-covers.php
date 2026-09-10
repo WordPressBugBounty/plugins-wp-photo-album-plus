@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.2.02.003
+* Version: 9.3.00.002
 *
 */
 
@@ -1202,7 +1202,7 @@ static $cached_cover_photo_ids;
 
 	// Other inits
 	$user   = wppa_get_user();
-	$rand   = wppa_get_randseed( 'page' );
+	$rand   = wppa_get_randseed();
 	$allalb = str_replace( '.', ',', wppa_expand_enum( wppa_alb_to_enum_children( $alb ) ) );
 	$albarr = explode( ',', $allalb );
 	$temp 	= null;
@@ -1219,9 +1219,10 @@ static $cached_cover_photo_ids;
 
 	// main_photo is -9: Random
 	if ( '-9' == $id ) {
-		$rs = wppa_get_randseed( 'page' );
+		$rs = wppa_get_randseed();
 		if ( current_user_can( 'wppa_moderate' ) ) {
 			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %s ORDER BY RAND(%d) LIMIT %d", $alb, $rs, $count ), ARRAY_A );
+			wppa_show_query();
 		}
 		else {
 			if ( is_user_logged_in() ) {
@@ -1254,7 +1255,7 @@ static $cached_cover_photo_ids;
 	}
 
 	$placeholders = implode( ',', array_fill( 0, count( $albarr ), '%d' ) );
-	
+
 	// Random from children
 	if ( '-3' == $id ) {
 		if ( current_user_can( 'wppa_moderate' ) ) {
@@ -1713,20 +1714,20 @@ global $wpdb;
 	$first = true;
 
 	// Get the albums sort order column
-	$albumorder_col	= wppa_get_album_order_column( $id );
+	$aoc = wppa_get_aoc_a( $id );
 
 	// If random...
-	if ( $albumorder_col == 'random' ) {
-		$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY RAND(%d)", $id, wppa_get_randseed() ), ARRAY_A );
+	if ( $aoc['rand'] ) {
+		$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY RAND(%d)", $id, $aoc['rand'] ), ARRAY_A );
 	}
 
 	// Not random, Decending?
 	else {
-		if ( wppa_is_album_order_desc( $id ) ) {
-			$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $id, $albumorder_col ), ARRAY_A );
+		if ( $aoc['desc'] ) {
+			$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $id, $aoc['order'] ), ARRAY_A );
 		}
 		else {
-			$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i", $id, $albumorder_col ), ARRAY_A );
+			$subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i", $id, $aoc['order'] ), ARRAY_A );
 		}
 	}
 
@@ -1995,14 +1996,14 @@ global $wppa_no_lightbox;
 
 	$desc = false;
 	$poc = wppa_get_poc_a( $albumid );
-	
+
 	if ( $poc['rand'] ) {
 		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d)", $albumid, $poc['rand'] ), ARRAY_A );
 	}
 	elseif ( $poc['desc'] ) {
 		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $albumid, $poc['order'] ), ARRAY_A );
 	}
-	else {	
+	else {
 		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $albumid, $pov['order'] ), ARRAY_A );
 	}
 	$result = '';

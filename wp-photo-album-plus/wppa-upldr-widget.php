@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 9.2.01.001
+* Version 9.3.00.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -142,26 +142,30 @@ class UpldrWidget extends WP_Widget {
 		$widget_content .= '<table><tbody>';
 		$albs = $instance['parent'] ? wppa_expand_enum( wppa_alb_to_enum_children( wppa_expand_enum( $instance['parent'] ) ) ) : '';
 		if ( ! $albs ) $albs = 0;
-		$a = wppa_trim_wppa_( '&amp;wppa-album='.$albs );
+		$a = wppa_trim_wppa_( '&wppa-album='.$albs );
 		$width = round( wppa_opt( 'widget_width' ) / 1.8 ) . 'px;';
 
 		if ( $myline ) {
 			$user = $myline;
 			$widget_content .= '<tr class="wppa-user" >
-									<td style="padding: 0 3px;max-width:' . $width . 'overflow:hidden"><a href="'.wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a).'" title="'.__('Photos uploaded by', 'wp-photo-album-plus' ).' '.$user['name'].'" ><b>'.$user['name'].'</b></a></td>
+									<td style="padding: 0 3px;max-width:' . $width . 'overflow:hidden">' .
+										wppa_html_tag( 'a', ['href' => wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a), 'title' => __('Photos uploaded by', 'wp-photo-album-plus' ).' '.$user['name']], '<b>'.$user['name'].'</b>' ) .
+									'</td>
 									<td style="padding: 0 3px"><b>'.$user['count'].'</b></td>
 									<td style="padding: 0 3px"><b>'.wppa_get_time_since($user['date']).'</b></td>
 								</tr>';
 		}
 		foreach ( $workarr as $user ) {
 			$widget_content .= '<tr class="wppa-user" >
-									<td style="padding: 0 3px;max-width:' . $width . 'overflow:hidden"><a href="'.wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a).'" title="'.__('Photos uploaded by', 'wp-photo-album-plus' ).' '.$user['name'].'" >'.$user['name'].'</a></td>
+									<td style="padding: 0 3px;max-width:' . $width . 'overflow:hidden">' .
+										wppa_html_tag( 'a', ['href' => wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a), 'title' => __('Photos uploaded by', 'wp-photo-album-plus' ).' '.$user['name']], $user['name'] ) .
+									'</td>
 									<td style="padding: 0 3px">'.$user['count'].'</td>
 									<td style="padding: 0 3px">'.wppa_get_time_since($user['date']).'</td>
 								</tr>';
 		}
 		$widget_content .= '</tbody></table></div>';
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// Output
 		$result = $before_widget;

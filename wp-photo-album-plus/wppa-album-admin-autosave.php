@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.2.04.002
+* Version 9.3.00.002
 *
 */
 
@@ -1391,7 +1391,7 @@ static $cache;
 
 						// Create sub album
 						if ( wppa_can_create_album() ) {
-							$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=new&amp;parent_id=' . $albuminfo['id'] . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+							$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=new&parent_id=' . $albuminfo['id'] . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 							$onc = 'if (confirm(\''.__( 'Are you sure you want to create a sub album?', 'wp-photo-album-plus' ).'\')) document.location=\''.$url.'\';';
 
 							wppa_echo( '
@@ -1409,11 +1409,11 @@ static $cache;
 							$url = get_admin_url() .
 									'admin.php' .
 									'?page=wppa_admin_menu' .
-									'&amp;tab=edit' .
-									'&amp;edit-id=new' .
-									'&amp;parent_id=' . $albuminfo['a_parent'] .
-									'&amp;is-sibling-of=' . $albuminfo['id'] .
-									'&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+									'&tab=edit' .
+									'&edit-id=new' .
+									'&parent_id=' . $albuminfo['a_parent'] .
+									'&is-sibling-of=' . $albuminfo['id'] .
+									'&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 							$onc = 'if (confirm(\''.__( 'Are you sure you want to create a sub album?', 'wp-photo-album-plus' ).'\')) document.location=\''.$url.'\';';
 
 							wppa_echo( '
@@ -1427,7 +1427,7 @@ static $cache;
 
 						// Edit parent
 						if ( $albuminfo['a_parent'] > 0 && wppa_album_exists( $albuminfo['a_parent'] ) && wppa_have_access( $albuminfo['a_parent'] ) ) {
-							$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=' . wppa_encrypt_album( $albuminfo['a_parent'] ) . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+							$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=' . wppa_encrypt_album( $albuminfo['a_parent'] ) . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 							$onc = 'document.location=\''.$url.'\';';
 							wppa_echo( '
 							<input
@@ -1436,7 +1436,7 @@ static $cache;
 								onclick="' . $onc . '"
 								value="' . esc_attr( __( 'Edit parent', 'wp-photo-album-plus' ) ) . '"
 							/>' );
-							$onc = 'document.location=\''.$url.'&amp;bulk=1\';';
+							$onc = 'document.location=\''.$url.'&bulk=1\';';
 							wppa_echo( '
 							<input
 								type="button"
@@ -1717,97 +1717,52 @@ static $cache;
 
 						// Cover type
 						if ( ! wppa_switch( 'covertype_is_restricted' ) || wppa_user_is_admin() ) {
-							$sel = ' selected';
+
 							/* Translators: option setting location, option value */
 							$title = sprintf( __( 'The default is set in %1$s and is currently set to %2$s', 'wp-photo-album-plus' ), wppa_setting_path( 'b', 'covers', 3, 4 ), wppa_opt( 'cover_type' ) );
 
-							wppa_echo( '
-							<div
-								style="max-width: 200px;margin-right: 4px;">
-								<label
-									for="covertype">' .
-									__( 'Cover&nbsp;Type', 'wp-photo-album-plus' ) . '
-								</label><br>
-								<select
-									id="covertype"
-									style="max-width:200px;"
-									onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cover_type\', this.value )"
-									title="' . esc_attr( $title ) . '"
-									>
-									<option value=""' . ( $cover_type == '' ? $sel : '' ) . ' >' .
-										__( '--- default ---', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="default"' . ( $cover_type == 'default' ? $sel : '' ) . ' >' .
-										__( 'Standard', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="longdesc"' . ( $cover_type == 'longdesc' ? $sel : '' ) . ' >' .
-										__( 'Long Descriptions', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="imagefactory"' . ( $cover_type == 'imagefactory' ? $sel : '' ) . ' >' .
-										__( 'Image Factory', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="default-mcr"' . ( $cover_type == 'default-mcr' ? $sel : '' ) . ' >' .
-										__( 'Standard mcr', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="longdesc-mcr"' . ( $cover_type == 'longdesc-mcr' ? $sel : '' ) . ' >' .
-										__( 'Long Descriptions mcr', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="imagefactory-mcr"' . ( $cover_type == 'imagefactory-mcr' ? $sel : '' ) . ' >' .
-										__( 'Image Factory mcr', 'wp-photo-album-plus' ) . '
-									</option>
-									<option value="titleonly"' . ( $cover_type == 'titleonly' ? $sel : '' ) . ' >' .
-										__( 'Album title only', 'wp-photo-album-plus' ) . '
-									</option>
-								</select>
-							</div>' );
+							wppa_html_echo( 'div', ['style' => 'max-width:200px'],
+								wppa_html_tag( 'label', ['for' => 'covertype'], __( 'Cover&nbsp;Type', 'wp-photo-album-plus' ) ) . '<br>' .
+								wppa_html_tag( 'select', ['id' => 'covertype', 'style' => 'max-width:200px', 'title' => $title,
+														  'onchange' => 'wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cover_type\', this.value, false, ' . $id . ')'],
+									wppa_html_tag( 'option', ['value' => '', ( $cover_type == '' ? 'selected' : '' )], __( '--- default ---', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'default', ( $cover_type == 'default' ? 'selected' : '' )], __( 'Standard', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'longdesc', ( $cover_type == 'longdesc' ? 'selected' : '' )], __( 'Long Descriptions', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'imagefactory', ( $cover_type == 'imagefactory' ? 'selected' : '' )], __( 'Image Factory', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'default-mcr', ( $cover_type == 'default-mcr' ? 'selected' : '' )], __( 'Standard mcr', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'longdesc-mcr', ( $cover_type == 'longdesc-mcr' ? 'selected' : '' )], __( 'Long Descriptions mcr', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'imagefactory-mcr', ( $cover_type == 'imagefactory-mcr' ? 'selected' : '' )], __( 'Image Factory mcr', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'titleonly', ( $cover_type == 'titleonly' ? 'selected' : '' )], __( 'Album title only', 'wp-photo-album-plus' ) ) ) );
 						}
 
 						// Cover photo
 						{
-							wppa_echo( '
-							<div>
-								<label>' .
-									__( 'Cover&nbsp;Photo', 'wp-photo-album-plus' ) . '
-								</label><br>' .
-								wppa_main_photo( $main_photo, $cover_type ) . '
-							</div>' );
+							wppa_html_echo( 'div', [],
+								wppa_html_tag( 'label', [], __( 'Cover&nbsp;Photo', 'wp-photo-album-plus' ) ) . '<br>' .
+								wppa_main_photo( $main_photo, $cover_type ) );
 						}
 
 						// Link type
 						{
-							$result = '
-							<div>
-								<label>' .
-									__( 'Link type', 'wp-photo-album-plus' ) . '
-								</label><br>';
-								$sel = ' selected';
-								$lt = $cover_linktype;
-								if ( wppa_switch( 'auto_page' ) ) {
-									$title = __( 'If you select "the link page with a clean url", select an Auto Page of one of the photos in this album.', 'wp-photo-album-plus' );
-								}
-								else {
-									$title = __( 'If you select "the link page with a clean url", make sure you enter the correct shortcode on the target page.', 'wp-photo-album-plus' );
-								}
-								$result .= '
-								<select
-									title="' . esc_attr( $title ) . '"
-									onchange="wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cover_linktype\', this )" >
-									<option value="content"' . ( $lt == 'content' ? $sel : '' ) . ' >' . __( 'the sub albums and thumbnails', 'wp-photo-album-plus' ) . '</option>
-									<option value="albums"' . ( $lt == 'albums' ? $sel : '' ) . ' >' . __( 'the sub albums', 'wp-photo-album-plus' ) . '</option>
-									<option value="thumbs"' . ( $lt == 'thumbs' ? $sel : '' ) . ' >' . __( 'the thumbnails', 'wp-photo-album-plus' ) . '</option>
-									<option value="slide"' . ( $lt == 'slide' ? $sel : '' ) . ' >' . __( 'the album photos as slideshow', 'wp-photo-album-plus' ) . '</option>
-									<option value="page"' . ( $lt == 'page' ? $sel : '' ) . ' >' . __( 'the link page with a clean url', 'wp-photo-album-plus' ) . '</option>
-									<option value="none"' . ( $lt == 'none' ? $sel : '' ) . ' >' . __( 'no link at all', 'wp-photo-album-plus' ) . '</option>
-									<option value="manual"' . ( $lt == 'manual' ? $sel : '' ) . ' >' . __( 'manually entered', 'wp-photo-album-plus' ) . '</option>
-									<option value="lightbox"' . ( $lt == 'lightbox' ? $sel : '' ) . ' >' . __( 'lightbox (for titleonly covertype only)', 'wp-photo-album-plus' ) . '</optiom>
-								</select>
-								<br>
-								<span class="description">';
-
-								$result .= '
-								</span>
-							</div>';
-							wppa_echo( $result );
+							$lt = $cover_linktype;
+							if ( wppa_switch( 'auto_page' ) ) {
+								$title = __( 'If you select "the link page with a clean url", select an Auto Page of one of the photos in this album.', 'wp-photo-album-plus' );
+							}
+							else {
+								$title = __( 'If you select "the link page with a clean url", make sure you enter the correct shortcode on the target page.', 'wp-photo-album-plus' );
+							}
+							wppa_html_echo( 'div', [],
+								wppa_html_tag( 'label', ['for' => 'cover-linktype'], __( 'Link type', 'wp-photo-album-plus' ) ) . '<br>' .
+								wppa_html_tag( 'select', ['id' => 'cover-linktype', 'title' => $title,
+														  'onchange' => 'wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cover_linktype\', this.value, false, ' . $id . ')'],
+									wppa_html_tag( 'option', ['value' => 'content', ( $lt == 'content' ? $sel : '' )], __( 'the sub albums and thumbnails', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'albums', ( $lt == 'albums' ? $sel : '' )], __( 'the sub albums', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'thumbs', ( $lt == 'thumbs' ? $sel : '' )], __( 'the thumbnails', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'slide', ( $lt == 'slide' ? $sel : '' )], __( 'the album photos as slideshow', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'page', ( $lt == 'page' ? $sel : '' )], __( 'the link page with a clean url', 'wp-photo-album-plus' ) ).
+									wppa_html_tag( 'option', ['value' => 'none', ( $lt == 'none' ? $sel : '' )], __( 'no link at all', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'manual', ( $lt == 'manual' ? $sel : '' )], __( 'manually entered', 'wp-photo-album-plus' ) ) .
+									wppa_html_tag( 'option', ['value' => 'lightbox', ( $lt == 'lightbox' ? $sel : '' )], __( 'lightbox (for titleonly covertype only)', 'wp-photo-album-plus' ) ) ) );
 						}
 
 						// Manually entered link
@@ -2361,7 +2316,7 @@ static $cache;
 				wppa_echo( '
 				<a
 					onclick="return confirm(\'' . $vfy . '\');"
-					href="' . $url . '"
+					href="' . esc_url( $url ) . '"
 					class="page-title-action">' .
 					__( 'Add New', 'wp-photo-album-plus' ) . '
 				</a>
@@ -2381,7 +2336,7 @@ static $cache;
 						<input
 							type="button"
 							class="button"
-							onclick="document.location=\'' . get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;switchto=collapsible\'"
+							onclick="document.location=\'' . get_admin_url() . 'admin.php?page=wppa_admin_menu&switchto=collapsible\'"
 							value="' . esc_attr__( 'Switch to Collapsable table', 'wp-photo-album-plus' ) . '"
 							' . ( $no_albs ? ' disabled ' : '' ) . '
 						/>';
@@ -2391,7 +2346,7 @@ static $cache;
 						<input
 							type="button"
 							class="button"
-							onclick="document.location=\'' . get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;switchto=flat\'"
+							onclick="document.location=\'' . get_admin_url() . 'admin.php?page=wppa_admin_menu&switchto=flat\'"
 							value="' . esc_attr__( 'Switch to Flat table', 'wp-photo-album-plus' ) . '"
 							' . ( $no_albs ? ' disabled ' : '' ) . '
 						/>';
@@ -2668,19 +2623,19 @@ global $wpdb;
 					$id 	= $album['id'];
 					$crid 	= wppa_encrypt_album( $id );
 					$counts = wppa_get_treecounts_a( $id, true );
-					$url 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=' . $crid;
+					$url 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=' . $crid;
 					$na 	= $counts['selfalbums'];
 					$np 	= $counts['selfphotos'];
 					$nm 	= $counts['pendselfphotos'];
 					$ns 	= $counts['scheduledselfphotos'];
 					$covid 	= max( $album['main_photo'], 0 );
-					$curl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=single&amp;photo=' . wppa_encrypt_photo( $covid ) . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&amp;just-edit=' . __( 'Edit+cover+image', 'wp-photo-album-plus' );
+					$curl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . wppa_encrypt_photo( $covid ) . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&just-edit=' . __( 'Edit+cover+image', 'wp-photo-album-plus' );
 
 					if ( wppa_have_access( $album ) ) {
 						$pendcount 	= $counts['pendselfphotos'];
 						$url 		= wppa_ea_url( $crid );
 						$delurl 	= wppa_ea_url( $crid, 'del' );
-						$creurl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=new&amp;parent_id=' . $id . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+						$creurl 	= get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=new&parent_id=' . $id . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 						$creonc 	= 'if (confirm(\''.esc_js(__( 'Are you sure you want to create a sub album?', 'wp-photo-album-plus' )).'\')) document.location=\''.$creurl.'\';';
 
 						$result .= '
@@ -2692,10 +2647,10 @@ global $wpdb;
 							<td>' . $album['a_order'] . '</td>
 							<td>' . wppa_get_album_name( $album['a_parent'], array( 'extended' => true ) ) . '</td>
 							<td>' . $na . '/' . $np . '/' . $nm . '/' . $ns . '</td>
-							<td><a href="' . $url . '" class="wppaedit">' . __( 'Edit', 'wp-photo-album-plus' ) . '</a></td>
-							<td><a href="' . $url . '&amp;quick=1" class="wppaedit">' . __( 'Quick', 'wp-photo-album-plus' ) . '</a></td>
-							<td><a href="' . $url . '&amp;bulk=1#manage-photos" class="wppaedit">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</a></td>
-							<td>' . ( $mayseq ? '<a href="' . $url . '&amp;seq=1" class="wppaedit">' . __( 'Seq', 'wp-photo-album-plus' ) . '</a>' : '' ) . '</td>
+							<td><a href="' . esc_url( $url ) . '" class="wppaedit">' . __( 'Edit', 'wp-photo-album-plus' ) . '</a></td>
+							<td><a href="' . esc_url( $url ) . '&quick=1" class="wppaedit">' . __( 'Quick', 'wp-photo-album-plus' ) . '</a></td>
+							<td><a href="' . esc_url( $url ) . '&bulk=1#manage-photos" class="wppaedit">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</a></td>
+							<td>' . ( $mayseq ? '<a href="' . esc_url( $url ) . '&seq=1" class="wppaedit">' . __( 'Seq', 'wp-photo-album-plus' ) . '</a>' : '' ) . '</td>
 							<td>' . ( $covid ? '<a href="' . $curl . '" class="wppaedit">' . __( 'CovImg', 'wp-photo-album-plus' ) . '</a>' : '' ) . '</td>';
 							if ( current_user_can( 'wppa_upload' ) ) {
 								$result .= '<td><a href="' . get_admin_url() . '/admin.php?page=wppa_upload_photos&wppa-set-album=' . $id . '" class="wppaedit" >' . __( 'Upload', 'wp-photo-album-plus' ) . '</a></td>';
@@ -3075,12 +3030,12 @@ global $plugin_page;
 			</a>
 		</td>
 		<td>
-			<a class="wppaedit" onclick="wppaEditSearch(\'' . wppa_ea_url( 'search' ) . '&amp;quick' . '\', \'wppa-edit-search\' )" >
+			<a class="wppaedit" onclick="wppaEditSearch(\'' . wppa_ea_url( 'search' ) . '&quick' . '\', \'wppa-edit-search\' )" >
 				<span style="font-weight:bold">' . __( 'Quick', 'wp-photo-album-plus' ) . '</span>
 			</a>
 		</td>
 		<td>
-			<a class="wppaedit" onclick="wppaEditSearch(\'' . wppa_ea_url( 'search' ) . '&amp;bulk=1' . '\', \'wppa-edit-search\' )" >
+			<a class="wppaedit" onclick="wppaEditSearch(\'' . wppa_ea_url( 'search' ) . '&bulk=1' . '\', \'wppa-edit-search\' )" >
 				<span style="font-weight:bold">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</span>
 			</a>
 		</td>
@@ -3156,12 +3111,12 @@ global $wpdb;
 			</a>
 		</td>
 		<td>
-			<a class="wppaedit" onclick="wppaEditTrash( \'' . wppa_ea_url( 'trash' ) . '&amp;quick=1' . '\' );">
+			<a class="wppaedit" onclick="wppaEditTrash( \'' . wppa_ea_url( 'trash' ) . '&quick=1' . '\' );">
 				<span style="font-weight:bold">' . __( 'Quick', 'wp-photo-album-plus' ) . '</span>
 			</a>
 		</td>
 		<td>
-			<a class="wppaedit" onclick="wppaEditTrash( \'' . wppa_ea_url( 'trash' ) . '&amp;bulk=1' . '\' );">
+			<a class="wppaedit" onclick="wppaEditTrash( \'' . wppa_ea_url( 'trash' ) . '&bulk=1' . '\' );">
 				<span style="font-weight:bold">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</span>
 			</a>
 		</td>
@@ -3279,7 +3234,7 @@ global $wpdb;
 					$i++;
 				}
 
-				$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=' . $crid;
+				$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=' . $crid;
 				$na = $counts['selfalbums'];
 				$np = $counts['selfphotos'];
 				$nm = $counts['pendselfphotos'];
@@ -3313,13 +3268,13 @@ global $wpdb;
 					$url = wppa_ea_url($crid);
 
 					$result .= '
-					<td><a href="' . $url . '" class="wppaedit">' . __( 'Edit', 'wp-photo-album-plus' ) . '</a></td>
-					<td><a href="' . $url . '&amp;quick=1" class="wppaedit">' . __( 'Quick', 'wp-photo-album-plus' ) . '</a></td>
-					<td><a href="' . $url . '&amp;bulk=1#manage-photos" class="wppaedit">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</a></td>';
+					<td><a href="' . esc_url( $url ) . '" class="wppaedit">' . __( 'Edit', 'wp-photo-album-plus' ) . '</a></td>
+					<td><a href="' . esc_url( $url ) . '&quick=1" class="wppaedit">' . __( 'Quick', 'wp-photo-album-plus' ) . '</a></td>
+					<td><a href="' . esc_url( $url ) . '&bulk=1#manage-photos" class="wppaedit">' . __( 'Bulk', 'wp-photo-album-plus' ) . '</a></td>';
 
 					if ( ! wppa_switch( 'porder_restricted' ) || wppa_user_is_admin() ) {
 						$result .= '
-						<td><a href="' . $url . '&amp;seq=1" class="wppaedit">' . __( 'Seq', 'wp-photo-album-plus' ) . '</a></td>';
+						<td><a href="' . esc_url( $url ) . '&seq=1" class="wppaedit">' . __( 'Seq', 'wp-photo-album-plus' ) . '</a></td>';
 					}
 					else {
 						$result .= '<td></td>';
@@ -3327,8 +3282,8 @@ global $wpdb;
 
 					$covid = max( $album['main_photo'], 0 );
 					if ( $covid ) {
-						$curl = get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=single&amp;photo=' . wppa_encrypt_photo( $covid ) .
-								'&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&amp;just-edit=' . __( 'Edit+cover+image', 'wp-photo-album-plus' );
+						$curl = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=single&photo=' . wppa_encrypt_photo( $covid ) .
+								'&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' ) . '&just-edit=' . __( 'Edit+cover+image', 'wp-photo-album-plus' );
 						$result .= '<td><a href="' . $curl . '" class="wppaedit">' . __( 'CovImg', 'wp-photo-album-plus' ) . '</a></td>';
 					}
 					else {
@@ -3342,13 +3297,13 @@ global $wpdb;
 					}
 					if ( wppa_user_is_admin() || wppa_get_user() == $album['owner'] ) {
 						$url = wppa_ea_url( $crid, 'del' );
-						$result .= '<td><a href="' . $url . '" class="wppadelete" >' . __( 'Delete', 'wp-photo-album-plus' ) . '</a></td>';
+						$result .= '<td><a href="' . esc_url( $url ) . '" class="wppadelete" >' . __( 'Delete', 'wp-photo-album-plus' ) . '</a></td>';
 						}
 					else {
 						$result .= '<td></td>';
 					}
 					if ( wppa_can_create_album() ) {
-						$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit-id=new&amp;parent_id=' . $id . '&amp;wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
+						$url = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=edit&edit-id=new&parent_id=' . $id . '&wppa-nonce=' . wp_create_nonce( 'wppa-nonce' );
 						$onc = 'if (confirm(\''.__( 'Are you sure you want to create a sub album?', 'wp-photo-album-plus' ).'\')) document.location=\''.$url.'\';';
 						$result .= '<td><a onclick="' . $onc . '" class="wppacreate">' . __( 'Create', 'wp-photo-album-plus' ) . '</a></td>';
 					}
@@ -3570,23 +3525,23 @@ global $wpdb;
 	wppa_add_local_js( 'wppa_album_sequence' );
 
 	// Get the albums sort order column and desc flag
-	$albumorder_col	= wppa_get_album_order_column( $parent );
-	$is_descending = wppa_is_album_order_desc( $parent );
+	$aoc = wppa_get_aoc_a( $parent );
 
 	// If random...
-	if ( $albumorder_col == 'random' ) {
-		$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %s ORDER BY RAND(%d)", $parent, wppa_get_randseed('page') ), ARRAY_A );
+	if ( $aoc['rand'] ) {
+		$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %s ORDER BY RAND(%d)", $parent, $aoc['rand'] ), ARRAY_A );
+		echo wppa_show_query(true);
 	}
 
 	// Not random
 	else {
 
 		// Ascending or descending
-		if ( $is_descending ) {
-			$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $parent, $albumorder_col ), ARRAY_A );
+		if ( $aoc['desc'] ) {
+			$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i DESC", $parent, $aoc['order'] ), ARRAY_A );
 		}
 		else {
-			$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i", $parent, $albumorder_col ), ARRAY_A );
+			$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE a_parent = %d ORDER BY %i", $parent, $aoc['order'] ), ARRAY_A );
 		}
 	}
 
@@ -3660,8 +3615,8 @@ global $wpdb;
 	}
 
 	// Check album order
-	if ( $albumorder_col != 'a_order' ) {
-		if ( $parent == 0) {
+	if ( $aoc['order'] != 'a_order' ) {
+		if ( $parent == 0 ) {
 			$result = '
 			<br>' .
 			esc_html__( 'You can edit top-level album sequence number here when you set the album sequence method to "Sequence #" or "Sequence # descending"', 'wp-photo-album-plus' );
@@ -3682,7 +3637,7 @@ global $wpdb;
 
 	$result = '
 	<div
-		style="' . ( $albumorder_col != 'a_order' ? 'display:none' : '' ) . '"
+		style="' . ( $aoc['order'] != 'a_order' ? 'display:none' : '' ) . '"
 		id="wppa-album-sequence"
 		>
 	<h2 style="margin:1em">' .
@@ -3745,7 +3700,7 @@ global $wpdb;
 	';
 	wppa_echo( $result );
 
-	if ( $is_descending && $albumorder_col == 'a_order' ) {
+	if ( $aoc['desc'] && $aoc['order'] == 'a_order' ) {
 		wppa_add_inline_script( 'wppa-admin', 'var wppaAlbSeqnoDesc=true;', false );
 	}
 	else {

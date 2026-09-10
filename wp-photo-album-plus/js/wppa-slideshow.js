@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '9.1.12.002';
+var wppaJsSlideshowVersion = '9.3.00.001';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -1080,8 +1080,10 @@ function wppaFormatSlide( mocc ) {
 	// Slide present in this occ?
 	var imgid    = 'theimg'+_wppaFg[mocc]+'-'+mocc;
 	var elm      = document.getElementById( imgid );
-	if ( ! elm ) {
-		return;	// No slide present
+
+	if ( ! elm ) { // Its a pano or zoomable
+		jQuery( '.bbb-'+mocc ).css( {width:'33%',height:'calc(100% - 40px)'} );
+		return;
 	}
 
 	// vars we have

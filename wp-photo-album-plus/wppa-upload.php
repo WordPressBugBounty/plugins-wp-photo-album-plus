@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 9.0.12.001
+* Version 9.3.00.002
 *
 */
 
@@ -116,7 +116,7 @@ global $upload_album;
 				$result .= '
 				<p>' .
 					__( 'No albums exist. You must', 'wp-photo-album-plus' ) . '
-					&nbsp;<a href="' . $url . '" >' .
+					&nbsp;<a href="' . esc_url( $url ) . '" >' .
 						__( 'create one', 'wp-photo-album-plus' ) . '
 					</a> ' .
 					__( 'before you can upload your photos.', 'wp-photo-album-plus' ) . '

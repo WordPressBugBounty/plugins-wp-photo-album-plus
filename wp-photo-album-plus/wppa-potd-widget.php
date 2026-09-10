@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the photo of the day widget
-* Version 9.2.01.003
+* Version 9.3.00.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -34,11 +34,15 @@ class PhotoOfTheDay extends WP_Widget {
 			return;
 		}
 
-		// get the photo  ($image)
-		$image = wppa_get_potd();
-
 		// Make the HTML for current picture
 		$widget_content = "\n".'<!-- WPPA+ Photo of the day Widget start -->';
+
+		// get the photo  ($image)
+		$image = wppa_get_potd();
+		$widget_content .= wppa( 'out' );
+
+		// Make the HTML for current picture
+//		$widget_content = "\n".'<!-- WPPA+ Photo of the day Widget start -->';
 
 		$widget_content .= '
 		<div' .
@@ -200,7 +204,7 @@ class PhotoOfTheDay extends WP_Widget {
 			}
 		}
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		$widget_content .= "\n".'<!-- WPPA+ Photo of the day Widget end -->';
 
@@ -211,9 +215,9 @@ class PhotoOfTheDay extends WP_Widget {
 		}
 		$result .= $widget_content . $after_widget;
 
-		if ( $image ) {
+//		if ( $image ) {
 			wppa_echo( $result );
-		}
+//		}
 		wppa_echo( wppa_widget_timer( 'show', $widget_title ) );
 
 		wppa( 'in_widget', false );

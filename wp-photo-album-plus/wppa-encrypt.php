@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 9.2.01.001
+* Version 9.3.00.001
 *
 */
 
@@ -198,14 +198,6 @@ function wppa_encrypt_url( $url ) {
 		return $url;
 	}
 
-	// Has it &amp; 's ?
-	if ( strpos( $url, '&amp;' ) === false ) {
-		$hasamp = false;
-	}
-	else {
-		$hasamp = true;
-	}
-
 	// Disassemble url
 	$temp = explode( '?', $url );
 
@@ -246,9 +238,6 @@ function wppa_encrypt_url( $url ) {
 	// Re-assemble url
 	$temp[1] = implode( '&', $qarray );
 	$newurl = implode( '?', $temp );
-	if ( $hasamp ) {
-		$newurl = str_replace( '&', '&amp;', $newurl );
-	}
 
 	return $newurl;
 }

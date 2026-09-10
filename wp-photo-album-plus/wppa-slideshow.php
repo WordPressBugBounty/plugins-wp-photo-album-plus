@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.2.06.001
+* Version 9.3.00.001
 *
 */
 
@@ -323,7 +323,7 @@ function wppa_start_stop_icons( $opt = '' ) {
 				style="float:right;cursor:pointer"
 				title="' . esc_attr( __('Renew', 'wp-photo-album-plus' ) ) . '"
 				onclick="_wppaStop(' . $mocc . ');wppaDoAjaxRender(event,' . $mocc . ', \'' . $ajax_url .
-							'wppa-slideonly=1&amp;wppa-filmonly=1&amp;wppa-album=' . wppa( 'start_album' ) . '&amp;wppa-occur=' . $mocc . '\', \'\' );return false;"
+							'wppa-slideonly=1&wppa-filmonly=1&wppa-album=' . wppa( 'start_album' ) . '&wppa-occur=' . $mocc . '\', \'\' );return false;"
 				>' .
 				wppa_get_svghtml( 'Redo', $iconsize ) . '
 			</span>';
@@ -404,7 +404,7 @@ function wppa_start_stop_text( $opt = '' ) {
 				class="wppa-nav-text renew"
 				style="float:right;cursor:pointer"
 				onclick="_wppaStop(' . $mocc . ');wppaDoAjaxRender(event,' . $mocc . ', \'' . $ajax_url .
-							'wppa-slideonly=1&amp;wppa-filmonly=1&amp;wppa-album=' . wppa( 'start_album' ) . '&amp;wppa-occur=' . $mocc . '\', \'\' );return false;"
+							'wppa-slideonly=1&wppa-filmonly=1&wppa-album=' . wppa( 'start_album' ) . '&wppa-occur=' . $mocc . '\', \'\' );return false;"
 				>' .
 				__( 'Renew', 'wp-photo-album-plus' ) . '
 			</a>';
@@ -501,25 +501,10 @@ function wppa_slide_frame( $thumbs ) {
 		if ( ( wppa_switch( 'show_bbb' ) && ! wppa_in_widget() ) ||
 			 ( wppa_switch( 'show_bbb_widget' ) && wppa_in_widget() ) ) {
 
-			wppa_out( '
-			<img
-				id="bbb-' . $mocc . '-l"
-				class="wppa-bbb wppa-bbb-l bbb-' . $mocc . '"
-				src="' . wppa_get_imgdir() . 'bbbl.png"
-				alt="bbbl"
-				onmouseover="wppaBbb(' . $mocc . ',\'l\',\'show\')"
-				onmouseout="wppaBbb(' . $mocc . ',\'l\',\'hide\')"
-				onclick="wppaBbb(' . $mocc . ',\'l\',\'click\')"
-			>
-			<img
-				id="bbb-' . $mocc . '-r"
-				class="wppa-bbb wppa-bbb-r bbb-' . $mocc . '"
-				src="' . wppa_get_imgdir() . 'bbbr.png"
-				alt="bbbr"
-				onmouseover="wppaBbb(' . $mocc . ',\'r\',\'show\')"
-				onmouseout="wppaBbb(' . $mocc . ',\'r\',\'hide\')"
-				onclick="wppaBbb(' . $mocc . ',\'r\',\'click\')"
-			>' );
+			wppa_html_out( 'img', ['id' => 'bbb-' . $mocc . '-l', 'class' => 'wppa-bbb wppa-bbb-l bbb-' . $mocc, 'src' => wppa_get_imgdir() . 'bbbl.png', 'alt' => 'bbbl',
+								   'onmouseover' => 'wppaBbb(' . $mocc . ',\'l\',\'show\')', 'onmouseout' => 'wppaBbb(' . $mocc . ',\'l\',\'hide\')', 'onclick' => 'wppaBbb(' . $mocc . ',\'l\',\'click\')'] );
+			wppa_html_out( 'img', ['id' => 'bbb-' . $mocc . '-r', 'class' => 'wppa-bbb wppa-bbb-r bbb-' . $mocc, 'src' => wppa_get_imgdir() . 'bbbr.png', 'alt' => 'bbbr',
+								   'onmouseover' => 'wppaBbb(' . $mocc . ',\'r\',\'show\')', 'onmouseout' => 'wppaBbb(' . $mocc . ',\'r\',\'hide\')', 'onclick' => 'wppaBbb(' . $mocc . ',\'r\',\'click\')'] );
 		}
 
 		// Ugly browse buttons ?
@@ -1627,7 +1612,7 @@ function wppa_browsebar_icons( $opt = '' ) {
 							' title="'.__('Click to start/stop', 'wp-photo-album-plus' ).'"' .
 							' >&nbsp;' .
 						'</span>' .
-						'<div style="clear:both"></div>' .
+						wppa_div_clear() .
 					'</div>'
 				);
 	}

@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.2.11.004
+/* Version 9.3.00.002
 /*
 */
 
@@ -34,11 +34,11 @@ global $wpdb;
 			$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $albs ) );
 		}
 	}
-	
+
 	elseif ( $alb == 'all' ) {
 		$photos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos" );
 	}
-	
+
 	elseif ( $alb == 'sep' ) {
 		if ( wppa_switch( 'potd_include_subs' ) ) {
 			$sepalbs = explode( '.', wppa_alb_to_enum_children( '-1' ) );
@@ -49,7 +49,7 @@ global $wpdb;
 		$placeholders = implode( ',', array_fill( 0, count( $sepalbs ), '%d' ) );
 		$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $sepalbs ) );
 	}
-	
+
 	elseif ( $alb == 'all-sep' ) {
 		if ( wppa_switch( 'potd_include_subs' ) ) {
 			$allminsepalbs = explode( '.', wppa_alb_to_enum_children( '0' ) );
@@ -89,7 +89,7 @@ global $wpdb;
 		$allphotos = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos" );
 		$photos = array_diff( $allphotos, $photos );
 	}
-		
+
 	// Compile status clause
 	$sfilter =  wppa_opt( 'potd_status_filter' );
 	$voidphotos = [];
@@ -114,7 +114,7 @@ global $wpdb;
 			break;
 	}
 	$photos = array_diff( $photos, $voidphotos );
-	
+
 	if ( ! count( $photos ) ) return [];
 
 	// If change every ..., order by p_order
@@ -264,7 +264,7 @@ global $wpdb;
 							$ids = $photos;
 							$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 							$photos = $wpdb->get_results( $wpdb->prepare( "SELECT id, p_order FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $ids, [$idn] ) ), ARRAY_A );
-							
+							echo wppa_show_query( true );
 
 							// Image found
 							$id = $photos[$idn]['id'];

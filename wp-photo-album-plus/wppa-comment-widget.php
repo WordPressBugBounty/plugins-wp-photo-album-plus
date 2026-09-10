@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the recent commets on photos
-* Version 9.2.01.001
+* Version 9.3.00.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -121,7 +121,7 @@ class wppaCommentWidget extends WP_Widget {
 		}
 		else $widget_content .= __( 'There are no commented photos (yet)', 'wp-photo-album-plus' );
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// Output
 		$result = "\n" . $before_widget;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 9.2.01.001
+* Version 9.3.00.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -458,7 +458,7 @@ class TopTenWidget extends WP_Widget {
 		}
 		else $widget_content .= __( 'There are no rated photos (yet)', 'wp-photo-album-plus' );
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// Output
 		$result = "\n" . $before_widget;

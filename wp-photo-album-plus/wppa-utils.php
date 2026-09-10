@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.2.11.004
+* Version: 9.3.00.001
 *
 */
 
@@ -918,13 +918,14 @@ global $wpdb;
 
 	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE photo = %d AND value = -1", $photo ) );
 
-	if ( wppa_opt( 'dislike_mail_every' ) > 0) {		// Feature enabled?
+	if ( wppa_opt( 'dislike_mail_every' ) > 0 ) {		// Feature enabled?
 		if ( $count % wppa_opt( 'dislike_mail_every' ) == 0 ) {	// Mail the admin
-			$to        = get_bloginfo('admin_email');
-			$subj 	   = __('Notification of inappropriate image', 'wp-photo-album-plus' );
+			$to        = get_bloginfo( 'admin_email' );
+			$subj 	   = __( 'Notification of inappropriate image', 'wp-photo-album-plus' );
 			/* translators: integer id, count */
-			$cont[0] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
-			$cont[1] = '<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo', 'wp-photo-album-plus' ).'</a>';
+			$cont[0] = sprintf( __( 'Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count );
+			$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=pmod&photo=' . $photo;
+			$cont[1] = wppa_html_tag( 'a', ['href' => $href], __('Manage photo', 'wp-photo-album-plus' ) );
 			wppa_send_mail( array( 'to' 	=> $to,
 								   'subj' 	=> $subj,
 								   'cont' 	=> $cont,
@@ -937,11 +938,12 @@ global $wpdb;
 		if ( $count == wppa_opt( 'dislike_set_pending' ) ) {
 			wppa_update_photo( $photo, ['status' => 'pending'] );
 			$to        = get_bloginfo('admin_email');
-			$subj 	   = __('Notification of inappropriate image', 'wp-photo-album-plus' );
+			$subj 	   = __( 'Notification of inappropriate image', 'wp-photo-album-plus' );
 			/* translators: integer id, count */
-			$cont[0] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
-			$cont[0] .= "\n".__('The status has been changed to \'pending\'.', 'wp-photo-album-plus' );
-			$cont[1] = '<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo', 'wp-photo-album-plus' ).'</a>';
+			$cont[0] = sprintf( __( 'Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count );
+			$cont[0] .= "\n" . __( 'The status has been changed to \'pending\'.', 'wp-photo-album-plus' );
+			$href = get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=pmod&photo=' . $photo;
+			$cont[1] = wppa_html_tag( 'a', ['href' => $href], __( 'Manage photo', 'wp-photo-album-plus' ) );
 			wppa_send_mail( array( 'to' 	=> $to,
 								   'subj' 	=> $subj,
 								   'cont' 	=> $cont,
@@ -953,11 +955,11 @@ global $wpdb;
 	if ( wppa_opt( 'dislike_delete' ) > 0 ) {			// Feature enabled?
 		if ( $count == wppa_opt( 'dislike_delete' ) ) {
 			$to        = get_bloginfo('admin_email');
-			$subj 	   = __('Notification of inappropriate image', 'wp-photo-album-plus' );
+			$subj 	   = __( 'Notification of inappropriate image', 'wp-photo-album-plus' );
 			/* translators: integer id, count */
-			$cont[0] = sprintf(__('Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count);
-			$cont[0] .= "\n".__('It has been deleted.', 'wp-photo-album-plus' );
-			$cont[1] = '';//<a href="'.get_admin_url().'admin.php?page=wppa_admin_menu&tab=pmod&photo='.$photo.'" >'.__('Manage photo').'</a>';
+			$cont[0] = sprintf( __( 'Photo %1$d has been marked as inappropriate by %2$d different visitors.', 'wp-photo-album-plus' ), $photo, $count );
+			$cont[0] .= "\n" . __( 'It has been deleted.', 'wp-photo-album-plus' );
+			$cont[1] = '';
 			wppa_send_mail( array( 'to' 	=> $to,
 								   'subj' 	=> $subj,
 								   'cont' 	=> $cont,
@@ -4520,55 +4522,55 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 					'<circle cx="12.5" cy="12.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="0s" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="12.5" cy="52.5" r="12.5" fill-opacity=".5">
 						<animate attributeName="fill-opacity"
 						 begin="100ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="52.5" cy="12.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="300ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="52.5" cy="52.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="600ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="92.5" cy="12.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="800ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="92.5" cy="52.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="400ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="12.5" cy="92.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="700ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="52.5" cy="92.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="500ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>
 					<circle cx="92.5" cy="92.5" r="12.5">
 						<animate attributeName="fill-opacity"
 						 begin="200ms" dur="1s"
-						 values="1;.2;1" calcMode="linear"
+						 values="1.2;1" calcMode="linear"
 						 repeatCount="indefinite" />
 					</circle>';
 				break;
@@ -4789,7 +4791,7 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 								 repeatCount="indefinite" />
 						<animate attributeName="fill-opacity" from="1" to="1"
 								 begin="0s" dur="0.8s"
-								 values="1;.5;1" calcMode="linear"
+								 values="1.5;1" calcMode="linear"
 								 repeatCount="indefinite" />
 					</circle>
 					<circle cx="60" cy="15" r="9" fill-opacity="0.3">
@@ -4799,7 +4801,7 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 								 repeatCount="indefinite" />
 						<animate attributeName="fill-opacity" from="0.5" to="0.5"
 								 begin="0s" dur="0.8s"
-								 values=".5;1;.5" calcMode="linear"
+								 values=".5;1.5" calcMode="linear"
 								 repeatCount="indefinite" />
 					</circle>
 					<circle cx="105" cy="15" r="15">
@@ -4809,7 +4811,7 @@ function wppa_get_spinner_svg_html( $xargs = array() ) {
 								 repeatCount="indefinite" />
 						<animate attributeName="fill-opacity" from="1" to="1"
 								 begin="0s" dur="0.8s"
-								 values="1;.5;1" calcMode="linear"
+								 values="1.5;1" calcMode="linear"
 								 repeatCount="indefinite" />
 					</circle>';
 				break;
@@ -5259,8 +5261,8 @@ function wppa_compress_html( $txt, $keeplinebreaks = false ) {
 		$L1 = strlen( $result );
 	}
 
-	// Now do the other comprssions
-	$from = 	array( 	"> <", "<ul></ul>", "<!--",   '" >', '&amp;', 'style=" ', '"/>',  ' style=""', 'px;;', '/>' );
+	// Now do the other compressions
+	$from = 	array( 	"> <", "<ul></ul>", "<!--",   '" >', '&amp;', 'style=" ', '"/>',  ' style=""', 'px;', '/>' );
 	$to = 		array(	"><",  "",          "\n<!--", '">',  '&',     'style="',  '" />', ' ',          'px;', '>'  );
 
 	$result = str_replace( $from, $to, $result );
@@ -6133,11 +6135,17 @@ function wppa_html_out( $tag, $xattribs = [], $content = '' ) {
 	wppa_out( wppa_html_tag( $tag, $xattribs, $content ) );
 }
 
+// Exho a vaild escaped complete html tag
+function wppa_html_echo( $tag, $xattribs = [], $content = '' ) {
+
+	wppa_echo( wppa_html_tag( $tag, $xattribs, $content ) );
+}
+
 function wppa_close_tag( $tag, $clear = false, $return = false ) {
 
 	$result = '';
 	if ( $clear ) {
-		$result .= '<div style="clear:both;"></div>';
+		$result .= wppa_div_clear();
 	}
 	$result .= '</' . $tag . '>';
 	if ( $return ) {
@@ -6162,6 +6170,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'href' 	 	=> '',
 				 'alt' 	 		=> '',
 				 'target' 	 	=> '',
+				 'for' 			=> '',
 				 'class' 	 	=> '',
 				 'type' 	 	=> '',
 				 'value' 		=> '',
@@ -6179,6 +6188,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				 'onerror' 		=> '',
 				 'decoding' 	=> '',
 				 'placeholder' 	=> '',
+				 'size' 		=> '',
 				 'loading' 		=> '',
 				 'data-id' 		=> '',
 				 'data-title' 	=> '',
@@ -6257,7 +6267,7 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	// Find vaild tags
 	$self_closing = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'p', 'video', 'audio', 'form', 'input', 'textarea', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] );
+	$allowed_tags = array_merge( $self_closing, ['span', 'a', 'div', 'select', 'option', 'p', 'video', 'audio', 'form', 'input', 'textarea', 'blockquote', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'style', 'label'] );
 
 	// Report invalid tag
 	if ( ! in_array( $tag, $allowed_tags ) ) {
@@ -6267,16 +6277,16 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 
 	$result = '<' . $tag;
 
-	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'class', 'type', 'value', 'preload', 'poster', 'width', 'height',
-					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding', 'placeholder',
+	$allowed_attrs = ['id', 'name', 'title', 'style', 'src', 'href', 'alt', 'target', 'for', 'class', 'type', 'value', 'preload', 'poster', 'width', 'height',
+					  'onload', 'onerror', 'onchange', 'onclick', 'ondblclick', 'onmouseover', 'onmouseout', 'onscroll', 'onwheel', 'decoding', 'placeholder', 'size',
 					  'disabled', 'selected', 'autoplay', 'controls', 'loading',
 					  'data-id', 'data-title', 'data-day', 'data-from', 'data-src', 'data-videohtml', 'data-posterurl', 'data-videonatwidth', 'data-videonatheight', 'data-audiohtml',
-					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama', 'data-type',
+					  'data-pdfhtml', 'data-rel', 'data-lbtitle', 'data-alt', 'data-pantype', 'data-panorama', 'data-type', 'data-wppa'
 					  ];
-	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls'];
+	$may_empty_attrs = ['disabled', 'selected', 'autoplay', 'controls', 'value'];
 
 	foreach( array_keys( $attribs ) as $attr ) {
-		if ( ! in_array( $attr, $allowed_attrs ) && ! in_array( $attr, $may_empty_attrs ) ) {
+		if ( ! in_array( $attr, $allowed_attrs ) && ! in_array( $attr, $may_empty_attrs ) && ! wppa_is_int( $attr ) ) {
 			wppa_log( 'err', "Unsupported attribute {b}$attr{/b} in wppa_html_tag()" );
 		}
 		else {
@@ -6299,6 +6309,15 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 				case 'controls':
 					$result .= ' ' . $attr;
 					break;
+
+				// May empty but need not
+				case 'value':
+					if ( $attribs['value'] == '' ) {
+						$result .= ' ' . $attr;
+					}
+					else {
+						$result .= ' ' . $attr . '="' . esc_attr( $attribs['value'] ) . '"';
+					}
 
 				// Normal attributes
 				default:
@@ -6332,6 +6351,11 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 	}
 
 	return $result;
+}
+
+function wppa_div_clear() {
+
+	return wppa_html_tag( 'div', ['style' => 'clear:both'], ' ' );
 }
 
 // Get the rating html to be used in slides and lightbox
@@ -6488,6 +6512,7 @@ function wppa_is_valid_utf8( $string ) {
 function wppa_fix_rights( $id ) {
 
 	wppa_chmod( wppa_get_source_path( $id ) );
+	wppa_chmod( wppa_get_o1_source_path( $id ) );
 	wppa_chmod( wppa_get_photo_path( $id ) );
 	wppa_chmod( wppa_get_thumb_path( $id ) );
 }

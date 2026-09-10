@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* Version 9.2.01.001
+* Version 9.3.00.001
 *
 */
 
@@ -21,19 +21,19 @@ global $wpdb;
 
 	// Pending comments
 	$com_pend = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE status = 'pending'" );
-	if ( $com_pend ) $com_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$com_pend.'</span>';
+	if ( $com_pend ) $com_pending = '&nbsp;' . wppa_html_tag( 'span', ['id' => 'ab-awaiting-mod', 'class' => 'pending-count'], $com_pend );
 	else $com_pending = '';
 
 	// Pending uploads
 	$upl_pend = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE status = 'pending' AND album > 0" );
-	if ( $upl_pend ) $upl_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$upl_pend.'</span>';
+	if ( $upl_pend ) $upl_pending = '&nbsp;' . wppa_html_tag( 'span', ['id' => 'ab-awaiting-mod', 'class' => 'pending-count'], $upl_pend );
 	else $upl_pending = '';
 
 	// Tot
 	$tot_pend = 0;
 	if ( current_user_can('administrator') ) $tot_pend += $com_pend;
 	if ( current_user_can('wppa_admin') ) $tot_pend += $upl_pend;
-	if ( $tot_pend ) $tot_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$tot_pend.'</span>';
+	if ( $tot_pend ) $tot_pending = '&nbsp' . wppa_html_tag( 'span', ['id' => 'ab-awaiting-mod', 'class' => 'pending-count'], $tot_pend );
 	else $tot_pending = '';
 
 	$atog = wppa_get_option( 'wppa_album_use_gallery', 'no' ) == 'yes';

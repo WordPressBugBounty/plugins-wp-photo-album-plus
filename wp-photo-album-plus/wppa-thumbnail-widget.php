@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 9.2.02.002
+* Version 9.3.00.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -88,7 +88,7 @@ class ThumbnailWidget extends WP_Widget {
 
 			$placeholders = implode( ',', array_fill( 0, count( $thumbs) , '%d' ) );
 			if ( $sortby == 'RAND()' ) {
-				$rand = wppa_get_randseed( 'session' );
+				$rand = wppa_get_randseed();
 				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $thumbs, [$rand] ) ), ARRAY_A );
 				$widget_content .= wppa_show_query( true );
 			}
@@ -164,7 +164,7 @@ class ThumbnailWidget extends WP_Widget {
 		}
 		else $widget_content .= __( 'There are no photos (yet)', 'wp-photo-album-plus' );
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// Title link
 		if ( ! empty( $widget_link ) ) {
@@ -277,14 +277,13 @@ class ThumbnailWidget extends WP_Widget {
 
 	// Set defaults
 	function get_defaults() {
-
 		$defaults = array( 	'title'		=> __( 'Thumbnail Photos', 'wp-photo-album-plus' ),
 							'link'	 	=> '',
 							'linktitle' => '',
 							'album' 	=> 0,
 							'name' 		=> 'no',
 							'display' 	=> 'thumbs',
-							'sortby' 	=> wppa_get_photo_order(0),
+							'sortby' 	=> 'id',
 							'limit' 	=> wppa_opt( 'thumbnail_widget_count' ),
 							'logonly' 	=> 'no',
 							'cache' 	=> 0,

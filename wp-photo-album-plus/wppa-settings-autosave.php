@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.2.11.004
+* version 9.3.00.001
 *
 */
 
@@ -5865,7 +5865,7 @@ global $wppa_hide_this;
 						$slug5 = '';
 						$slug = array($slug1, $slug2, $slug3, $slug4, $slug5);
 						$html1 = wppa_checkbox($slug1);
-						$html2 = wppa_see_also( 'covers', '2', 10 );;
+						$html2 = wppa_see_also( 'covers', '2', 10 );
 						$html3 = '';
 						$html4 = '';
 						$html5 = '';
@@ -5976,7 +5976,7 @@ global $wppa_hide_this;
 						$desc = __('Frontend upload can fill in custom data fields.', 'wp-photo-album-plus' );
 						$help = '';
 						$slug = 'wppa_fe_custom_fields';
-						$html = wppa_checkbox($slug).wppa_see_also( 'custom', '2' );;
+						$html = wppa_checkbox($slug).wppa_see_also( 'custom', '2' );
 						wppa_setting_new($slug, '12', $name, $desc, $html, $help);
 
 						$name = __('User upload tags', 'wp-photo-album-plus' );

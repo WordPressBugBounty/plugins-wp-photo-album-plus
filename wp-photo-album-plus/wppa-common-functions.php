@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.2.10.004
+* Version: 9.3.00.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -288,112 +288,22 @@ global $wppa_current_shortcode_atts;
 	}
 }
 
-function wppa_get_randseed( $type = '' ) {
-global $wppa_session;
-global $wppa_volitile_randseed;
-global $wppa_randseed_modified;
+function wppa_get_randseed() {
+static $randseed;
 
-	switch ( $type ) {
-
-		// This randseed survives pageloads up to the duration of the session ( usually 1 hour )
-		case 'session':
-			$result = $wppa_session['randseed'];
-			break;
-
-		// Once a day
-		case 'admin':
-			$result = wppa_local_date( 'd', time() );
-			break;
-
-		// This randseed is for one pageload only
-		case 'page':
-
-			if ( wppa( 'random' ) ) {
-				$result = wppa( 'random' );
-			}
-			elseif ( wppa_get( 'random', 0, 'int' ) ) {
-				$result = wppa( 'random' );
-			}
-
-			else {
-
-
-
-				// Not Been here before?
-				if ( ! $wppa_volitile_randseed ) {
-
-					// Make new pageload specific rsandseed
-					$wppa_volitile_randseed = time() % 7487;
-				}
-				$result = $wppa_volitile_randseed;
-			}
-			break;
-
-		// This randseed is new for each pagelad and all subsequent ajax calls.
-		// It must remain at lease 30 seconds the same, even when non ajax pageloads happen.
-		// This is to survive themes that do a reload right after the beginning.
-		default:
-
-			// Init, get the now saved in the session
-			if ( isset( $wppa_session['randseed'] ) && $wppa_session['randseed'] ) {
-				$result = $wppa_session['randseed'];
-			}
-
-			// No saved one, initialize randseed, save it and save the time we made it
-			else {
-				$result = time() % 4721;
-				$wppa_session['randseed'] = $result;
-				$wppa_session['randseedtime'] = time();
-
-//				wppa_save_session();
-			}
-
-			// We have a seed. Assume we need to renew it
-			$renew = true;
-
-			// The following conditions make we do not need to renew
-			if ( $wppa_randseed_modified ) $renew = false; 										// Already renewed this pageload
-			if ( wppa( 'ajax' ) ) $renew = false; 												// Not during ajax call
-			if ( strpos( wppa_request_uri(), 'wp-content' ) !== false ) $renew = false; 	// Url to a content item needs no renew
-			if ( wppa_get( 'paged', 0 ) ) $renew = false; 								// A subsequent wppa page needs the same sequence
-			if ( isset( $wppa_session['randseedtime'] ) && $wppa_session['randseedtime'] > ( time() - 10 ) ) $renew = false; // Not within 10 seconds
-
-			// Still renew if the current wp page differs from the last
-			$wp_page = wppa_get( 'fromp' ) ? wppa_get( 'fromp' ) : get_the_ID();
-			if ( isset( $wppa_session['randpage'] ) && $wp_page && $wp_page != $wppa_session['randpage'] ) {
-				$renew = true;
-			}
-
-			// Make new
-			if ( $renew ) {
-				$result = wppa_renew_randseed();
-			}
+	if ( wppa( 'random' ) ) {
+		return wppa( 'random' );
+	}
+	elseif ( wppa_get( 'random', 0, 'int' ) ) {
+		return wppa_get( 'random' );
 	}
 
-	// Return the randseed
-	return $result;
-}
-
-function wppa_renew_randseed() {
-global $wppa_session;
-global $wppa_volitile_randseed;
-global $wppa_randseed_modified;
-
-	// Make new saved randseed
-	$result = time() % 4721;
-	$wppa_session['randseed'] = $result;
-	$wppa_session['randseedtime'] = time();
-	$p = wppa_get( 'fromp' ) ? wppa_get( 'fromp' ) : get_the_ID();
-	if ( $p ) {
-		$wppa_session['randpage'] = $p;
+	if ( ! $randseed ) {
+		$randseed = time() % 4711;
 	}
 
-	// Indicaate we found a new randseed during this pageload
-	$wppa_randseed_modified = true;
-
-	// Make sure we save it
-//	wppa_save_session();
-
+	$result = $randseed + wppa( 'mocc' );
+	wppa( 'random', $result );
 	return $result;
 }
 
@@ -459,102 +369,22 @@ function wppa_get_wppa_url() {
 	return $result;
 }
 
-// get album order
-function wppa_get_album_order( $parent = 0 ) {
-global $wppa;
+// Returns array (sub) album sequence order and desc for given Album
+function wppa_get_aoc_a( $parent = 0 ) {
 
 	// Init
-    $result = '';
 	$order = 0;
+	$result = ['rand' => false, 'order' => 'id', 'desc' => false];
 
-	// Album given ?
-	if ( $parent > 0 ) {
-		$album = wppa_cache_album( $parent );
-		if ( $album ) {
-			$order = $album['suba_order_by'];
-		}
+	// Random overrule?
+	if ( wppa( 'is_random' ) ) {
+		$result['rand'] = wppa_get_randseed();
+		return $result;
 	}
-	if ( ! $order ) $order = wppa_opt( 'list_albums_by' );
-
-	switch ( $order ) {
-		case '':
-		case 0:
-			$result = '';
-			break;
-		case 1:
-			$result = 'ORDER BY a_order';
-			break;
-		case '-1':
-			$result = 'ORDER BY a_order DESC';
-			break;
-		case '2':
-			$result = 'ORDER BY name';
-			break;
-		case '-2':
-			$result = 'ORDER BY name DESC';
-			break;
-		case '3':
-			$result = 'ORDER BY RAND( '.wppa_get_randseed().' )';
-			break;
-		case '5':
-			$result = 'ORDER BY timestamp';
-			break;
-		case '-5':
-			$result = 'ORDER BY timestamp DESC';
-			break;
-		default:
+	elseif ( wppa( 'random' ) ) {
+		$result['rand'] = wppa( 'random' );
+		return $result;
 	}
-
-	return $result;
-}
-
-function wppa_get_album_order_a( $parent = 0 ) {
-
-	// Init result
-	$result = ['order' => 'id', 'desc' => ''];
-	$order = '';
-
-	// Album given ?
-	if ( $parent > 0 ) {
-		$album = wppa_cache_album( $parent );
-		if ( $album ) {
-			$order = $album['suba_order_by'];
-		}
-	}
-	if ( ! $order ) $order = wppa_opt( 'list_albums_by' );
-
-	switch ( $order ) {
-		case 1:
-			$result['order'] = 'a_order';
-			break;
-		case '-1':
-			$result['order'] = 'a_order';
-			$result['desc'] = 'DESC';
-			break;
-		case '2':
-			$result['order'] = 'name';
-			break;
-		case '-2':
-			$result['order'] = 'name';
-			$result['desc'] = 'DESC';
-			break;
-		case '3':
-			$result['order'] = 'RAND( '.wppa_get_randseed().' )';
-			break;
-		case '5':
-			$result['order'] = 'timestamp';
-			break;
-		case '-5':
-			$result['order'] = 'timestamp';
-			$result['desc'] = 'DESC';
-			break;
-		default:
-	}
-
-	return $result;
-}
-
-function wppa_get_album_order_column( $parent = 0 ) {
 
 	// Album given ?
 	if ( $parent > 0 ) {
@@ -565,168 +395,54 @@ function wppa_get_album_order_column( $parent = 0 ) {
 	}
 	if ( ! $order ) {
 		$order = wppa_opt( 'list_albums_by' );
+	}
+
+	// Descending order?
+	if ( $order < 0 ) {
+		$result['desc'] = true;
 	}
 
 	switch ( $order ) {
 		case '1':
 		case '-1':
-			$result = 'a_order';
+			$result['order'] = 'a_order';
 			break;
 		case '2':
 		case '-2':
-			$result = 'name';
+			$result['order'] = 'name';
 			break;
 		case '3':
-			$result = 'random';
+			$result['order'] = 'id';
+			$result['rand'] = wppa_get_randseed();
 			break;
 		case '5':
 		case '-5':
-			$result = 'timestamp';
+			$result['order'] = 'timestamp';
 			break;
 		default:
-			$result = 'id';
+			break;
 	}
 
 	return $result;
 }
 
-function wppa_is_album_order_desc( $parent = 0 ) {
-
-	// Album given ?
-	if ( $parent > 0 ) {
-		$order = wppa_get_album_item( $parent, 'suba_order_by' );
-	}
-	else {
-		$order = 0;
-	}
-	if ( ! $order ) {
-		$order = wppa_opt( 'list_albums_by' );
-	}
-
-	return ( $order < 0 ) ? "DESC" : "";
-}
-
-// get photo order
-function wppa_get_photo_order( $id = 0, $no_random = false ) {
-global $wppa;
-
-	// Random overrule?
-	if ( wppa( 'is_random' ) ) {
-		$result = " ORDER BY RAND(" . wppa_get_randseed() . ")";
-		return $result;
-	}
-
-	// Filmonly random?
-	if ( wppa( 'is_filmonly' ) && wppa_switch( 'filmonly_random' ) ) {
-		$result = " ORDER BY RAND()";
-		return $result;
-	}
-
-	// Album specified?
-	if ( wppa_is_int( $id ) && $id > 0 ) {
-		$order = wppa_get_album_item( $id, 'p_order_by' );
-	}
-
-	// No album specified
-	else {
-		$order = 0;
-	}
-
-	// No order yet? Use default
-    if ( ! $order ) {
-		$order = wppa_opt( 'list_photos_by' );
-	}
-
-    switch ( $order )
-    {
-	case '':
-	case 0:
-		$result = '';
-		break;
-    case 1:
-        $result = 'ORDER BY p_order';
-        break;
-	case '-1':
-		$result = 'ORDER BY p_order DESC';
-		break;
-    case '2':
-        $result = 'ORDER BY name';
-        break;
-    case '-2':
-        $result = 'ORDER BY name DESC';
-        break;
-    case '3':
-		if ( $no_random ) $result = 'ORDER BY name';
-        else $result = 'ORDER BY RAND( '.wppa_get_randseed().' )';
-        break;
-    case '-3':
-		if ( $no_random ) $result = 'ORDER BY name DESC';
-        else $result = 'ORDER BY RAND( '.wppa_get_randseed().' ) DESC';
-        break;
-	case '4':
-		$result = 'ORDER BY mean_rating';
-		break;
-	case '-4':
-		$result = 'ORDER BY mean_rating DESC';
-		break;
-	case '5':
-		$result = 'ORDER BY timestamp';
-		break;
-	case '-5':
-		$result = 'ORDER BY timestamp DESC';
-		break;
-	case '6':
-		$result = 'ORDER BY rating_count';
-		break;
-	case '-6':
-		$result = 'ORDER BY rating_count DESC';
-		break;
-	case '7':
-		$result = 'ORDER BY exifdtm';
-		break;
-	case '-7':
-		$result = 'ORDER BY exifdtm DESC';
-		break;
-
-    default:
- 		$result = '';
-    }
-
-    return $result;
-}
-
-function wppa_is_photo_order_desc( $id = 0 ) {
-
-	// Album specified?
-	if ( wppa_is_int( $id ) && $id > 0 ) {
-		$order = wppa_get_album_item( $id, 'p_order_by' );
-	}
-
-	// No album specified
-	else {
-		$order = 0;
-	}
-
-	// No order yet? Use default
-    if ( ! $order ) {
-		$order = wppa_opt( 'list_photos_by' );
-	}
-
-	return ( $order < 0 ) ? "DESC" : "";
-}
-
-// Returns the columname for ORDER BY clause, DESC added where appliccable
-function wppa_get_poc( $id = 0, $admin = 'session' ) {
-global $wppa;
+// Returns array photo sequence order and desc for given Album
+function wppa_get_poc_a( $id = 0 ) {
 
 	// Init
 	$order = 0;
+	$result = ['rand' => false, 'order' => 'id', 'desc' => false];
 
 	// Random overrule?
 	if ( wppa( 'is_random' ) ) {
-		$result = 'RAND(' . wppa_get_randseed('session') . ')';
+		$result['rand'] = wppa_get_randseed();
 		return $result;
 	}
+//	elseif ( wppa( 'random' ) ) {
+//		$result['rand'] = wppa( 'random' );
+//if ( $id == '411' ) wppa_out( 'ex 2' );
+//		return $result;
+//	}
 
 	// Album specified?
 	if ( wppa_is_int( $id ) && $id > 0 ) {
@@ -738,46 +454,45 @@ global $wppa;
 		$order = wppa_opt( 'list_photos_by' );
 	}
 
-    switch ( $order ) {
-
-		case '1': $result = 'p_order'; break;
-		case '-1': $result = 'p_order DESC'; break;
-		case '2': $result = 'name'; break;
-		case '-2': $result = 'name DESC'; break;
-		case '3': $result = 'RAND(' . wppa_get_randseed($admin) . ')'; break;
-		case '-3': $result = 'RAND(' . wppa_get_randseed($admin) . ')'; break;
-		case '4': $result = 'mean_rating'; break;
-		case '-4': $result = 'mean_rating DESC'; break;
-		case '5': $result = 'timestamp'; break;
-		case '-5': $result = 'timestamp DESC'; break;
-		case '6': $result = 'rating_count'; break;
-		case '-6': $result = 'rating_count DESC'; break;
-		case '7': $result = 'exifdtm'; break;
-		case '-7': $result = 'exifdtm DESC'; break;
-		default: $result = 'id';
-    }
-    return $result;
-}
-
-// Returns array order and desc for given Album
-function wppa_get_poc_a( $id = 0, $admin = 'session' ) {
-
-	$result = [];
-	$temp = wppa_get_poc( $id, $admin );
-	if ( strpos( $temp, 'RAND' ) !== false ) {
-		$result['rand'] = wppa_get_randseed('session');
-	}
-	else {
-		$result['rand'] = false;
-	}
-	if ( strpos( $temp, 'DESC' ) !== false ) {
+	// Descending order?
+	if ( $order < 0 ) {
 		$result['desc'] = true;
-		$result['order'] = trim( str_replace( 'DESC', '', $temp ) );
 	}
-	else {
-		$result['desc'] = false;
-		$result['order'] = trim( $temp );
-	}
+
+	// Dispatch on seq order type
+    switch ( $order ) {
+		case '1':
+		case '-1':
+			$result['order'] = 'p_order';
+			break;
+		case '2':
+		case '-2':
+			$result['order'] = 'name';
+			break;
+		case '3':
+		case '-3':
+			$result['rand'] = wppa_get_randseed();
+			break;
+		case '4':
+		case '-4':
+			$result['order'] = 'mean_rating';
+			break;
+		case '5':
+		case '-5':
+			$result['order'] = 'timestamp';
+			break;
+		case '6':
+		case '-6':
+			$result['order'] = 'rating_count';
+			break;
+		case '7':
+		case '-7':
+			$result['order'] = 'exifdtm';
+			break;
+		default:
+			break;
+    }
+
 	return $result;
 }
 

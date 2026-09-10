@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version: 9.2.10.002
+* Version: 9.3.00.001
 *
 */
 
@@ -1125,7 +1125,7 @@ global $wppa_url_set_extension;
 	}
 
 	// Add it to the extension of the ajax url
-	$wppa_url_set_extension .= "$name=$value&amp;"; // "&wppa-set[$name]=$value";
+	$wppa_url_set_extension .= "$name=$value&"; // "&wppa-set[$name]=$value";
 
 	// Save
 	wppa_encrypt_set();

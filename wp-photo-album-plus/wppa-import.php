@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 9.2.10.001
+* Version 9.3.00.002
 *
 */
 
@@ -360,7 +360,7 @@ global $wppa_import_errors;
 			wppa_echo( '
 			<p>' .
 				__( 'No albums exist. You must', 'wp-photo-album-plus' ) . '
-				<a href="' . $url . '" >' .
+				<a href="' . esc_url( $url ) . '" >' .
 					__( 'create one', 'wp-photo-album-plus' ) . '
 				</a> ' .
 				__( 'before you can import your photos.', 'wp-photo-album-plus' ) . '<br>' .
@@ -901,7 +901,7 @@ global $wppa_supported_document_extensions;
 	<div style="clear:both"></div>
 	<form
 		id="wppa-uplform"
-		action="' . wppa_get_ajaxlink( 'plain' ) . '&amp;wppa-action=do-import-upload"
+		action="' . wppa_get_ajaxlink( 'plain' ) . '&wppa-action=do-import-upload"
 		method="post"
 		enctype="multipart/form-data"
 		>';

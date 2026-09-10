@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.2.09.001
+* Version: 9.3.00.001
 *
 */
 
@@ -288,14 +288,7 @@ global $wppa_supported_audio_extensions;
 					$sel = ( $oldvalue && $oldvalue == $desc ) ? 'selected' : '';
 					if ( $sel ) $result .= 'selected:' . $oldvalue;
 					$ddesc = strlen( $desc ) > '32' ? substr( $desc, 0, 30 ) . '...' : $desc;
-					$result .= 	'
-					<option
-						value="' . esc_attr( $desc ) . '"
-						class="wppa-iptclist-' . $mocc . '" ' .
-						$sel . '
-						>' .
-						$ddesc . '
-					</option>';
+					$result .= wppa_html_tag( 'option', ['value' => $desc, 'class' => 'wppa-iptclist-' . $mocc, $sel], $ddesc );
 					$last = $desc;
 					$any = true;
 				}
@@ -395,14 +388,7 @@ global $wppa_supported_audio_extensions;
 						$ddesc = '(' . sprintf( '%5.2f', $t[0]/$t[1] ) . ') ' . $ddesc;
 					}
 
-					$result .= '
-					<option
-						value="' . esc_attr( $desc ) . '"
-						class="wppa-exiflist-' . $mocc . '" ' .
-						$sel . '
-						>' .
-						$ddesc . '
-					</option>';
+					$result .= wppa_html_tag( 'option', ['value' => $desc, 'class' => 'wppa-exiflist-' . $mocc, $sel], $ddesc );
 					$any = true;
 				}
 			}
@@ -920,7 +906,7 @@ global $wppa_supported_audio_extensions;
 						if ( ! wppa_is_dir( $zipsdir ) ) wppa_mkdir( $zipsdir );
 						if ( ! wppa_is_dir( $zipsdir ) ) {
 							$status = 'ER';
-							$alert .= __( 'Unable to create zipsdir' , 'wp-photo-album-plus' ) . '. ';;
+							$alert .= __( 'Unable to create zipsdir' , 'wp-photo-album-plus' ) . '. ';
 							$ok = false;
 						}
 
@@ -1023,14 +1009,14 @@ global $wppa_supported_audio_extensions;
 				wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '93', true ) ] ) );
 				wppa_exit();
 			}
-				
+
 			// Check nonce
 			$nonce = wppa_get( 'nonce' );
 			if ( ! wp_verify_nonce( $nonce, 'wppa-delmyzip' ) ) {
 				wppa_echo( wp_json_encode( ['txt' => wppa_secfail( '94', true ) ] ) );
 				wppa_exit();
 			}
-			
+
 			// Verify existance of zips dir
 			$zipsdir = WPPA_UPLOAD_PATH . '/zips/';
 			if ( wppa_is_dir( $zipsdir ) ) {
@@ -1079,9 +1065,8 @@ global $wppa_supported_audio_extensions;
 			$content .=
 			'<br><br>' . __('His request specification is', 'wp-photo-album-plus' ) . '<br>' .
 
-			'<blockquote style="color:#000077; background-color: #dddddd; border:1px solid black; padding: 6px; border-radius: 4px">
-				<em> ' . sanitize_text_field( wppa_get( 'emailtext', 'text' ) ) . '</em>
-			</blockquote>';
+			wppa_html_tag( 'blockquote', ['style' => 'color:#000077; background-color: #dddddd; border:1px solid black; padding: 6px; border-radius: 4px'],
+				'<em> ' . sanitize_text_field( wppa_get( 'emailtext', 'text' ) ) . '</em>' );
 
 			if ( ! function_exists( 'wppa_send_mail' ) ) {
 				require_once( 'wppa-mailing.php' );
@@ -1198,38 +1183,15 @@ global $wppa_supported_audio_extensions;
 			$result = str_replace( ['cursor:pointer', 'cursor: pointer'], 'cursor:help', $result );
 
 			// Output the result
-			wppa_echo ( '
-			<style>
-				#wppa-gutenberg-preview div {
-					position:relative;
-				}
-
-				.filmwindow {
-					width:622px!important;
-				}
-
-				.wppa-container-wrapper {
-					width: 100% !important;
-					margin-left:0 !important;
-					margin-right:0 !important;
-					text-align:center;
-				}
-
-				.wppa-container-wrapper img {
-					cursor: help;
-				}
-
-			</style>
-			<div
-				id="wppa-container-' . esc_attr( $wppa['mocc'] ) . '"
-				style="position:relative;width:100%" >
-				<div class="wppa-preview-caption" style="font-size:12px;color:green;margin:12px 0;width:100%;text-align:center;">
-					<i>' . esc_html( __('In this preview: links and buttons will not work', 'wp-photo-album-plus' ) ) . ',<br>' .
-						   esc_html( __('optional size and alignment settings are ignored', 'wp-photo-album-plus' ) ) . '.
-					</i>
-				</div>' .
-				$result . '
-			</div>', ['needjs' => true] );
+			wppa_echo ( wppa_html_tag( 'style', [], '#wppa-gutenberg-preview div {position:relative;}
+													.filmwindow {width:622px!important;}
+													.wppa-container-wrapper {width: 100% !important;margin-left:0 !important;margin-right:0 !important;text-align:center;}
+													.wppa-container-wrapper img {cursor: help;}' ) .
+						wppa_html_tag( 'div', ['id' => 'wppa-container-' . esc_attr( $wppa['mocc'] ), 'style' => 'position:relative;width:100%'],
+							wppa_html_tag( 'div', ['class' => 'wppa-preview-caption', 'style' => 'font-size:12px;color:green;margin:12px 0;width:100%;text-align:center'],
+								'<i>' . esc_html( __('In this preview: links and buttons will not work', 'wp-photo-album-plus' ) ) . ',<br>' .
+										esc_html( __('optional size and alignment settings are ignored', 'wp-photo-album-plus' ) ) . '.
+								</i>' ) . $result ), ['needjs' => true] );
 
 			$wppa_gutenberg_preview = false;
 
@@ -1750,16 +1712,16 @@ global $wppa_supported_audio_extensions;
 			$edit_link = wppa_ea_url( 'single' ) . '&photo=' . wppa_encrypt_photo( $photo );
 			$a = wppa_allow_uploads( $album );
 			if ( $immediate ) {
-				wppa_echo( '||1||<span style="color:red" >' .
+				wppa_echo( '||1||' . wppa_html_tag( 'span', ['style' => 'color:red'],
 						/* translators: photo id */
-						sprintf( __( 'Photo %s has been permanently removed' ,'wp-photo-album-plus' ), '<a href="'.$edit_link.'" target="_blank" >' . $photo . '</a>' ) .
-						'</span>||' . ( $a ? 'notfull||'.$a : 'full' ) );
+						sprintf( __( 'Photo %s has been permanently removed' ,'wp-photo-album-plus' ), html_tag( 'a', ['href' => $edit_link, 'target' => '_blank'], $photo ) ) ) .
+						'||' . ( $a ? 'notfull||'.$a : 'full' ) );
 			}
 			else {
-				wppa_echo( '||1||<span style="color:red" >' .
+				wppa_echo( '||1||' . wppa_html_tag( 'span', ['style' => 'color:red'],
 						/* translators: photo id */
-						sprintf( __( 'Photo %s has been deleted' ,'wp-photo-album-plus' ), '<a href="'.$edit_link.'" target="_blank" >' . $photo . '</a>' ) .
-						'</span>||' . ( $a ? 'notfull||'.$a : 'full' ) );
+						sprintf( __( 'Photo %s has been deleted' ,'wp-photo-album-plus' ), html_tag( 'a', ['href' => $edit_link, 'target' => '_blank'], $photo ) ) ) .
+						'||' . ( $a ? 'notfull||'.$a : 'full' ) );
 			}
 			break;
 
@@ -2459,7 +2421,7 @@ global $wppa_supported_audio_extensions;
 					wppa( 'error', $err );
 					if ( ! $err || $err == '30' ) {
 						if ( wppa_get_photo_item( $photo, 'thumblock' ) ) {
-							$extra = '<span style=\"color:red\" > ' . __( 'The thumbnail could not be remade', 'wp-photo-album-plus' ) . '</span>';
+							$extra = wppa_html_tag( 'span', ['style' => 'color:red'], __( 'The thumbnail could not be remade', 'wp-photo-album-plus' ) );
 						}
 						else {
 							$extra = '';
@@ -2609,7 +2571,7 @@ global $wppa_supported_audio_extensions;
 
 					// Do the magick command
 					$err = wppa_image_magick( 'convert ' . $path . ' ' . $quality . ' ' . $command . ' ' . $path );
-
+wppa_log('misc', 'Phase 1');
 					// Error?
 					if ( $err ) {
 						$txt = __( 'An error occurred while trying to process photo', 'wp-photo-album-plus' );
@@ -2617,7 +2579,7 @@ global $wppa_supported_audio_extensions;
 					}
 
 					// Housekeeping
-					else {
+					else  {
 
 						// Horizon correction shaves size.
 						if ( $item == 'skyleft' || $item == 'skyright' ) {
@@ -2646,8 +2608,10 @@ global $wppa_supported_audio_extensions;
 								default:
 							}
 						}
+
 						/* translators: command name, photo id */
-						$txt = sprintf( __( 'Command %1$s magically executed on photo %2$d', 'wp-photo-album-plus' ), '<span style=\"color:blue;\" ><i>'.$command.'</i></span>', $id );
+						$txt = sprintf( __( 'Command %1$s magically executed on photo %2$d', 'wp-photo-album-plus' ), wppa_html_tag( 'span', ['style' => 'color:blue;'], '<i>'.$command.'</i>'), $id );
+
 					}
 					$jsfields = array_merge( $jsfields, ['thumbmod' => true, 'photomod' => true, 'magickmod' => true] );
 					break;
@@ -2677,7 +2641,7 @@ global $wppa_supported_audio_extensions;
 					wppa_create_thumbnail( $photo, false );
 					$dbfields['magickstack'] = $newstack;
 					/* translators: command name, photo id */
-					$txt = sprintf( __( 'Command %1$s magically executed on photo %2$d', 'wp-photo-album-plus' ), '<span style=\"color:blue;\" ><i>magickundo</i></span>', $photo );
+					$txt = sprintf( __( 'Command %1$s magically executed on photo %2$d', 'wp-photo-album-plus' ), wppa_html_tag( 'span', ['style' => 'color:blue;'], '<i>'.$command.'</i>'), $id );
 					$jsfields = array_merge( $jsfields, ['thumbmod' => true, 'photomod' => true, 'magickmod' => true] );
 					break;
 
@@ -2710,7 +2674,7 @@ global $wppa_supported_audio_extensions;
 								wppa_move_source( $photodata['filename'], $photodata['album'], $toalb );
 
 								/* translators: photo id, album name, album id */
-								wppa_echo( '||99||'.sprintf( __( 'Photo %1$s has been moved to album %2$s (%3$d)', 'wp-photo-album-plus' ), '<a href="'.$edit_link.'" target="_blank" >' . $photodata['id'] . '</a>', wppa_get_album_name( $toalb ), $toalb ) );
+								wppa_echo( '||99||'.sprintf( __( 'Photo %1$s has been moved to album %2$s (%3$d)', 'wp-photo-album-plus' ), wppa_html_tag( 'a', ['href' => $edit_link, 'target' => '_blank'], $photodata['id'] ), wppa_get_album_name( $toalb ), $toalb ) );
 								wppa_exit();
 							}
 							else {
@@ -4386,7 +4350,7 @@ global $wppa_supported_audio_extensions;
 			if ( ! wppa_have_access( $album ) ) {
 				wppa_alert_text( __( 'ERROR: Illegal attempt to upload a file.', 'wp-photo-album-plus' ) );
 				echo wp_json_encode( ['html' => wppa_alert_html()] );
-				wppa_exit();;
+				wppa_exit();
 			}
 			require_once 'wppa-non-admin.php';
 			wppa_user_upload();

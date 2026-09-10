@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.2.10.004
+* Version: 9.3.00.002
 *
 */
 
@@ -176,15 +176,15 @@ global $wpdb;
 			$porder = wppa_get_poc_a( $album );
 			if ( $porder['rand'] ) {
 				$photos  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY RAND(%d) LIMIT %d, %d", $album, $porder['rand'], $skip, $pagesize ), ARRAY_A );
-				wppa_echo( wppa_show_query( true ) );
+//				wppa_echo( wppa_show_query( true ) );
 			}
 			elseif ( $porder['desc'] ) {
 				$photos  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC LIMIT %d, %d", $album, $porder['order'], $skip, $pagesize ), ARRAY_A );
-				wppa_echo( wppa_show_query( true ) );
+//				wppa_echo( wppa_show_query( true ) );
 			}
 			else {
 				$photos  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i LIMIT %d, %d", $album, $porder['order'], $skip, $pagesize ), ARRAY_A );
-				wppa_echo( wppa_show_query( true ) );
+//				wppa_echo( wppa_show_query( true ) );
 			}
 			if ( ! count( $photos ) && $parms['page'] > 1 ) {
 				wppa_album_photos( $album, $photo, $owner, $moderate, true );
@@ -1967,8 +1967,8 @@ global $wpdb;
 											$formats 	.= $fmt . ' (' . wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) ) . ')<br>';
 											$paths 		.= str_replace( WPPA_UPLOAD_PATH, '.../wppa', str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) ) . '<br>';
 											$url 		= str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
-											$urls 		.= '<a href="' . $url . $ver . '" target="_blank">' . $url . '</a><br>';
-											$download 	=  '<a href="' . $url . $ver . '" target="_blank" download="' . wppa_strip_ext( $filename ) . '.' . $fmt . '">
+											$urls 		.= '<a href="' . esc_url( $url . $ver ) . '" target="_blank">' . $url . '</a><br>';
+											$download 	=  '<a href="' . esc_url( $url . $ver ) . '" target="_blank" download="' . wppa_strip_ext( $filename ) . '.' . $fmt . '">
 																<input type="button" value="' . esc_attr__( 'Download', 'wp-photo-album-plus' ) . '">
 															</a>';
 											$downloads 	.= $download . '<br>';
@@ -2035,7 +2035,7 @@ global $wpdb;
 											$paths 		.= str_replace( WPPA_UPLOAD_PATH, '.../wppa', str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) ) . '<br>';
 											$url 		= str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
 											$urls 		.= '<a href="'. $url .'" target="_blank">' . $url . '</a><br>';
-											$download 	= '<a href="' . $url . '" target="_blank" download="' . wppa_strip_ext( $filename ) . '.' . $fmt . '">
+											$download 	= '<a href="' . esc_url( $url ) . '" target="_blank" download="' . wppa_strip_ext( $filename ) . '.' . $fmt . '">
 																<input type="button" value="' . esc_attr__( 'Download', 'wp-photo-album-plus' ) . '">
 															</a>';
 											$downloads 	.= $download . '<br>';
@@ -3974,25 +3974,27 @@ global $wpdb;
 	wppa_add_local_js( 'wppa_album_photos_sequence' );
 
 	if ( $album ) {
-		$photoorder 	= wppa_get_poc( $album, 'norandom' );
-		$is_descending 	= strpos( $photoorder, 'DESC' ) != false;
-		$is_p_order 	= $photoorder == 'p_order';
+		$poc = wppa_get_poc_a( $album );
+		if ( $poc['rand'] ) {
+			$poc['rand'] = false;
+			$poc['order'] = 'id';
+		}
 
-		if ( $is_descending && $is_p_order ) {
+		if ( $poc['desc'] && $poc['order'] == 'p_order' ) {
 			wppa_add_inline_script( 'wppa-admin', 'var wppaSeqnoDesc=true;', false );
 		}
 		else {
 			wppa_add_inline_script( 'wppa-admin', 'var wppaSeqnoDesc=false;', false );
 		}
 
-		$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $album, $photoorder ), ARRAY_A );
+		$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $album, $poc['order'] ), ARRAY_A );
 		wppa_echo( wppa_show_query( true ) );
 
 		$link 	= get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit-id='.$album.'&bulk=1'.'&wppa-nonce=' . wp_create_nonce('wppa-nonce');
 		$size 	= '180';
 
 		if ( $photos ) {
-			if ( ! $is_p_order ) wppa_warning_message( __( 'Setting photo sequence has only effect if the photo sequence method is set to <b>Sequence #</b>' , 'wp-photo-album-plus' ) );
+			if ( $poc['order'] != 'p_order' ) wppa_warning_message( __( 'Setting photo sequence has only effect if the photo sequence method is set to <b>Sequence #</b>' , 'wp-photo-album-plus' ) );
 
 			$result = '
 			<div class="widefat wppa-photo-admin-sortable" style="border-color:#cccccc">
@@ -4476,7 +4478,7 @@ global $wpdb;
 
 	// Close form
 	$result .= '</form>';
-	$result .= '<div style="clear:both"></div>';
+	$result .= wppa_div_clear();
 
 
 	// Nicescroller

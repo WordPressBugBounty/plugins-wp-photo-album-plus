@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version: 9.2.04.003
+* Version: 9.3.00.001
 *
 */
 
@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) exit();
 
 function wppa_backup_settings() {
 global $wppa_opt;
-
 
 	// Make contents
 	$contents = '';
@@ -202,28 +201,28 @@ global $wpdb;
 function wppa_update_message( $msg, $fixed = false, $id = '' ) {
 
 	if ( defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) return;
-	wppa_echo( '<div class="notice notice-info is-dismissible" ><p>' . $msg . '</p></div>' );
+	wppa_echo( wppa_html_tag( 'div', ['class' => 'notice notice-info is-dismissible'], wppa_html_tag( 'p', [], $msg ) ) );
 }
 
 // display error message
 function wppa_error_message( $msg ) {
 
 	if ( defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) return;
-	wppa_echo( '<div class="notice notice-error is-dismissible"><p>' . $msg . '</p></div>' );
+	wppa_echo( wppa_html_tag( 'div', ['class' => 'notice notice-error is-dismissible'], wppa_html_tag( 'p', [], $msg ) ) );
 }
 
 // display warning message
 function wppa_warning_message( $msg ) {
 
 	if ( defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) return;
-	wppa_echo( '<div class="notice notice-warning is-dismissible"><p>' . $msg . '</p></div>' );
+	wppa_echo( wppa_html_tag( 'div', ['class' => 'notice notice-warning is-dismissible'], wppa_html_tag( 'p', [], $msg ) ) );
 }
 
 // display ok message
 function wppa_ok_message( $msg ) {
 
 	if ( defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) return;
-	wppa_echo( '<div class="notice notice-success is-dismissible"><p>' . $msg . '</p></div>' );
+	wppa_echo( wppa_html_tag( 'div', ['class' => 'notice notice-success is-dismissible'], wppa_html_tag( 'p', [], $msg ) ) );
 }
 
 function wppa_check_numeric( $value, $minval, $target, $maxval = '' ) {
@@ -992,7 +991,7 @@ function wppa_ea_url( $edit_id, $tab = 'edit' ) {
 
 	$nonce = wp_create_nonce( 'wppa-nonce' );
 
-	return get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=' . $tab . '&amp;edit-id=' . $edit_id . '&amp;wppa-nonce=' . $nonce;
+	return get_admin_url() . 'admin.php?page=wppa_admin_menu&tab=' . $tab . '&edit-id=' . $edit_id . '&wppa-nonce=' . $nonce;
 }
 
 // Convert a non 360 deg spheric panorama photo to 360 deg by padding
@@ -1149,129 +1148,84 @@ function wppa_admin_pagination( $pagesize, $current, $total_items, $url, $which 
 
 	// Overall wrapper, for bottom only
 	if ( $which == 'bottom' ) {
-		$output .= '<div class="test" style="line-height:2.1em;margin-top:6px;">';
+		$output .= wppa_html_tag( 'div', ['style' => 'line-height:2.1em;margin-top:6px;'], false );
 	}
 
 	// Inner wrapper
-	$output .= '<div class="wppa-admin-pagination">';
+	$output .= wppa_html_tag( 'div', ['class' => 'wppa-admin-pagination'], false );
 
 	// Total number of items
-	$output .= '
-			<span class="displaying-num">' .
-				sprintf(
-				/* translators: %s: Number of items. */
-				_n( '%s item', '%s items', $total_items, 'wp-photo-album-plus' ),
-				number_format_i18n( $total_items ) ) . '
-			</span>';
+	/* translators: %s: Number of items. */
+	$cont = sprintf( _n( '%s item', '%s items', $total_items, 'wp-photo-album-plus' ), number_format_i18n( $total_items ) ) . ' ';
+	$output .= wppa_html_tag( 'span', ['class' => 'displaying-num'], $cont );
 
 	// Start pagination links
-	$output .= '<span class="pagination-links">';
+	$output .= wppa_html_tag( 'span', ['class' => 'pagination-links'], false );
 
 	// First indicator / button
 	if ( $disable_first ) {
-		$output .= '
-		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</span>';
+		$output .= wppa_html_tag( 'span', ['class' => 'tablenav-pages-navspan button disabled'],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	} else {
-		$output .= '
-		<a class="first-page button" href="' . esc_url( add_query_arg( 'paged', 1, $current_url ) ) . '">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'class' => 'nolazy', 'title' => __( 'First page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</a>';
+		$output .= wppa_html_tag( 'a', ['class' => 'first-page button', 'href' => add_query_arg( 'paged', 1, $current_url )],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-3.svg'), 'class' => 'nolazy', 'title' => __( 'First page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	}
 
 	// Prev indicator / button
 	if ( $disable_prev ) {
-		$output .= '
-		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</span>';
+		$output .= wppa_html_tag( 'span', ['class' => 'tablenav-pages-navspan button disabled'],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	} else {
-		$output .= '
-		<a class="prev-page button" href="' . esc_url( add_query_arg( 'paged', max( 1, $current - 1 ) ) ) . '">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'class' => 'nolazy', 'title' => __( 'Previous page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</a>';
+		$output .= wppa_html_tag( 'a', ['class' => 'prev-page button', 'href' => add_query_arg( 'paged', max( 1, $current - 1 ) )],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Left-2.svg'), 'class' => 'nolazy', 'title' => __( 'Previous page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	}
 
 	// Current page selector
-	$output .= '
-	<span class="paging-input" style="padding-right:5px;">';
-		$cur = '
-		<input
-			class="current-page"
-			style="cursor:pointer"
-			id="current-page-selector"
-			type="text"
-			name="paged"
-			title="'.esc_attr__( 'Current page', 'wp-photo-album-plus' ).'"
-			value="'.$current.'"
-			size="'.strlen( $total_pages ).'"
-			onchange="document.location.href=\''.esc_url( remove_query_arg( 'paged' ) ).'&paged=\'+Math.min(Math.max(parseInt(this.value)||1,1),'.$total_pages.')"
-		/>';
-		$tot = '<span class="total-pages">'.number_format_i18n( $total_pages ) .'</span>';
-
-		$output .= sprintf(
-
-		/* translators: 1: Current page, 2: Total pages. */
-		__( '%1$s of %2$s', 'wp-photo-album-plus' ),
-		$cur,
-		$tot ) . '
-	</span>';
+	$output .= wppa_html_tag( 'span', ['class' => 'paging-input', 'style' => 'padding-right:5px;'],
+		wppa_html_tag( 'input', ['class' => 'current-page', 'style' => 'cursor:pointer', 'id' => 'current-page-selector', 'type' => 'text', 'name' => 'paged',
+								 'title' => __( 'Current page', 'wp-photo-album-plus' ), 'value' => $current, 'size' => strlen( $total_pages ),
+								 'onchange' => 'document.location.href=\''.esc_url( remove_query_arg( 'paged' ) ).'&paged=\'+Math.min(Math.max(parseInt(this.value)||1,1),'.$total_pages.')'] ) .
+		' ' . __( 'of', 'wp-photo-album-plus' ) . ' ' .
+		wppa_html_tag( 'span', ['class' => 'total-pages'], $total_pages ) );
 
 	// Next button / indicator
 	if ( $disable_next ) {
-		$output .= '
-		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</span>';
+		$output .= wppa_html_tag( 'span', ['class' => 'tablenav-pages-navspan button disabled'],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	} else {
-		$output .= '
-		<a class="next-page button" href="'.esc_url( add_query_arg( 'paged', min( $total_pages, $current + 1 ), $current_url ) ).'">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'class' => 'nolazy', 'title' => __( 'Next page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</a>';
+		$output .= wppa_html_tag( 'a', ['class' => 'next-page button', 'href' => add_query_arg( 'paged', min( $total_pages, $current + 1 ), $current_url )],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-2.svg'), 'class' => 'nolazy', 'title' => __( 'Next page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	}
 
 	// Last button / indicator
 	if ( $disable_last ) {
-		$output .= '
-		<span class="tablenav-pages-navspan button disabled">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</span>';
+		$output .= wppa_html_tag( 'span', ['class' => 'tablenav-pages-navspan button disabled'],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'class' => 'nolazy', 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	} else {
-		$output .= '
-		<a class="last-page button" href="'.esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ).'">' .
-			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'class' => 'nolazy', 'title' => __( 'Last page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) . '
-		</a>';
+		$output .= wppa_html_tag( 'a', ['class' => 'last-page button', 'href' => add_query_arg( 'paged', $total_pages, $current_url )],
+			wppa_html_tag( 'img', ['src' => wppa_get_imgdir('Right-3.svg'), 'class' => 'nolazy', 'title' => __( 'Last page', 'wp-photo-album-plus' ), 'style' => 'height:1em;margin-bottom:-1px;'] ) );
 	}
 
 	// The pagesize selectionbox
-//	if ( $which == 'top' ) {
-		$output .= ' ' .
-		__( 'Pagesize', 'wp-photo-album-plus' ) . '
-		<select style="vertical-align:top"
-			onchange="jQuery( \'#wppa-admin-spinner\' ).show();document.location.href=\''.$link.'1&wppa-pagesize=\'+this.value;">
-			<option value="10"' . ( $pagesize == 10 ? ' selected' : '' ) . '>10</option>
-			<option value="20"' . ( $pagesize == 20 ? ' selected' : '' ) . '>20</option>
-			<option value="50"' . ( $pagesize == 50 ? ' selected' : '' ) . '>50</option>
-			<option value="100"' . ( $pagesize == 100 ? ' selected' : '' ) . '>100</option>
-			<option value="200"' . ( $pagesize == 200 ? ' selected' : '' ) . '>200</option>
-			<option value="500"' . ( $pagesize == 500 ? ' selected' : '' ) . '>500</option>
-			<option value="1000"' . ( $pagesize == 1000 ? ' selected' : '' ) . '>1000</option>
-			<option value="2000"' . ( $pagesize == 2000 ? ' selected' : '' ) . '>2000</option>
-			<option value="5000"' . ( $pagesize == 5000 ? ' selected' : '' ) . '>5000</option>
-			<option value="10000"' . ( $pagesize == 10000 ? ' selected' : '' ) . '>10000</option>
-		</select>';
-//	}
+	$output .= ' ' . __( 'Pagesize', 'wp-photo-album-plus' ) . ' ' .
+		wppa_html_tag( 'select', ['style' => 'vertical-align:top', 'onchange' => 'jQuery( \'#wppa-admin-spinner\' ).show();document.location.href=\''.esc_url($link).'1&wppa-pagesize=\'+this.value;'],
+			wppa_html_tag( 'option', ['value' => '10', $pagesize == 10 ? 'selected' : ''], 10 ) .
+			wppa_html_tag( 'option', ['value' => '20', $pagesize == 20 ? 'selected' : ''], 20 ) .
+			wppa_html_tag( 'option', ['value' => '50', $pagesize == 50 ? 'selected' : ''], 50 ) .
+			wppa_html_tag( 'option', ['value' => '100', $pagesize == 100 ? 'selected' : ''], 100 ) .
+			wppa_html_tag( 'option', ['value' => '200', $pagesize == 200 ? 'selected' : ''], 200 ) .
+			wppa_html_tag( 'option', ['value' => '500', $pagesize == 500 ? 'selected' : ''], 500 ) .
+			wppa_html_tag( 'option', ['value' => '1000', $pagesize == 1000 ? 'selected' : ''], 1000 ) );
 
 	// Close pagination links
-	$output .= '</span>';
+	$output .= wppa_close_tag( 'span', false, true );
 
 	// Close overall inner
-	$output .= '</div>';
+	$output .= wppa_close_tag( 'div', false, true );
 
 	// Close overall wrapper, bottom only
 	if ( $which == 'bottom' ) {
-		$output .= '</div>';
+		$output .= wppa_close_tag( 'div', false, true );
 	}
 
 	// Done
@@ -1318,7 +1272,7 @@ static $p1_overrule;
 	}
 
 	// Pagesize
-	$all_parms[$slug]['pagesize'] = wppa_get( 'pagesize', $all_parms[$slug]['pagesize'], 'int' );
+	$all_parms[$slug]['pagesize'] = min( wppa_get( 'pagesize', $all_parms[$slug]['pagesize'], 'int' ), 1000 );
 
 	set_transient( 'wppa_paging_parms_' . $user_id, $all_parms, MONTH_IN_SECONDS );
 	return $all_parms[$slug];
@@ -1409,8 +1363,6 @@ static $wppa_statarray;
 		return '';
 	}
 }
-
-
 
 // Get the pdf to album conversion parms
 // Arg 1: id of the pdf

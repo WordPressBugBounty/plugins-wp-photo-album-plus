@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 9.1.13.005
+* Version 9.3.00.001
 *
 */
 
@@ -289,11 +289,11 @@ function wppa_get_picture_html( $args ) {
 		$result .= '
 		<iframe
 			id="pdf-' . $id . '-' . $mocc . '"
-			src="' . $href . '" ' .
+			src="' . esc_url( $href ) . '" ' .
 			wppa_get_imgalt( $id ) .
 			( $class ? ' class="' . $class . '" ' : '' ) .
 			( $title ? ' title="' . $title . '" ' : '' ) . '
-			style="' . $style . '"
+			style="' . esc_attr( $style ) . '"
 		>
 		</iframe>';
 	}

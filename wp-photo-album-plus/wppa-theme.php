@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the albums/photos/slideshow in a page or post
-* Version 9.1.10.009
+* Version 9.3.00.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -596,63 +596,63 @@ function wppa_get_extra_url() {
 
 	// occur
 	$occur = wppa_get( 'occur', wppa( 'mocc' ) );
-	$extra_url .= '&amp;wppa-occur=' . $occur;
+	$extra_url .= '&wppa-occur=' . $occur;
 
 	// cover
 	$cover = wppa_get( 'cover', wppa( 'is_cover' ) );
 	if ( ! $cover ) $cover = 0;
-	$extra_url .= '&amp;wppa-cover='.$cover;
+	$extra_url .= '&wppa-cover='.$cover;
 
 	// album
 	$album = wppa_get( 'album', wppa( 'start_album' ) );
-	if ( $album ) $extra_url .= '&amp;wppa-album='.$album;
+	if ( $album ) $extra_url .= '&wppa-album='.$album;
 
 	// slide or photo
 	$slide = wppa_get( 'slide', wppa( 'is_slide' ) );
-	if ( $slide ) $extra_url .= '&amp;wppa-slide=1';
+	if ( $slide ) $extra_url .= '&wppa-slide=1';
 
 	// Photo
 	$photo = wppa_get( 'photo', wppa( 'start_photo' ) );
-	if ( $photo ) $extra_url .= '&amp;wppa-photo=' . wppa_get( 'photo' );
+	if ( $photo ) $extra_url .= '&wppa-photo=' . wppa_get( 'photo' );
 
 	// Topten?
-	if ( wppa( 'is_topten' ) ) $extra_url .= '&amp;wppa-topten='.wppa( 'is_topten' );
+	if ( wppa( 'is_topten' ) ) $extra_url .= '&wppa-topten='.wppa( 'is_topten' );
 
 	// Lasten?
-	if ( wppa( 'is_lasten' ) ) $extra_url .= '&amp;wppa-lasten='.wppa( 'lasten_count' );
+	if ( wppa( 'is_lasten' ) ) $extra_url .= '&wppa-lasten='.wppa( 'lasten_count' );
 
 	// Comten?
-	if ( wppa( 'is_comten' ) ) $extra_url .= '&amp;wppa-comten='.wppa( 'comten_count' );
+	if ( wppa( 'is_comten' ) ) $extra_url .= '&wppa-comten='.wppa( 'comten_count' );
 
 	// Featen?
-	if ( wppa( 'is_featen' ) ) $extra_url .= '&amp;wppa-featen='.wppa( 'featen_count' );
+	if ( wppa( 'is_featen' ) ) $extra_url .= '&wppa-featen='.wppa( 'featen_count' );
 
 	// Tag?
-	if ( wppa( 'is_tag' ) && ! wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-tag='.wppa( 'is_tag' );
+	if ( wppa( 'is_tag' ) && ! wppa( 'is_related' ) ) $extra_url .= '&wppa-tag='.wppa( 'is_tag' );
 
 	// Search?
-	if ( wppa( 'src' ) && ! wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-searchstring='.urlencode( wppa( 'searchstring' ) );
+	if ( wppa( 'src' ) && ! wppa( 'is_related' ) ) $extra_url .= '&wppa-searchstring='.urlencode( wppa( 'searchstring' ) );
 
 	// Supersearch?
-	if ( wppa( 'supersearch' ) ) $extra_url .= '&amp;wppa-supersearch=' . str_replace( '/', '%2F', urlencode( wppa( 'supersearch' ) ) );
+	if ( wppa( 'supersearch' ) ) $extra_url .= '&wppa-supersearch=' . str_replace( '/', '%2F', urlencode( wppa( 'supersearch' ) ) );
 
 	// Related
-	if ( wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-rel='.wppa( 'is_related' ).'&amp;wppa-relcount='.wppa( 'related_count' );
+	if ( wppa( 'is_related' ) ) $extra_url .= '&wppa-rel='.wppa( 'is_related' ).'&wppa-relcount='.wppa( 'related_count' );
 
 	// Uploader?
-	if ( wppa( 'is_upldr' ) ) $extra_url .= '&amp;wppa-upldr='.wppa( 'is_upldr' );
+	if ( wppa( 'is_upldr' ) ) $extra_url .= '&wppa-upldr='.wppa( 'is_upldr' );
 
 	// Calendar ?
-	if ( wppa( 'calendar' ) ) $extra_url .= '&amp;wppa-calendar='.wppa( 'calendar' ).'&amp;wppa-caldate='.wppa( 'caldate' );
+	if ( wppa( 'calendar' ) ) $extra_url .= '&wppa-calendar='.wppa( 'calendar' ).'&wppa-caldate='.wppa( 'caldate' );
 
 	// Photos only?
-	if ( wppa( 'photos_only' ) ) $extra_url .= '&amp;wppa-photos-only=1';
+	if ( wppa( 'photos_only' ) ) $extra_url .= '&wppa-photos-only=1';
 
 	// Albums only?
-	if ( wppa( 'albums_only' ) ) $extra_url .= '&amp;wppa-albums-only=1';
+	if ( wppa( 'albums_only' ) ) $extra_url .= '&wppa-albums-only=1';
 
 	// Inverse?
-	if ( wppa( 'is_inverse' ) ) $extra_url .= '&amp;wppa-inv=1';
+	if ( wppa( 'is_inverse' ) ) $extra_url .= '&wppa-inv=1';
 
 	return $extra_url;
 }

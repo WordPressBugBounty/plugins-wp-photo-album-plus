@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.2.10.003
+* Version 9.3.00.002
 *
 */
 
@@ -472,7 +472,7 @@ global $wppa_session;
 	$pagelink 		= get_page_link( $page );
 	$cansubsearch  	= $sub && $wppa_session['use_searchstring'];
 	$value 			= $cansubsearch ? '' : wppa_test_for_search( true );
-	$root 			= isset( $wppa_session['search_root'] ) ? $wppa_session['search_root'] : '';;
+	$root 			= isset( $wppa_session['search_root'] ) ? $wppa_session['search_root'] : '';
 	$rootboxset 	= $root ? '' : 'checked="checked" disabled';
 	$fontsize 		= wppa_in_widget() ? 'font-size: 9px;' : '';
 	$mocc 			= wppa( 'mocc' );
@@ -1482,10 +1482,10 @@ function wppa_get_tagcloud_html( $seltags = '', $minsize = '8', $maxsize = '24' 
 			$hr = wppa_get_permalink( $page );
 		}
 		if ( wppa_opt( 'tagcloud_linktype' ) == 'album' ) {
-			$hr .= 'wppa-album=0&amp;wppa-cover=0&amp;wppa-occur='.$oc;
+			$hr .= 'wppa-album=0&wppa-cover=0&wppa-occur='.$oc;
 		}
 		if ( wppa_opt( 'tagcloud_linktype' ) == 'slide' ) {
-			$hr .= 'wppa-album=0&amp;wppa-cover=0&amp;wppa-occur='.$oc.'&amp;slide';
+			$hr .= 'wppa-album=0&wppa-cover=0&wppa-occur='.$oc.'&slide';
 		}
 	}
 	else {
@@ -1504,7 +1504,7 @@ function wppa_get_tagcloud_html( $seltags = '', $minsize = '8', $maxsize = '24' 
 		$selarr = $seltags ? explode( ',', $seltags ) : array();
 		foreach ( $tags as $tag ) {
 			if ( ! $seltags || in_array( $tag['tag'], $selarr ) ) {
-				$href 		= $hr . '&amp;wppa-tag=' . urlencode( $tag['tag'] );
+				$href 		= $hr . '&wppa-tag=' . urlencode( $tag['tag'] );
 				$href 		= wppa_encrypt_url( $href );
 				$title 		= sprintf( '%d photos - %s%%', $tag['count'], $tag['fraction'] * 100 );
 				$name 		= $tag['tag'];
@@ -1534,7 +1534,7 @@ function wppa_get_tagcloud_html( $seltags = '', $minsize = '8', $maxsize = '24' 
 			}
 		}
 		if ( wppa_switch( 'empty_tags' ) ) {
-			$href = $hr . '&amp;wppa-tag=-none-';
+			$href = $hr . '&wppa-tag=-none-';
 			$result .=
 			wppa_html_tag( 'a', ['href' => $href, 'title' => __('Items without tags', 'wp-photo-album-plus'), 'style' => "font-size:1em;"], wppa_translate( '-none-' ) );
 		}
@@ -1609,14 +1609,15 @@ global $wppa_lang;
 
 	$res_mocc = wppa_switch( 'ownersel_below' ) ? $mocc + 1 : $mocc - 1;
 	$url = wppa_get_permalink('',true).'?wppa-occur='.$res_mocc.$l.'&wppa-photos-only=1&wppa-upldr=\'+this.value+\'&wppa-cover=0&vt=1';
-	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.$res_mocc.$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value,\''.$url.'\')';
+	$ajx = wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.$res_mocc.$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value';
+	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.esc_url($ajx).',\''.esc_url($url).'\')';
 
-	$result = '<select id="wppa-ownerselection-'.$mocc.'" name="wppa-ownerselection-'.$mocc.'" onchange="'.esc_attr($onchange).'">';
-	$result .= '<option id="dummy" value="" disabled selected>' . __('Please select a user', 'wp-photo-album-plus') . '</option>';
+	$options = wppa_html_tag( 'option', [/*'id' => 'dummy', 'value' => 'dummy',*/ 'disabled' => 'disabled', 'selected' => 'selected'], __('Please select a user', 'wp-photo-album-plus') );
 	foreach( $owners as $owner ) {
-		$result .= '<option id="wppa-owner-' . esc_attr( $owner['owner'] ) . '" value="' . esc_attr( $owner['owner'] ) . '" >' . $owner['name'] . '</option>';
+		$options .= wppa_html_tag( 'option', ['id' => 'wppa-owner-' . $owner['owner'], 'value' => $owner['owner']], $owner['name'] );
 	}
-	$result .= '</select>';
+
+	$result = wppa_html_tag( 'select', ['id' => 'wppa-ownerselection-'.$mocc, 'name' => 'wppa-ownerselection-'.$mocc, 'onchange' => $onchange], $options );
 
 	return $result;
 
@@ -1659,7 +1660,6 @@ function wppa_get_multitag_html( $nperline = '2', $seltags = '' ) {
 		else {
 			$hr = wppa_get_permalink( $page );
 		}
-		$hr = str_replace( '&amp;', '&', $hr );
 		if ( wppa_opt( 'multitag_linktype' ) == 'album' ) {
 			$hr .= 'wppa-album=0&wppa-cover=0&wppa-occur='.$oc;
 		}
@@ -1881,7 +1881,6 @@ global $wppa_fb_init_done;
 	}
 	else {
 		$share_url = wppa_get_image_page_url_by_id( $id, wppa_switch( 'share_single_image' ) );
-		$share_url = str_replace( '&amp;', '&', $share_url );
 	}
 
 	$share_url = wppa_convert_to_pretty( wppa_encrypt_url( $share_url ), 'nonames' );
@@ -2342,9 +2341,9 @@ global $wppa_fb_init_done;
 		$wppa_fb_init_done = true;
 	}
 
-	$result = 	'<div style="clear:both"></div>' .
+	$result = 	wppa_div_clear() .
 				$qr . $tw . $pi . $li . $fb .
-				'<div style="clear:both"></div>';
+				wppa_div_clear();
 
 	return $result;
 
@@ -2540,12 +2539,12 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 	// Create the return url
 	$returnurl = wppa_get_permalink();
 	if ( $where == 'cover' ) {
-		$returnurl .= 'wppa-album=' . $parent . '&amp;wppa-cover=0&amp;wppa-occur=' . $occur;
+		$returnurl .= 'wppa-album=' . $parent . '&wppa-cover=0&wppa-occur=' . $occur;
 	}
 	elseif ( $where == 'thumb' ) {
-		$returnurl .= 'wppa-album=' . $parent . '&amp;wppa-cover=0&amp;wppa-occur=' . $occur;
+		$returnurl .= 'wppa-album=' . $parent . '&wppa-cover=0&wppa-occur=' . $occur;
 	}
-	if ( wppa( 'page' ) ) $returnurl .= '&amp;wppa-paged=' . wppa( 'page' );
+	if ( wppa( 'page' ) ) $returnurl .= '&wppa-paged=' . wppa( 'page' );
 	$returnurl = trim( $returnurl, '?' );
 	$returnurl = wppa_trim_wppa_( $returnurl );
 	$t = $mcr ? 'mcr-' : '';
@@ -2688,7 +2687,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 					$result .= '
 					<div style="float:left; margin: 6px 0">
 						<div style="float:left">' .
-							wppa_make_captcha( wppa_get_randseed( 'session' ) ) . '
+							wppa_make_captcha( wppa_get_randseed() ) . '
 						</div>
 						<input
 							type="text"
@@ -2787,7 +2786,7 @@ static $albums_granted;
 	$cralb 	= wppa_encrypt_album( $yalb );
 
 	// Open wrapper
-	$result = '<div style="clear:both"></div>';//<div id="fe-upl-wrap-' . $mocc . '" style="background-color:#FFC">';
+	$result = wppa_div_clear();//<div id="fe-upl-wrap-' . $mocc . '" style="background-color:#FFC">';
 
 	// Using seqno to distinguish from different places within one occurrence because
 	// the album no is not known when there is a selection box.
@@ -2908,7 +2907,7 @@ static $albums_granted;
 	$big = ! $small;
 
 	// Create the return url
-	$returnurl = wppa_get_ajaxlink( 'plain' ) . '&amp;wppa-action=do-fe-upload';
+	$returnurl = wppa_get_ajaxlink( 'plain' ) . '&wppa-action=do-fe-upload';
 
 	// Make the HTML
 	$t = $mcr ? 'mcr-' : '';
@@ -3602,7 +3601,7 @@ static $albums_granted;
 		}
 
 		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
-		$ajax_url_after_upload = str_replace( '&amp;', '&', wppa_get_ajaxlink() ) . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
+		$ajax_url_after_upload = wppa_get_ajaxlink() . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
 		$on_complete = 'wppaDoAjaxRender(event, ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' );return false;';
 	}
 	else {
@@ -3659,14 +3658,14 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 	// Create the return url
 	$returnurl = wppa_get_permalink();
 	if ( $where == 'cover' ) {
-		$returnurl .= 'wppa-album=' . $alb . '&amp;wppa-cover=1&amp;wppa-occur=' . wppa( 'mocc' );
+		$returnurl .= 'wppa-album=' . $alb . '&wppa-cover=1&wppa-occur=' . wppa( 'mocc' );
 	}
 	elseif ( $where == 'thumb' ) {
-		$returnurl .= 'wppa-album=' . $alb . '&amp;wppa-cover=0&amp;wppa-occur=' . wppa( 'mocc' );
+		$returnurl .= 'wppa-album=' . $alb . '&wppa-cover=0&wppa-occur=' . wppa( 'mocc' );
 	}
 //	elseif ( $where == 'widget' || $where == 'uploadbox' ) {
 //	}
-	if ( wppa( 'page' ) ) $returnurl .= '&amp;wppa-paged=' . wppa( 'page' );
+	if ( wppa( 'page' ) ) $returnurl .= '&wppa-paged=' . wppa( 'page' );
 	$returnurl = trim( $returnurl, '?' );
 
 	$returnurl = wppa_encrypt_url( $returnurl );
@@ -4533,7 +4532,7 @@ global $wpdb;
 					'</tbody>' .
 				'</table>' .
 			'</div>' .
-			'<div style="clear:both"></div>';
+			wppa_div_clear();
 
 	return $result;
 }
@@ -4634,7 +4633,7 @@ global $wppa_iptc_cache;
 					'</a>';
 
 		$result .=
-				'<div style="clear:both"></div>' .
+				wppa_div_clear() .
 					'<table class="wppa-iptc-table-'.wppa( 'mocc' ).' wppa-detail" style="border:0 none; margin:0;'.$d2.'" >' .
 						'<tbody>';
 		$oldtag = '';
@@ -4752,7 +4751,7 @@ global $wppa_exif_cache;
 						__( 'Hide EXIF data', 'wp-photo-album-plus' ) .
 					'</a>';
 
-		$result .= 	'<div style="clear:both"></div>' .
+		$result .= 	wppa_div_clear() .
 					'<table' .
 						' class="wppa-exif-table-'.wppa( 'mocc' ).' wppa-detail"' .
 						' style="'.$d2.' border:0 none; margin:0;"' .
@@ -5087,23 +5086,23 @@ global $other_deps;
 						elseif ( $linktype != 'none' ) {
 							switch ( $linktype ) {
 								case 'owneralbums':
-									$href = wppa_get_permalink( $page ).'wppa-cover=1&amp;wppa-owner='.$thumb['owner'].'&amp;wppa-occur=1';
+									$href = wppa_get_permalink( $page ).'wppa-cover=1&wppa-owner='.$thumb['owner'].'&wppa-occur=1';
 									$title = __( 'See the authors albums', 'wp-photo-album-plus' );
 									break;
 								case 'ownerphotos':
-									$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-owner='.$thumb['owner'].'&photos-only&amp;wppa-occur=1';
+									$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-owner='.$thumb['owner'].'&photos-only&wppa-occur=1';
 									$title = __( 'See the authors photos', 'wp-photo-album-plus' );
 									break;
 								case 'upldrphotos':
-									$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-upldr='.$thumb['owner'].'&amp;wppa-occur=1';
+									$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-upldr='.$thumb['owner'].'&wppa-occur=1';
 									$title = __( 'See all the authors photos', 'wp-photo-album-plus' );
 									break;
 								case 'ownerphotosslide':
-									$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-owner='.$thumb['owner'].'&photos-only&amp;wppa-occur=1&slide';
+									$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-owner='.$thumb['owner'].'&photos-only&wppa-occur=1&slide';
 									$title = __( 'See the authors photos', 'wp-photo-album-plus' );
 									break;
 								case 'upldrphotosslide':
-									$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-upldr='.$thumb['owner'].'&amp;wppa-occur=1&slide';
+									$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-upldr='.$thumb['owner'].'&wppa-occur=1&slide';
 									$title = __( 'See all the authors photos', 'wp-photo-album-plus' );
 									break;
 								default:
@@ -5177,7 +5176,7 @@ global $other_deps;
 							}
 
 						$result .= '</div>';
-						$result .= '<div style="clear:both"></div>';
+						$result .= wppa_div_clear();
 
 					$result .= "\n".'</div>';
 				}
@@ -5200,23 +5199,23 @@ global $other_deps;
 				if ( $linktype != 'none' ) {
 					switch ( $linktype ) {
 						case 'owneralbums':
-							$href = wppa_get_permalink( $page ).'wppa-cover=1&amp;wppa-owner='.$data[$author]['owner'].'&amp;wppa-occur=1';
+							$href = wppa_get_permalink( $page ).'wppa-cover=1&wppa-owner='.$data[$author]['owner'].'&wppa-occur=1';
 							$title = __( 'See the authors albums', 'wp-photo-album-plus' );
 							break;
 						case 'ownerphotos':
-							$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-owner='.$data[$author]['owner'].'&amp;photos-only=1&amp;wppa-occur=1';
+							$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-owner='.$data[$author]['owner'].'&photos-only=1&wppa-occur=1';
 							$title = __( 'See the authors photos', 'wp-photo-album-plus' );
 							break;
 						case 'ownerphotosslide':
-							$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-owner='.$data[$author]['owner'].'&amp;slide=1&amp;wppa-occur=1';
+							$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-owner='.$data[$author]['owner'].'&slide=1&wppa-occur=1';
 							$title = __( 'See the authors photos in a slideshow', 'wp-photo-album-plus' );
 							break;
 						case 'upldrphotos':
-							$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-upldr='.$data[$author]['owner'].'&amp;wppa-occur=1';
+							$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-upldr='.$data[$author]['owner'].'&wppa-occur=1';
 							$title = __( 'See all the authors photos', 'wp-photo-album-plus' );
 							break;
 						case 'upldrphotosslide':
-							$href = wppa_get_permalink( $page ).'wppa-cover=0&amp;wppa-upldr='.$data[$author]['owner'].'&amp;wppa-occur=1&amp;slide=1';
+							$href = wppa_get_permalink( $page ).'wppa-cover=0&wppa-upldr='.$data[$author]['owner'].'&wppa-occur=1&slide=1';
 							$title = __( 'See all the authors photos', 'wp-photo-album-plus' );
 							break;
 						default:
@@ -6148,11 +6147,11 @@ function wppa_get_real_calendar_link( $year, $month ) {
 	}
 	$album = str_replace( ',', '.', wppa_expand_enum( wppa( 'start_album' ) ) );
 	$result = wppa_encrypt_url( wppa_get_ajaxlink() .
-								'wppa-calendar=' . wppa( 'calendar' ) . '&amp;' .
-								'wppa-calendar-year=' . $year . '&amp;' .
-								'wppa-calendar-month=' . $month . '&amp;' .
-								( $album ? 'wppa-album=' . $album . '&amp;' : '' ) .
-								( wppa( 'cache' ) ? 'wppa-cache=1&amp;' : '' ) .
+								'wppa-calendar=' . wppa( 'calendar' ) . '&' .
+								'wppa-calendar-year=' . $year . '&' .
+								'wppa-calendar-month=' . $month . '&' .
+								( $album ? 'wppa-album=' . $album . '&' : '' ) .
+								( wppa( 'cache' ) ? 'wppa-cache=1&' : '' ) .
 								'wppa-occur=' . wppa( 'mocc' )
 								);
 

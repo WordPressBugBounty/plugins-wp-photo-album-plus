@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 9.0.00.000
+* Version 9.3.00.001
 *
 */
 
@@ -258,7 +258,7 @@ global $wppa_subtab_names;
 	// Make the htnl
 	$result = '
 	<div
-		style="display:' . $display . ';;"
+		style="display:' . $display . ';"
 		class="' . $switch . '" >
 		&nbsp;' . __( 'See also', 'wp-photo-album-plus' ) . ':&nbsp;
 		<a

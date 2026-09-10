@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the interface to SCABN
-* Version 8.7.03.002
+* Version 9.3.00.001
 *
 */
 
@@ -50,7 +50,6 @@ global $wppa_session;
 	// Thumbnail vieuw?
 	else {
 		$action_url = wppa_get_thumb_callback_url();
-		if ( ! strpos( $action_url, '&amp;' ) ) $action_url = str_replace( '&', '&amp;', $action_url );
 		$item_url 	= wppa_get_slide_callback_url( $thumb['id'] ) . '&wppa-single=1';
 		$action_url = wppa_convert_to_pretty( $action_url );
 		$item_url 	= wppa_convert_to_pretty( $item_url );

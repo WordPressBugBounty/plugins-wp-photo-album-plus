@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.2.01.001
+* Version: 9.3.00.003
 *
 */
 
@@ -278,7 +278,7 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 				$quality = '-quality ' . $q;
 			}
 
-			$iret = wppa_image_magick( 'convert ' . $file . ' ' . $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height . ' ' . $newimage );
+			$iret = wppa_image_magick( 'convert ' . escapeshellarg($file) . ' ' . $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height . ' ' . escapeshellarg($newimage) );
 			if ( $iret ) {
 				wppa_log( 'fso', 'Magick could not create ' . $newimage );
 			}
@@ -1176,7 +1176,7 @@ global $wpdb;
 
 	wppa_log( $log, "Conversion of {b}$album_name{/b} ($alb) completed. Total {b}$page{/b} pages" );
 	$url 	= wppa_ea_url( wppa_encrypt_album( $alb ) );
-	$link 	= '<a href="' . $url . '">' . $album_name . '</a>';
+	$link 	= '<a href="' . esc_url( $url ) . '">' . $album_name . '</a>';
 	wppa_update_pdf_conv_parms( $id, ['ready' => true] );
 	/* translators: intreger pagecount */
 	return sprintf( __( 'Conversion completed. %d pages total', 'wp-photo-album-plus' ), $page ) . ' ' .

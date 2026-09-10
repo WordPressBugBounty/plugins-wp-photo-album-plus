@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.2.10.004
+* Version: 9.3.00.003
 *
 */
 
@@ -602,7 +602,7 @@ global $wpdb;
 	$data = wp_strip_all_tags( $data );
 	$data = str_replace( array( '<', '>' ), ' ', $data );
 	$data = strip_shortcodes( $data );
-	$data = str_replace( array( '&amp;', "'" ), '', $data );
+//	$data = str_replace( array( '&amp;', "'" ), '', $data );
 	$data = str_replace( array( '&', '#', '$' ), ';', $data );
 	$data = str_replace( array( '(', ')', '[', ']', '{', '}', ':', '=' ), ' ', $data );
 	$data = str_replace( ' ', ';', $data );
@@ -979,6 +979,15 @@ global $wppa;
 	$total_ids 			= false;
 	$max 				= 0;
 
+	// Find sequence
+	if ( wppa_is_posint( wppa( 'start_album' ) ) ) {
+		$a = wppa( 'start_album' );
+	}
+	else {
+		$a = 0;
+	}
+	$poc = wppa_get_poc_a( $a );
+
 	// If paginated search, use saved result
 	if ( wppa_get( 'usr', '', 'text' ) ) {
 		$wppa['usr'] = 1;
@@ -992,24 +1001,6 @@ global $wppa;
 	// Convert album name to number
 	if ( substr( wppa( 'start_album' ), 0, 1 ) == '$' ) {
 		wppa( 'start_album', wppa_album_name_to_number( wppa( 'start_album' ) ) );
-	}
-
-	// Find sequence
-	if ( wppa_is_posint( wppa( 'start_album' ) ) ) {
-		$a = wppa( 'start_album' );
-	}
-	else {
-		$a = 0;
-	}
-	$order = wppa_get_poc($a);
-	if ( wppa( 'is_featen' ) ) $order = 'RAND'; 	// Featen always random
-	if ( substr( $order, 0, 4 ) == 'RAND' ) {
-		if ( wppa_get( 'random', 0, 'int' ) ) {
-			wppa( 'random', wppa_get( 'random', 0, 'int' ) );
-		}
-		if ( ! wppa( 'random' ) ) {
-			wppa( 'random', wppa_get_randseed() );
-		}
 	}
 
 	// Compute separate albums
@@ -1194,23 +1185,23 @@ global $wppa;
 		$max = wppa( 'is_topten' );
 		switch ( wppa_opt( 'topten_sortby' ) ) {
 			case 'rating_count':
-				$order = ["rating_count", "mean_rating", "views"];
+				$poc['order'] = ["rating_count", "mean_rating", "views"];
 				$ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE rating_count > 0 " );
 				wppa_show_query();
 				break;
 			case 'views':
-				$order = ["views", "mean_rating", "rating_count"];
+				$poc['order'] = ["views", "mean_rating", "rating_count"];
 				$ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE views > 0 " );
 				wppa_show_query();
 				break;
 			case 'dlcount':
-				$order = ["dlcount", "mean_rating", "rating_count"];
+				$poc['order'] = ["dlcount", "mean_rating", "rating_count"];
 				$ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE dlcount > 0" );
 				wppa_show_query();
 				break;
 			default:
 				// case 'mean_rating':
-				$order = ["mean_rating", "rating_count", "views"];
+				$poc['order'] = ["mean_rating", "rating_count", "views"];
 				$ids = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE mean_rating > 0 " );
 				wppa_show_query();
 				break;
@@ -1397,7 +1388,7 @@ global $wppa;
 			$root = $wppa_session['search_root'];
 			$root_albs = wppa_expand_enum( wppa_alb_to_enum_children( $root ) );
 			$root_albs = explode( '.', $root_albs );
-			$order = 'id';
+			$poc['order'] = 'id';
 			$placeholders = implode( ',', count( $root_albs ), '%d' );
 			$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album IN ($placeholders)", $root_albs ) );
 			wppa_show_query();
@@ -1509,17 +1500,6 @@ global $wppa;
 	// Nothing left. Quit
 	if ( ! $total_ids ) return false;
 
-	// Order random set by shortcode?
-	$sc_random = false;
-	if ( wppa( 'is_random' ) ) {
-		if ( wppa( 'is_lasten' ) || wppa( 'is_topten' ) ) {
-			$sc_random = true;
-		}
-		else {
-			$order = 'RAND('.wppa( 'random' ).')';
-		}
-	}
-
 	// Max by shortcode?
 	if ( wppa( 'max' ) ) $max = wppa( 'max' );
 
@@ -1546,34 +1526,32 @@ global $wppa;
 	}
 
 	// Final query
-	$ran = wppa( 'random' );
 	$placeholders = implode( ',', array_fill( 0, count( $total_ids ), '%d' ) );
-	if ( is_array( $order ) && count( $order ) == 3 ) { 	// Topten
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i DESC, %i DESC, %i DESC LIMIT %d", array_merge( $total_ids, [$order[0]], [$order[1]], [$order[2]], [$max] ) ), ARRAY_A );
+	if ( is_array( $poc['order'] ) && count( $poc['order'] ) == 3 ) { 	// Topten
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i DESC, %i DESC, %i DESC LIMIT %d", array_merge( $total_ids, [$poc['order'][0]], [$poc['order'][1]], [$poc['order'][2]], [$max] ) ), ARRAY_A );
 		wppa_show_query();
 	}
-	elseif ( strpos( $order, 'RAND' ) !== false ) {
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $total_ids, [$ran+wppa('mocc')], [$max] ) ), ARRAY_A );
+	elseif ( $poc['rand'] ) {
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d) LIMIT %d", array_merge( $total_ids, [$poc['rand']], [$max] ) ), ARRAY_A );
 		wppa_show_query();
 	}
-	elseif ( strpos( $order, 'DESC' ) ) {
-		$order = str_replace( ' DESC', '', $order );
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i DESC LIMIT %d", array_merge( $total_ids, [$order], [$max] ) ), ARRAY_A );
+	elseif ( $poc['desc'] ) {
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i DESC LIMIT %d", array_merge( $total_ids, [$poc['order']], [$max] ) ), ARRAY_A );
 		wppa_show_query();
 	}
 	else {
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i LIMIT %d", array_merge( $total_ids, [$order], [$max] ) ), ARRAY_A );
+		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY %i LIMIT %d", array_merge( $total_ids, [$poc['order']], [$max] ) ), ARRAY_A );
 		wppa_show_query();
 	}
 
 	$final_ids = array_column( $result, 'id');
 
 	// Re-order random
-	if ( $sc_random ) {
-		$placeholders = implode( ',', array_fill( 0, count( $final_ids ), '%d' ) );
-		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $final_ids, [$ran+wppa('mocc')] ) ), ARRAY_A );
-		wppa_show_query();
-	}
+//	if ( $sc_random ) {
+//		$placeholders = implode( ',', array_fill( 0, count( $final_ids ), '%d' ) );
+//		$result = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE id IN ($placeholders) ORDER BY RAND(%d)", array_merge( $final_ids, [$ran+wppa('mocc')] ) ), ARRAY_A );
+//		wppa_show_query();
+//	}
 
 	// Save ids for page caching
 	$photos_used = implode( '.', $final_ids );
@@ -2164,7 +2142,6 @@ static $user;
 	// Get the callback url.
 	if ( wppa_switch( 'rating_on' ) ) {
 		$url = wppa_get_slide_callback_url( $callbackid );
-		$url = str_replace( '&amp;', '&', $url );	// js use
 	}
 	else {
 		$url = '';
@@ -2263,7 +2240,6 @@ static $user;
 	else {
 		$shareurl = wppa_get_image_page_url_by_id( $id, false, wppa( 'start_album' ) );
 		$shareurl = wppa_convert_to_pretty( $shareurl );
-		$shareurl = str_replace( '&amp;', '&', $shareurl );
 	}
 
 	// Make photo desc, filtered
@@ -2361,7 +2337,7 @@ static $user;
 		}
 	}
 	if ( $editlink || $dellink || $choicelink || $infolink || $downloadlink ) {
-		$desc = $editlink.$dellink.$choicelink.$infolink.$downloadlink.'<div style="clear:both"></div>'.$desc;
+		$desc = $editlink.$dellink.$choicelink.$infolink.$downloadlink.wppa_div_clear().$desc;
 	}
 
 	if ( in_array( $thumb['status'], array( 'pending', 'scheduled' ) ) ) {
@@ -3699,10 +3675,10 @@ global $blog_id;
 	}
 
 	// Close request?
-	elseif ( $action == 'close' )	{
+	elseif ( $action == 'close' ) {
 
 		if ( wppa_page( 'oneofone' ) ) wppa( 'portrait_only', false );
-		if ( ! wppa_in_widget() ) wppa_out( '<div style="clear:both;"></div>' );
+		if ( ! wppa_in_widget() ) wppa_out( wppa_div_clear() );
 
 		if ( ! defined( 'DOING_WPPA_AJAX' ) ) {
 
@@ -4708,7 +4684,7 @@ global $wppa_alert;
 			elseif ( $max ) { // See if max reached ( 0 = unlimited )
 				$tc = wppa_get_treecounts_a( $parent );
 				$nchild = $tc['selfalbums'];
-				if ( $nchild >= $max ) $may_create = false;;
+				if ( $nchild >= $max ) $may_create = false;
 			}
 		}
 	}
@@ -4730,7 +4706,7 @@ global $wppa_alert;
 			// Check captcha
 			if ( wppa_switch( 'user_create_captcha' ) ) {
 
-				$captkey = wppa_get_randseed( 'session' );
+				$captkey = wppa_get_randseed();
 
 				if ( ! wppa_check_captcha( $captkey ) ) {
 					wppa_alert_text( __( 'Wrong captcha, please try again', 'wp-photo-album-plus' ) );
@@ -4828,7 +4804,7 @@ global $wppa_alert;
 
 						$filename = $file['name'];
 						if ( $file_is_ok['proper_filename'] ) {
-							$filename = $file_is_ok['proper_filename'];
+							$filename = wppa_sanitize_filename( $file_is_ok['proper_filename'] );
 						}
 						$dirname = WPPA_UPLOAD_PATH . '/temp';
 						if ( ! wppa_is_dir( $dirname ) ) {

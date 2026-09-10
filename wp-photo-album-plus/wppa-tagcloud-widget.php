@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the tagcloud widget
-* Version 9.0.00.000
+* Version 9.3.00.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -56,7 +56,7 @@ class TagcloudPhotos extends WP_Widget {
 			' >' .
 			wppa_get_tagcloud_html( implode( ',', $instance['tags'] ), wppa_opt( 'tagcloud_min' ), wppa_opt( 'tagcloud_max' ) ) .
 		'</div>' .
-		'<div style="clear:both"></div>';
+		wppa_div_clear();
 
 		// Output
 		$result = "\n" . $before_widget;

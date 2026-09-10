@@ -4,7 +4,7 @@
 *
 * Contains mailing functions
 *
-* Version 9.2.01.001
+* Version 9.3.00.002
 *
 */
 
@@ -1064,7 +1064,7 @@ function wppa_unsubscribe_link( $user_id, $listtype ) {
 
 	$url .= '&wppa-action=mailinglist&list=' . $listtype . '&onoff=off&user=' . $user_id . '&crypt=' . $crypt;
 
-	$link = '<a href="' . $url . '" >';
+	$link = '<a href="' . esc_url( $url ) . '" >';
 	/* translators: html a tag */
 	$result = sprintf( __( 'You can %1$sunsubscribe%2$s here from this mailinglist', 'wp-photo-album-plus' ), $link, '</a>' );
 
@@ -1241,9 +1241,7 @@ global $wppa_opt;
 	wppa_log( 'Err', 'Mail sending failed. Hash: ' . $hash . ', To=' . $to . ', subject=' . $subject . ', message=' . $message );
 
 	// Failed
-	if ( ! wppa_is_cron() ) {
-		wppa_echo( __( 'Mail sending Failed', 'wp-photo-album-plus' ) );
-	}
+	wppa_log( 'err', __( 'Mail sending Failed', 'wp-photo-album-plus' ) );
 
 	// Registee failed mail
 	wppa_process_failed_mail(	$to,

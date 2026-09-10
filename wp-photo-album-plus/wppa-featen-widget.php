@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 9.2.01.001
+* Version 9.3.00.002
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -56,7 +56,7 @@ class FeaTenWidget extends WP_Widget {
 
 			// Owner/public
 			case '-3':
-				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d)", wppa_get_randseed( 'session' ) ), ARRAY_A );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d)", wppa_get_randseed() ), ARRAY_A );
 				if ( $temp ) {
 					$c = 0;
 					$thumbs = array();
@@ -76,7 +76,7 @@ class FeaTenWidget extends WP_Widget {
 
 			// Generic
 			case '-2':
-				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d)", wppa_get_randseed( 'session' ) ), ARRAY_A );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d)", wppa_get_randseed() ), ARRAY_A );
 				if ( $temp ) {
 					$c = 0;
 					$thumbs = array();
@@ -95,13 +95,13 @@ class FeaTenWidget extends WP_Widget {
 
 			// All
 			case 0:
-				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d) LIMIT %d", wppa_get_randseed( 'session' ), $max ), ARRAY_A );
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' ORDER BY RAND(%d) LIMIT %d", wppa_get_randseed(), $max ), ARRAY_A );
 				break;
 
 			// Album spec
 			default:
 				if ( wppa_is_album_visible( $album ) ) {
-					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' AND album = %d ORDER BY RAND(%d) LIMIT %d", $album, wppa_get_randseed( 'session' ), $max ), ARRAY_A );
+					$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE status = 'featured' AND album = %d ORDER BY RAND(%d) LIMIT %d", $album, wppa_get_randseed(), $max ), ARRAY_A );
 				}
 				else {
 					$thumbs = array();
@@ -178,7 +178,7 @@ class FeaTenWidget extends WP_Widget {
 		// No thumbs
 		else $widget_content .= __( 'There are no featured photos (yet)', 'wp-photo-album-plus' );
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// Output
 		$result = "\n" . $before_widget;

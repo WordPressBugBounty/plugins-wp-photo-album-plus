@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.2.10.004
+* vrsion: 9.3.00.001
 *
 */
 
@@ -556,7 +556,7 @@ global $wpdb;
 		if ( $thumb['duration'] ) {
 			$mins = floor( $thumb['duration'] / 60 );
 			$secs = round( $thumb['duration'] % 60 );
-			$result = str_replace( 'w#duration', sprintf( '%s&#39;%s&#34;.', $mins, $secs ), $result );
+			$result = str_replace( 'w#duration', sprintf( '%s&#39;%s&#34.', $mins, $secs ), $result );
 		}
 		else {
 			$result = str_replace( 'w#duration', '', $result );

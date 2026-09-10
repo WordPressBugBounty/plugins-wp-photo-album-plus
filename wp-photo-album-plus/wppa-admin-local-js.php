@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * local js code for admin pages
-* Version 9.2.01.001
+* Version 9.3.00.002
 *
 */
 
@@ -984,7 +984,7 @@ function wppa_add_local_js( $slug, $arg1 = '', $arg2 = '' ) {
 					$the_js .= '
 					function wppaImportReload(from) {
 						console.log("reload requested from "+from);
-						if (! wppaImportRuns) setTimeout(function(){document.location.href="' . $url . '"},200);
+						if (! wppaImportRuns) setTimeout(function(){document.location.href="' . esc_url( $url ) . '"},200);
 						else wppaReloadPending = true;
 					}';
 				}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the admins-choice widget
-* Version 9.0.00.000
+* Version 9.3.00.001
 *
 */
 
@@ -40,13 +40,10 @@ class AdminsChoice extends WP_Widget {
 			$widget_content = __( 'This feature is not enabled', 'wp-photo-album-plus' );
 		}
 		else {
-			$widget_content =
-			'<div class="wppa-admins-choice-widget" data-wppa="yes">' .
-				wppa_get_admins_choice_html( false ) .
-			'</div>';
+			$widget_content = wppa_html_tag( 'div', ['class' => 'wppa-admins-choice-widget', 'data-wppa' => 'yes'], wppa_get_admins_choice_html( false ) );
 		}
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= wppa_div_clear();
 
 		// Output
 		$result = "\n" . $before_widget;
@@ -80,10 +77,7 @@ class AdminsChoice extends WP_Widget {
 
 		// Make sure the feature is enabled
 		if ( wppa_opt( 'admins_choice' ) == 'none' ) {
-			wppa_echo( '
-			<p style="color:red">' .
-				esc_html__( 'Please enable this feature', 'wp-photo-album-plus' ) . ' ' . wppa_see_also( 'system', 1, '28' ) . '
-			</p>' );
+			wppa_echo( wppa_html_tag( 'p', ['style' => 'color:red'], esc_html__( 'Please enable this feature', 'wp-photo-album-plus' ) . ' ' . wppa_see_also( 'system', 1, '28' ) ) );
 		}
 
 		// Defaults
