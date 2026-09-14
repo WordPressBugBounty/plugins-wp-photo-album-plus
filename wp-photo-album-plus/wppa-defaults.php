@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* version 9.2.11.004
+* version 9.3.01.002
 *
 */
 
@@ -536,6 +536,7 @@ horizrailenabled:false,";
 						'wppa_cache_maxfiles' 			=> 50,
 						'wppa_qr_max' 					=> 50,
 						'wppa_delay_overrule' 			=> 'default',
+						'wppa_save_sessions' 			=> 'yes',
 
 						// B Full size and Slideshow
 						'wppa_fullvalign' 				=> 'center',
@@ -1323,7 +1324,7 @@ horizrailenabled:false,";
 						'wppa_pre_cache_albums' 	=> 20,
 						'wppa_pre_cache_photos' 	=> 100,
 						'wppa_show_scgens' 			=> '',
-						
+
 						'wppa_enable_debug' 		=> 'no',
 						'wppa_seo_optimize' 		=> 'yes',
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.3.00.002
+* Version 9.3.01.002
 *
 */
 
@@ -1751,7 +1751,8 @@ static $cache;
 							else {
 								$title = __( 'If you select "the link page with a clean url", make sure you enter the correct shortcode on the target page.', 'wp-photo-album-plus' );
 							}
-							wppa_html_echo( 'div', [],
+							$result =
+							wppa_html_tag( 'div', [],
 								wppa_html_tag( 'label', ['for' => 'cover-linktype'], __( 'Link type', 'wp-photo-album-plus' ) ) . '<br>' .
 								wppa_html_tag( 'select', ['id' => 'cover-linktype', 'title' => $title,
 														  'onchange' => 'wppaAjaxUpdateAlbum(\'' . $crid . '\', \'cover_linktype\', this.value, false, ' . $id . ')'],
@@ -1763,6 +1764,7 @@ static $cache;
 									wppa_html_tag( 'option', ['value' => 'none', ( $lt == 'none' ? $sel : '' )], __( 'no link at all', 'wp-photo-album-plus' ) ) .
 									wppa_html_tag( 'option', ['value' => 'manual', ( $lt == 'manual' ? $sel : '' )], __( 'manually entered', 'wp-photo-album-plus' ) ) .
 									wppa_html_tag( 'option', ['value' => 'lightbox', ( $lt == 'lightbox' ? $sel : '' )], __( 'lightbox (for titleonly covertype only)', 'wp-photo-album-plus' ) ) ) );
+							wppa_echo( $result );
 						}
 
 						// Manually entered link

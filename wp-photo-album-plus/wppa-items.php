@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.3.00.001
+* vrsion: 9.3.01.001
 *
 */
 
@@ -350,10 +350,10 @@ global $wppa_skip_alb_to_gal;
 	$desc = wppa_filter_exif( $desc, $id, true );				// E# tags
 
 	// Other filters
-	$desc = wppa_html( $desc );				// Enable html
 	$desc = balanceTags( $desc, true );		// Balance tags
 	$desc = make_clickable( $desc );		// Auto make a tags for links
 	$desc = convert_smilies( $desc );		// Make smilies visible
+	$desc = wp_kses( $desc, wppa_allowed_simple_tags() );
 
 	// CMTooltipGlossary on board?
 	$desc = wppa_filter_glossary( $desc );
@@ -719,11 +719,9 @@ global $wppa_skip_alb_to_gal;
 		$desc = wppa_translate( $desc );
 	}
 
-	// Enable or strip html
-	$desc = wppa_html( $desc );
-
 	// Balance tags
 	$desc = balanceTags( $desc, true );
+	$desc = wp_kses( $desc, wppa_allowed_simple_tags() );
 
 	// To prevent recursive rendering of scripts or shortcodes:
 	$desc = str_replace( array( '%%wppa%%', '[wppa', '[/wppa]' ), array( '%-wppa-%', '{wppa', '{/wppa}' ), $desc );

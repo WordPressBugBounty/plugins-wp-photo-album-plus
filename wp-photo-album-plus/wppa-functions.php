@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.3.00.003
+* Version: 9.3.01.002
 *
 */
 
@@ -2341,7 +2341,7 @@ static $user;
 	}
 
 	if ( in_array( $thumb['status'], array( 'pending', 'scheduled' ) ) ) {
-		$desc .= wppa_html( esc_js( wppa_moderate_links( 'slide', $id ) ) );
+		$desc .= esc_js( wppa_moderate_links( 'slide', $id ) );
 	}
 
 	// Share HTML
@@ -2458,6 +2458,9 @@ static $user;
 		$ratio = 1;
 	}
 
+	$desc = str_replace( "'", "\'", $desc );
+	$desc = str_replace( '\\\\', '\\', $desc );
+
 	// Produce final result
     $result = "'".wppa( 'mocc' )."','";
 	$result .= $index."','";
@@ -2521,7 +2524,7 @@ function wppa_get_slide_desc( $id ) {
 		}
 
 		// And format
-		$desc = wppa_html( esc_js( stripslashes( $desc ) ) );
+//		$desc = esc_js( stripslashes( $desc ) );
 
 		// Remove extra space created by other filters like wpautop
 		if ( wppa_switch( 'allow_foreign_shortcodes' ) && wppa_switch( 'clean_pbr' ) ) {
@@ -4321,7 +4324,7 @@ global $wppa_after_smx;
 				$desc = nl2br( $desc );
 			}
 //			wppa_out( '<p class="wp-caption-text">' . $desc . '</p>' );
-			wppa_out( '<div class="wp-caption-text">' . $desc . ( $wppa_after_smx ? wp_kses_post( $wppa_after_smx ) : '' ) . '</div>' );
+			wppa_out( '<div class="wp-caption-text">' . wp_kses_post( $desc ) . ( $wppa_after_smx ? wp_kses_post( $wppa_after_smx ) : '' ) . '</div>' );
 
 			// The rating, only on xphoto when enabled in II-B7
 			if ( $stype == 'x' && wppa_switch( 'rating_on' ) ) {
@@ -4791,6 +4794,10 @@ global $wppa_alert;
 
 						// Upload from frontend. Check for valid extension and mime type
 						$file_is_ok = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], wppa_get_mime_types() );
+						$filename = wppa_sanitize_file_name( $file['name'] );
+						if ( $file_is_ok['proper_filename'] ) {
+							$filename = wppa_sanitize_file_name( $file_is_ok['proper_filename'] );
+						}
 
 						if ( ! $file_is_ok['ext'] || ! $file_is_ok['type'] ) {
 							$upload_message =
@@ -4804,7 +4811,7 @@ global $wppa_alert;
 
 						$filename = $file['name'];
 						if ( $file_is_ok['proper_filename'] ) {
-							$filename = wppa_sanitize_filename( $file_is_ok['proper_filename'] );
+							$filename = wppa_sanitize_file_name( $file_is_ok['proper_filename'] );
 						}
 						$dirname = WPPA_UPLOAD_PATH . '/temp';
 						if ( ! wppa_is_dir( $dirname ) ) {

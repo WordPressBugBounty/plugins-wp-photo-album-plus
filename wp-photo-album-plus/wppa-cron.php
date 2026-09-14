@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
- Version: 9.2.01.001
+ Version: 9.3.01.002
 *
 */
 
@@ -202,8 +202,10 @@ global $wppa_endtime;
 	$savetime 	= 86400;		// Save session data for 24 hour
 	$expire 	= time() - $lifetime;
 	$purge 		= time() - $savetime;
-	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE timestamp < %s", $expire ) );
-	$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", $purge ) );
+	if ( wppa_switch( 'save_sessions' ) ) {
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE timestamp < %s", $expire ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_session WHERE timestamp < %s", $purge ) );
+	}
 
 	// Delete obsolete spam
 	$spammaxage = wppa_opt( 'spam_maxage' );

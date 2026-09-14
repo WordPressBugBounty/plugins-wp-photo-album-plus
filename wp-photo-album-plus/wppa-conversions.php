@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various conversion functions
-* Version: 9.2.04.001
+* Version: 9.3.01.002
 *
 */
 
@@ -18,6 +18,8 @@ global $wpdb;
 	wppa( 'start_album', '' );
 
 	wppa( 'is_owner', wppa_get( 'owner', '', 'text' ) );
+
+	wppa( 'is_virtual', wppa_get( 'lasten' ) || wppa_get( 'topten' ) || wppa_get( 'featen' ) || wppa_get( 'tag' ) || wppa_get( 'cat' ) || wppa_get( 'upldr' ) );
 
 	if ( $albums ) {
 
@@ -611,7 +613,7 @@ function wppa_convert_to_webp( $id ) {
 		// ImageMagick
 		if ( wppa_can_magick() ) {
 			$iret = 1;
-			$i = wppa_image_magick( 'convert ' . $file . ' -quality ' . wppa_opt( 'jpeg_quality' )  . ' ' . $newfile );
+			$i = wppa_image_magick_a( ['convert', $file, '-quality ' . wppa_opt( 'jpeg_quality' ), $newfile] );
 			if ( $i ) {
 				/* Translators: media item id */
 				return sprintf( __( 'Could not magick convert photo %d', 'wp-photo-album-plus' ), $id ); // Error

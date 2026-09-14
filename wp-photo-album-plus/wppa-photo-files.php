@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.3.00.003
+* Version: 9.3.01.003
 *
 */
 
@@ -36,7 +36,7 @@ function wppa_make_o1_source( $id ) {
 
 	// ImageMagick
 	if ( wppa_can_magick() ) {
-		wppa_image_magick( 'convert ' . $src_path . ' -auto-orient ' . $dst_path );
+		wppa_image_magick_a( ['convert', $src_path, '-auto-orient', $dst_path] );
 	}
 
 	// Classic
@@ -164,7 +164,7 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 		if ( wppa_can_magick() ) {
 
 			// Try making the jpg from the pdf
-			wppa_image_magick( 'convert -density 200 ' . $pdf . '[0] -quality 90 -background white -alpha remove ' . $jpg );
+			wppa_image_magick_a( ['convert -density 200', $pdf, '-quality 90 -background white -alpha remove', $jpg], 0 );
 			$err = ! wppa_is_file( $jpg );
 			if ( ! $err ) {
 				switch ( wppa_opt( 'newphoto_name_method' ) ) {
@@ -278,7 +278,7 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 				$quality = '-quality ' . $q;
 			}
 
-			$iret = wppa_image_magick( 'convert ' . escapeshellarg($file) . ' ' . $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height . ' ' . escapeshellarg($newimage) );
+			$iret = wppa_image_magick_a( ['convert', $file, $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height, $newimage] );
 			if ( $iret ) {
 				wppa_log( 'fso', 'Magick could not create ' . $newimage );
 			}
@@ -620,8 +620,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 		// External Magick command?
 		if ( ! $done && wppa_can_magick() && $type == 'none' ) {
 
-			$cmd = 'convert ' . $file . ' -thumbnail ' . $perc . '% ' . $thumbpath;
-			$iret = wppa_image_magick( $cmd );
+			$iret = wppa_image_magick_a( ['convert', $file, '-thumbnail ' . $perc . '%', $thumbpath] );
 			if ( $iret ) {
 				wppa_log( 'fso', 'Magick command could not create ' . $thumbpath );
 			}
@@ -815,9 +814,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 	// If existing file not updated, return false
 	if ( wppa_is_file( $thumbpath ) ) {
 		$newtime = wppa_filetime( $thumbpath );
-	}
-	if ( $newtime == $thumbtime ) {
-		return false;
+		if ( $newtime == $thumbtime ) return false;
 	}
 
 	// Fix filesystem rights
@@ -837,13 +834,30 @@ function wppa_is_magick( $command ) {
 	return wppa_is_file( rtrim( wppa_opt( 'image_magick' ), '/' ) . '/' . $command );
 }
 
-// Process ImageMagick command
-function wppa_image_magick( $command ) {
+// Process image magick command
+function wppa_image_magick_a( $com_arr, $page = false ) {
 
 	// Image magic enabled?
 	if ( ! wppa_can_magick() ) {
+		wppa_log( 'err', 'ImageMagick not enabled' );
 		return '-9';
 	}
+
+	// Validate input
+	if ( ! is_array( $com_arr ) || count( $com_arr ) != 4 ) {
+		wppa_log( 'err', 'Improper args to  wppa_image_magick_a()' );
+		return '-9';
+	}
+
+	if ( $page !== false ) {
+		$com_arr[1] .= '['.$page.']';
+	}
+
+	// Make command
+	$command =	$com_arr[0] . ' ' .										// command before first path
+				escapeshellarg( $com_arr[1] ) . ' ' .					// from path
+				$com_arr[2] . ' ' .										// action specification
+				escapeshellarg( $com_arr[3] ); 							// to path
 
 	// Image Magick root dir
 	$path = rtrim( wppa_opt( 'image_magick' ), '/' ) . '/';
@@ -857,7 +871,7 @@ function wppa_image_magick( $command ) {
 	$err  = 0;
 
 	try {
-		$run  = exec( escapeshellcmd( $path . $command ), $out, $err );
+		$run  = exec( $path . $command, $out, $err );
 	}
 	catch (Exception $e) {
 		wppa_log( 'err', 'Exec imagick cmd raised exception: ',  $e->getMessage());
@@ -1069,8 +1083,7 @@ global $wpdb;
 			$jpg = $targetalbdir . '/' . $jpgfilename;
 
 			// Do the extraction
-			$command = "convert -density 200 $pdf"."[$page] -quality 90 -background white -alpha remove $jpg";
-			wppa_image_magick( $command );
+			wppa_image_magick_a( ['convert -density 200', $pdf, '-quality 90 -background white -alpha remove', $jpg], $page );
 
 			// Possible error done
 			$err = ! wppa_is_file( $jpg );
@@ -1189,6 +1202,7 @@ add_action( 'wppa_pdf_to_album', 'wppa_pdf_to_album', 10, 4 );
 // find out if a pdf has more than one Page
 // No error reporting, just return false on error
 function wppa_is_pdf_multiple( $id ) {
+global $wppa_opt;
 
 	$file = wppa_get_source_path( $id );
 	if ( wppa_get_ext( $file ) != 'pdf' ) return false;
@@ -1196,7 +1210,15 @@ function wppa_is_pdf_multiple( $id ) {
 
 	// Try converting the second Page
 	$tempfile = WPPA_UPLOAD_PATH . '/' . md5( microtime( true ) ) . '.jpg';
-	wppa_image_magick( "convert -density 200 $file"."[1] -quality 90 -background white -alpha remove $tempfile" );
+
+	// Suppress error from wppa_image_magick_a()
+	$t = $wppa_opt['wppa_log_fso'];
+	$wppa_opt['wppa_log_fso'] = 'no';
+
+	wppa_image_magick_a( ['convert -density 200', $file, '-quality 90 -background white -alpha remove', $tempfile], 1 );
+
+	// Restore orig errorlog setting
+	$wppa_opt['wppa_log_fso'] = $t;
 
 	$result = wppa_is_file( $tempfile );
 	if ( $result ) wppa_unlink( $tempfile );
@@ -1217,10 +1239,8 @@ function wppa_create_video_poster( $id ) {
 	$photo_file = wppa_get_photo_path( $id );
 	$video_file = str_replace( wppa_get_ext( $photo_file ), $first_ext, $photo_file );
 
-	$cmd = "convert -density 200 $video_file"."[1] -quality 90 -background white -alpha remove $photo_file";
-	$cmd = "convert $video_file"."[1] $photo_file";
-	wppa_log('misc', $cmd );
-	$iret = wppa_image_magick( $cmd );
+//	$cmd = "convert $video_file"."[1] $photo_file";
+	$iret = wppa_image_magick_a( ['convert', $video_file, '', $photo_file], 1 );
 	wppa_log('misc', 'magick returned code '.$iret );
 	if ( wppa_is_file( $photo_file ) ) {
 		return true;

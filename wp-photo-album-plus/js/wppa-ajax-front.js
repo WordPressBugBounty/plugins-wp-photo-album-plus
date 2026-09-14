@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.2.07.002';
+var wppaJsAjaxVersion = '9.3.01.002';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -1421,6 +1421,9 @@ function wppaUpdatePhotoNew(id,mocc) {
 	if ( jQuery('#upn-reload').prop('checked') ) {
 		myData += '&upn-reload=on';
 	}
+// console.log(myData);
+myData.replaceAll("'", "%047");
+// console.log(myData);
 
 	jQuery.ajax( { 	url: 		wppaAjaxUrl,
 					data: 		myData,

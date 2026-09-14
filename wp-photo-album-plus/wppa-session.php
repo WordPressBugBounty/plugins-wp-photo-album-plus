@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.3.00.002
+* Version 9.3.01.003
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -62,13 +62,16 @@ global $wppa_session;
 	$lifetime 	= 3600;			// Sessions expire after one hour
 	$expire 	= time() - $lifetime;
 	$session_id = wppa_get_session_id();
+	$session 	= false;
 
 	// Is session already started?
-	$session = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_session
-												WHERE session = %s
-												AND status = 'valid'
-												ORDER BY id DESC
-												LIMIT 1", $session_id ), ARRAY_A );
+	if ( wppa_switch( 'save_sessions' ) ) {
+		$session = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_session
+													WHERE session = %s
+													AND status = 'valid'
+													ORDER BY id DESC
+													LIMIT 1", $session_id ), ARRAY_A );
+	}
 
 	// Started but expired?
 	if ( $session ) {
@@ -91,7 +94,7 @@ global $wppa_session;
 	if ( ! $session ) {
 
 		// Do cleanup only once in 5 minutes
-		if ( ! get_transient( 'wppa_session_exp' ) ) {
+		if ( ! get_transient( 'wppa_session_exp' ) && wppa_switch( 'save_sessions' ) ) {
 
 			set_transient( 'wppa_session_exp', true, 300 );
 
@@ -114,7 +117,7 @@ global $wppa_session;
 		$iret = wppa_create_session_entry();
 
 		if ( ! $iret ) {
-			wppa_log( 'Err', 'Unable to create session for user ' . wppa_get_user() );
+			if ( wppa_switch( 'save_sessions' ) ) wppa_log( 'Err', 'Unable to create session for user ' . wppa_get_user() );
 
 			// Give up
 			return false;
@@ -161,6 +164,8 @@ function wppa_save_session() {
 global $wpdb;
 global $wppa_session;
 
+	if ( ! wppa_switch( 'save_sessions' ) ) return false;
+
 	// If no id can be found, give up
 	$session_id = wppa_get_session_id();
 	if ( ! $session_id ) return false;
@@ -183,6 +188,8 @@ global $wppa_session;
 function wppa_extend_session() {
 global $wpdb;
 
+	if ( ! wppa_switch( 'save_sessions' ) ) return false;
+
 	$sessionid = wppa_get_session_id();
 	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
 								   SET timestamp = %d
@@ -198,6 +205,8 @@ global $wpdb;
 	if ( ! $wppa_session ) {
 		wppa_begin_session();
 	}
+
+	if ( ! wppa_switch( 'save_sessions' ) ) return false;
 
 	$data = $wpdb->get_var( $wpdb->prepare( "SELECT data from $wpdb->wppa_session WHERE session = %s ORDER BY id DESC LIMIT 1", $sessionid ) );
 	if ( $data ) $wppa_session = unserialize( $data );

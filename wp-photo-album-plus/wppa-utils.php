@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.3.00.001
+* Version: 9.3.01.002
 *
 */
 

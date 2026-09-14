@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the stats widget
-* Version 9.2.11.001
+* Version 9.3.01.002
 *
 */
 
@@ -49,22 +49,24 @@ class WppaStatsWidget extends WP_Widget {
 		if ( wppa_checked( $instance['dayno'] ) ) {
 			$widget_content .= __('Today is day no', 'wp-photo-album-plus' ) . ': <b>' . ( date_i18n( 'z', time() ) + 1 ) . '</b><br>';
 		}
-		if ( wppa_checked( $instance['sessions-active'] ) ) {
-			$sescount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d", ( time() - 3600 ) ) );
-			$widget_content .= __('Number of active sessions', 'wp-photo-album-plus' ) . ': <b>' . $sescount . '</b><br>';
-		}
-		if ( wppa_checked( $instance['sessions-day'] ) ) {
-			$t = time() - 3600*24;
-			$daysescount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d", $t ) );
-			$robots 	 = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d AND data LIKE %s", $t, '%'.$wpdb->esc_like("isrobot").'%' ) );
-			if ( $wpdb->get_var( "SELECT id FROM $wpdb->wppa_session ORDER BY id LIMIT 1" ) == 1 ) {
-				$txt = __('Number of sessions since last reset', 'wp-photo-album-plus' );
+		if ( wppa_switch( 'save_sessions' ) ) {
+			if ( wppa_checked( $instance['sessions-active'] ) ) {
+				$sescount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d", ( time() - 3600 ) ) );
+				$widget_content .= __('Number of active sessions', 'wp-photo-album-plus' ) . ': <b>' . $sescount . '</b><br>';
 			}
-			else {
-				$txt = __('Number of sessions last 24 hours', 'wp-photo-album-plus' );
+			if ( wppa_checked( $instance['sessions-day'] ) ) {
+				$t = time() - 3600*24;
+				$daysescount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d", $t ) );
+				$robots 	 = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d AND data LIKE %s", $t, '%'.$wpdb->esc_like("isrobot").'%' ) );
+				if ( $wpdb->get_var( "SELECT id FROM $wpdb->wppa_session ORDER BY id LIMIT 1" ) == 1 ) {
+					$txt = __('Number of sessions since last reset', 'wp-photo-album-plus' );
+				}
+				else {
+					$txt = __('Number of sessions last 24 hours', 'wp-photo-album-plus' );
+				}
+				$widget_content .= 	$txt . ': <b>' . $daysescount . '</b><br>' .
+									( $robots ? __('Of which known robots', 'wp-photo-album-plus' ) . ': <b>' . $robots . '</b><br>' : '' );
 			}
-			$widget_content .= 	$txt . ': <b>' . $daysescount . '</b><br>' .
-								( $robots ? __('Of which known robots', 'wp-photo-album-plus' ) . ': <b>' . $robots . '</b><br>' : '' );
 		}
 		if ( wppa_checked( $instance['reg-users'] ) ) {
 			$users = $wpdb->get_var( "SELECT COUNT(*) FROM " . $wpdb->prefix . 'users' . "" );

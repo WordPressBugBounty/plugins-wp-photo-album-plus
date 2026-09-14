@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains routines for local cdn implementation
-* Version 9.1.09.005
+* Version 9.3.01.002
 *
 */
 
@@ -84,7 +84,7 @@ function wppa_cdn_make( $id, $x, $y ) {
 			$err = ! $bret;
 		}
 		else {
-			$err = wppa_image_magick( 'convert ' . $fmpath . ' ' . $quality . ' -resize ' . $x . 'x' . $y . ' ' . $topath );
+			$err = wppa_image_magick_a( ['convert', $fmpath, $quality . ' -resize ' . $x . 'x' . $y, $topath] );
 		}
 
 		// Log what we did

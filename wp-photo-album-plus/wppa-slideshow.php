@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.3.00.001
+* Version 9.3.01.002
 *
 */
 
@@ -766,11 +766,14 @@ function wppa_slide_rating_vote_only( $opt, $id = 0, $is_lightbox = false ) {
 
 function wppa_get_slide_rating_vote_only( $opt, $id = 0, $is_lightbox = false ) {
 
-	if ( ! $is_lightbox ) {
-		if ( $opt == 'optional' && ! wppa_is_item_displayable( wppa( 'start_album' ), 'rating', 'rating_on' ) ) return;
-		if ( wppa( 'is_slideonly' ) ) return '';	/* Not when slideonly */
-		if ( is_feed() ) return '';
+	if ( is_feed() ) return '';
+
+	// On a slide: depending on slide visibility settings
+	if ( ! $is_lightbox && ! wppa( 'is_virtual' ) && ! wppa_is_item_displayable( wppa( 'start_album' ), 'rating', 'rating_on' ) ) {
+		return '';
 	}
+
+	if ( wppa( 'is_slideonly' ) ) return '';	/* Not when slideonly */
 
 	$result = '';
 
@@ -894,7 +897,7 @@ function wppa_slide_rating_range( $opt ) {
 	}
 
 	// On a slide: depending on slide visibility settings
-	if ( $opt == 'optional' && ! wppa_is_item_displayable( wppa( 'start_album' ), 'rating', 'rating_on' ) ) {
+	if ( ! wppa( 'is_virtual' ) && ! wppa_is_item_displayable( wppa( 'start_album' ), 'rating', 'rating_on' ) ) {
 		return '';
 	}
 
@@ -1667,6 +1670,8 @@ function wppa_browsebar_text( $opt = '' ) {
 
 function wppa_comments( $opt = '' ) {
 
+	if ( ! wppa_switch( 'show_comments' ) ) return;
+
 	if ( is_feed() ) {
 		if ( wppa_switch( 'show_comments' ) ) {
 			wppa_dummy_bar( __( '- - - Comments box activated - - -', 'wp-photo-album-plus' ) );
@@ -1675,8 +1680,7 @@ function wppa_comments( $opt = '' ) {
 	}
 
 	$do_it = false;
-	if ( $opt != 'optional' ) $do_it = true;
-	if ( ! wppa( 'is_slideonly' ) && wppa_is_item_displayable( wppa( 'start_album' ), 'comments', 'show_comments' ) && ! wppa_in_widget() ) $do_it = true;
+	if ( ! wppa( 'is_slideonly' ) && ( wppa_is_item_displayable( wppa( 'start_album' ), 'comments', 'show_comments' ) || wppa( 'is_virtual' ) ) && ! wppa_in_widget() ) $do_it = true;
 
 	if ( $do_it ) {
 		wppa_out( 	'<div' .

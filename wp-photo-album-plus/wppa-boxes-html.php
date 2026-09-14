@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.3.00.002
+* Version 9.3.01.001
 *
 */
 
@@ -4093,12 +4093,7 @@ global $wpdb;
 
 							// Status approved
 							if ( ( $comment['status'] != 'approved' || wppa_switch( 'edit_com_link' ) ) && ( current_user_can( 'wppa_moderate' ) || current_user_can( 'wppa_comments' ) ) ) {
-								if ( wppa( 'no_esc' ) ) {
-									$commentblock .= wppa_moderate_links( 'comment', $id, $comment['id'], $comment['status'] );
-								}
-								else {
-									$commentblock .= wppa_html( esc_js( wppa_moderate_links( 'comment', $id, $comment['id'], $comment['status'] ) ) );
-								}
+								$commentblock .= wp_kses_post( wppa_moderate_links( 'comment', $id, $comment['id'], $comment['status'] ) );
 							}
 
 							// Status pending
@@ -4861,7 +4856,7 @@ function wppa_album_desc( $key ) {
 							' class="wppa-box-text wppa-black wppa-thumbarea-albdesc"' .
 							' style="padding-right:6px;"' .
 							' >' .
-							$desc .
+							wp_kses_post( $desc ) .
 						'</div>' .
 						'<div style="clear:both" ></div>';
 		}
@@ -4871,7 +4866,7 @@ function wppa_album_desc( $key ) {
 							' class="wppa-box-text wppa-black wppa-thumbarea-albdesc"' .
 							' style="clear:both; padding-right:6px;"' .
 							' >' .
-							$desc .
+							wp_kses_post( $desc ) .
 						'</div>';
 		}
 	}
@@ -6915,10 +6910,10 @@ function wppa_audio_only_container( $action ) {
 						$result .= '<div style="float:left;padding:'.$padding.'max-width:80%;">';
 					}
 					if ( wppa_switch( 'audioonly_name' ) ) {
-						$result .= '<h3 style="margin-top:6px;">' . wppa_get_album_name( $album ) . '</h3>';
+						$result .= '<h3 style="margin-top:6px;">' . wp_kses_post( wppa_get_album_name( $album ) ) . '</h3>';
 					}
 					if ( wppa_switch( 'audioonly_desc' ) ) {
-						$result .= '<span style="margin-top:6px;">' . wppa_get_album_desc( $album ) . '</span>';
+						$result .= '<span style="margin-top:6px;">' . wp_kses_post( wppa_get_album_desc( $album ) ) . '</span>';
 					}
 					if ( $poster ) {
 						$result .= '</div>';

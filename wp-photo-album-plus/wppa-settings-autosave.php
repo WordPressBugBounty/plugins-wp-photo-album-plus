@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.3.00.001
+* version 9.3.01.002
 *
 */
 
@@ -6961,6 +6961,13 @@ global $wppa_hide_this;
 						$slug = 'wppa_seo_optimize';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '49', $name, $desc, $html, $help);
+
+						$name = __('Save session data', 'wp-photo-album-plus');
+						$desc = __('Save sessions in database table', 'wp-photo-album-plus');
+						$help = __('Switch off in case your site\'s cpu is too heavy loaded or you have too many database calls', 'wp-photo-album-plus');
+						$slug = 'wppa_save_sessions';
+						$html = wppa_checkbox($slug);
+						wppa_setting_new($slug, '97', $name, $desc, $html, $help);
 /*
 						$name = __('Use compressed javascript', 'wp-photo-album-plus');
 						$desc = __('Switch off for debugging purposes', 'wp-photo-album-plus');

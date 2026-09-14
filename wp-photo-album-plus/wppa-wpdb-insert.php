@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.2.11.002
+* Version 9.3.01.002
 *
 */
 
@@ -57,13 +57,15 @@ global $wppa_session;
 					'count' 			=> 1,
 	);
 
-	$bret = wppa_insert( $table, $data );
-	if ( $bret ) {
-		if ( ! defined( 'DOING_CRON' ) ) setcookie( 'wppa_session_id', $sid, time() + 3600 );
-		return $wpdb->insert_id;
-	}
+	if ( wppa_switch( 'save_sessions' ) ) {
+		$bret = wppa_insert( $table, $data );
+		if ( $bret ) {
+			if ( ! defined( 'DOING_CRON' ) ) setcookie( 'wppa_session_id', $sid, time() + 3600 );
+			return $wpdb->insert_id;
+		}
 
-	wppa_log( 'err', 'Could not insert into db table wppa_session' );
+		wppa_log( 'err', 'Could not insert into db table wppa_session' );
+	}
 	return false;
 }
 
@@ -308,7 +310,6 @@ global $wpdb;
 	$data = apply_filters( 'wppa_photo_entry', $data );
 
 	$data['name'] 			= trim( $data['name'] );
-	$allowed = current_user_can( 'unfiltered_html' ) ? wppa_allowed_tags() : wppa_allowed_simple_tags();
 	$data['description'] 	= strip_shortcodes( wppa_filter_html( $data['description'] ) );
 	$data['sname'] 			= wppa_name_slug( $data['sname'] );
 	$data['tags'] 			= str_replace( '-none-,', '', $data['tags'] );

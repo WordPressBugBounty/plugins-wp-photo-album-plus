@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.2.04.001
+* Version: 9.3.01.001
 *
 */
 
@@ -344,7 +344,7 @@ global $wpdb;
 												 $com['user'].' '.__( 'wrote' , 'wp-photo-album-plus' ).' '.wppa_get_time_since( $com['timestamp'] ).':' );
 				$result .=	wppa_html_tag( 'p', ['style' => 'font-size:10px;line-height:12px;padding:0 0 0 6px;text-align:left;margin:0;clear:left;overflow:auto;'],
 												wp_kses_post( $com['comment'] ));
-				
+
 										//		html_entity_decode( convert_smilies( stripslashes( $com['comment'] ) ) ) );
 				$first = false;
 			}
@@ -481,7 +481,7 @@ global $wpdb;
 				$desc = nl2br( $desc );
 			}
 
-			$result .= wppa_html_tag( 'div', ['class' => 'wppa-thumb-text'], $desc );
+			$result .= wppa_html_tag( 'div', ['class' => 'wppa-thumb-text'], wp_kses_post( $desc ) );
 		}
 
 		// Rating
@@ -693,7 +693,7 @@ global $thlinkmsggiven;
 
 			$result .= 	'<p' .
 							' class="wppa-box-text wppa-black"' .
-							'" >' . $desc .
+							'>' . $desc .
 						'</p>';
 		$result .= 	'</div>';
 

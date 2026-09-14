@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.3.00.002
+* Version: 9.3.01.001
 *
 */
 
@@ -3076,11 +3076,11 @@ global $wpdb;
 											<td style="padding:0 4px">' . wppa_exif_tagname( $exif['tag'] ) . ':</td>' );
 										}
 
-										$raw_value = wp_kses( $desc, 'post' );
+										$raw_value = wp_kses_post( $desc );
 										if ( strlen( $raw_value ) > 50 ) {
 											$raw_value = substr( $raw_value, 0, 47 ) . '...';
 										}
-										$formatted_value = wp_kses( wppa_format_exif( $exif['tag'], $exif['description'], $brand ), 'post' );
+										$formatted_value = wp_kses_post( wppa_format_exif( $exif['tag'], $exif['description'], $brand ) );
 										if ( strlen( $formatted_value ) > 50 ) {
 											$formatted_value = substr( $formatted_value, 0, 47 ) . '...';
 										}

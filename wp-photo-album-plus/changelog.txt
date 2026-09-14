@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.3.01 =
+
+* Applied 13 security related fixes.
+* New setting: System -> I -> Item 97: Save session data - Save sessions in database table. Switch off in case your site's cpu is too heavy loaded or you have too many database calls.
+* Rating and comments did not show up on slideshows of virtual albums (topten, lasten etc). Fixed.
+
 = 9.3.00 =
 
 * All code has been throughly revised for proper sanitizing input and escaping output for stable and secure functioning.

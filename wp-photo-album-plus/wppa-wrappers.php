@@ -5,7 +5,7 @@
 * Contains wrappers for standard php functions
 * For security and bug reasons
 *
-* Version 9.3.00.001
+* Version 9.3.01.001
 *
 */
 
@@ -805,9 +805,14 @@ function wppa_filetime( $path, $log = false ) {
 // Outgoing html
 function wppa_echo( $html, $flags = array() ) {
 
-	$flags = wp_parse_args( $flags, ['return' => false, 'keeplinebreaks' => false, 'needjs' => false, 'needonerror' => false] );
+	$flags = wp_parse_args( $flags, ['simple' => false, 'return' => false, 'keeplinebreaks' => false, 'needjs' => false, 'needonerror' => false] );
 
-	$t = wppa_allowed_tags( $flags );
+	if ( $flags['simple'] ) {
+		$t = wppa_allowed_simple_tags( $flags );
+	}
+	else {
+		$t = wppa_allowed_tags( $flags );
+	}
 	$p = wp_allowed_protocols();
 
 	$html = wppa_compress_html( $html, $flags['keeplinebreaks'] );

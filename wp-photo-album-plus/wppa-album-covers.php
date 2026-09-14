@@ -2004,7 +2004,7 @@ global $wppa_no_lightbox;
 		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i DESC", $albumid, $poc['order'] ), ARRAY_A );
 	}
 	else {
-		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $albumid, $pov['order'] ), ARRAY_A );
+		$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE album = %d ORDER BY %i", $albumid, $poc['order'] ), ARRAY_A );
 	}
 	$result = '';
 	$first 	= true;

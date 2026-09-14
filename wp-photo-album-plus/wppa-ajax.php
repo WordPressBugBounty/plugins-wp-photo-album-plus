@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.00.001
+* Version: 9.3.01.002
 *
 */
 
@@ -2570,8 +2570,8 @@ global $wppa_supported_audio_extensions;
 					}
 
 					// Do the magick command
-					$err = wppa_image_magick( 'convert ' . $path . ' ' . $quality . ' ' . $command . ' ' . $path );
-wppa_log('misc', 'Phase 1');
+					$err = wppa_image_magick_a( ['convert', $path, $quality . ' ' . $command, $path] );
+
 					// Error?
 					if ( $err ) {
 						$txt = __( 'An error occurred while trying to process photo', 'wp-photo-album-plus' );
@@ -2631,7 +2631,7 @@ wppa_log('misc', 'Phase 1');
 					while ( $i < ( count( $commands ) - 1 ) ) {
 
 						// Do the magick command
-						$err = wppa_image_magick( 'convert ' . $path . ' ' . trim( $commands[$i] ) . ' ' . $path );
+						$err = wppa_image_magick_a( ['convert', $path, trim( $commands[$i] ), $path] );
 						$newstack .= ( $i != 0 ? ' | ' : '' ) . $commands[$i];
 						$i++;
 					}
