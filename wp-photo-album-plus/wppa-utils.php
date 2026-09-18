@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.3.01.002
+* Version: 9.3.02.001
 *
 */
 
@@ -6246,15 +6246,15 @@ function wppa_html_tag( $tag, $xattribs = [], $content = '' ) {
 	}
 
 	// Make sure img has width and height
-	elseif ( $tag == 'img' && ! ( $attribs['width'] && $attribs['width'] ) ) {
-		if ( $attribs['src'] && strpos( $attribs['src'], '/wppa/icons/' ) === false && $attribs['src'] != 'dummy' ) {
-			list( $width, $height, $type, $attr) = getimagesize( $attribs['src'] );
-			if ( $width && $height ) {
-				$attribs['width'] = $width;
-				$attribs['height'] = $height;
-			}
-		}
-	}
+//	elseif ( $tag == 'img' && ! ( $attribs['width'] && $attribs['width'] ) && is_file( $attribs['src'] ) ) {
+//		if ( $attribs['src'] && strpos( $attribs['src'], '/wppa/icons/' ) === false && $attribs['src'] != 'dummy' ) {
+//			list( $width, $height, $type, $attr) = getimagesize( $attribs['src'] );
+//			if ( $width && $height ) {
+//				$attribs['width'] = $width;
+//				$attribs['height'] = $height;
+//			}
+//		}
+//	}
 
 	// If lazy, modify src into data-src, and add/completize onload event
 	if ( $lazy && $attribs['src'] ) {

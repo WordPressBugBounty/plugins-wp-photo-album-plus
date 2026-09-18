@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various conversion functions
-* Version: 9.3.01.002
+* Version: 9.3.02.003
 *
 */
 
@@ -17,9 +17,9 @@ global $wpdb;
 	// We start with arg $albumm, so clear start_album first
 	wppa( 'start_album', '' );
 
-	wppa( 'is_owner', wppa_get( 'owner', '', 'text' ) );
+	wppa( 'is_owner', wppa_get( 'owner' ) );
 
-	wppa( 'is_virtual', wppa_get( 'lasten' ) || wppa_get( 'topten' ) || wppa_get( 'featen' ) || wppa_get( 'tag' ) || wppa_get( 'cat' ) || wppa_get( 'upldr' ) );
+	wppa( 'is_virtual', wppa_get( 'lasten' ) || wppa_get( 'topten' ) ||  wppa_get( 'comten' ) || wppa_get( 'featen' ) || wppa_get( 'tag' ) || wppa_get( 'cat' ) || wppa_get( 'upldr' ) );
 
 	if ( $albums ) {
 
@@ -395,6 +395,7 @@ global $wpdb;
 	$wppa['photos_only'] = wppa_get( 'photos-only' );
 	$wppa['medals_only'] = wppa_get( 'medals-only' );
 	$wppa['is_related'] = wppa_get( 'rel', '', 'text' ); 			// either '', 'tags', 'desc'
+	if ( !in_array( $wppa['is_related'], ['', 'tags', 'desc'] ) ) $wppa['is_related'] = '';
 	$wppa['related_count'] = wppa_get( 'relcount', 0, 'int' );
 	$wppa['is_potdhis'] = wppa_get( 'potdhis', 0, 'int' );
 	$wppa['is_parent'] = wppa_get( 'parent', 0, 'int' );
@@ -488,9 +489,9 @@ global $wpdb;
 	$wppa['max'] =  wppa_get( 'max', 0, 'int' );
 
 	// In link from supersearch collection
-	$wppa['is_name'] = wppa_get( 'name', '', 'text' );
-	$wppa['is_iptc'] = wppa_get( 'iptc', '', 'text' );
-	$wppa['is_exif'] = wppa_get( 'exif', '', 'text' );
+	$wppa['is_name'] = wppa_get( 'name' );
+	$wppa['is_iptc'] = wppa_get( 'iptc' );
+	$wppa['is_exif'] = wppa_get( 'exif' );
 
 	return true;
 }

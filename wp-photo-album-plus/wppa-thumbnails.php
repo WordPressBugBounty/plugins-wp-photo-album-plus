@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.3.01.001
+* Version: 9.3.02.002
 *
 */
 
@@ -196,8 +196,8 @@ global $wpdb;
 
 				// The a img ajax
 				$p =  wppa( 'calendar' ) ? '' : $xid;
-				$ajax_url = wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) );
-				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) );
+				$ajax_url = esc_js( wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) ) );
+				$href_url = esc_js( wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) ) );
 				$onclick = "wppaDoAjaxRender(event,$tmocc,'$ajax_url','$href_url'); return false;";
 				if ( $is_video ) {
 					$the_abody = wppa_get_video_html( ['id' => $id, 'tagid' => 'i-'.$xid.'-'.$mocc, 'alt' => wppa_alt($id), 'title' => $title, 'style' => $imgstyle.'cursor:pointer;', 'use_thumb' => true,
@@ -967,11 +967,8 @@ function wppa_get_thumb_masonry( $id ) {
 				// The a img ajax
 				$p =  wppa( 'calendar') ? '' : $xid;
 
-				$ajax_url = wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ),
-																'photo' => $p ) );
-
-				$href_url = wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ),
-														   'photo' => $p ) );
+				$ajax_url = esc_js( wppa_get_slideshow_url_ajax( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) ) );
+				$href_url = esc_js( wppa_get_slideshow_url( array( 'album' => wppa( 'start_album' ), 'photo' => $p ) ) );
 
 				$onclick = "wppaDoAjaxRender(event,$tmocc,'$ajax_url','$href_url'); return false;";
 

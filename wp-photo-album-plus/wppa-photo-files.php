@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.3.01.003
+* Version: 9.3.02.001
 *
 */
 
@@ -36,7 +36,7 @@ function wppa_make_o1_source( $id ) {
 
 	// ImageMagick
 	if ( wppa_can_magick() ) {
-		wppa_image_magick_a( ['convert', $src_path, '-auto-orient', $dst_path] );
+		wppa_image_magick_a( ['convert', '', $src_path, '-auto-orient', $dst_path] );
 	}
 
 	// Classic
@@ -164,7 +164,8 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 		if ( wppa_can_magick() ) {
 
 			// Try making the jpg from the pdf
-			wppa_image_magick_a( ['convert -density 200', $pdf, '-quality 90 -background white -alpha remove', $jpg], 0 );
+			wppa_image_magick_a( ['convert', '-density 200', $pdf, '-quality 90 -background white -alpha remove', $jpg], 0 );
+
 			$err = ! wppa_is_file( $jpg );
 			if ( ! $err ) {
 				switch ( wppa_opt( 'newphoto_name_method' ) ) {
@@ -203,6 +204,9 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 				if ( wppa_is_file( $disp ) ) {
 					wppa_unlink( $disp );
 				}
+			}
+			else {
+				wppa_log( 'err', 'Could not create jpg from pdf source. Status = '.$err );
 			}
 		}
 
@@ -278,7 +282,7 @@ function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true, $do_exif
 				$quality = '-quality ' . $q;
 			}
 
-			$iret = wppa_image_magick_a( ['convert', $file, $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height, $newimage] );
+			$iret = wppa_image_magick_a( ['convert', '', $file, $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height, $newimage] );
 			if ( $iret ) {
 				wppa_log( 'fso', 'Magick could not create ' . $newimage );
 			}
@@ -620,7 +624,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 		// External Magick command?
 		if ( ! $done && wppa_can_magick() && $type == 'none' ) {
 
-			$iret = wppa_image_magick_a( ['convert', $file, '-thumbnail ' . $perc . '%', $thumbpath] );
+			$iret = wppa_image_magick_a( ['convert', '', $file, '-thumbnail ' . $perc . '%', $thumbpath] );
 			if ( $iret ) {
 				wppa_log( 'fso', 'Magick command could not create ' . $thumbpath );
 			}
@@ -844,20 +848,31 @@ function wppa_image_magick_a( $com_arr, $page = false ) {
 	}
 
 	// Validate input
-	if ( ! is_array( $com_arr ) || count( $com_arr ) != 4 ) {
-		wppa_log( 'err', 'Improper args to  wppa_image_magick_a()' );
-		return '-9';
-	}
+	$err = 0;
+	if ( ! is_array( $com_arr ) || count( $com_arr ) != 5 ) $err = 1;
+	if ( $page !== false && ! wppa_is_int( $page ) ) $err = 2;
 
-	if ( $page !== false ) {
-		$com_arr[1] .= '['.$page.']';
+	if ( ! in_array( $com_arr[0], ['convert'] ) ) $err = 3;
+	if ( ! in_array( $com_arr[1], ['', '-density 200'] ) ) $err = 4;
+	if ( ! is_file( $com_arr[2] ) ) $err = 4;
+	if ( ! wppa_check_magick_action( $com_arr[3] ) ) $err = 5;
+	if ( ! wppa_is_path_safe( $com_arr[4] ) ) $err = 6;
+
+	if ( $err ) {
+		wppa_log( 'err', 'Invalid call to wppa_image_magick_a(), code = '.$err );
+		wppa_exit();
 	}
 
 	// Make command
-	$command =	$com_arr[0] . ' ' .										// command before first path
-				escapeshellarg( $com_arr[1] ) . ' ' .					// from path
-				$com_arr[2] . ' ' .										// action specification
-				escapeshellarg( $com_arr[3] ); 							// to path
+	if ( $page !== false ) {
+		$com_arr[2] .= '['.$page.']';
+	}
+
+	$command =					$com_arr[0] . ' ' .							// convert
+								$com_arr[1] . ' ' .							// '' or '-density 200'
+				escapeshellarg( $com_arr[2] ) . ' ' .						// from path
+								$com_arr[3] . ' ' .							// action specification
+				escapeshellarg( $com_arr[4] ); 								// to path
 
 	// Image Magick root dir
 	$path = rtrim( wppa_opt( 'image_magick' ), '/' ) . '/';
@@ -881,10 +896,32 @@ function wppa_image_magick_a( $com_arr, $page = false ) {
 	$logcom = str_replace( ABSPATH, '...', $logcom );
 	$logcom = str_replace( wppa_opt( 'image_magick' ), '...', $logcom );
 
-	wppa_log( 'Fso', 'Exec ' . $logcom . ' return status: ' . $err );
+	wppa_log( 'fso', 'Exec ' . $logcom . ' return status: ' . $err );
 
 	if ( $err == '46' ) $err = 0;
 	return $err;
+}
+
+function wppa_check_magick_action( $action ) {
+
+	$a_arr = explode( ' ', $action );
+	
+	// Test for keywords
+	foreach( array_keys( $a_arr ) as $key ) {
+		$item = $a_arr[$key];		
+		if ( in_array( $item, ['-auto-orient', '-quality', '-background', '-resize', '-thumbnail', 'white', '-alpha', 'remove'] ) ) {
+			$a_arr[$key] = '';
+		}
+	}
+	
+	// Recombine and test for numerics
+	$a = implode( '', $a_arr );
+	$a = rtrim( $a, '%' );
+	$a = str_replace( 'x', '', $a );
+	
+	if ( is_numeric( $a ) || $a == '' ) return true;
+	wppa_log('err', 'Unsupported item found in magick action: ', esc_html($a));
+	return false;
 }
 
 // Convert .png's to .jpg's
@@ -1083,7 +1120,7 @@ global $wpdb;
 			$jpg = $targetalbdir . '/' . $jpgfilename;
 
 			// Do the extraction
-			wppa_image_magick_a( ['convert -density 200', $pdf, '-quality 90 -background white -alpha remove', $jpg], $page );
+			wppa_image_magick_a( ['convert', '-density 200', $pdf, '-quality 90 -background white -alpha remove', $jpg], $page );
 
 			// Possible error done
 			$err = ! wppa_is_file( $jpg );
@@ -1215,7 +1252,7 @@ global $wppa_opt;
 	$t = $wppa_opt['wppa_log_fso'];
 	$wppa_opt['wppa_log_fso'] = 'no';
 
-	wppa_image_magick_a( ['convert -density 200', $file, '-quality 90 -background white -alpha remove', $tempfile], 1 );
+	wppa_image_magick_a( ['convert', '-density 200', $file, '-quality 90 -background white -alpha remove', $tempfile], 1 );
 
 	// Restore orig errorlog setting
 	$wppa_opt['wppa_log_fso'] = $t;
@@ -1240,7 +1277,7 @@ function wppa_create_video_poster( $id ) {
 	$video_file = str_replace( wppa_get_ext( $photo_file ), $first_ext, $photo_file );
 
 //	$cmd = "convert $video_file"."[1] $photo_file";
-	$iret = wppa_image_magick_a( ['convert', $video_file, '', $photo_file], 1 );
+	$iret = wppa_image_magick_a( ['convert', '', $video_file, '', $photo_file], 1 );
 	wppa_log('misc', 'magick returned code '.$iret );
 	if ( wppa_is_file( $photo_file ) ) {
 		return true;

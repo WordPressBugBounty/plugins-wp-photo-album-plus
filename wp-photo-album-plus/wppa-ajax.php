@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.01.002
+* Version: 9.3.02.001
 *
 */
 
@@ -1709,20 +1709,23 @@ global $wppa_supported_audio_extensions;
 			wppa_delete_photo( $photo, $immediate );
 			wppa_clear_cache( ['photo' => $photo] );
 			wppa_clear_cache( ['album' => $album] );
+
 			$edit_link = wppa_ea_url( 'single' ) . '&photo=' . wppa_encrypt_photo( $photo );
-			$a = wppa_allow_uploads( $album );
+			$edit_html = wppa_html_tag( 'a', ['href' => $edit_link, 'target' => '_blank'], $photo );
+
 			if ( $immediate ) {
-				wppa_echo( '||1||' . wppa_html_tag( 'span', ['style' => 'color:red'],
-						/* translators: photo id */
-						sprintf( __( 'Photo %s has been permanently removed' ,'wp-photo-album-plus' ), html_tag( 'a', ['href' => $edit_link, 'target' => '_blank'], $photo ) ) ) .
-						'||' . ( $a ? 'notfull||'.$a : 'full' ) );
+				/* translators: photo id */
+				$txt = sprintf( __( 'Photo %s has been permanently removed' ,'wp-photo-album-plus' ), $edit_html );
 			}
 			else {
-				wppa_echo( '||1||' . wppa_html_tag( 'span', ['style' => 'color:red'],
-						/* translators: photo id */
-						sprintf( __( 'Photo %s has been deleted' ,'wp-photo-album-plus' ), html_tag( 'a', ['href' => $edit_link, 'target' => '_blank'], $photo ) ) ) .
-						'||' . ( $a ? 'notfull||'.$a : 'full' ) );
+				/* translators: photo id */
+				$txt = sprintf( __( 'Photo %s has been deleted' ,'wp-photo-album-plus' ), $edit_html );
 			}
+
+			$a = wppa_allow_uploads( $album );
+			$result = '||1||' . wppa_html_tag( 'span', ['style' => 'color:red'], $txt ) . '||' . ( $a ? 'notfull||'.$a : 'full' );
+			wppa_echo( $result );
+			wppa_exit();
 			break;
 
 		case 'undelete-photo':
@@ -2570,7 +2573,7 @@ global $wppa_supported_audio_extensions;
 					}
 
 					// Do the magick command
-					$err = wppa_image_magick_a( ['convert', $path, $quality . ' ' . $command, $path] );
+					$err = wppa_image_magick_a( ['convert', '', $path, $quality . ' ' . $command, $path] );
 
 					// Error?
 					if ( $err ) {
@@ -2631,7 +2634,7 @@ global $wppa_supported_audio_extensions;
 					while ( $i < ( count( $commands ) - 1 ) ) {
 
 						// Do the magick command
-						$err = wppa_image_magick_a( ['convert', $path, trim( $commands[$i] ), $path] );
+						$err = wppa_image_magick_a( ['convert', '', $path, trim( $commands[$i] ), $path] );
 						$newstack .= ( $i != 0 ? ' | ' : '' ) . $commands[$i];
 						$i++;
 					}

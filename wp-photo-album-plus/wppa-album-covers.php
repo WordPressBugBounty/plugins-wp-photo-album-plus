@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version: 9.3.00.002
+* Version: 9.3.02.002
 *
 */
 
@@ -153,7 +153,7 @@ global $cover_count_key;
 	$ajax_slideshow = wppa_get_slideshow_url_ajax( array( 'album' => $albumid,
 														  'page' => $linkpage ) );
 	if ( ! $linkpage ) {
-		$onclick_slideshow = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_slideshow . "', '" . $href_slideshow . "' );return false;";
+		$onclick_slideshow = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax_slideshow ) . "', '" . esc_js( $href_slideshow ) . "' );return false;";
 		$href_slideshow = "#";
 	}
 
@@ -443,7 +443,7 @@ global $cover_count_key;
 	$ajax_slideshow = wppa_get_slideshow_url_ajax( array( 'album' => $albumid,
 														  'page' => $linkpage ) );
 	if ( ! $linkpage ) {
-		$onclick_slideshow = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_slideshow . "', '" . $href_slideshow . "' );return false;";
+		$onclick_slideshow = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax_slideshow ) . "', '" . esc_js( $href_slideshow ) . "' );return false;";
 		$href_slideshow = "#";
 	}
 
@@ -716,7 +716,7 @@ global $cover_count_key;
 	$ajax_slideshow = wppa_get_slideshow_url_ajax( array( 'album' => $albumid,
 														  'page' => $linkpage ) );
 	if ( ! $linkpage ) {
-		$onclick_slideshow = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_slideshow . "', '" . $href_slideshow . "' );return false;";
+		$onclick_slideshow = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax_slideshow ) . "', '" . esc_js( $href_slideshow ) . "' );return false;";
 		$href_slideshow = "#";
 	}
 
@@ -1411,7 +1411,7 @@ function wppa_get_album_title_attr_a( $albumid, $linktype, $linkpage, $has_conte
 				$href_title = wppa_get_album_url( $args );
 				$ajax_title = wppa_get_album_url_ajax( $args );
 
-				$onclick_title = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_title . "', '" . $href_title . "' );return false;";
+				$onclick_title = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax_title ) . "', '" . esc_js( $href_title ) . "' );return false;";
 //				$href_title = "#";
 				break;
 			case 'slide':
@@ -1420,7 +1420,7 @@ function wppa_get_album_title_attr_a( $albumid, $linktype, $linkpage, $has_conte
 				$ajax_title = wppa_get_slideshow_url_ajax( array( 'album' => $albumid,
 																  'page' => $linkpage,  ) );
 
-				$onclick_title = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_title . "', '" . $href_title . "' );return false;";
+				$onclick_title = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax_title ) . "', '" . esc_js( $href_title ) . "' );return false;";
 //				$href_title = "#";
 				break;
 			default:
@@ -1440,7 +1440,7 @@ function wppa_get_album_title_attr_a( $albumid, $linktype, $linkpage, $has_conte
 
 				if ( $coverphoto ) {
 					$onclick_title = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" .
-						wppa_encrypt_url( wppa_get_image_url_ajax_by_id( $coverphoto ) ) . "', '" . $href_title . "' );return false;";
+						esc_js( wppa_encrypt_url( wppa_get_image_url_ajax_by_id( $coverphoto ) ) ) . "', '" . esc_js( $href_title ) . "' );return false;";
 				}
 				else {
 					$onclick_title = '';
@@ -1488,7 +1488,7 @@ function wppa_album_cover_view_link( $id ) {
 	$ajax = wppa_get_album_url_ajax( array( 'album' => $id, 'page' => $page ) );
 	$onclick = '';
 	if ( ! $page ) {
-		$onclick = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax . "', '" . $href . "' );return false;";
+		$onclick = "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax ) . "', '" . esc_js( $href ) . "' );return false;";
 		$href = "#";
 	}
 	$target = '_self';
@@ -1777,7 +1777,7 @@ global $wpdb;
 					$ajax_content 		= wppa_get_album_url_ajax( array( 'album' => $albumid,
 																		  'page' => $linkpage ) );
 
-					$onclick_content 	= "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $ajax_content . "', '" . $href_content . "' );return false;";
+					$onclick_content 	= "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $ajax_content ) . "', '" . esc_js( $href_content ) . "' );return false;";
 
 					$title = esc_attr( __( 'View the album', 'wp-photo-album-plus' ) . ': ' . wppa_get_album_name( $albumid ) );
 				}
@@ -1789,7 +1789,7 @@ global $wpdb;
 					$ajax_content		= wppa_get_slideshow_url_ajax( array( 'album' => $albumid,
 																			  'page' => $linkpage ) );
 
-					$onclick_content 	= "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . $alax_content . "', '" . $href_content . "' );return false;";
+					$onclick_content 	= "wppaDoAjaxRender(event, " . wppa( 'targetmocc' ) . ", '" . esc_js( $alax_content ) . "', '" . esc_js( $href_content ) . "' );return false;";
 
 					$title = esc_attr( __( 'View the album', 'wp-photo-album-plus' ) . ': ' . wppa_get_album_name( $albumid ) );
 				}

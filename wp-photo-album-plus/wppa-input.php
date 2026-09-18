@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.3.01.001
+* Version: 9.3.02.002
 *
 */
 
@@ -191,6 +191,17 @@ function wppa_get_get_filter( $name ) {
 		case 'cat':
 		case 'cats':
 			$result = 'tagcat';
+			break;
+
+		// alpha only
+		case 'calendar':
+		case 'caldate':
+		case 'upldr':
+		case 'name':
+		case 'iptc':
+		case 'exif':
+		case 'owner':
+			$result = 'alpha';
 			break;
 
 		// Custom data
@@ -398,6 +409,12 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 
 		case 'gutsc':
 			return isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : ''; // str_replace( '%23', '#', stripslashes( $_REQUEST['shortcode'] ) );
+			break;
+
+		case 'alpha':
+			$value = isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : '';
+			$value = str_replace( ["'", '"'], '', $value );
+			return $value;
 			break;
 
 		case 'text':

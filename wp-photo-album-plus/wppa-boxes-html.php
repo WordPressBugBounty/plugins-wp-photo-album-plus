@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.3.01.001
+* Version 9.3.02.003
 *
 */
 
@@ -1610,7 +1610,7 @@ global $wppa_lang;
 	$res_mocc = wppa_switch( 'ownersel_below' ) ? $mocc + 1 : $mocc - 1;
 	$url = wppa_get_permalink('',true).'?wppa-occur='.$res_mocc.$l.'&wppa-photos-only=1&wppa-upldr=\'+this.value+\'&wppa-cover=0&vt=1';
 	$ajx = wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.$res_mocc.$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value';
-	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.esc_url($ajx).',\''.esc_url($url).'\')';
+	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.esc_js($ajx).',\''.esc_js($url).'\')';
 
 	$options = wppa_html_tag( 'option', [/*'id' => 'dummy', 'value' => 'dummy',*/ 'disabled' => 'disabled', 'selected' => 'selected'], __('Please select a user', 'wp-photo-album-plus') );
 	foreach( $owners as $owner ) {
@@ -3602,7 +3602,7 @@ static $albums_granted;
 
 		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
 		$ajax_url_after_upload = wppa_get_ajaxlink() . 'wppa-occur=' . wppa( 'mocc' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
-		$on_complete = 'wppaDoAjaxRender(event, ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' );return false;';
+		$on_complete = 'wppaDoAjaxRender(event, ' . $occur . ', \'' . esc_js( $ajax_url_after_upload ) . '\', \'' . esc_js( $url_after_ajax_upload ) . '\' );return false;';
 	}
 	else {
 		$url_after_ajax_upload = '';
@@ -5481,7 +5481,7 @@ global $photos_used;
 
 					$onclick = 'jQuery(\'.wppa-minicover-' . $mocc . '\').removeClass(\'wppa-minicover-current\');
 								jQuery(this).addClass(\'wppa-minicover-current\');
-								wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'' . $normurl . '\');return false;';
+								wppaDoAjaxRender(event,' . $mocc1 . ', \'' . esc_js( $ajaxurl ) . '\', \'' . esc_js( $normurl ) . '\');return false;';
 
 					$result .= '
 					<a
@@ -5523,7 +5523,7 @@ global $photos_used;
 
 				$onclick = 'jQuery( \'.wppa-minicover-' . $mocc . '\' ).removeClass( \'wppa-minicover-current\' );
 							jQuery(this).addClass(\'wppa-minicover-current\');
-							wppaDoAjaxRender(event,' . $mocc1 . ', \'' . $ajaxurl . '\', \'' . $normurl . '\');return false;';
+							wppaDoAjaxRender(event,' . $mocc1 . ', \'' . esc_js( $ajaxurl ) . '\', \'' . esc_js( $normurl ) . '\');return false;';
 
 				$result .= 	'
 				<a
@@ -5710,7 +5710,7 @@ global $photos_used;
 					else {
 					$result .= '
 						<td class="wppa-real-calendar-small wppa-real-calendar-head-td-'.$mocc.'"
-							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $year-1, $month ) . '\');return false;"
+							onclick="'.esc_attr('wppaDoAjaxRender(event,' . $mocc . ', \'' . esc_js( wppa_get_real_calendar_link( $year-1, $month ) ) . '\');return false;').'"
 							>' .
 							( $year - 1 ) . '
 						</td>';
@@ -5731,7 +5731,7 @@ global $photos_used;
 						else {
 							$result .= '
 							<td class="wppa-real-calendar-small wppa-real-calendar-head-td-'.$mocc.'"
-							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $year, $m ) . '\');return false;"
+							onclick="'.esc_attr('wppaDoAjaxRender(event,' . $mocc . ', \'' . esc_js( wppa_get_real_calendar_link( $year, $m ) ) . '\');return false;').'"
 							>' .
 							$month_lbls[$m - 1] . '
 							</td>';
@@ -5750,7 +5750,7 @@ global $photos_used;
 					else {
 						$result .= '
 						<td class="wppa-real-calendar-small wppa-real-calendar-head-td-'.$mocc.'"
-							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $year+1, $month ) . '\');return false;"
+							onclick="'.esc_attr('wppaDoAjaxRender(event,' . $mocc . ', \'' . esc_js( wppa_get_real_calendar_link( $year+1, $month ) ) . '\');return false;').'"
 							>' .
 							( $year + 1 ) . '
 						</td>';
@@ -5777,7 +5777,7 @@ global $photos_used;
 						<td colspan="1"
 							class="wppa-real-calendar-navi wppa-real-calendar-head-td-'.$mocc.'"
 							title="' . ucfirst( $month_labels[$pm-1] ) . ' ' . $py . '"
-							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $py, $pm ) . '\');return false;"
+							onclick="'.esc_attr('wppaDoAjaxRender(event,' . $mocc . ', \'' . esc_js( wppa_get_real_calendar_link( $py, $pm ) ) . '\');return false;').'"
 							>' .
 							ucfirst( $month_lbls[$pm-1] ) . '
 						</td>';
@@ -5808,7 +5808,7 @@ global $photos_used;
 						<td colspan="2"
 							class="wppa-real-calendar-today wppa-real-calendar-navi wppa-real-calendar-head-td-'.$mocc.'"
 							title="' . ucfirst( $month_labels[wppa_local_date( 'm', time() )-1] ) . ' - ' . wppa_local_date( 'Y', time() ) . '"
-							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( 0, 0 ) . '\');return false;"
+							onclick="'.esc_attr('wppaDoAjaxRender(event,' . $mocc . ', \'' . esc_js( wppa_get_real_calendar_link( 0, 0 ) ) . '\');return false;').'"
 							>' .
 							__( "Now", 'wp-photo-album-plus' ) . '
 						</td>';
@@ -5828,7 +5828,7 @@ global $photos_used;
 						<td colspan="1"
 							class="wppa-real-calendar-navi wppa-real-calendar-head-td-'.$mocc.'"
 							title="' . ucfirst( $month_labels[$nm-1] ) . ' ' . $ny . '"
-							onclick="wppaDoAjaxRender(event,' . $mocc . ', \'' . wppa_get_real_calendar_link( $ny, $nm ) . '\');return false;"
+							onclick="'.esc_attr('wppaDoAjaxRender(event,' . $mocc . ', \'' . esc_js( wppa_get_real_calendar_link( $ny, $nm ) ) . '\');return false;').'"
 							>' .
 							ucfirst( $month_lbls[$nm-1] ) . '
 						</td>';
@@ -5970,7 +5970,7 @@ global $photos_used;
 										<a
 											data-id="' . wppa_encrypt_photo( $id ) . '"
 											style="color:white;cursor:pointer"
-											onclick="wppaDoAjaxRender(event,' . ( $mocc + 1 ) . ', \'' . $ajaxurl . '\',\'' . $normurl . '\' );return false;"
+											onclick="'.esc_attr('wppaDoAjaxRender(event,' . ( $mocc + 1 ) . ', \'' . esc_js( $ajaxurl ) . '\',\'' . esc_js( $normurl ) . '\' );return false;').'"
 											>';
 
 										// The cell content
@@ -6458,7 +6458,7 @@ global $wppa_lang;
 			' id="wppa-button-initial-' . $mocc . '"' .
 			' type="button"' .
 			' value="' . wppa( 'is_button' ) . '"' .
-			' onclick="wppaDoAjaxRender(event, ' . $mocc . ', \'' . $al . '\' );return false;"' .
+			' onclick="wppaDoAjaxRender(event, ' . $mocc . ', \'' . esc_js( $al ) . '\' );return false;"' .
 		' />';
 
 	// Output
@@ -6668,7 +6668,7 @@ function wppa_get_grid_image_html( $id ) {
 
 			// The a img
 			if ( $link['ajax_url'] ) {
-				$result .= '<a style="position:static;" onclick="wppaDoAjaxRender(event,'.wppa('targetmocc').', \''.$link['ajax_url'].'\', \''.$link['url'].'\');return false;" class="grid-img" id="x-'.$xid.'-'.$mocc.'" >';
+				$result .= '<a style="position:static;" onclick="wppaDoAjaxRender(event,'.wppa('targetmocc').', \''.esc_js($link['ajax_url']).'\', \''.esc_js($link['url']).'\');return false;" class="grid-img" id="x-'.$xid.'-'.$mocc.'" >';
 			}
 			else {
 				$result .= '<a style="position:static;" href="'.$link['url'].'" target="'.$link['target'].'" class="grid-img" id="x-'.$xid.'-'.$mocc.'" >';

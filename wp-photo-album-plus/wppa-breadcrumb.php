@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 9.3.00.001
+* Version 9.3.02.003
 *
 */
 
@@ -224,8 +224,8 @@ static $post_type_value;
 		$value = stripslashes( $value );
 
 		if ( wppa( 'is_slide' ) ) {
-			$thumbhref 	= wppa_get_permalink().'wppa-cover=0&wppa-occur='.wppa( 'mocc' ).'&wppa-supersearch='.stripslashes( wppa( 'supersearch' ) );
-			$thumbajax  = wppa_get_ajaxlink().'wppa-cover=0&wppa-occur='.wppa( 'mocc' ).'&wppa-supersearch='.stripslashes( wppa( 'supersearch' ) );
+			$thumbhref 	= wppa_get_permalink().'wppa-cover=0&wppa-occur='.wppa( 'mocc' ).'&wppa-supersearch='.urlencode( wppa( 'supersearch' ) );
+			$thumbajax  = wppa_get_ajaxlink().'wppa-cover=0&wppa-occur='.wppa( 'mocc' ).'&wppa-supersearch='.urlencode( wppa( 'supersearch' ) );
 			$title  = __( 'View the thumbnails' , 'wp-photo-album-plus' );
 			wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 		}
@@ -628,7 +628,7 @@ static $post_type_value;
 			$mocc = wppa( 'mocc' );
 
 			wppa_html_out( 'span', ['title' => __( 'Thumbnail view', 'wp-photo-album-plus' ), 'class' => 'wppa-nav-text', 'style' => 'float:right; cursor:pointer',
-									'onclick' => 'wppaDoAjaxRender(event,'.$mocc.', \''.esc_url($ajax_url.$s).'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.esc_url($href_url.$s).'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true);return false;'],
+									'onclick' => 'wppaDoAjaxRender(event,'.$mocc.', \''.esc_js($ajax_url.$s).'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']], \''.esc_js($href_url.$s).'&wppa-paged=\'+wppaThumbPage['.$mocc.']+\'&wppa-hilite=\'+_wppaId['.$mocc.'][_wppaCurIdx['.$mocc.']],true);return false;'],
 				wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, 10, 10, 10, 10 ) );
 		}
 	}
@@ -693,7 +693,7 @@ global $wppa_lang;
 
 	if ( $href ) {
 		if ( $ajax ) {
-			wppa_out(  wppa_html_tag( 'a', ['onclick' => 'wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . esc_url( $ajax ) . '\', \'' . esc_url( $href ) . '\' );return false;',
+			wppa_out(  wppa_html_tag( 'a', ['onclick' => 'wppaDoAjaxRender(event,' . wppa( 'mocc' ) . ', \'' . esc_js( $ajax ) . '\', \'' . esc_js( $href ) . '\' );return false;',
 											'href' => $href, 'class' => 'wppa-nav-text ' . $class, 'style' => 'cursor:pointer', 'title' => $title], $value ) );
 		}
 		else {
