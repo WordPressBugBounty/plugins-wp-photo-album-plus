@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* version 9.3.01.002
+* version 9.3.03.002
 *
 */
 
@@ -19,21 +19,11 @@ global $wppa_defaults;
 	// Test for too early
 	if ( ! defined('WPPA_UPLOAD') ) {
 		wppa_log( 'err', 'WPPA_UPLOAD not defined in wppa_set_defaults().' );
+		return;
 	}
 
 	$npd = '
-<a onClick="jQuery(\'.wppa-dtl\').css(\'display\', \'block\'); jQuery(\'.wppa-more\').css(\'display\', \'none\'); wppaOvlResize();">
-<div class="wppa-more">
-Camera info
-</div>
-</a>
-<a onClick="jQuery(\'.wppa-dtl\').css(\'display\', \'none\'); jQuery(\'.wppa-more\').css(\'display\', \'block\'); wppaOvlResize();">
-<div class="wppa-dtl" style="display:none">
-Hide Camera info
-</div>
-</a>
-<div class="wppa-dtl" style="display:none;">
-<br>
+<div>
 <table style="margin:0; border:none">
 <tr><td class="wppa-label" >Date Time</td><td class="wppa-value" >E#0132</td></tr>
 <tr><td class="wppa-label" >Camera</td><td class="wppa-value" >E#0110</td></tr>
@@ -1054,7 +1044,7 @@ horizrailenabled:false,";
 
 
 						'wppa_moderate_bulk' 			=> 'no', 	// B20
-						'wppa_use_wp_editor' 			=> 'no',
+//						'wppa_use_wp_editor' 			=> 'no',
 						'wppa_admin_theme_css' 			=> 'no',
 						'wppa_admin_inline_css' 		=> '',
 						'wppa_admin_extra_css' 			=> '',

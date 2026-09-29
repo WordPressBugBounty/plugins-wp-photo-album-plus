@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.02.001
+* Version: 9.3.03.003
 *
 */
 
@@ -51,6 +51,7 @@ global $wppa;
 global $wppa_url_set_extension;
 global $wppa_supported_video_extensions;
 global $wppa_supported_audio_extensions;
+global $wppa_defaults;
 
 	wppa( 'ajax', true );
 	if ( ! defined( 'DOING_WPPA_AJAX' ) ) {
@@ -3895,13 +3896,18 @@ global $wppa_supported_audio_extensions;
 					break;
 
 				case 'wppa_newphoto_description':
+					$alert = '';
 					$value = wppa_get( 'value', '', 'html' );
+					if ( $value == 'reset' ) {
+						$value = $wppa_defaults['wppa_newphoto_description'];
+						$alert = __( 'New photo description reset to the default value, reload the page to make it visible', 'wp-photo-album-plus' );
+						wppa( 'error', 0 );
+					}
 					if ( wppa_switch( 'compress_newdesc' ) ) {
 						$value = wppa_compress_html( $value );
 					}
 					wppa_update_option( $option, $value );
 					wppa( 'error', 0 );
-					$alert = '';
 					wppa_index_compute_skips();
 					break;
 

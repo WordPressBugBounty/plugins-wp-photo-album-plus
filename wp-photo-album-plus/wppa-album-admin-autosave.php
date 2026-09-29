@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 9.3.01.002
+* Version 9.3.03.002
 *
 */
 
@@ -1240,6 +1240,7 @@ static $cache;
 										__( 'Description', 'wp-photo-album-plus' ) . '
 									</legend>' );
 
+/*
 									// WP Editor
 									if ( wppa_switch( 'use_wp_editor') ) {
 
@@ -1263,9 +1264,9 @@ static $cache;
 										/>' .
 										wppa_html_tag( 'img', ['id' => "wppa-album-spin", 'src' => wppa_get_imgdir('spinner.gif'), 'alt' => "Spin", 'style' => "visibility:hidden"] ) );
 									}
-
+*/
 									// Textarea
-									else {
+							//		else {
 										wppa_echo(
 
 											wppa_html_tag( 'textarea', ['id' => 'wppa-description',
@@ -1274,7 +1275,7 @@ static $cache;
 																		'placeholder' => __( 'Enter album description (optionally)', 'wp-photo-album-plus' )],
 																		esc_textarea( stripslashes( $description ) ) )
 										 );
-									}
+							//		}
 								wppa_echo( '
 								</fieldset>' );
 							}

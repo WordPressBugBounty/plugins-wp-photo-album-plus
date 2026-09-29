@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.3.01.003
+* Version 9.3.03.002
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -34,34 +34,47 @@ if ( ! defined( 'ABSPATH' ) ) exit();
 function wppa_get_session_id() {
 global $wppa_version;
 global $wpdb;
-static $session_id;
+global $wppa_session_id;
 
 	// Found already?
-	if ( $session_id ) {
-		return $session_id;
+	if ( $wppa_session_id ) {
+		return $wppa_session_id;
+	}
+
+	// Cron?
+	if ( defined( 'DOING_CRON' ) ) {
+		$wppa_session_id = 'cron';
+		return $wppa_session_id;
 	}
 
 	// Look for a cookie
 	if ( isset( $_COOKIE['wppa_session_id'] ) ) {
-		$session_id = sanitize_text_field( $_COOKIE['wppa_session_id'] );
-		if ( $session_id ) {
-			return $session_id;
-		}
+		$wppa_session_id = sanitize_text_field( $_COOKIE['wppa_session_id'] );
 	}
+
+	// Not found yet, create new
+	if ( ! $wppa_session_id ) {
+		$wppa_session_id = md5( microtime( true ) );
+		setcookie( 'wppa_session_id', $wppa_session_id, time() + 3600 );
+	}
+
+	// Done
+	return $wppa_session_id;
 }
 
 // Dummy for wfcart
-function wppa_session_start () {}
+function wppa_session_start() {}
 
 // Start a session or retrieve the sessions data. To be called at init.
 function wppa_begin_session() {
 global $wpdb;
 global $wppa_session;
+global $wppa_session_id;
 
 	// Init
-	$lifetime 	= 3600;			// Sessions expire after one hour
+	$lifetime 	= 3600;			// Sessions expires after one hour
 	$expire 	= time() - $lifetime;
-	$session_id = wppa_get_session_id();
+	if ( ! $wppa_session_id ) $wppa_session_id = wppa_get_session_id();
 	$session 	= false;
 
 	// Is session already started?
@@ -70,7 +83,7 @@ global $wppa_session;
 													WHERE session = %s
 													AND status = 'valid'
 													ORDER BY id DESC
-													LIMIT 1", $session_id ), ARRAY_A );
+													LIMIT 1", $wppa_session_id ), ARRAY_A );
 	}
 
 	// Started but expired?
@@ -80,7 +93,7 @@ global $wppa_session;
 
 		if ( $session['timestamp'] < $expire ) {
 
-			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE session = %s", $session_id ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET status = 'expired' WHERE session = %s", $wppa_session_id ) );
 			$session = false;
 		}
 
@@ -130,23 +143,19 @@ global $wppa_session;
 
 	// Session exists, Update counter
 	else {
-		$count = $wpdb->get_var( $wpdb->prepare( "SELECT `count` FROM $wpdb->wppa_session WHERE session = %s", $session_id ) );
-		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %d WHERE session = %s", $count + 1, $session_id ) );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT `count` FROM $wpdb->wppa_session WHERE session = %s", $wppa_session_id ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %d WHERE session = %s", $count + 1, $wppa_session_id ) );
 	}
 
 	if ( ! isset( $wppa_session['page'] ) ) $wppa_session['page'] = 0;
 	$wppa_session['page']++;
 	if ( ! isset( $wppa_session['uris'] ) ) $wppa_session['uris'] = [];
-	if ( wppa_request_uri() ) {
-		$new_item = date_i18n("H:i") . ' ' . wppa_request_uri();
+	if ( $_SERVER['REQUEST_URI'] ) {
+		$new_item = date_i18n("H:i") . ' ' . sanitize_text_field( wp_strip_all_tags( html_entity_decode( $_SERVER['REQUEST_URI'] ) ) );
 		if ( ! in_array( $new_item, (array) $wppa_session['uris'] ) ) {
 			$wppa_session['uris'][] = $new_item;
 		}
-		if ( stripos( wppa_request_uri(), '/robots.txt' ) !== false ) {
-			$wppa_session['isrobot'] = true;
-		}
 	}
-
 	return true;
 }
 
@@ -164,22 +173,23 @@ function wppa_save_session() {
 global $wpdb;
 global $wppa_session;
 
+	// Are we saving sessions?
 	if ( ! wppa_switch( 'save_sessions' ) ) return false;
 
 	// If no id can be found, give up
-	$session_id = wppa_get_session_id();
-	if ( ! $session_id ) return false;
+	$wppa_session_id = wppa_get_session_id();
+	if ( ! $wppa_session_id ) return false;
 
 	// To prevent data overflow, only save the most recent 100 urls
 	$c = isset( $wppa_session['uris'] ) && is_array( $wppa_session['uris'] ) ? count( $wppa_session['uris'] ) : 0;
 	if ( $c > 100 ) {
 		array_shift( $wppa_session['uris'] );
 	}
-// wppa_log('dbg', 'up to save '.$wppa_session['use_searchstring']);
+
 	// Compose the query
 	$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session
 											SET data = %s
-											WHERE session = %s", serialize( $wppa_session ), $session_id ) );
+											WHERE session = %s", serialize( $wppa_session ), $wppa_session_id ) );
 	// Rreturn result
 	return $iret;
 }
@@ -200,14 +210,13 @@ global $wpdb;
 function wppa_read_session() {
 global $wppa_session;
 global $wpdb;
+global $wppa_session_id;
 
-	$sessionid = wppa_get_session_id();
-	if ( ! $wppa_session ) {
-		wppa_begin_session();
-	}
-
+	// are we saving sessions?
 	if ( ! wppa_switch( 'save_sessions' ) ) return false;
 
-	$data = $wpdb->get_var( $wpdb->prepare( "SELECT data from $wpdb->wppa_session WHERE session = %s ORDER BY id DESC LIMIT 1", $sessionid ) );
+	if ( ! $wppa_session_id ) $wppa_session_id = wppa_get_session_id();
+
+	$data = $wpdb->get_var( $wpdb->prepare( "SELECT data from $wpdb->wppa_session WHERE session = %s ORDER BY id DESC LIMIT 1", $wppa_session_id ) );
 	if ( $data ) $wppa_session = unserialize( $data );
 }

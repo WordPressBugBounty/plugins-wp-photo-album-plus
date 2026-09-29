@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version: 9.3.01.001
+* Version: 9.3.03.002
 *
 */
 
@@ -1649,6 +1649,7 @@ global $wpdb;
 									__( 'Description', 'wp-photo-album-plus' ) . '
 								</legend>' );
 
+/*
 								// WP editor
 								if ( wppa_switch( 'use_wp_editor' ) ) {
 									$alfaid = wppa_alfa_id( $id );
@@ -1672,9 +1673,9 @@ global $wpdb;
 									/>' .
 									wppa_html_tag( 'img', ['id' => 'wppa-photo-spin-'.$id, 'src' => wppa_get_imgdir('spinner.gif'), 'style' => "visibility:hidden"] ) );
 								}
-
+*/
 								// Textarea
-								else {
+				//				else {
 									wppa_echo( '
 									<div>
 										<textarea
@@ -1684,7 +1685,7 @@ global $wpdb;
 											esc_textarea( stripslashes( $description ) ) . '
 										</textarea>
 									</div>' );
-								}
+				//				}
 							wppa_echo( '
 							</fieldset>' );
 						}

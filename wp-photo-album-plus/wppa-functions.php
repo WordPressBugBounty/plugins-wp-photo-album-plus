@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.3.01.002
+* Version: 9.3.03.002
 *
 */
 
@@ -1161,10 +1161,12 @@ global $wppa;
 
 		// Select order
 		if ( wppa_switch( 'lasten_use_modified' ) ) {
-			$order = "modified DESC";
+			$poc['order'] = "modified";
+			$poc['desc'] = true;
 		}
 		else {
-			$order = "timestamp DESC";
+			$poc['order'] = "timestamp";
+			$poc['desc'] = true;
 		}
 		$a = wppa( 'start_album' );
 		if ( $a ) {
@@ -2350,7 +2352,7 @@ static $user;
 	// Og Description
 	$ogdsc = '';
 	if ( wppa_switch( 'facebook_comments' ) && ! wppa_in_widget() && ! wppa( 'is_filmonly' ) && ! wppa( 'is_slideonly' ) ) {
-		$ogdsc = strip_shortcodes( wp_strip_all_tags( wppa_html( wppa_get_photo_desc( $id ) ) ) );
+		$ogdsc = strip_shortcodes( wp_strip_all_tags( wppa_get_photo_desc( $id ) ) );
 		$ogdsc = esc_js( $ogdsc );
 	}
 

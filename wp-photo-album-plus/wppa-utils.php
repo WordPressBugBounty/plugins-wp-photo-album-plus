@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.3.02.001
+* Version: 9.3.03.002
 *
 */
 
@@ -361,15 +361,6 @@ function wppa_get_parentalbumid( $id ) {
 
 	return $album['a_parent'];
 }
-
-function wppa_html( $str ) {
-// It is assumed that the raw data contains html.
-// Make sure it is decoded
-
-	$result = html_entity_decode( $str );
-	return $result;
-}
-
 
 // get a photos album id
 function wppa_get_album_id_by_photo_id( $id ) {
@@ -1642,7 +1633,7 @@ global $wppa;
 function wppa_get_og_desc( $id, $short = false ) {
 
 	if ( $short ) {
-		$result = strip_shortcodes( wp_strip_all_tags( wppa_html( wppa_get_photo_desc( $id ) ) ) );
+		$result = strip_shortcodes( wp_strip_all_tags( wppa_get_photo_desc( $id ) ) );
 		if ( ! $result ) {
 			$result = str_replace( '&amp;', __( 'and', 'wp-photo-album-plus' ), get_bloginfo( 'name' ) );
 		}
@@ -1651,7 +1642,7 @@ function wppa_get_og_desc( $id, $short = false ) {
 		/* translators: website address */
 		$result = 	sprintf( __( 'See this image on %s', 'wp-photo-album-plus' ), str_replace( '&amp;', __( 'and', 'wp-photo-album-plus' ), get_bloginfo( 'name' ) ) ) .
 					': ' .
-					strip_shortcodes( wp_strip_all_tags( wppa_html( wppa_get_photo_desc( $id ) ) ) );
+					strip_shortcodes( wp_strip_all_tags( wppa_get_photo_desc( $id ) ) );
 	}
 
 	$result = 	apply_filters( 'wppa_get_og_desc', $result );
@@ -1935,13 +1926,18 @@ static $repeat_count;
 	}
 
 	// Get stacktrace 5 levels
+	$traceline = '';
 	if ( $trace && $dbg ) {
-		$data = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 5 );
 		$traceline = ' Stack: ';
-		$traceline .= basename( $data[1]['file'] ) . ':' . $data[1]['line'] . ' <- ' . basename( $data[2]['file'] ) . ':' . $data[2]['line'] . ' <- ' . basename( $data[3]['file'] ) . ':' . $data[3]['line'];
-	}
-	else {
-		$traceline = '';
+		$data = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 5 );
+		if ( is_array( $data ) && count( $data ) == 5 ) {
+			for( $i = 1; $i < 4; $i++ ) {
+				if ( isset( $data[$i]['file'] ) && isset( $data[$i]['line'] ) ) {
+					$traceline .= basename( $data[$i]['file'] ) . ':' . $data[$i]['line'] . ' <- ';
+				}
+			}
+		}
+		$traceline = substr( $traceline, 0, strlen( $traceline ) - 4 ); // trim last ' <- '
 	}
 
 	// Write log message

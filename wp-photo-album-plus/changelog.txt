@@ -1,5 +1,14 @@
 WP Photo Album Plus Changelog
 
+= 9.3.03 =
+
+* Slideshows from virtual albums did not always display the correct slideshow boxes. Fixed.
+* The pluging could give a fatal error on activation. Fixed.
+* For security reasons: all user entered input (album/photo descriptions etc) that may contain html, may only contain simple html without events according to wp_kses_post();
+If you enter 'reset' in Advanced settings -> New -> I -> Item 13: New photo desc, the new default version will be activated that has no onclick and other events in the html code.
+* For security reasons: you can no longer use tinymcce editor for album and photo descriptions.
+* Improved display in the stats widget with respect to session statistics.
+
 = 9.3.02 =
 
 * Rating and comments did not show up on slideshows of virtual album comten. Fixed.

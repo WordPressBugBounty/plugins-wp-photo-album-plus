@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.3.02.003
+* Version 9.3.03.002
 *
 */
 
@@ -1608,11 +1608,11 @@ global $wppa_lang;
 	}
 
 	$res_mocc = wppa_switch( 'ownersel_below' ) ? $mocc + 1 : $mocc - 1;
-	$url = wppa_get_permalink('',true).'?wppa-occur='.$res_mocc.$l.'&wppa-photos-only=1&wppa-upldr=\'+this.value+\'&wppa-cover=0&vt=1';
-	$ajx = wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.$res_mocc.$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=\'+this.value';
-	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.esc_js($ajx).',\''.esc_js($url).'\')';
+	$url = wppa_get_permalink('',true).'?wppa-occur='.$res_mocc.$l.'&vt=1&wppa-photos-only=1&wppa-cover=0&wppa-upldr=';
+	$ajx = wppa_get_ajaxlink('plain').'&wppa-action=render&wppa-occur='.$res_mocc.$l.'&vt=1&photos-only=1&wppa-cover=0&wppa-upldr=';
+	$onchange = 'wppaDoAjaxRender(event,'.$res_mocc.',\''.esc_js($ajx).'\'+this.value,\''.esc_js($url).'\'+this.value)';
 
-	$options = wppa_html_tag( 'option', [/*'id' => 'dummy', 'value' => 'dummy',*/ 'disabled' => 'disabled', 'selected' => 'selected'], __('Please select a user', 'wp-photo-album-plus') );
+	$options = wppa_html_tag( 'option', ['disabled' => 'disabled', 'selected' => 'selected'], __('Please select a user', 'wp-photo-album-plus') );
 	foreach( $owners as $owner ) {
 		$options .= wppa_html_tag( 'option', ['id' => 'wppa-owner-' . $owner['owner'], 'value' => $owner['owner']], $owner['name'] );
 	}
@@ -1892,7 +1892,7 @@ global $wppa_fb_init_done;
 	$photo_name = wppa_get_photo_name( $id );
 
 	// The share description
-	$photo_desc = wppa_html( wppa_get_photo_desc( $id ) );
+	$photo_desc = wppa_get_photo_desc( $id );
 	$photo_desc = strip_shortcodes( wp_strip_all_tags( $photo_desc ) );
 
 	// The default description

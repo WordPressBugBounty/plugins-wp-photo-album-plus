@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.3.00.002
+* Version: 9.3.03.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();

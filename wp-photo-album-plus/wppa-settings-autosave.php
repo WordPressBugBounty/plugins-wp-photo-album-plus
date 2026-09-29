@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.3.01.002
+* version 9.3.03.003
 *
 */
 
@@ -7257,7 +7257,7 @@ global $wppa_hide_this;
 						$name = __('New photo desc', 'wp-photo-album-plus' );
 						$desc = __('The description (template) to add to a new photo.', 'wp-photo-album-plus' );
 						$help = __('Enter the default description.', 'wp-photo-album-plus' );
-						$help .= '<br>'.__('If you use html, please check item B-1 of this table.', 'wp-photo-album-plus' );
+						$help .= '<br>'.__('If you enter \'reset\', it will be reset to the default value', 'wp-photo-album-plus');
 						$help .= '<br>'.__('If you tick the checkbox, linebreaks and redundand spaces will be removed.', 'wp-photo-album-plus' );
 						$slug = 'wppa_newphoto_description';
 						$slug2 = 'wppa_compress_newdesc';
@@ -8434,14 +8434,14 @@ global $wppa_hide_this;
 						$vals = $opts;
 						$html = wppa_select($slug, $opts, $vals);
 						wppa_setting_new($slug, '13', $name, $desc, $html, $help);
-
+/*
 						$name = __('Enable TinyMCE editor', 'wp-photo-album-plus');
 						$desc = __('Use classic WP editor for album and photo descriptions', 'wp-photo-album-plus');
 						$help = '';
 						$slug = 'wppa_use_wp_editor';
 						$html = wppa_checkbox($slug);
 						wppa_setting_new($slug, '14', $name, $desc, $html, $help);
-
+*/
 						$name = __('Load theme css at the backend', 'wp-photo-album-plus');
 						$desc = __('This may make previews more realistic', 'wp-photo-album-plus');
 						$help = __('Use with care, it can damage the admin layout, depending of the theme used. It does only load the standard and child theme css, no inline css', 'wp-photo-album-plus');

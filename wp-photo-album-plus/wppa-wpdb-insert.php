@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.3.01.002
+* Version 9.3.03.002
 *
 */
 
@@ -14,7 +14,24 @@ function wppa_create_session_entry() {
 global $wpdb;
 global $wppa_session;
 
-	$usag = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+	// Am i a robt?
+	$is_robot = '';
+	if ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+		$bots = ['www.baidu.com/search/spider.html',
+				 'GPTBot',
+				 'developers.facebook.com/docs/sharing/webmasters/crawler',
+				 'www.apple.com/go/applebot',
+				 'www.facebook.com/externalhit_uatext.php'];
+		foreach( array_keys( $bots ) as $i ) {
+			if ( strpos( $_SERVER['HTTP_USER_AGENT'], $bots[$i] ) !== false ) {
+				$is_robot = true;
+			}
+		}
+	}
+	if ( stripos( $_SERVER['REQUEST_URI'], '/robots.txt' ) !== false ) {
+		$is_robot = true;
+	}
+
 	$wppa_session = array(
 						'has_searchbox' 		=> false,
 						'rootbox' 				=> false,
@@ -28,10 +45,9 @@ global $wppa_session;
 						'page'					=> 0,
 						'ajax'					=> 0,
 						'user' 					=> wppa_get_user(),
-						'id' 					=> wppa_get_session_id(),
-						'uris' 					=> array(),
-					//	'isrobot' 				=> false,
-						'agent' 				=> $usag,
+						'uris' 					=> [date_i18n("H:i") . ' ' . esc_url( wp_strip_all_tags( html_entity_decode( $_SERVER['REQUEST_URI'] ) ) )],
+						'isrobot' 				=> $is_robot,
+						'agent' 				=> isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '',
 						'wfcart' 				=> null,
 						'is_wppa_tree' 			=> false,
 						'rem_url' 				=> array(),
@@ -39,28 +55,22 @@ global $wppa_session;
 						'search_photos' 		=> '',
 						);
 
-	if ( strpos( $usag, 'GPTBot' ) !== false ) $wppa_session['isrobot'] = 'GPTBot';
-
-	$wppa_session['uris'][] = date_i18n("H:i") . ' init ' . wppa_request_uri();
-
 	$table 	= $wpdb->wppa_session;
 
-	$sid = md5( microtime( true ) );
-
 	$data 	= array(
-					'session' 			=> $sid,
+					'session' 			=> wppa_get_session_id(),
 					'timestamp' 		=> time(),
 					'user'				=> wppa_get_user(),
 					'ip'				=> wppa_get_user_ip(),
 					'status' 			=> 'valid',
-					'data'				=> serialize($wppa_session),
+					'data'				=> serialize( $wppa_session ),
 					'count' 			=> 1,
-	);
+					);
 
+	// Are we saving sessions?
 	if ( wppa_switch( 'save_sessions' ) ) {
 		$bret = wppa_insert( $table, $data );
 		if ( $bret ) {
-			if ( ! defined( 'DOING_CRON' ) ) setcookie( 'wppa_session_id', $sid, time() + 3600 );
 			return $wpdb->insert_id;
 		}
 

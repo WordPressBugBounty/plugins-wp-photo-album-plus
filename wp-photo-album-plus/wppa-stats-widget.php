@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the stats widget
-* Version 9.3.01.002
+* Version 9.3.03.002
 *
 */
 
@@ -50,42 +50,69 @@ class WppaStatsWidget extends WP_Widget {
 			$widget_content .= __('Today is day no', 'wp-photo-album-plus' ) . ': <b>' . ( date_i18n( 'z', time() ) + 1 ) . '</b><br>';
 		}
 		if ( wppa_switch( 'save_sessions' ) ) {
+
+			// Active sessions
 			if ( wppa_checked( $instance['sessions-active'] ) ) {
 				$sescount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d", ( time() - 3600 ) ) );
 				$widget_content .= __('Number of active sessions', 'wp-photo-album-plus' ) . ': <b>' . $sescount . '</b><br>';
+
+				// Bots active ( give them 2 minutes )
+				$t = time() - 120;
+				$botcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d AND data LIKE %s", $t, '%'.$wpdb->esc_like( '"isrobot";b:1;' ).'%' ) );
+				$widget_content .= wppa_show_query( true );
+
+				// Display botcount
+				if ( $botcount ) {
+					$widget_content .= __('Of which known robots', 'wp-photo-album-plus' ) . ': <b>' . $botcount . '</b><br>';
+				}
 			}
+
+			// Sessions last 24 hrs
 			if ( wppa_checked( $instance['sessions-day'] ) ) {
 				$t = time() - 3600*24;
 				$daysescount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d", $t ) );
-				$robots 	 = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d AND data LIKE %s", $t, '%'.$wpdb->esc_like("isrobot").'%' ) );
+				$widget_content .= wppa_show_query( true );
+
+				// Bots last 24 hrs
+				$botcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE timestamp > %d AND data LIKE %s", $t, '%'.$wpdb->esc_like( '"isrobot";b:1;' ).'%' ) );
+				$widget_content .= wppa_show_query( true );
+
+				// Check if reset in past 24 hrs
 				if ( $wpdb->get_var( "SELECT id FROM $wpdb->wppa_session ORDER BY id LIMIT 1" ) == 1 ) {
+					$widget_content .= wppa_show_query( true );
 					$txt = __('Number of sessions since last reset', 'wp-photo-album-plus' );
 				}
 				else {
 					$txt = __('Number of sessions last 24 hours', 'wp-photo-album-plus' );
 				}
+
+				// Display last 24 hours session counts
 				$widget_content .= 	$txt . ': <b>' . $daysescount . '</b><br>' .
-									( $robots ? __('Of which known robots', 'wp-photo-album-plus' ) . ': <b>' . $robots . '</b><br>' : '' );
+									( $botcount ? __('Of which known robots', 'wp-photo-album-plus' ) . ': <b>' . $botcount . '</b><br>' : '' );
 			}
 		}
 		if ( wppa_checked( $instance['reg-users'] ) ) {
 			$users = $wpdb->get_var( "SELECT COUNT(*) FROM " . $wpdb->prefix . 'users' . "" );
+			$widget_content .= wppa_show_query( true );
 			$widget_content .= __('Number of registered users', 'wp-photo-album-plus' ) . ': <b>' . $users . '</b><br>';
 		}
 		if ( wppa_checked( $instance['albums'] ) ) {
 			$albums = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums" );
+			$widget_content .= wppa_show_query( true );
 			if ( $albums ) {
 				$widget_content .= __('Number of albums', 'wp-photo-album-plus' ) . ': <b>' . $albums . '</b><br>';
 			}
 		}
 		if ( wppa_checked( $instance['mediaitems'] ) ) {
 			$items = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
+			$widget_content .= wppa_show_query( true );
 			if ( $items ) {
 				$widget_content .= __('Number of media items', 'wp-photo-album-plus' ) . ': <b>' . $items . '</b><br>';
 			}
 		}
 		if ( wppa_checked( $instance['photos'] ) ) {
 			$photos = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE ext <> 'xxx' AND filename NOT LIKE '%.pdf'" );
+			$widget_content .= wppa_show_query( true );
 			if ( $photos ) {
 				$widget_content .= __('Number of photos', 'wp-photo-album-plus' ) . ': <b>' . $photos . '</b><br>';
 			}
@@ -93,6 +120,7 @@ class WppaStatsWidget extends WP_Widget {
 		$multi = false;
 		if ( wppa_checked( $instance['videos'] ) && wppa_switch( 'enable_video' ) ) {
 			$multi = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE ext = 'xxx'" );
+			$widget_content .= wppa_show_query( true );
 			$cnt = 0;
 			foreach( $multi as $item ) {
 				if ( wppa_is_video( $item ) ) $cnt++;
@@ -104,6 +132,7 @@ class WppaStatsWidget extends WP_Widget {
 		if ( wppa_checked( $instance['audios'] ) && wppa_switch( 'enable_audio' ) ) {
 			if ( ! $multi ) {
 				$multi = $wpdb->get_col( "SELECT id FROM $wpdb->wppa_photos WHERE ext = 'xxx'" );
+				$widget_content .= wppa_show_query( true );
 			}
 			$cnt = 0;
 			foreach( $multi as $item ) {
@@ -115,18 +144,21 @@ class WppaStatsWidget extends WP_Widget {
 		}
 		if ( wppa_checked( $instance['pdfs'] ) && wppa_switch( 'enable_pdf' ) ) {
 			$pdfs = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE filename LIKE '%.pdf'" );
+			$widget_content .= wppa_show_query( true );
 			if ( $pdfs ) {
 				$widget_content .= __('Number of pdfs', 'wp-photo-album-plus' ) . ': <b>' . $pdfs . '</b><br>';
 			}
 		}
 		if ( wppa_checked( $instance['comments'] ) && wppa_switch( 'show_comments' ) ) {
 			$comments = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments" );
+			$widget_content .= wppa_show_query( true );
 			if ( $comments ) {
 				$widget_content .= __('Number of comments', 'wp-photo-album-plus' ) . ': <b>' . $comments . '</b><br>';
 			}
 		}
 		if ( wppa_checked( $instance['rating'] ) && wppa_switch( 'rating_on' ) ) {
 			$ratings = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_rating" );
+			$widget_content .= wppa_show_query( true );
 			if ( $ratings ) {
 				$widget_content .= __('Number of ratings', 'wp-photo-album-plus' ) . ': <b>' . $ratings . '</b><br>';
 			}

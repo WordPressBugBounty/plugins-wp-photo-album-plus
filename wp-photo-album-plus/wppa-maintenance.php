@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* version 9.2.10.004
+* version 9.3.03.002
 *
 */
 
@@ -1797,9 +1797,9 @@ global $wppa_log_file;
 				<table>
 					<thead>
 						<tr>
-							<th>Id</th>
-							<th>Session id</th>
-							<th>IP</th>
+							<th>Id</th>' .
+//							<th>Session id</th>
+							'<th>IP</th>
 							<th>Started</th>
 							<th>Count</th>
 							<th>Status</th>
@@ -1813,9 +1813,9 @@ global $wppa_log_file;
 						$data = wppa_unserialize( $session['data'] );
 						$result .= '
 							<tr>
-								<td>'.$session['id'].'</td>
-								<td>'.$session['session'].'</td>
-								<td>' . htmlspecialchars( strlen( $session['ip'] ) > 15 ? substr( $session['ip'], 0, 12 ) . '...' : $session['ip'] ) . '</td>
+								<td>'.$session['id'].'</td>' .
+							//	<td>'.$session['session'].'</td>
+							'	<td>' . htmlspecialchars( strlen( $session['ip'] ) > 15 ? substr( $session['ip'], 0, 12 ) . '...' : $session['ip'] ) . '</td>
 								<td style="width:150px">'.wppa_local_date(wppa_get_option('date_format', "F j, Y,").' '.wppa_get_option('time_format', "g:i a"), $session['timestamp']).'</td>
 								<td>' . htmlspecialchars( $session['count'] ) . '</td>
 								<td>' . htmlspecialchars( $session['status'] ) . '</td>
@@ -1848,7 +1848,11 @@ global $wppa_log_file;
 								if ( isset( $data['uris'] ) ) {
 									if ( is_array( $data['uris'] ) ) {
 										foreach ( $data['uris'] as $uri ) {
-											$result .= $uri.'<br>';
+
+											// $uri starts with timestamp
+											$part1 = substr( $uri, 0, strpos( $uri, '/' ) );
+											$part2 = substr( $uri, strpos( $uri, '/' ) );
+											$result .= $part1 . esc_url( $part2 ) . '<br>';
 										}
 									}
 								}

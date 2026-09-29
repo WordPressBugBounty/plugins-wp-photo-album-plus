@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 9.3.00.001
+* Version: 9.3.03.003
 *
 */
 
@@ -438,13 +438,13 @@ function wppa_edit_email() {
 require_once 'wppa-admin-functions.php';
 
 // Shortcode generators fdor editors
-add_action( 'init', 'wppa_add_scgens', 1 );
+add_action( 'admin_init', 'wppa_add_scgens', 1 );
 
 function wppa_add_scgens() {
 global $pagenow;
 
 	// Only when configured and on an edit page/post
-	if ( wppa_show_scgens() && ( $pagenow === 'post.php' || $pagenow === 'post-new.php' ) ) {
+	if ( wppa_show_scgens() && ( $pagenow != 'wppa_admin_menu' ) ) {
         require_once 'wppa-tinymce-shortcodes.php';
 		require_once 'wppa-tinymce-photo.php';
 		require_once 'wppa-gutenberg-wppa.php';
