@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.03.003
+* Version: 9.3.04.002
 *
 */
 
@@ -702,6 +702,11 @@ global $wppa_defaults;
 
 			// Remove photo
 			if ( $pid ) {
+				if ( ! wp_verify_nonce( wppa_get( 'remp', '', 'text' ), 'wppa-remp' ) ) {
+					echo wp_json_encode( ['txt' => __( 'Security check failure', 'wp-photo-album-plus' )] );
+					wppa_exit();
+				}
+
 				if ( wppa_may_user_fe_delete( $pid ) ) {
 
 					wppa_delete_photo( $pid );
@@ -711,6 +716,10 @@ global $wppa_defaults;
 
 			// Remove comment
 			elseif ( $cid ) {
+				if ( ! wp_verify_nonce( wppa_get( 'remc', '', 'text' ), 'wppa-remc' ) ) {
+					echo wp_json_encode( ['txt' => __( 'Security check failure', 'wp-photo-album-plus' )] );
+					wppa_exit();
+				}
 
 				// Am i allowed to do this?
 				if ( ! current_user_can( 'wppa_moderate' ) && ! current_user_can( 'wppa_comments' ) ) {

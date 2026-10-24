@@ -2,7 +2,7 @@
 /**
  * WPPA common block functions
  *
- * Version: 9.2.01.001
+ * Version: 9.3.04.002
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -60,7 +60,7 @@ global $wpdb;
 }
 
 // Make the styles for wppa blocks
-add_action( 'admin_init', 'wppa_block_styles',10 );
+add_action( 'enqueue_block_assets', 'wppa_block_styles',10 );
 
 function wppa_block_styles() {
 

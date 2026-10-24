@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.3.04 =
+
+* Fixed a potential infinite recursion.
+* Security fix.
+* Comment moderate links on the slideshow did not work. Fixed.
+
 = 9.3.03 =
 
 * Slideshows from virtual albums did not always display the correct slideshow boxes. Fixed.

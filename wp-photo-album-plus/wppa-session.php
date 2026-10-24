@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.3.03.002
+* Version 9.3.04.002
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -48,14 +48,23 @@ global $wppa_session_id;
 	}
 
 	// Look for a cookie
-	if ( isset( $_COOKIE['wppa_session_id'] ) ) {
-		$wppa_session_id = sanitize_text_field( $_COOKIE['wppa_session_id'] );
+//	if ( isset( $_COOKIE['wppa_session_id'] ) ) {
+//		$wppa_session_id = sanitize_text_field( $_COOKIE['wppa_session_id'] );
+//	}
+
+	// Search by ip
+	$ip = wppa_get_user_ip();
+	if ( ! $ip ) {
+		$wppa_session_id = 'none';
+	}
+	else {
+		$wppa_session_id = $wpdb->get_var( $wpdb->prepare( "SELECT session FROM $wpdb->wppa_session WHERE ip = %s AND status = 'valid' ORDER BY id DESC LIMIT 1", $ip ) );
 	}
 
 	// Not found yet, create new
 	if ( ! $wppa_session_id ) {
 		$wppa_session_id = md5( microtime( true ) );
-		setcookie( 'wppa_session_id', $wppa_session_id, time() + 3600 );
+//		setcookie( 'wppa_session_id', $wppa_session_id, time() + 3600 );
 	}
 
 	// Done
@@ -162,6 +171,11 @@ global $wppa_session_id;
 // Saves the session data. To be called at shutdown
 function wppa_session_end() {
 global $wppa_session;
+
+ 	// Request ended before WPPA initialised (early exit during init)
+ 	if ( ! defined( 'WPPA_UPLOAD' ) || ! is_array( $wppa_session ) ) {
+ 		return;
+ 	}
 
 	// May have logged in now
 	$wppa_session['user'] = wppa_get_user();

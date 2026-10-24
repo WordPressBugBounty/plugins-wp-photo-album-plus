@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 9.3.00.001
+* Version 9.3.04.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -45,7 +45,7 @@ class UpldrWidget extends WP_Widget {
 		$total_ownercount 	= 0;
 		$total_photocount 	= 0;
 		$selalbs 			= explode( '.', wppa_expand_enum( wppa_alb_to_enum_children( wppa_expand_enum( $instance['parent'] ) ) ) );
-		$placeholders 		= implode( array_fill( 0, count( $selalbs ), '%d' ) );
+		$placeholders 		= implode( ',', array_fill( 0, count( $selalbs ), '%d' ) );
 
 		// Make the data we need
 		if ( $users ) foreach ( $users as $user ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.3.03.002
+* Version: 9.3.04.002
 *
 */
 
@@ -2270,6 +2270,7 @@ static $user;
 				/><span></span>';
 		}
 		if ( wppa_may_user_fe_delete( $id ) && $thumb['album'] > 0 ) {
+			$nonce = wp_create_nonce( 'wppa-remp' );
 			$dellink = '
 				<input
 					id="wppa-delete-' . wppa_encrypt_photo($thumb['id']) . '"
@@ -2279,7 +2280,7 @@ static $user;
 					onclick="
 						wppaStopShow( ' . wppa( 'mocc' ) . ' );' .
 						esc_attr( 'if ( confirm( "' . __( 'Are you sure you want to remove this photo?', 'wp-photo-album-plus' ) . '" ) )
-						wppaAjaxRemovePhoto( '.wppa( 'mocc' ).', '.esc_js('\''.wppa_encrypt_photo($thumb['id']).'\'').', true );' ) .
+						wppaAjaxRemovePhoto( '.wppa( 'mocc' ).', '.esc_js('\''.wppa_encrypt_photo($thumb['id']).'\'').', true, \''.$nonce.'\' );' ) .
 						'"
 					value="' . __( 'Delete', 'wp-photo-album-plus' ) . '"
 				/>';

@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version: 9.3.03.001
+* Version: 9.3.04.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -14,10 +14,17 @@ global $wppa_opt;
 global $wppa_revno;
 global $wppa_version;
 global $wppa_defaults;
+static $busy = false;
 
 	if ( is_array( $wppa ) && is_array( $wppa_opt ) && ! $force ) {
 		return; 	// Done already
 	}
+
+ 	// Too early (before init prio 1) or already running: don't recurse
+ 	if ( $busy || ! defined( 'WPPA_UPLOAD' ) ) {
+ 		return;
+ 	}
+ 	$busy = true;
 
 	// Rebuild options array, start with the defaults
 	wppa_set_defaults();
@@ -66,10 +73,12 @@ global $wppa_defaults;
 	// Check if grant parents must be made
 	// If there is only one grant parent, make sure the granted album is created regardless of if it is used.
 	if ( ! wppa_is_cron() && ! wppa( 'ajax' ) ) {
-		if ( wppa_is_int( wppa_get_option( 'wppa_grant_parent' ) ) ) {
+		if ( (int) wppa_get_option( 'wppa_grant_parent' ) > 0 ) {
 			wppa_grant_albums();
 		}
 	}
+
+	$busy = false;
 }
 
 function wppa_reset_occurrance() {

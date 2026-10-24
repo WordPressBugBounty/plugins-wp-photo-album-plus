@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* version 9.2.10.004
+* version 9.3.04.003
 *
 */
 
@@ -147,7 +147,7 @@ class WPPA_Comment_table extends WPPA_List_Table {
 
 	function column_status( $item ) {
 
-		$p1 = '<a href="?page=wppa_manage_comments&commentids[0]=' . $item['id'] . '&paged=' . wppa_get( 'paged', 1, 'int' );
+		$p1 = '<a href="?page=wppa_manage_comments&commentids[0]=' . $item['id'] . '&paged=' . wppa_get( 'paged', 1, 'int' ) . '&_wpnonce=' . wp_create_nonce( '_wpnonce' );
 		$actions = array(
 			'approvesingle' 	=> $p1 . '&action=approvesingle" >' . __( 'Approve', 'wp-photo-album-plus' ) . '</a>',
 			'pendingsingle' 	=> $p1 . '&action=pendingsingle" >' . __( 'Pending', 'wp-photo-album-plus' ) . '</a>',
@@ -243,48 +243,54 @@ class WPPA_Comment_table extends WPPA_List_Table {
 
 		if ( $current_action && $ids ) {
 
-			foreach( $ids as $id ) {
+			if ( wp_verify_nonce( wppa_get( '_wpnonce', '', 'text' ), '_wpnonce' ) ) {
 
-				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $id ) );
+				foreach( $ids as $id ) {
 
-				// Delete
-				if ( 'delete' === $current_action || 'deletesingle' === $current_action ) {
-					wppa_del_row( WPPA_COMMENTS, 'id', $id );
-				}
+					$photo = $wpdb->get_var( $wpdb->prepare( "SELECT photo FROM $wpdb->wppa_comments WHERE id = %d", $id ) );
 
-				// Approve
-				if ( 'approve' === $current_action || 'approvesingle' === $current_action ) {
-					$iret = wppa_update_comment( $id, ['status' => 'approved'] );
-					if ( $iret ) {
-						wppa_schedule_mailinglist( 'commentapproved', 0, 0, $id );
-						wppa_add_credit_points( wppa_opt( 'cp_points_comment_appr' ), __( 'Photo comment approved' , 'wp-photo-album-plus' ), $photo, '', wppa_get_photo_item( $photo, 'owner' )	);
+					// Delete
+					if ( 'delete' === $current_action || 'deletesingle' === $current_action ) {
+						wppa_del_row( WPPA_COMMENTS, 'id', $id );
 					}
-				}
 
-				// Spam
-				if ( 'spam' === $current_action || 'spamsingle' === $current_action ) {
-					$iret = wppa_update_comment( $id, ['status' => 'spam'] );
-				}
+					// Approve
+					if ( 'approve' === $current_action || 'approvesingle' === $current_action ) {
+						$iret = wppa_update_comment( $id, ['status' => 'approved'] );
+						if ( $iret ) {
+							wppa_schedule_mailinglist( 'commentapproved', 0, 0, $id );
+							wppa_add_credit_points( wppa_opt( 'cp_points_comment_appr' ), __( 'Photo comment approved' , 'wp-photo-album-plus' ), $photo, '', wppa_get_photo_item( $photo, 'owner' )	);
+						}
+					}
 
-				// Pending
-				if ( 'pending' === $current_action || 'pendingsingle' === $current_action ) {
-					$iret = wppa_update_comment( $id, ['status' => 'pending'] );
-				}
+					// Spam
+					if ( 'spam' === $current_action || 'spamsingle' === $current_action ) {
+						$iret = wppa_update_comment( $id, ['status' => 'spam'] );
+					}
 
-				// Edit, exists single only
-				if ( 'editsingle' === $current_action ) {
-					$commenttext = wppa_get( 'commenttext' );
-					$id = wppa_get( 'commentids' );
-					wppa_update_comment( $id, ['comment' => $commenttext] );
-				}
+					// Pending
+					if ( 'pending' === $current_action || 'pendingsingle' === $current_action ) {
+						$iret = wppa_update_comment( $id, ['status' => 'pending'] );
+					}
 
-				// Update index in the near future
-				if ( wppa_switch( 'search_comments' ) ) {
-					wppa_index_update( 'photo', $photo );
-				}
+					// Edit, exists single only
+					if ( 'editsingle' === $current_action ) {
+						$commenttext = wppa_get( 'commenttext' );
+						$id = wppa_get( 'commentids' );
+						wppa_update_comment( $id, ['comment' => $commenttext] );
+					}
 
-				// Clear cache
-				wppa_clear_cache( array( 'photo' => $photo ) );
+					// Update index in the near future
+					if ( wppa_switch( 'search_comments' ) ) {
+						wppa_index_update( 'photo', $photo );
+					}
+
+					// Clear cache
+					wppa_clear_cache( array( 'photo' => $photo ) );
+				}
+			}
+			else {
+				wp_die( __( 'Security check failure', 'wp-photo-album-plus') );
 			}
 		}
 

@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.2.11.004
+* Version 9.3.04.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -342,7 +342,7 @@ global $wppa_opt;
 		$js_ver = gmdate( "ymd-Gis", filemtime( plugin_dir_path( __FILE__ ) . 'js/' . $js_files[$idx] . '.js' ) );
 		wp_enqueue_script( $js_files[$idx], WPPA_URL . '/js/' . $js_files[$idx] . '.js', $js_depts, $js_ver, $footer );
 	}
-	
+
 	// Localize main
 	wp_localize_script( 'wppa-main', 'wppaObj', array(
 		'restUrl' => rest_url(),

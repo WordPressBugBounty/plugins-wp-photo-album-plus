@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.3.00.001
+/* Version 9.3.04.002
 /* Various js routines used in admin pages
 */
 
@@ -392,7 +392,7 @@ function wppaAjaxDeleteExportZips() {
 								},
 					error: 		function( xhr, status, error ) {
 									wppaConsoleLog( 'wppaAjaxDeleteExportZips failed. Error = ' + error + ', status = ' + status );
-								},
+								}
 				} );
 }
 
@@ -1259,12 +1259,12 @@ function wppaAjaxPopupWindow( slug ) {
 							effect: 	"fadeIn",
 							duration: 	800
 						},
-			closeText: 	__( 'Close!', 'wp-photo-album-plus' ),
+			closeText: 	__( 'Close!', 'wp-photo-album-plus' )
 		};
 		try {
 			jQuery( '#wppa-modal-container' ).dialog('destroy');
 		}
-		catch {
+		catch ( error ) {
 			jQuery( '#wppa-modal-container' ).html('');
 		}
 		jQuery( '#wppa-modal-container' ).html(result);
@@ -1276,21 +1276,21 @@ function wppaAjaxPopupWindow( slug ) {
 										padding: 			'8px',
 										backgroundColor: 	'#cccccc',
 										boxSizing: 			'content-box',
-										zIndex: 			'200200',
+										zIndex: 			'200200'
 									});
 		jQuery( '.ui-dialog-titlebar' ).css({
 												lineHeight: '0px',
-												height: 	'50px',
+												height: 	'50px'
 											});
 		jQuery( '.ui-dialog-title' ).html('<h2>'+dialogtitle+'</h2>');
 		jQuery( '.ui-button' ).css({
 										position: 	'absolute',
 										top: 		'12px',
-										right: 		'12px',
+										right: 		'12px'
 									});
 		jQuery( '.ui-button' ).attr( 'title', __( 'Close!', 'wp-photo-album-plus' ) );
 		jQuery( '.ui-widget-overlay' ).css({
-										backgroundColor: 	'transparent',
+										backgroundColor: 	'transparent'
 									});
 
 		setTimeout( function() {
@@ -1820,29 +1820,29 @@ function wppaTimedConfirm( text ) {
 									padding: 			'8px',
 									backgroundColor: 	'#cccccc',
 									boxSizing: 			'content-box',
-									zIndex: 			'200200',
+									zIndex: 			'200200'
 								});
 	jQuery( '.ui-dialog-titlebar' ).css(
 											{
 												lineHeight: '0px',
-												height: 	'32px',
+												height: 	'32px'
 											}
 										)
 	jQuery( '.ui-button' ).css(
 								{
 									float: 		'right',
 									position: 	'relative',
-									bottom: 	'40px',
+									bottom: 	'40px'
 								});
 
 	jQuery( '.ui-dialog-titlebar-close' ).css(
 								{
-									display: 	'none',
+									display: 	'none'
 								});
 
 	jQuery( '.ui-widget-overlay' ).css(
 								{
-									backgroundColor: 	'transparent',
+									backgroundColor: 	'transparent'
 								});
 
 	jQuery( '.ui-button' ).attr( 'title', __( 'Close!', 'wp-photo-album-plus' ) );
@@ -2072,7 +2072,7 @@ function wppaAjaxReplaceLog() {
 								},
 					error:		function( xhr, status, error ) {
 									wppaConsoleLog( 'wppaAjaxReplaceLog failed. Error = ' + error + ', status = ' + status );
-								},
+								}
 	});
 }
 
@@ -2114,7 +2114,7 @@ function wppaAjaxCommentUpdate( elm, id ) {
 				 admin: 	1,
 				 comment: 	theComment,
 				 comid: 	id,
-				 nonce: 	jQuery('#nonce-'+id).html(),
+				 nonce: 	jQuery('#nonce-'+id).html()
 	};
 
 	var theData = JSON.stringify( data );
@@ -2204,7 +2204,7 @@ function wppaInitMagick(id) {
 		dragMode: "move",
 		responsive: true,
 		movable: false,
-		aspectRatio: ratio,
+		aspectRatio: ratio
 	});
 
 	button.onclick = function () {

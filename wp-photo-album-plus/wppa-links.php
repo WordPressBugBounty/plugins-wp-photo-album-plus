@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.3.02.003
+* Version: 9.3.04.004
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -848,7 +848,7 @@ function wppa_moderate_links( $type, $id, $comid = '', $status = '' ) {
 						if ( $status != 'approved' && current_user_can('wppa_moderate') ) $result .= '
 						<a class="wppa-approve-' . $comid . '"
 							style="font-weight:bold; color:green; cursor:pointer"
-							onclick="if ( confirm(\''.__('Are you sure you want to publish this comment?', 'wp-photo-album-plus' ).'\') ) wppaAjaxApproveComment(\''.$comid.'\')">
+							onclick="'.esc_attr('if ( confirm(\''.__('Are you sure you want to publish this comment?', 'wp-photo-album-plus' ).'\') ) wppaAjaxApproveComment(\''.$comid.'\')').'">
 							' .
 							__('Approve', 'wp-photo-album-plus' ) .
 						'</a>';
@@ -863,12 +863,15 @@ function wppa_moderate_links( $type, $id, $comid = '', $status = '' ) {
 						'</a>';
 
 						// Delete
-						if ( $status != 'approved' && current_user_can('wppa_moderate') ) $result .= '
-						<a class="wppa-approve-'.$comid.'"
-							style="font-weight:bold; color:red; cursor:pointer"
-							onclick="if ( confirm(\''.__('Are you sure you want to remove this comment?', 'wp-photo-album-plus' ).'\') ) wppaAjaxRemoveComment(\''.$comid.'\', true)">
-							' . __('Delete', 'wp-photo-album-plus' ) .
-						'</a>';
+						if ( $status != 'approved' && current_user_can('wppa_moderate') ) {
+							$nonce = wp_create_nonce( 'wppa-remc' );
+							$result .= '
+							<a class="wppa-approve-'.$comid.'"
+								style="font-weight:bold; color:red; cursor:pointer"
+								onclick="'.esc_attr('if ( confirm(\''.__('Are you sure you want to remove this comment?', 'wp-photo-album-plus' ).'\') ) wppaAjaxRemoveComment(\''.$comid.'\', \''.$nonce.'\' )').'">
+								' . __('Delete', 'wp-photo-album-plus' ) .
+							'</a>';
+						}
 
 					// Close wrapper
 					$result .= '<br class="wppa-approve-'.$comid.'" />';

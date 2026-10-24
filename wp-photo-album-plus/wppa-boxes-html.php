@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.3.03.002
+* Version 9.3.04.004
 *
 */
 
@@ -4093,7 +4093,7 @@ global $wpdb;
 
 							// Status approved
 							if ( ( $comment['status'] != 'approved' || wppa_switch( 'edit_com_link' ) ) && ( current_user_can( 'wppa_moderate' ) || current_user_can( 'wppa_comments' ) ) ) {
-								$commentblock .= wp_kses_post( wppa_moderate_links( 'comment', $id, $comment['id'], $comment['status'] ) );
+								$commentblock .= wppa_moderate_links( 'comment', $id, $comment['id'], $comment['status'] );
 							}
 
 							// Status pending

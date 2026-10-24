@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.3.03.002
+* Version: 9.3.04.001
 *
 */
 
@@ -458,18 +458,13 @@ static $cache;
 function wppa_switch( $xkey ) {
 global $wppa_opt;
 
-	// Are we initialized?
-	if ( ! isset( $wppa_opt[$xkey] ) ) {
-		wppa_initialize_runtime();
-	}
+ 	// Old style?
+ 	$key = ( substr( $xkey, 0, 5 ) == 'wppa_' ) ? $xkey : 'wppa_' . $xkey;
 
-	// Old style?
-	if ( substr( $xkey, 0, 5 ) == 'wppa_' ) {
-		$key = $xkey;
-	}
-	else {
-		$key = 'wppa_' . $xkey;
-	}
+ 	// Are we initialized?
+ 	if ( ! isset( $wppa_opt[$key] ) ) {
+ 		wppa_initialize_runtime();
+ 	}
 
 	if ( isset( $wppa_opt[$key] ) ) {
 		if ( $wppa_opt[$key] === 'yes' ) return true;

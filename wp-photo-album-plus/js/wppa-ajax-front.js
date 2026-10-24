@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsAjaxVersion = '9.3.01.002';
+var wppaJsAjaxVersion = '9.3.04.003';
 
 // The new AJAX rendering routine Async
 function wppaDoAjaxRender(event, mocc, ajaxurl, newurl, addHilite ) {
@@ -307,12 +307,13 @@ function wppaAjaxApprovePhoto( photo ) {
 }
 
 // Remove photo
-function wppaAjaxRemovePhoto( mocc, photo, isslide ) {
+function wppaAjaxRemovePhoto( mocc, photo, isslide, nonce ) {
 
 	jQuery.ajax( { 	url: 		wppaAjaxUrl,
 					data: 		'action=wppa' +
 								'&wppa-action=remove' +
-								'&photo-id=' + photo,
+								'&photo-id=' + photo +
+								'&wppa-remp=' + nonce,
 					async: 		true,
 					type: 		'GET',
 					timeout: 	60000,
@@ -412,12 +413,13 @@ function wppaAjaxApproveComment( comment ) {
 }
 
 // Remove comment
-function wppaAjaxRemoveComment( comment ) {
+function wppaAjaxRemoveComment( comment, nonce ) {
 
 	jQuery.ajax( { 	url: 		wppaAjaxUrl,
 					data: 		'action=wppa' +
 								'&wppa-action=remove' +
-								'&comment-id=' + comment,
+								'&comment-id=' + comment +
+								'&wppa-remc=' + nonce,
 					async: 		true,
 					type: 		'GET',
 					timeout: 	60000,

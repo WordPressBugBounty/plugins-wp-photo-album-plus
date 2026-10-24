@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version: 9.3.02.002
+* Version: 9.3.04.002
 *
 */
 
@@ -448,9 +448,10 @@ global $wpdb;
 
 				// The delete link
 				if ( wppa_may_user_fe_delete( $id ) && $thumb['album'] > 0 ) {
+					$nonce = wp_create_nonce( 'wppa-remp' );
 					$result .= wppa_html_tag( 'a', ['id' => 'wppa-delete-'.$thumb['crypt'], 'style' => 'color:red;cursor:pointer;',
 													'onclick' => 'if ( confirm("'.__( 'Are you sure you want to remove this photo?' , 'wp-photo-album-plus' ).'") ) ' .
-																 'wppaAjaxRemovePhoto('.$mocc.', \''.$xid.'\', false ); return false;'], __( 'Delete' , 'wp-photo-album-plus' ) );
+																 'wppaAjaxRemovePhoto('.$mocc.', \''.$xid.'\', false, \''.$nonce.'\' ); return false;'], __( 'Delete' , 'wp-photo-album-plus' ) );
 					$result .= '&nbsp;';
 				}
 

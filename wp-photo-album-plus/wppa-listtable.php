@@ -4,7 +4,7 @@
 *
 * Copy of wp version
 * Modified by OpaJaap
-* Version 9.2.01.001
+* Version 9.3.04.003
 *
 */
 
@@ -1168,7 +1168,7 @@ class WPPA_List_Table {
 	 */
 	protected function display_tablenav( $which ) {
 		if ( 'top' === $which ) {
-			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+			wp_nonce_field( '_wpnonce' ); //'bulk-' . $this->_args['plural'] );
 		}
 		?>
 	<div class="tablenav <?php echo esc_attr( $which ); ?>">
