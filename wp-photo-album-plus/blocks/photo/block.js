@@ -1,7 +1,7 @@
 /**
  * WPPA photo block
  *
- * Version: 8.5.01.001
+ * Version: 9.3.05.001
  */
 
 jQuery(document).ready(function(){
@@ -48,8 +48,6 @@ jQuery(document).ready(function(){
 			var attributes = props.attributes;
 			var shortcode  = evaluate(props);
 			var result;
-			var previewId  = 'wppaphoto-'+Math.floor(Math.random() * 100);
-			var needPreview = true;
 
 			result = el(
 				'div',
@@ -81,10 +79,8 @@ jQuery(document).ready(function(){
 				}),
 
 				el('small',null,__( 'Corresponding shortcode', 'wp-photo-album-plus' )+': '+evaluate(props)),
-				el('div', {id: previewId}),
 			);
 
-			setTimeout(function(){if(needPreview)wppaGutenbergGetWppaShorcodeRendered(shortcode, previewId);needPreview=false;},100);
 			return result;
 		},
 

@@ -1,7 +1,7 @@
 /**
  * WPPA general block
  *
- * Version: 8.5.01.001
+ * Version: 9.3.05.001
  */
 
 jQuery(document).ready(function(){
@@ -71,8 +71,6 @@ jQuery(document).ready(function(){
 			var attributes = props.attributes;
 			var shortcode  = evaluate(props);
 			var result;
-			var previewId  = 'wppaslide-'+Math.floor(Math.random() * 100);
-			var needPreview = true;
 
 				result = el(
 					'div',
@@ -96,7 +94,6 @@ jQuery(document).ready(function(){
 							onChange: function( val ) {
 								props.setAttributes( { wppaAlbum: parseInt(val) } );
 								props.setAttributes( { wppaShortcode: evaluate(props) } );
-								needPreview = true;
 							},
 						}
 					),
@@ -106,7 +103,6 @@ jQuery(document).ready(function(){
 						onChange: function( value ) {
 							props.setAttributes( { timeout: value } );
 							props.setAttributes( { wppaShortcode: evaluate(props) } );
-							needPreview = true;
 						},
 					}),
 					el( wp.components.CheckboxControl, {
@@ -114,7 +110,6 @@ jQuery(document).ready(function(){
 						checked: attributes.filmstrip,
 						onChange: function( value ) {
 							props.setAttributes( { filmstrip: value } );
-							needPreview = true;
 						},
 					}),
 					el( wp.components.CheckboxControl, {
@@ -133,12 +128,9 @@ jQuery(document).ready(function(){
 						},
 					}),
 					el('small',null,__( 'Corresponding shortcode', 'wp-photo-album-plus' )+': '+evaluate(props)),
-					el('div', {id: previewId}),
 				);
 
-			setTimeout(function(){if(needPreview)wppaGutenbergGetWppaShorcodeRendered(shortcode.replace('#','%23'), previewId);needPreview=false;},100);
 			return result;
-
 		},
 
 		save: function( props ) {

@@ -2,7 +2,7 @@
 /**
  * WPPA common block functions
  *
- * Version: 9.3.04.002
+ * Version: 9.3.05.001
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -70,3 +70,4 @@ function wppa_block_styles() {
 	wp_register_style( 'wppa_block_style', WPPA_URL . '/blocks/common/' . $file, '', $ver );
 	wp_enqueue_style( 'wppa_block_style' );
 }
+

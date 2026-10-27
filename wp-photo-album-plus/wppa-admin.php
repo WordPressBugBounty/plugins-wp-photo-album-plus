@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version: 9.3.03.003
+* Version: 9.3.05.001
 *
 */
 
@@ -447,7 +447,6 @@ global $pagenow;
 	if ( wppa_show_scgens() && ( $pagenow != 'wppa_admin_menu' ) ) {
         require_once 'wppa-tinymce-shortcodes.php';
 		require_once 'wppa-tinymce-photo.php';
-		require_once 'wppa-gutenberg-wppa.php';
 	}
 }
 
@@ -503,7 +502,7 @@ add_filter( 'block_categories_all', 'wppa_block_categories', 10, 2 );
 
 // Fix Gutenberg bug and clear cache selectively
 function wppa_fix_gutenberg_shortcodes( $id, $post, $update ) {
-wppa_log( 'obs', 'Doing fix gutenberg');
+wppa_log( 'misc', 'Doing fix gutenberg');
 	// Get content
 	$post_content = $post->post_content;
 

@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.3.04.004
+* Version 9.3.05.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -516,10 +516,9 @@ function wppa_add_js_language_files( $where ) {
 function wppa_js( $txt, $now = false, $needready = true ) {
 global $wppa_js_page_data;
 global $wppa_script_open;
-global $wppa_gutenberg_preview;
 
 	// Do it
-	if ( wppa_is_caching() || $now || $wppa_gutenberg_preview || defined( 'DOING_AJAX' ) || wppa_in_widget() ) {
+	if ( wppa_is_caching() || $now || defined( 'DOING_AJAX' ) || wppa_in_widget() ) {
 
 		if ( $needready) {
 			wppa_out( '<script>jQuery(document).ready(function(){' . $txt . '})</script>' );

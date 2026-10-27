@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* Version: 9.2.10.004
+* Version: 9.3.05.002
 *
 *
 */
@@ -3636,7 +3636,8 @@ if ( strlen($tag) != 6 ) {
 		$temp = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE photo = 0", ARRAY_A );
 		$editabletags = array();
 		if ( is_array( $temp ) ) foreach ( $temp as $item ) {
-			$editabletags[ hexdec( substr( $item['tag'], 2, 4 ) ) ] = trim( $item['description'], ': ' );
+		//	$editabletags[ hexdec( substr( $item['tag'], 2, 4 ) ) ] = trim( $item['description'], ': ' );
+			$editabletags[ $item['tag'] ] = trim( $item['description'], ': ' );
 		}
 	}
 

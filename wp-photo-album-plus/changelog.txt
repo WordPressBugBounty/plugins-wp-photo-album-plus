@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.3.05 =
+
+* Security fix
+* Changing EXIF labels on the settings page did not reflect in the display. Fixed.
+* Removed obsolete gutenberg code
+
 = 9.3.04 =
 
 * Fixed a potential infinite recursion.

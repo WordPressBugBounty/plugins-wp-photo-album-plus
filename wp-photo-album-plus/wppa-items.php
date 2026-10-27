@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* vrsion: 9.3.01.001
+* vrsion: 9.3.05.002
 *
 */
 
@@ -214,7 +214,7 @@ global $wppa_skip_alb_to_gal;
 	// Name ?
 	if ( $args['showname'] ) {
 		$wppa_skip_alb_to_gal = true;
-		$result .= wppa_translate( stripslashes( $thumb['name'] ) );
+		$result .= esc_html( wppa_translate( stripslashes( $thumb['name'] ) ) );
 	}
 
 	// Add owner?

@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.04.002
+* Version: 9.3.05.001
 *
 */
 
@@ -1120,7 +1120,7 @@ global $wppa_defaults;
 
 		case 'getshortcodedrendered':
 
-			// Used by gutenberg and cover preview in album admin
+			// Used by cover preview in album admin
 
 			// Are we legally here?
 			$from = wppa_get( 'from', '', 'text' );
@@ -1144,9 +1144,6 @@ global $wppa_defaults;
 			}
 
 			// Force direct script tags
-			global $wppa_gutenberg_preview;
-			$wppa_gutenberg_preview = true;
-
 			global $wppa_preview_container_width;
 			$wppa_preview_container_width = 650;
 
@@ -1202,8 +1199,6 @@ global $wppa_defaults;
 								'<i>' . esc_html( __('In this preview: links and buttons will not work', 'wp-photo-album-plus' ) ) . ',<br>' .
 										esc_html( __('optional size and alignment settings are ignored', 'wp-photo-album-plus' ) ) . '.
 								</i>' ) . $result ), ['needjs' => true] );
-
-			$wppa_gutenberg_preview = false;
 
 			// Done
 			wppa_exit();
@@ -4373,7 +4368,7 @@ global $wppa_defaults;
 			require_once 'wppa-non-admin.php';
 			wppa_user_upload();
 			global $wppa_upload_succes_id;
-			if ( ( wppa_get( 'fromtinymce' ) || wppa_get( 'fromgutenberg' ) ) && $wppa_upload_succes_id ) {
+			if ( ( wppa_get( 'fromtinymce' ) ) && $wppa_upload_succes_id ) {
 				wppa_echo( '||' . $wppa_upload_succes_id . '||' );
 				wppa_echo( wppa_get_myphotos_selection_body_for_tinymce( $wppa_upload_succes_id ) );
 			}

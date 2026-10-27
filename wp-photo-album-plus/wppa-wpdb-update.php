@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version: 9.2.04.003
+* Version: 9.3.05.002
 *
 */
 
@@ -353,7 +353,7 @@ global $wpdb;
 
 	// Name
 	if ( isset( $args['name'] ) ) {
-		$n = sanitize_text_field( $args['name'] );
+		$n = wppa_sanitize_photo_name( $args['name'] );
 		if ( $n ) {
 			$fields['name'] 	= $n;
 			$fields['sname'] 	= wppa_name_slug( $n );
