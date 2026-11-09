@@ -4,7 +4,7 @@
 *
 * Contains all the slideshow high level functions
 *
-* Version 9.3.03.001
+* Version 9.3.06.001
 *
 */
 
@@ -698,40 +698,7 @@ function wppa_slide_custom( $opt = '' ) {
 		$content = str_replace( 'w#albdesc', '', $content );
 	}
 
-	// w#fotomoto
-	$f_on_this = false;
-	if ( function_exists( 'fotomoto_page_enabled' ) ) {
-		$f_on_this = ! wppa( 'in_widget' ) && fotomoto_page_enabled( wppa_get_the_ID() );
-	}
-	if ( wppa_switch( 'fotomoto_on' ) && $f_on_this ) {
-		$content = str_replace( 'w#fotomoto',
-			'<div
-				id="wppa-fotomoto-container-' . wppa( 'mocc' ) . '"
-				class="wppa-fotomoto-container"
-				>
-			</div>
-			<div
-				id="wppa-fotomoto-checkout-' . wppa( 'mocc' ) . '"
-				class="wppa-fotomoto-checkout FotomotoToolbarClass"
-				style="float:right; clear:none;"
-				>
-				<ul
-					class="FotomotoBar"
-					style="list-style:none outside none;"
-					>
-					<li>
-						<a onclick="FOTOMOTO.API.checkout(); return false;">' .
-							__('Checkout', 'wp-photo-album-plus' ) . '
-						</a>
-					</li>
-				</ul>
-			</div>
-			<div style="clear:both;"></div>',
-			$content );
-	}
-	else {
-		$content = str_replace( 'w#fotomoto', '', $content );
-	}
+	$content = str_replace( 'w#fotomoto', '', $content );
 
 	wppa_out( 	'
 	<div

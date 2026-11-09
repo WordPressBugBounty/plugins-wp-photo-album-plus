@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* version 9.3.03.002
+* version 9.3.06.002
 *
 */
 
@@ -1815,29 +1815,29 @@ global $wppa_log_file;
 							<tr>
 								<td>'.$session['id'].'</td>' .
 							//	<td>'.$session['session'].'</td>
-							'	<td>' . htmlspecialchars( strlen( $session['ip'] ) > 15 ? substr( $session['ip'], 0, 12 ) . '...' : $session['ip'] ) . '</td>
+							'	<td>' . esc_html( strlen( $session['ip'] ) > 15 ? substr( $session['ip'], 0, 12 ) . '...' : $session['ip'] ) . '</td>
 								<td style="width:150px">'.wppa_local_date(wppa_get_option('date_format', "F j, Y,").' '.wppa_get_option('time_format', "g:i a"), $session['timestamp']).'</td>
-								<td>' . htmlspecialchars( $session['count'] ) . '</td>
-								<td>' . htmlspecialchars( $session['status'] ) . '</td>
+								<td>' . esc_html( $session['count'] ) . '</td>
+								<td>' . esc_html( $session['status'] ) . '</td>
 								<td style="border-bottom:1px solid gray">';
 									if ( is_array( $data ) ) foreach ( array_keys( $data ) as $key ) {
 										if ( $key != 'uris' ) {
 											if ( is_array( $data[$key] ) ) {
 												$result .= '['.$key.'] => Array(<br>';
 												foreach( array_keys($data[$key]) as $k ) {
-													$result .= '&nbsp;' . $k . ' = ' . $data[$key][$k] . '<br>';
+													$result .= '&nbsp;' . esc_html( $k ) . ' = ' . esc_html( $data[$key][$k] ) . '<br>';
 												}
 												$result .=
 												')<br>';
 											}
 
 											elseif ( is_object( $data[$key] ) ) {
-												$temp = var_export( $data[$key], true );
+												$temp = esc_html( var_export( $data[$key], true ) );
 												$result .= '['.$key.'] => ' . $temp;
 											}
 
 											else {
-												$result .= '['.$key.'] => '.$data[$key].'<br>';
+												$result .= '['.esc_html($key).'] => '.esc_html($data[$key]).'<br>';
 											}
 										}
 									}
@@ -1968,7 +1968,7 @@ global $wppa_log_file;
 			break;
 
 		default:
-			$result = 'Error: Unimplemented slug: ' . $slug . ' in wppa_do_maintenance_popup()';
+			$result = 'Error: Unimplemented slug: ' . sanitize_text_field( wp_unslash( $slug ) ) . ' in wppa_do_maintenance_popup()';
 	}
 
 	$result .= '

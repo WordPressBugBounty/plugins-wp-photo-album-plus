@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp $ library
 //
-var wppaJsSlideshowVersion = '9.3.00.001';
+var wppaJsSlideshowVersion = '9.3.06.001';
 var wppaHasControlbar = false;
 
 // This is an entrypoint to load the slide data
@@ -2343,10 +2343,6 @@ function _wppaShowMetaData( mocc, key ) {
 			if ( wppaShareHideWhenRunning ) {
 				jQuery( '#wppa-share-'+mocc ).css( 'display', '' );
 			}
-
-			// Fotomoto
-			wppaFotomotoToolbar( mocc, _wppaHiresUrl[mocc][_wppaCurIdx[mocc]] );
-
 		}
 		else {							// Hide
 			// Hide existing comments
@@ -2358,23 +2354,16 @@ function _wppaShowMetaData( mocc, key ) {
 			// Fade the browse arrows out
 //			jQuery( '.wppa-first-'+mocc ).fadeOut( 300 );
 //			jQuery( '.wppa-last-'+mocc ).fadeOut( 300 );
-			wppaFotomotoHide( mocc );
 		}
 	}
 	// What to do when the slideshow is running
 	else {	// Slideshow is running
-		if ( key == 'show' ) {
-			// Fotomoto
-			if ( ! wppaFotomotoHideWhenRunning ) wppaFotomotoToolbar( mocc, _wppaHiresUrl[mocc][_wppaCurIdx[mocc]] );
-		}
-		else {
+		if ( key != 'show' ) {
+		
 			// SM box
 			if ( wppaShareHideWhenRunning ) {
 				jQuery( '#wppa-share-'+mocc ).css( 'display', 'none' );
 			}
-			// Fotomoto
-		//	if ( wppaFotomotoHideWhenRunning )
-		//	wppaFotomotoHide( mocc );
 		}
 	}
 

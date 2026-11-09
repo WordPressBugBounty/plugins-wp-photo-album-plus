@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.3.04.002
+* Version: 9.3.06.003
 *
 */
 
@@ -359,7 +359,7 @@ global $other_deps;
 		 ! wppa( 'in_widget' ) &&
 		 ( ( isset( $wppa_session['has_searchbox'] ) && $wppa_session['has_searchbox'] ) ||
 			 wppa_get( 'forceroot' )
-		 ) ) {
+		 ) && wp_verify_nonce( wppa_get( 'src-nonce', 'wppa-src-nonce' ) ) ) {
 
 		// Is it a search now?
 		if ( wppa( 'src' ) ) {
@@ -398,7 +398,7 @@ global $other_deps;
 		// Update searchroot in search boxes
 		$rt = $wppa_session['search_root'];
 		if ( ! $rt || wppa_is_enum( $rt ) ) $rt = 0;	// must be non-empty string
-		wppa_add( 'src_script', 'jQuery(document).ready(function(){wppaUpdateSearchRoot( \'' . esc_js( wppa_display_root( $rt ) ) . '\', \'' . $rt . '\' )});' );
+		wppa_add( 'src_script', 'jQuery(document).ready(function(){wppaUpdateSearchRoot( \'' . esc_js( wppa_display_root( $rt ) ) . '\', \'' . esc_js( $rt ) . '\' )});' );
 
 		// If not search forget previous results
 		if ( ! wppa( 'src' )  ) {
@@ -2187,9 +2187,6 @@ static $user;
 			$photourl = str_replace( '.pdf', '.jpg', $photourl );
 		}
 	}
-	elseif ( wppa_switch( 'fotomoto_on' ) && ! wppa_is_stereo( $id ) ) {
-		$photourl = wppa_get_hires_url( $id );
-	}
 	elseif ( wppa_use_thumb_file( $id, $style_a['width'], $style_a['height'] ) && ! wppa_is_stereo( $id ) ) {
 		$photourl = wppa_get_thumb_url( $id, true, '', $style_a['width'], $style_a['height'] );
 	}
@@ -2550,7 +2547,7 @@ function wppa_get_slide_name_a( $id ) {
 	if ( wppa_is_item_downloadable( $id ) && wppa_opt( 'art_monkey_display' ) == 'button' ) $addmedal = false;
 
 	if ( $disp && ( ! wppa( 'is_slideonly' ) || wppa( 'name_on' ) ) && ! wppa( 'is_filmonly' ) ) {
-		$name = esc_js( wppa_get_photo_name( $id ) );
+		$name = esc_html( esc_js( wppa_get_photo_name( $id ) ) );
 		$fullname = wppa_get_photo_name( $id, array( 	'addowner' 	=> wppa_switch( 'show_full_owner' ),
 														'addmedal' 	=> $addmedal,
 														'escjs' 	=> true,

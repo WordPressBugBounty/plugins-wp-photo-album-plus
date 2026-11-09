@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 9.3.03.002
+* Version 9.3.06.001
 *
 */
 
@@ -31,6 +31,9 @@ global $wppa_session;
 	if ( stripos( $_SERVER['REQUEST_URI'], '/robots.txt' ) !== false ) {
 		$is_robot = true;
 	}
+	
+	$agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	if ( strlen( $agent ) > 200 ) $agent = substr( $agent, 0, 200 ) . '...';
 
 	$wppa_session = array(
 						'has_searchbox' 		=> false,
@@ -47,7 +50,7 @@ global $wppa_session;
 						'user' 					=> wppa_get_user(),
 						'uris' 					=> [date_i18n("H:i") . ' ' . esc_url( wp_strip_all_tags( html_entity_decode( $_SERVER['REQUEST_URI'] ) ) )],
 						'isrobot' 				=> $is_robot,
-						'agent' 				=> isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '',
+						'agent' 				=> $agent,
 						'wfcart' 				=> null,
 						'is_wppa_tree' 			=> false,
 						'rem_url' 				=> array(),

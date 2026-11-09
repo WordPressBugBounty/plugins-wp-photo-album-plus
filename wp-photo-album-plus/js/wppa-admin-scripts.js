@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.3.04.002
+/* Version 9.3.06.002
 /* Various js routines used in admin pages
 */
 
@@ -1246,8 +1246,9 @@ function wppaAjaxPopupWindow( slug ) {
 
 	// Process result
 	if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-		var temp = wppaEntityDecode( xmlhttp.responseText ).split('|');
-		var dialogtitle = temp[0];
+	//	var temp = wppaEntityDecode( xmlhttp.responseText ).split('|');
+		var temp = xmlhttp.responseText.split('|');
+		var dialogtitle = wppaEntityDecode( temp[0] );
 		temp[0] = '';
 		var result = temp.join('|').substring(1);
 
@@ -2051,6 +2052,8 @@ function wppaSetConfirmMove( id ) {
 
 // Replace log
 function wppaAjaxReplaceLog() {
+
+//document.location.reload();
 
 	jQuery.ajax( { 	url:		wppaAdminAjaxUrl,
 					data: 		'action=wppa' +

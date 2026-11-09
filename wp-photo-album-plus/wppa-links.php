@@ -4,7 +4,7 @@
 *
 * Frontend links
 *
-* Version: 9.3.04.004
+* Version: 9.3.05.003
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -1298,6 +1298,10 @@ global $wpdb;
 			if ( $thumb['linkurl'] ) {
 				// Use it. It superceeds other settings
 				$result['url'] = esc_attr( $thumb['linkurl'] );
+				// If it contains album and/or photo specs make sure its encrypted
+				if ( strpos( $result['url'], 'wppa-album' ) || strpos( $result['url'], 'wppa-photo' ) ) {
+					$result['url'] = wppa_encrypt_url( $result['url'] );
+				}
 				$result['title'] = esc_attr( wppa_translate( stripslashes( $thumb['linktitle'] ) ) );
 				$result['is_url'] = true;
 				$result['is_lightbox'] = false;

@@ -3,7 +3,7 @@
 /* It is strongly recommended not to modify this file because it will be overwritten by an update
 /* Any modifications to styles that are not configurable on the settings page should be made in the standard wp customizer css tab
 /*
-/* This is version 9.1.10.008
+/* This is version 9.3.06.001
 */
 
 .wppa-container, .wppa-cover-box, .wppa-thumb-area {
@@ -462,32 +462,6 @@ float:left;
 /* Fix for css3 transition that interferes with jQuery animation */
 #wppa-overlay-ic img, .wppa-popup a img, .wppa-popup img {
 transition: width 0s ease-in-out 0s, left 0s ease-in-out 0s, right 0s ease-in-out 0s;
-}
-
-.wppa-fotomoto-checkout, .wppa-fotomoto-container {
-margin-bottom: 3px;
-}
-.FotomotoBar {
-padding: 0 !important;
-margin: 0 !important;
-/* font-size:12px !important; */
-}
-.wppa-fotomoto-checkout a {
-text-decoration: none;
-font-weight: bold;
-float:right;
-}
-.wppa-fotomoto-checkout a:hover {
-	text-decoration: underline;
-}
-.FotomotoBarLink {
-float:left !important;
-}
-.FotomotoECardButton {
-float:left !important;
-}
-.FotomotoClear {
-display:none;
 }
 
 /* Ajax front upload */

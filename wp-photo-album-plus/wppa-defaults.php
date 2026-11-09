@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains default settings
-* version 9.3.03.002
+* version 9.3.06.001
 *
 */
 
@@ -1229,9 +1229,6 @@ horizrailenabled:false,";
 						'wppa_map_apikey' 						=> '',
 						'wppa_gpx_shortcode'					=> '[map style="width: auto; height:300px; margin:0; " marker="yes" lat="w#lat" lon="w#lon"]',
 						'wppa_geo_zoom' 						=> 10,
-						'wppa_fotomoto_on'						=> 'no',
-						'wppa_fotomoto_hide_when_running'		=> 'no',
-						'wppa_fotomoto_min_width' 				=> 400,
 						'wppa_image_magick' 					=> '',
 						'wppa_image_magick_ratio' 				=> 'NaN',
 

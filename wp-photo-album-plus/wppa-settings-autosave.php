@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* version 9.3.03.003
+* version 9.3.06.001
 *
 */
 
@@ -10903,32 +10903,6 @@ global $wppa_hide_this;
 						$help = '';
 						$html = array();
 						wppa_setting_new($slug, '8', $name, $desc, $html, $help, $show, $clas);
-
-						$name = __('Fotomoto', 'wp-photo-album-plus' );
-						$desc = __('Yes, we use Fotomoto on this site. Read the help text!', 'wp-photo-album-plus' );
-						$help = __('In order to function properly:', 'wp-photo-album-plus' );
-						$help .= '<br>'.__('1. Get yourself a Fotomoto account.', 'wp-photo-album-plus' );
-						$help .= '<br>'.__('2. Install the Fotomoto plugin, enter the "Fotomoto Site Key:" and check the "Use API Mode:" checkbox.', 'wp-photo-album-plus' );
-						$help .= '<br>'.__('Note: Do NOT Disable the Custom box in the Slideshow component specification.', 'wp-photo-album-plus' );
-						$help .= '<br>'.__('Do NOT remove the text w#fotomoto from the Custombox content.', 'wp-photo-album-plus' );
-						$slug = 'wppa_fotomoto_on';
-						$onch = "wppaSlaveChecked(this,'fmon');";
-						$html = wppa_checkbox($slug, $onch) . wppa_see_also( 'slide', 1, '25.26' );
-						wppa_setting_new($slug, '9', $name, $desc, $html, $help);
-
-						$name = __('Hide when running', 'wp-photo-album-plus' );
-						$desc = __('Hide toolbar on running slideshows', 'wp-photo-album-plus' );
-						$help = __('The Fotomoto toolbar will re-appear when the slideshow stops.', 'wp-photo-album-plus' );
-						$slug = 'wppa_fotomoto_hide_when_running';
-						$html = wppa_checkbox($slug);
-						wppa_setting_new($slug, '11', $name, $desc, $html, $help, wppa_switch( 'fotomoto_on' ), 'fmon');
-
-						$name = __('Fotomoto minwidth', 'wp-photo-album-plus' );
-						$desc = __('Minimum width to display Fotomoto toolbar.', 'wp-photo-album-plus' );
-						$help = __('The display of the Fotomoto Toolbar will be suppressed on smaller slideshows.', 'wp-photo-album-plus' );
-						$slug = 'wppa_fotomoto_min_width';
-						$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus' ));
-						wppa_setting_new($slug, '12', $name, $desc, $html, $help, wppa_switch( 'fotomoto_on' ), 'fmon');
 
 						$name = __('Image Magick', 'wp-photo-album-plus' );
 						$desc = __('Absolute path to the ImageMagick commands', 'wp-photo-album-plus' );// . ' <span style="color:red">' . __('experimental', 'wp-photo-album-plus' ) . '</span>';

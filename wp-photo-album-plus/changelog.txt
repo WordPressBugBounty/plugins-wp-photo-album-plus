@@ -1,5 +1,12 @@
 WP Photo Album Plus Changelog
 
+= 9.3.06 =
+
+* When photo specific link refers to any wppa display having wppa-album and/or wppa-photo specs, for backeard compatibility they will be encryptes when needed.
+* Removed fotomoto interface as fotomoto retired at oct 10 2026.
+* Supersearch on iptc and exif did not work. Fixed.
+* Security fix.
+
 = 9.3.05 =
 
 * Security fix

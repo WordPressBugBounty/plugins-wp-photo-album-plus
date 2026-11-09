@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.3.04.001
+* Version: 9.3.06.003
 *
 */
 
@@ -2223,7 +2223,6 @@ global $wppa_supported_photo_extensions;
 }
 
 // Get url of photo with highest available resolution.
-// Not for display ( need not to download fast ) but for external services like Fotomoto
 function wppa_get_hires_url( $id, $add_version = false ) {
 
 /*
@@ -2956,6 +2955,7 @@ function wppa_sanitize_file_name( $file, $check_length = true ) {
 // Create a html safe photo name from a filename. May be a pathname
 function wppa_sanitize_photo_name( $file ) {
 	$result = htmlspecialchars( wp_strip_all_tags( stripslashes( basename( $file ) ) ) );
+	$result = str_replace( array('[img', '[a ', '[br ', '[/a]'), '', $result );
 	$maxlen = wppa_opt( 'max_photoname_length' );
 	if ( $maxlen && strlen( $result ) > $maxlen ) {
 		$result = wppa_strip_ext( $result ); // First remove any possible file-extension
@@ -5271,7 +5271,7 @@ static $level;
 }
 function _wppa_get_nesting_level( $id ) {
 
-	if ( ! $id ) return 0;
+	if ( ! wppa_is_posint( $id ) ) return 0;
 	$alb = wppa_cache_album( $id );
 	if ( is_array( $alb ) && $alb['a_parent'] > 0 ) {
 		return _wppa_get_nesting_level( $alb['a_parent'] ) + 1;

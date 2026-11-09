@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.3.03.002
+* Version: 9.3.06.002
 *
 */
 
@@ -114,6 +114,8 @@ function wppa_get_get_filter( $name ) {
 		case 'timeout':
 		case 'lbtimeout':
 		case 'mocc':
+		case 'searchroot':
+		case 'random':
 			$result = 'int';
 			break;
 
@@ -133,6 +135,7 @@ function wppa_get_get_filter( $name ) {
 		case 'medals-only':
 		case 'rel':
 		case 'rootsearch':
+		case 'subsearch':
 		case 'potdhis':
 		case 'inv':
 		case 'vt':
@@ -193,7 +196,7 @@ function wppa_get_get_filter( $name ) {
 			$result = 'tagcat';
 			break;
 
-		// alpha only
+		// alpha only (a--z A--Z 0--9 # $ , . )
 		case 'calendar':
 		case 'caldate':
 		case 'upldr':
@@ -201,6 +204,14 @@ function wppa_get_get_filter( $name ) {
 		case 'iptc':
 		case 'exif':
 		case 'owner':
+		case 'action':
+		case 'nonce':
+		case 'qr-nonce':
+		case 'src-nonce':
+		case 'exiftag':
+		case 'iptctag':
+		case 'supersearch':
+		case 'option':
 			$result = 'alpha';
 			break;
 
@@ -253,8 +264,15 @@ function wppa_get_get_filter( $name ) {
 			$result = 'txtarr';
 			break;
 
-		default:
+		// Text
+		case 'cache':
+		case 'page':
+		case 'slug':
 			$result = 'text';
+			break;
+
+		default:
+			$result = 'dummy';
 			break;
 	}
 
@@ -417,7 +435,10 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			break;
 
 		case 'text':
+			return isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : '';
+
 		default:
+			wppa_log( 'err', "wppa_get( '$key' ) has no filter specified. 'text' used" );
 			return isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : '';
 			break;
 

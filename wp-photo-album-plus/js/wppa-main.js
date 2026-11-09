@@ -3,7 +3,7 @@
 // contains common functions
 //
 
-wppaWppaVer = '9.1.12.002';
+wppaWppaVer = '9.3.06.002';
 
 // jQuery(document).ready(function(){wppaConsoleLog('Document.ready')});
 
@@ -664,37 +664,6 @@ function wppaGetChildI( parent ) {
 		}
 	}
 	return false;
-}
-
-// Fotomoto
-var wppaFotomotoLoaded = false;
-var wppaFotomotoToolbarIds = [];
-function fotomoto_loaded() {
-	wppaFotomotoLoaded = true;
-}
-function wppaFotomotoToolbar( mocc, url ) {
-	if ( wppaColWidth[mocc] >= wppaFotomotoMinWidth ) {	// Space enough to show the toolbar
-		jQuery( '#wppa-fotomoto-container-'+mocc ).css('display','inline' );
-		jQuery( '#wppa-fotomoto-checkout-'+mocc ).css('display','inline' );
-	}
-	else {
-		jQuery( '#wppa-fotomoto-container-'+mocc ).css('display','none' );
-		jQuery( '#wppa-fotomoto-checkout-'+mocc ).css('display','none' );
-		return;	// Too small
-	}
-	if ( wppaFotomoto && document.getElementById('wppa-fotomoto-container-'+mocc ) ) { // Configured and container present
-		if ( wppaFotomotoLoaded ) {
-			FOTOMOTO.API.checkinImage( url );
-			wppaFotomotoToolbarIds[mocc] = FOTOMOTO.API.showToolbar('wppa-fotomoto-container-'+mocc, url );
-		}
-		else { // Not loaded yet, retry after 200 ms
-			setTimeout('wppaFotomotoToolbar( '+mocc+',"'+url+'" )', 200 );
-		}
-	}
-}
-function wppaFotomotoHide( mocc ) {
-	jQuery( '#wppa-fotomoto-container-'+mocc ).css('display','none' );
-	jQuery( '#wppa-fotomoto-checkout-'+mocc ).css('display','none' );
 }
 
 // Sanitize utility
@@ -1540,6 +1509,7 @@ function wppaDelayedSearch( url, mocc, n ) {
 	if ( jQuery( '#wppa-rootsearch-'+mocc).prop('checked' ) ) url +="wppa-rootsearch=on" + '&';
 	if ( jQuery( '#wppa-catbox-'+mocc ).length == 1 ) url += "wppa-catbox=" + jQuery( '#wppa-catbox-'+mocc ).val() + '&';
 	if ( jQuery( '#wppa-rootbox-'+mocc ).prop('checked') ) url += "wppa-rootbox=on" + '&';
+	if ( jQuery( '#wppa-src-nonce' ).length == 1 ) url += "wppa-src-nonce=" + jQuery( '#wppa-src-nonce' ).val() + '&';
 
 	if ( n > 0 ) {
 		var i;

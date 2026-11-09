@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 9.3.04.004
+* Version 9.3.06.002
 *
 */
 
@@ -503,6 +503,9 @@ global $wppa_session;
 		id="wppa_searchform_' . $mocc . '"
 		class="widget_search search-form"
 		>';
+
+		// Nonce field
+		$result .= '<input type="hidden" id="wppa-src-nonce" value="' . wp_create_nonce( 'wppa-src-nonce' ) . '" />';
 
 		// Catbox
 		if ( $catbox ) {

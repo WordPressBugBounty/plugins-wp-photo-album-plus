@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.05.001
+* Version: 9.3.06.002
 *
 */
 
@@ -297,7 +297,7 @@ global $wppa_defaults;
 			if ( ! $any ) {
 				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET status = 'hide' WHERE photo = 0 AND tag = %s", $tag ) );
 			}
-			wppa_echo( wp_json_encode( ['txt' => $result] ) );
+			echo( wp_json_encode( ['txt' => $result] ) );
 			wppa_exit();
 			break;
 
@@ -398,7 +398,7 @@ global $wppa_defaults;
 			if ( ! $any ) {
 				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET status = 'hide' WHERE photo = 0 AND tag = %s", $tag ) );
 			}
-			wppa_echo( wp_json_encode( ['txt' => $result] ) );
+			echo( wp_json_encode( ['txt' => $result] ) );
 			wppa_exit();
 			break;
 
@@ -4041,21 +4041,6 @@ global $wppa_defaults;
 					$value = 0;
 					break;
 
-				case 'wppa_fotomoto_on':
-					if ( $value == 'yes' ) {
-						$custom_content = wppa_opt( 'custom_content' );
-						if ( strpos( $custom_content, 'w#fotomoto' ) === false ) {
-							$custom_content = 'w#fotomoto '.$custom_content;
-							wppa_update_option( 'wppa_custom_content', $custom_content );
-							$alert = __( 'The content of the Custom box has been changed to display the Fotomoto toolbar.' , 'wp-photo-album-plus' ).' ';
-						}
-						if ( ! wppa_switch( 'custom_on' ) ) {
-							wppa_update_option( 'wppa_custom_on', 'yes' );
-							$alert .= __( 'The display of the custom box has been enabled' , 'wp-photo-album-plus' );
-						}
-					}
-					break;
-
 				case 'wppa_save_gpx':
 					if ( $value == 'yes' ) {
 						$custom_content = wppa_opt( 'custom_content' );
@@ -4354,7 +4339,7 @@ global $wppa_defaults;
 				wppa_echo( 'Security check failure||'.$slug.'||Error||0' );
 				wppa_exit();
 			}
-			wppa_echo( wppa_do_maintenance_popup( $slug ) );
+			echo ( wp_kses_post( wppa_do_maintenance_popup( $slug ) ) );
 			wppa_exit();
 			break;
 

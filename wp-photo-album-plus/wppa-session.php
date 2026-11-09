@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 9.3.04.002
+* Version 9.3.06.001
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -160,7 +160,7 @@ global $wppa_session_id;
 	$wppa_session['page']++;
 	if ( ! isset( $wppa_session['uris'] ) ) $wppa_session['uris'] = [];
 	if ( $_SERVER['REQUEST_URI'] ) {
-		$new_item = date_i18n("H:i") . ' ' . sanitize_text_field( wp_strip_all_tags( html_entity_decode( $_SERVER['REQUEST_URI'] ) ) );
+		$new_item = date_i18n("H:i") . ' ' . esc_url( wp_strip_all_tags( html_entity_decode( $_SERVER['REQUEST_URI'] ) ) );
 		if ( ! in_array( $new_item, (array) $wppa_session['uris'] ) ) {
 			$wppa_session['uris'][] = $new_item;
 		}

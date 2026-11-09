@@ -4,7 +4,7 @@
 *
 * This file contains all functions for activating javascript
 *
-* Version 9.3.05.001
+* Version 9.3.06.001
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit();
@@ -136,10 +136,7 @@ global $wpdb;
 	wppaBumpViewCount = '.( wppa_switch( 'track_viewcounts' ) ? 'true' : 'false' ) . ',
 	wppaBumpClickCount = '.( wppa_switch( 'track_clickcounts' ) ? 'true' : 'false' ) . ',
 	wppaShareHideWhenRunning = '.( wppa_switch( 'share_hide_when_running' ) ? 'true' : 'false' ) . ',
-	wppaFotomoto = '.( wppa_switch( 'fotomoto_on' ) ? 'true' : 'false' ) . ',
-	wppaFotomotoHideWhenRunning = '.( wppa_switch( 'fotomoto_hide_when_running' ) ? 'true' : 'false' ) . ',
 	wppaCommentRequiredAfterVote = '.( wppa_switch( 'vote_needs_comment' ) ? 'true' : 'false' ) . ',
-	wppaFotomotoMinWidth = '.wppa_opt( 'fotomoto_min_width' ) . ',
 	wppaOvlHires = '.( wppa_switch( 'lb_hres' ) ? 'true' : 'false' ) . ',
 	wppaSlideVideoStart = '.( wppa_switch( 'start_slide_video' ) ? 'true' : 'false' ) . ',
 	wppaSlideAudioStart = '.( wppa_switch( 'start_slide_audio' ) ? 'true' : 'false' ) . ',
