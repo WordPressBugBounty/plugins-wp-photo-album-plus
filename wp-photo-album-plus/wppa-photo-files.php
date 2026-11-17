@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version: 9.3.02.001
+* Version: 9.3.07.002
 *
 */
 
@@ -835,7 +835,7 @@ function wppa_is_magick( $command ) {
 	if ( ! wppa_can_magick() ) {
 		return false;
 	}
-	return wppa_is_file( rtrim( wppa_opt( 'image_magick' ), '/' ) . '/' . $command );
+	return wppa_is_file( rtrim( get_option( 'image_magick' ), '/' ) . '/' . $command );
 }
 
 // Process image magick command
@@ -860,7 +860,8 @@ function wppa_image_magick_a( $com_arr, $page = false ) {
 
 	if ( $err ) {
 		wppa_log( 'err', 'Invalid call to wppa_image_magick_a(), code = '.$err );
-		wppa_exit();
+//		wppa_exit();
+		return $err;
 	}
 
 	// Make command
@@ -875,7 +876,8 @@ function wppa_image_magick_a( $com_arr, $page = false ) {
 				escapeshellarg( $com_arr[4] ); 								// to path
 
 	// Image Magick root dir
-	$path = rtrim( wppa_opt( 'image_magick' ), '/' ) . '/';
+	$path = '';//rtrim( get_option( 'wppa_image_magick' ), '/' ) . '/';
+	// Image Magick rootdir appears not to be needed in the command, so there is no longer the possibility to hack the command
 
 	// Try to prepend 'magick' to the command if its not already there.
 	// This is for forward compatibility, e.g. when 'magick' exists but 'convert' not.
@@ -886,7 +888,8 @@ function wppa_image_magick_a( $com_arr, $page = false ) {
 	$err  = 0;
 
 	try {
-		$run  = exec( $path . $command, $out, $err );
+		wppa_log('misc', escapeshellcmd( $path . $command ));
+		$run = exec( escapeshellcmd( $path . $command ), $out, $err );
 	}
 	catch (Exception $e) {
 		wppa_log( 'err', 'Exec imagick cmd raised exception: ',  $e->getMessage());
@@ -904,23 +907,28 @@ function wppa_image_magick_a( $com_arr, $page = false ) {
 
 function wppa_check_magick_action( $action ) {
 
-	$a_arr = explode( ' ', $action );
-	
+	// Split ino parts
+	$a = str_replace( ['x', '.', '-', '+', '%', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], '', $action );
+	$a_arr = explode( ' ', $a );
+
 	// Test for keywords
+	$wrong = false;
 	foreach( array_keys( $a_arr ) as $key ) {
-		$item = $a_arr[$key];		
-		if ( in_array( $item, ['-auto-orient', '-quality', '-background', '-resize', '-thumbnail', 'white', '-alpha', 'remove'] ) ) {
+		$item = $a_arr[$key];
+
+		if ( in_array( $item, ['autoorient', 'quality', 'background', 'resize', 'thumbnail', 'white', 'alpha', 'remove', 'shave',
+								'rotate', 'flip', 'flop', 'enhance', 'sharpen', 'blur', 'autogamma', 'autolevel', 'brightnesscontrast',
+								'despeckle', 'colorspace', 'gray', 'grayscale', 'RecLuma', 'charcoal', 'paint', 'sepiatone'
+								] ) ) {
 			$a_arr[$key] = '';
 		}
+		else {
+			$wrong = $item;
+		}
 	}
-	
-	// Recombine and test for numerics
-	$a = implode( '', $a_arr );
-	$a = rtrim( $a, '%' );
-	$a = str_replace( 'x', '', $a );
-	
-	if ( is_numeric( $a ) || $a == '' ) return true;
-	wppa_log('err', 'Unsupported item found in magick action: ', esc_html($a));
+
+	if ( ! $wrong ) return true;
+	wppa_log('err', 'Unsupported item found in magick action: '. esc_html($wrong). ', action = '.esc_html($action) );
 	return false;
 }
 

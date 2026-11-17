@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.2.02.004
+* Version: 9.3.07.002
 *
 */
 
@@ -765,10 +765,8 @@ static $login;
 	// My item?
 	if ( $owner == $user ) return true;
 
-	if ( $status === false && $owner === false ) {
-//		wppa_log( 'dbg', 'Photo '.$id.' not visible because no status and no owner');
-		return false; // Photo does not exist
-	}
+	// Album visible?
+	if ( ! wppa_is_album_visible( wppa_get_photo_item( $id, 'album' ) ) ) return false;
 
 	// Dispatch on photo status
 	switch( $status ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version: 9.3.06.003
+* Version: 9.3.07.001
 *
 */
 
@@ -4244,7 +4244,10 @@ global $wppa_current_shortcode;
 global $wppa_after_smx;
 
 	if ( ! wppa_photo_exists( $id ) ) {
-//		wppa_log( 'Err', 'Photo does not exist ( wppa_smx_photo() ), type = ' . $stype . ', single_photo = ' . $id . ' sc = ' . $wppa_current_shortcode );
+		return;
+	}
+
+	if ( ! wppa_is_photo_visible( $id ) ) {
 		return;
 	}
 

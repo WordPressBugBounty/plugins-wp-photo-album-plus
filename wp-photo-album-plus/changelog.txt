@@ -1,5 +1,11 @@
 WP Photo Album Plus Changelog
 
+= 9.3.07 =
+
+* Security fix related to ImageMagick, pointed to by Patchstack.
+* Edit image using ImageMagick did not work correctly. Fixed.
+* Improved check for the visibility of media items. Thanx to "Respect" who pointed me to this security vulnerability.
+
 = 9.3.06 =
 
 * When photo specific link refers to any wppa display having wppa-album and/or wppa-photo specs, for backeard compatibility they will be encryptes when needed.

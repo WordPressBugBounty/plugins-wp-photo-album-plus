@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 9.3.00.001
+* Version 9.3.07.001
 *
 */
 
@@ -23,6 +23,7 @@ function wppa_activate_plugin() {
 	$old_rev = wppa_get_option( 'wppa_revision', 100 );
 	$new_rev = $old_rev - '0.01';
 	wppa_update_option( 'wppa_revision', $new_rev );
+	delete_option( 'wppa-set' );
 }
 
 // Set force to true to re-run it even when on rev (happens in wppa-settings.php)
@@ -38,6 +39,8 @@ global $wppa_cron_maintenance_slugs;
 	$old_rev = wppa_get_option( 'wppa_revision', 100 );
 
 	if ( $old_rev == $wppa_revno && ! $force ) return; // Nothing to do here
+	
+	delete_option( 'wppa-set' );
 
 	$wppa_error = false;	// Init no error
 

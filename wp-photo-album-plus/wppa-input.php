@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions for sanitizing and formatting user input
-* Version: 9.3.06.002
+* Version: 9.3.07.001
 *
 */
 
@@ -196,7 +196,7 @@ function wppa_get_get_filter( $name ) {
 			$result = 'tagcat';
 			break;
 
-		// alpha only (a--z A--Z 0--9 # $ , . )
+		// alpha only (a--z A--Z 0--9 # $ , . - _)
 		case 'calendar':
 		case 'caldate':
 		case 'upldr':
@@ -212,6 +212,9 @@ function wppa_get_get_filter( $name ) {
 		case 'iptctag':
 		case 'supersearch':
 		case 'option':
+		case 'tab':
+		case 'edit-id':
+		case 'item':
 			$result = 'alpha';
 			break;
 
@@ -268,6 +271,7 @@ function wppa_get_get_filter( $name ) {
 		case 'cache':
 		case 'page':
 		case 'slug':
+		case 'shortcode':
 			$result = 'text';
 			break;
 
@@ -438,7 +442,7 @@ function wppa_get( $xname, $default = false, $filter = false, $strict = false ) 
 			return isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : '';
 
 		default:
-			wppa_log( 'err', "wppa_get( '$key' ) has no filter specified. 'text' used" );
+			wppa_log( 'war', "wppa_get( '".esc_js($key)."' ) has no filter specified. 'text' used" );
 			return isset( $_REQUEST[$key] ) ? sanitize_text_field( wp_unslash( $_REQUEST[$key] ) ) : '';
 			break;
 

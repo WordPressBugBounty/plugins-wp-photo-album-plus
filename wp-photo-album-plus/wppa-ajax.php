@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version: 9.3.06.002
+* Version: 9.3.07.001
 *
 */
 
@@ -76,7 +76,7 @@ global $wppa_defaults;
 	}
 
 	// Interprete encrypted wppa_set settings
-	wppa_decrypt_set();
+	if ( $wppa_action != 'getshortcodedrendered' && $wppa_action != 'getshortcodedrenderedfenodelay' ) wppa_decrypt_set();
 
 	switch ( $wppa_action ) {
 		case 'log':
@@ -703,7 +703,7 @@ global $wppa_defaults;
 			// Remove photo
 			if ( $pid ) {
 				if ( ! wp_verify_nonce( wppa_get( 'remp', '', 'text' ), 'wppa-remp' ) ) {
-					echo wp_json_encode( ['txt' => __( 'Security check failure', 'wp-photo-album-plus' )] );
+					echo wp_json_encode( ['txt' => __( 'Security check failure', 'wp-photo-album-plus' ) . ' (a1)'] );
 					wppa_exit();
 				}
 
@@ -717,7 +717,7 @@ global $wppa_defaults;
 			// Remove comment
 			elseif ( $cid ) {
 				if ( ! wp_verify_nonce( wppa_get( 'remc', '', 'text' ), 'wppa-remc' ) ) {
-					echo wp_json_encode( ['txt' => __( 'Security check failure', 'wp-photo-album-plus' )] );
+					echo wp_json_encode( ['txt' => __( 'Security check failure', 'wp-photo-album-plus' ) . ' (a2)'] );
 					wppa_exit();
 				}
 
@@ -1121,6 +1121,8 @@ global $wppa_defaults;
 		case 'getshortcodedrendered':
 
 			// Used by cover preview in album admin
+			global $wppa_no_inline_set;
+			$wppa_no_inline_set = true;;
 
 			// Are we legally here?
 			$from = wppa_get( 'from', '', 'text' );
@@ -1206,17 +1208,20 @@ global $wppa_defaults;
 
 		case 'getshortcodedrenderedfenodelay':
 
+			global $wppa_no_inline_set;
+			$wppa_no_inline_set = true;
+
 			// Used by delay feature
 			$nonce = wppa_get( 'nonce' );
 			if ( ! wp_verify_nonce( $nonce, 'wppa-check' ) ) {
-				echo wp_json_encode( ['html' => __('Security check failure', 'wp-photo-album-plus'), 'js' => ''] );
+				echo wp_json_encode( ['html' => __('Security check failure', 'wp-photo-album-plus') . ' (a3)', 'js' => ''] );
 				wppa_exit();
 			}
 
 			// Is it a valid shortcode?
 			$shortcode = wppa_get( 'shortcode' );
 			if ( $shortcode != '[wppa]' && substr( $shortcode, 0, 6 ) != '[wppa ' && substr( $shortcode, 0, 7 ) != '[photo ' ) {
-				echo wp_json_encode( ['html' => __('Security check failure', 'wp-photo-album-plus'), 'js' => ''] );
+				echo wp_json_encode( ['html' => __('Security check failure', 'wp-photo-album-plus') . ' (a4)', 'js' => ''] );
 				wppa_exit();
 			}
 
@@ -2584,6 +2589,8 @@ global $wppa_defaults;
 					if ( $err ) {
 						$txt = __( 'An error occurred while trying to process photo', 'wp-photo-album-plus' );
 						wppa_log('err', 'Imagic err on "convert ' . $path . ' ' . $quality . ' ' . $command . ' ' . $path . '"');
+						wppa_json_photo_update( $photo, $txt, $err);
+						wppa_exit();
 					}
 
 					// Housekeeping
@@ -2649,7 +2656,7 @@ global $wppa_defaults;
 					wppa_create_thumbnail( $photo, false );
 					$dbfields['magickstack'] = $newstack;
 					/* translators: command name, photo id */
-					$txt = sprintf( __( 'Command %1$s magically executed on photo %2$d', 'wp-photo-album-plus' ), wppa_html_tag( 'span', ['style' => 'color:blue;'], '<i>'.$command.'</i>'), $id );
+					$txt = sprintf( __( 'Command %1$s magically executed on photo %2$d', 'wp-photo-album-plus' ), wppa_html_tag( 'span', ['style' => 'color:blue;'], '<i>'.$command.'</i>'), $photo );
 					$jsfields = array_merge( $jsfields, ['thumbmod' => true, 'photomod' => true, 'magickmod' => true] );
 					break;
 
@@ -3400,7 +3407,7 @@ global $wppa_defaults;
 			$nonce  = wppa_get( 'nonce' );
 			if ( ! wp_verify_nonce( $nonce, 'wppa-nonce' ) ) {
 				wppa_log( 'Misc', 'nonce failed on ' . $wppa_action );
-				wppa_echo( '||1||'.__( 'Security check failure', 'wp-photo-album-plus' ) );
+				wppa_echo( '||1||'.__( 'Security check failure', 'wp-photo-album-plus' ) . ' (a5)' );
 				wppa_exit();
 			}
 
@@ -4373,7 +4380,7 @@ global $wppa_defaults;
 			// Check nonce
 			$nonce = wppa_get( 'import-upload-nonce', '', 'text' );
 			if ( ! wp_verify_nonce( $nonce, 'wppa-import-upload-nonce' ) ) {
-				wppa_echo( 0 . __( 'Security check failure', 'wp-photo-album-plus' ) );
+				wppa_echo( 0 . __( 'Security check failure', 'wp-photo-album-plus' ).' (a6)' );
 			}
 			else {
 				require_once 'wppa-import.php';

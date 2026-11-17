@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 9.3.06.002
+/* Version 9.3.07.001
 /* Various js routines used in admin pages
 */
 
@@ -575,11 +575,12 @@ function wppaAjaxUpdatePhoto( photo, actionslug, value, reload, bef, aft ) {
 	// Set it to the desired state
 	wppaFeAjaxLog('in');
 
-console.log('Data = '+'action=wppa&wppa-action=update-photo' +
+/* console.log('Data = '+'action=wppa&wppa-action=update-photo' +
 								'&photo-id=' + photo +
 								'&item=' + actionslug +
 								'&wppa-nonce=' + document.getElementById( 'photo-nonce-' + photo ).value +
 								'&value=' + wppaEncode( value ) );
+*/
 
 	// Open ajax object
 	jQuery.ajax( { 	url: 		wppaAdminAjaxUrl,
@@ -621,7 +622,7 @@ console.log('Data = '+'action=wppa&wppa-action=update-photo' +
 											break;
 
 										default:	// No or recoverable error
-// console.log(ArrValues[2]);
+
 											// Extract update felds
 											var updates = JSON.parse( ArrValues[2] );
 											var fieldName;

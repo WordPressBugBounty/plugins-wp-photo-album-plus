@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* version 9.3.06.002
+* version 9.3.07.001
 *
 */
 
@@ -1589,7 +1589,7 @@ function wppa_maintenance_update_status( $slug, $lastid, $togo ) {
 	}
 }
 
-function wppa_do_maintenance_popup( $slug ) {
+function wppa_do_maintenance_popup( $slug, $direct = false ) {
 global $wpdb;
 global $wppa_log_file;
 
@@ -1605,6 +1605,12 @@ global $wppa_log_file;
 
 	// Open nicescroller wrapper
 	$result .= '<div class="wppa-nicewrap" >';
+
+	// Check nonce
+	if ( ! $direct && ! wp_verify_nonce( wppa_get( 'nonce' ), 'wppa-nonce' ) ) {
+		$result .= __('Security check failure', 'wp-photo-album-plus') . ' (m1)' . '</div></div>';
+		return $header . '|' . $result;
+	}
 
 	switch ( $slug ) {
 
@@ -2023,14 +2029,14 @@ function wppa_log_page() {
 				type="button" >
 		</h1><br>' .
 
-		wp_nonce_field('wppa-nonce', 'wppa-nonce') . '
+//		wp_nonce_field('wppa-nonce', 'wppa-nonce') .
 
-		&nbsp;' .
+		'&nbsp;' .
 			wppa_html_tag( 'img', ['id' => "wppa-spinner", 'src' => wppa_get_imgdir( 'spinner.gif' ), 'style' => "display:none;",
 								   'class' => 'nolazy', 'onload' => "setInterval(function(){wppaAjaxReplaceLog();}, 10000)"] ) . '
 		<div id="wppa-logbody" >' .
 
-			ltrim( wppa_do_maintenance_popup( 'wppa_list_errorlog' ), '| ' ) .
+			ltrim( wppa_do_maintenance_popup( 'wppa_list_errorlog', true ), '| ' ) .
 
 		'</div>
 	</div>' );

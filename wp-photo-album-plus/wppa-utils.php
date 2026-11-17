@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version: 9.3.06.003
+* Version: 9.3.07.001
 *
 */
 
@@ -5283,7 +5283,9 @@ function _wppa_get_nesting_level( $id ) {
 
 // Can we do magick?
 function wppa_can_magick() {
-	return ( wppa_opt( 'image_magick' ) && wppa_opt( 'image_magick' ) != 'none' );
+	$opt = get_option( 'wppa_image_magick', 'none' );
+	$result = $opt != 'none' && is_dir( $opt ) && realpath( $opt );
+	return ( $result );
 }
 
 // Get my first granted album
