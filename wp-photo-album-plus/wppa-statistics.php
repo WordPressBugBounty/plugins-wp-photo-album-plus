@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version: 9.3.07.002
+* Version: 9.3.07.003
 *
 */
 
@@ -653,7 +653,7 @@ static $login;
 		$photos = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM $wpdb->wppa_photos WHERE album = %s", $id ) );
 		foreach( $photos as $p ) {
 
-			if ( wppa_is_photo_visible( $p ) ) {
+			if ( wppa_is_photo_visible( $p, false ) ) {
 				return true; 	// Found at least one
 			}
 		}
@@ -720,7 +720,7 @@ static $cache;
 }
 
 // Find out if a given photo is visible for the current user
-function wppa_is_photo_visible( $id ) {
+function wppa_is_photo_visible( $id, $check_album = true ) {
 static $user;
 static $admin;
 static $login;
@@ -766,7 +766,7 @@ static $login;
 	if ( $owner == $user ) return true;
 
 	// Album visible?
-	if ( ! wppa_is_album_visible( wppa_get_photo_item( $id, 'album' ) ) ) return false;
+	if ( $check_album && ! wppa_is_album_visible( wppa_get_photo_item( $id, 'album' ) ) ) return false;
 
 	// Dispatch on photo status
 	switch( $status ) {
